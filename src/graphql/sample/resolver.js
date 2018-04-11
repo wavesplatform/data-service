@@ -11,4 +11,4 @@ const resolvers = {
   },
 };
 
-module.exports = resolvers;
+exports.resolver = resolvers;

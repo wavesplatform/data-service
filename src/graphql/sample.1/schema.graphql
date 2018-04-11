@@ -1,0 +1,7 @@
+type SampleResult2 {
+  result: String!
+}
+
+extend type Query {
+  sample2: SampleResult2!
+}
