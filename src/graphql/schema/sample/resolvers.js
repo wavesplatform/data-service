@@ -2,7 +2,7 @@ const resolvers = {
   SampleResult: {
     result: (...args) => {
       console.log(args);
-      Promise.resolve('Sample deep resolve result');
+      return Promise.resolve('Sample deep resolve result');
     },
   },
   Query: {
