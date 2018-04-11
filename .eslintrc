@@ -1,0 +1,30 @@
+{
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "es6": true
+  },
+  "extends": ["eslint:recommended"],
+  "parserOptions": {
+    "ecmaVersion": 2017,
+    "ecmaFeatures": {
+      "experimentalObjectRestSpread": true
+    },
+    "sourceType": "module"
+  },
+  "rules": {
+    "arrow-parens": 0,
+    "linebreak-style": ["error", "unix"],
+    "quotes": "off",
+    "indent": ["error", 2, { "SwitchCase": 1 }],
+    "no-irregular-whitespace": "warn",
+    "no-multiple-empty-lines": "off",
+    "no-constant-condition": ["error", { "checkLoops": false }]
+  },
+  "globals": {
+    "__dirname": false,
+    "__filename": false,
+    "process": false,
+    "NODE_ENV": false
+  }
+}

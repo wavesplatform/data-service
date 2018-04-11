@@ -1,0 +1,16 @@
+.idea/
+.vscode/
+.history/
+node_modules/
+.DS_Store/
+dist/
+bld/
+
+logs/
+
+*.env
+config.yml
+
+npm-debug.log
+yarn-error.log
+prepros.cfg
