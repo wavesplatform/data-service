@@ -16,7 +16,7 @@ const assetsResolver = async (options = {}) => {
   // Get result from API
   let result;
   try {
-    result = await api.getAssets(ids);
+    result = { assets: await api.assets(ids) };
   } catch (e) {
     throw AssetsResolverError(`Error from api: ${e.message}`);
   }
