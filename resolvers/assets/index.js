@@ -6,7 +6,7 @@ const { inputSchema, outputSchema } = require('./schema');
 
 const AssetsResolverError = message => new ResolverError('assets', message);
 
-const assets = async (options = {}) => {
+const assetsResolver = async (options = {}) => {
   // Validate input
   const validOptions = ajv.validate(inputSchema, options);
   if (!validOptions)
@@ -28,4 +28,4 @@ const assets = async (options = {}) => {
   return Promise.resolve(result);
 };
 
-module.exports = assets;
+module.exports = assetsResolver;
