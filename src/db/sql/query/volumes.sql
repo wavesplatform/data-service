@@ -9,8 +9,8 @@ FROM (
   FROM
     txs_7
   WHERE (amount_asset, price_asset)
-  IN $1:raw --first of pair
-  AND txs_7.time_stamp > (now() - interval '1 day') -- last 24hours
+  IN $1:raw
+  AND txs_7.time_stamp > (now() - interval '1 day')
 GROUP BY
   amount_asset,
   price_asset) AS sum_amt
