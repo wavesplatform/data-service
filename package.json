@@ -8,5 +8,10 @@
   "license": "MIT",
   "devDependencies": {
     "eslint": "^4.19.1"
+  },
+  "dependencies": {
+    "pg-promise": "^8.2.3",
+    "ramda": "^0.25.0",
+    "yamljs": "^0.3.0"
   }
 }
