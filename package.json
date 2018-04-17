@@ -6,7 +6,19 @@
   "repository": "git@github.com:wavesplatform/data-service.git",
   "author": "Dmitry Shuranov <dvshur@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest"
+  },
   "devDependencies": {
     "eslint": "^4.19.1"
+  },
+  "dependencies": {
+    "ajv": "^6.4.0",
+    "chalk": "^2.3.2",
+    "jest": "^22.4.3",
+    "koa": "^2.5.0",
+    "koa-router": "^7.4.0",
+    "ramda": "^0.25.0"
   }
 }
