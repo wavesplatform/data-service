@@ -14,12 +14,12 @@ const assetsResolver = async (options = {}) => {
   const { ids, api } = options;
 
   // Get result from API
-  let result;
-  try {
-    result = await api.getAssets(ids);
-  } catch (e) {
-    throw AssetsResolverError(`Error from api: ${e.message}`);
-  }
+  let result = await api
+    .assets(ids)
+    .then(assets => ({ assets }))
+    .catch(e => {
+      throw AssetsResolverError(`Error from api: ${e.message}`);
+    });
 
   // Validate output
   const validResult = ajv.validate(outputSchema, result);
