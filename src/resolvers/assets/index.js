@@ -22,24 +22,17 @@ const validateResult = result =>
         AssetsResolverError(`Wrong result shape: ${JSON.stringify(result)}`)
       );
 
-const getResults = async ({ ids, api }) => {
-  let result;
-  try {
-    result = await api.assets(ids);
-    return Either.Right(result);
-  } catch (e) {
-    return Either.Left(AssetsResolverError(`Error from api: ${e.message}`));
-  }
+const getResults = ({ ids, api }) => {
+  return api.assets(ids);
 };
 const logger = label => a => {
   console.log(label, a);
   return a;
 };
-const assetsResolver = async (options = {}) =>
-  validateInput(options)
-    .map(logger(1))
-    .map(getResults)
-    .map(logger(2))
-    .map(p => p.then(e => e.map(logger(3)).map(validateResult)));
+const assetsResolver = (options = {}) =>
+  Either.Right(options)
+    .chain(validateInput)
+    .chain(getResults);
+// .chain(validateResult);
 
 module.exports = assetsResolver;

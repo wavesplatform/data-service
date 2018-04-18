@@ -4,11 +4,18 @@ const universalProxy = new Proxy(
   { toString: () => 'str', valueOf: () => 1 },
   { get: (obj, prop) => (prop in obj ? obj[prop] : universalProxy) }
 );
-const { Either } = require('monet');
+// const { Either } = require('monet');
+
+const { createDbAdapter } = require('../../db');
+const { dbFail, dbSuccess } = require('../../db/mocks/db');
+
 const apiMockImplementation = require('../../mocks/api');
+
 const apiMock = {
-  assets: jest.fn(apiMockImplementation.assets),
+  assets: jest.fn(createDbAdapter(dbSuccess).assets),
 };
+
+// assets(['q', 'w']) :: [{ id: 'q' }, { id: 'w' }]
 
 describe('Assets resolver', () => {
   beforeEach(() => apiMock.assets.mockClear());
@@ -53,13 +60,18 @@ describe('Assets resolver', () => {
     expect(result.right()).toBeDefined();
     expect(() => result.left()).toThrow();
   });
-  it.only('calling api.getAssets with ids', async () => {
+
+  it.only('calling api.getAssets with ids', done => {
     const ids = ['1', '2', '3'];
-    const result = await getAssets({ ids, api: apiMock });
-    expect(apiMock.assets).toBeCalledWith(ids);
-    console.log(result.right());
-    expect(result.right()).toEqual({ assets: ids.map(id => ({ id })) });
+    const exp = ids.map(id => ({ id: 1 }));
+    const task = getAssets({ ids, api: apiMock }); // Task
+    
+    const result = await task.run().promise()
+    // expect(apiMock.assets).toBeCalledWith(ids);
+    // console.log(result.right());
+    // expect(result.right()).toEqual({ assets: ids.map(id => ({ id })) });
   });
+
   xit('throwing ResolverError if api throws', async () => {
     const api = {
       getAssets: jest.fn(() => {
