@@ -1,4 +1,4 @@
-const chalk = require('chalk');
+// const chalk = require('chalk');
 function setStack(self) {
   if (Error.captureStackTrace) {
     Error.captureStackTrace(self, self.constructor);
@@ -6,12 +6,8 @@ function setStack(self) {
     self.stack = new Error().stack;
   }
 }
-function setTS(self) {
-  self.ts = new Date();
-  self.ts.toString = self.ts.toLocaleString;
-}
+
 function config(self) {
-  setTS(self);
   setStack(self);
 }
 
@@ -20,10 +16,8 @@ class CustomError extends Error {
     super(...args);
     config(this);
 
-    this.name = chalk.red('Custom error');
-    this.message = `
-    ${this.ts} | ${chalk.yellow(message)}
-    `;
+    this.name = 'Custom error';
+    this.message = message;
   }
 }
 class ResolverError extends Error {
@@ -31,10 +25,8 @@ class ResolverError extends Error {
     super(...rest);
     config(this);
 
-    this.name = chalk.red('Resolver error');
-    this.message = `
-    ${this.ts} | ${chalk.yellow(resolverName)} | ${JSON.stringify(args)}
-    `;
+    this.name = 'Resolver error';
+    this.message = `${resolverName} | ${JSON.stringify(args)}`;
   }
 }
 
@@ -43,10 +35,8 @@ class RouterError extends Error {
     super(...args);
     config(this);
 
-    this.name = chalk.red('Router error');
-    this.message = `
-    ${this.ts} | Requested: ${chalk.yellow(ctx.url)}
-    `;
+    this.name = 'Router error';
+    this.message = `Requested: ${ctx.url}`;
   }
 }
 module.exports = { CustomError, RouterError, ResolverError };

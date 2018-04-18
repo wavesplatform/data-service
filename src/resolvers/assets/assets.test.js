@@ -1,15 +1,15 @@
 const getAssets = require('./');
 const { ResolverError } = require('../../utils/error');
 const universalProxy = new Proxy(
-  {},
-  { get: () => universalProxy, toString: () => '', valueOf: () => 1 }
+  { toString: () => 'str', valueOf: () => 1 },
+  { get: (obj, prop) => (prop in obj ? obj[prop] : universalProxy) }
 );
+universalProxy.toString = () => 'str2';
+universalProxy.valueOf = () => 2;
 const apiMockImplementation = require('../../mocks/api');
 const apiMock = {
   getAssets: jest.fn(apiMockImplementation.getAssets),
 };
-
-module.exports.apiMock = apiMock;
 
 describe('Assets resolver', () => {
   beforeEach(() => apiMock.getAssets.mockClear());
