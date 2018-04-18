@@ -11,4 +11,5 @@ const formatPairs = R.pipe(
 
 module.exports = {
   formatPairs,
+  batchQuery: require('./batchQuery'),
 };
