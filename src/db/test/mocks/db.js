@@ -7,7 +7,8 @@ const dbSuccess = {
 };
 
 const dbFail = {
-  many: () => promiseReject('Rand val', 100),
+  many: () =>
+    promiseReject(new Error('ECONNREFUSED: Unable to connect to db'), 100),
 };
 
 module.exports = {
