@@ -4,51 +4,63 @@ const universalProxy = new Proxy(
   { toString: () => 'str', valueOf: () => 1 },
   { get: (obj, prop) => (prop in obj ? obj[prop] : universalProxy) }
 );
-universalProxy.toString = () => 'str2';
-universalProxy.valueOf = () => 2;
+const { Either } = require('monet');
 const apiMockImplementation = require('../../mocks/api');
 const apiMock = {
-  getAssets: jest.fn(apiMockImplementation.getAssets),
+  assets: jest.fn(apiMockImplementation.assets),
 };
 
 describe('Assets resolver', () => {
-  beforeEach(() => apiMock.getAssets.mockClear());
+  beforeEach(() => apiMock.assets.mockClear());
   it('is function', () => {
     expect(typeof getAssets).toBe('function');
   });
-  it('throws, if called without arguments', async () => {
-    await expect(getAssets()).rejects.toBeInstanceOf(ResolverError);
+
+  it('returns Left, if called without arguments', async () => {
+    const result = await getAssets();
+    expect(result.left()).toBeInstanceOf(ResolverError);
+    expect(() => result.right()).toThrow();
   });
-  it('throws, if called with anything without ids, api properties on itself', async () => {
-    await expect(getAssets({ api: universalProxy })).rejects.toBeInstanceOf(
-      ResolverError
-    );
-    await expect(getAssets({ ids: universalProxy })).rejects.toBeInstanceOf(
-      ResolverError
-    );
-    await expect(getAssets(String(1))).rejects.toBeInstanceOf(ResolverError);
-    await expect(getAssets(Number(1))).rejects.toBeInstanceOf(ResolverError);
-    await expect(getAssets(Boolean(1))).rejects.toBeInstanceOf(ResolverError);
+  it('returns Left, if called with anything without ids, api properties on itself', async () => {
+    let result;
+
+    result = await getAssets({ api: universalProxy });
+    expect(result.left()).toBeInstanceOf(ResolverError);
+
+    result = await getAssets({ ids: universalProxy });
+    expect(result.left()).toBeInstanceOf(ResolverError);
+
+    result = await getAssets(String(1));
+    expect(result.left()).toBeInstanceOf(ResolverError);
+
+    result = await getAssets(Number(1));
+    expect(result.left()).toBeInstanceOf(ResolverError);
+
+    result = await getAssets(Boolean(1));
+    expect(result.left()).toBeInstanceOf(ResolverError);
   });
-  it('throw, if called with {ids: not string[], api: {}}', async () => {
-    await expect(getAssets({ ids: [1], api: {} })).rejects.toBeInstanceOf(
-      ResolverError
-    );
-    await expect(getAssets({ ids: [{}], api: {} })).rejects.toBeInstanceOf(
-      ResolverError
-    );
+  it('returns Left, if called with wrong-schemed object', async () => {
+    let result;
+
+    result = await getAssets({ ids: [1], api: {} });
+    expect(result.left()).toBeInstanceOf(ResolverError);
+
+    result = await getAssets({ ids: [{}], api: {} });
+    expect(result.left()).toBeInstanceOf(ResolverError);
   });
-  it('not throw, if called with {ids: string[], api: {getAssets}}', async () => {
-    await expect(
-      getAssets({ ids: ['1'], api: apiMock })
-    ).resolves.toBeDefined();
+  it('returns Right, if called with {ids: string[], api: {getAssets}}', async () => {
+    let result = await getAssets({ ids: ['1'], api: apiMock });
+    expect(result.right()).toBeDefined();
+    expect(() => result.left()).toThrow();
   });
-  it('calling api.getAssets with ids', async () => {
+  it.only('calling api.getAssets with ids', async () => {
     const ids = ['1', '2', '3'];
-    await getAssets({ ids, api: apiMock });
-    expect(apiMock.getAssets).toBeCalledWith(ids);
+    const result = await getAssets({ ids, api: apiMock });
+    expect(apiMock.assets).toBeCalledWith(ids);
+    console.log(result.right());
+    expect(result.right()).toEqual({ assets: ids.map(id => ({ id })) });
   });
-  it('throwing ResolverError if api throws', async () => {
+  xit('throwing ResolverError if api throws', async () => {
     const api = {
       getAssets: jest.fn(() => {
         throw new Error('something wrong');

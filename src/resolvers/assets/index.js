@@ -4,28 +4,42 @@ var Ajv = require('ajv');
 var ajv = new Ajv({ allErrors: true });
 const { inputSchema, outputSchema } = require('./schema');
 
+const { Either } = require('monet');
+
 const AssetsResolverError = message => new ResolverError('assets', message);
 
-const assetsResolver = async (options = {}) => {
-  // Validate input
-  const validOptions = ajv.validate(inputSchema, options);
-  if (!validOptions)
-    throw AssetsResolverError(`Wrong arguments: ${JSON.stringify(options)}`);
-  const { ids, api } = options;
+const validateInput = options =>
+  ajv.validate(inputSchema, options)
+    ? Either.Right(options)
+    : Either.Left(
+        AssetsResolverError(`Wrong arguments: ${JSON.stringify(options)}`)
+      );
 
-  // Get result from API
-  let result = await api
-    .assets(ids)
-    .then(assets => ({ assets }))
-    .catch(e => {
-      throw AssetsResolverError(`Error from api: ${e.message}`);
-    });
+const validateResult = result =>
+  ajv.validate(outputSchema, result)
+    ? Either.Right(result)
+    : Either.Left(
+        AssetsResolverError(`Wrong result shape: ${JSON.stringify(result)}`)
+      );
 
-  // Validate output
-  const validResult = ajv.validate(outputSchema, result);
-  if (!validResult)
-    throw AssetsResolverError(`Wrong result shape: ${JSON.stringify(result)}`);
-  return Promise.resolve(result);
+const getResults = async ({ ids, api }) => {
+  let result;
+  try {
+    result = await api.assets(ids);
+    return Either.Right(result);
+  } catch (e) {
+    return Either.Left(AssetsResolverError(`Error from api: ${e.message}`));
+  }
 };
+const logger = label => a => {
+  console.log(label, a);
+  return a;
+};
+const assetsResolver = async (options = {}) =>
+  validateInput(options)
+    .map(logger(1))
+    .map(getResults)
+    .map(logger(2))
+    .map(p => p.then(e => e.map(logger(3)).map(validateResult)));
 
 module.exports = assetsResolver;
