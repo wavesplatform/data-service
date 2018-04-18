@@ -1,7 +1,3 @@
-SELECT
-  *
-FROM
-  txs_3
-WHERE
-  id IN ($1:csv);
+SELECT * FROM assets
+WHERE id IN ($1:csv);
 
