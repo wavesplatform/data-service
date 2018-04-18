@@ -6,4 +6,4 @@ const batchQuery = (matchFn, requests, results) => {
   return map(findRes, requests);
 };
 
-module.exports = batchQuery;
+module.exports = curry(batchQuery);

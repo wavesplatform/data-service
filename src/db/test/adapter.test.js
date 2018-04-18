@@ -1,6 +1,6 @@
-const createDbAdapter = require('./');
+const createDbAdapter = require('../adapter');
 
-const { dbSuccess, dbFail, transformFn } = require('../mocks/db');
+const { dbSuccess, dbFail, transformFn } = require('./mocks/db');
 
 // spec
 describe('Db adapter should return a Task than', () => {

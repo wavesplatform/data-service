@@ -1,4 +1,4 @@
-const { promiseResolve, promiseReject } = require('../../utils/test/');
+const { promiseResolve, promiseReject } = require('../../../utils/test');
 
 const transformFn = xs => xs.map(x => ({ id: x }));
 

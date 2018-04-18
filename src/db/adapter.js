@@ -2,7 +2,7 @@
 
 const { task } = require('folktale/concurrency/task');
 
-const sql = require('../sql');
+const sql = require('./sql');
 
 const taskify = (promiseFactory, errorTransform) =>
   task(resolver =>
