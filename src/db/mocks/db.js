@@ -2,7 +2,7 @@ const { promiseResolve, promiseReject } = require('../../utils/test/');
 
 const dbSuccess = {
   many: (_, assetIdArr) =>
-    promiseResolve(assetIdArr.map(x => ({ id: x })), 100),
+    promiseResolve(assetIdArr[0].map(x => ({ id: x })), 100),
 };
 
 const dbFail = {
