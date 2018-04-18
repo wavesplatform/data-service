@@ -5,9 +5,11 @@ const { task } = require('folktale/concurrency/task');
 const sql = require('../sql');
 
 const taskify = (promiseFactory, errorTransform) =>
-  task(resolver => promiseFactory().then(x => resolver.resolve(x))).mapRejected(
-    errorTransform
-  );
+  task(resolver =>
+    promiseFactory()
+      .then(resolver.resolve)
+      .catch(resolver.reject)
+  ).mapRejected(errorTransform);
 
 const createDbAdapter = db => {
   return {
