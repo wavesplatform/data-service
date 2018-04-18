@@ -1,9 +1,9 @@
 const { promiseResolve, promiseReject } = require('../../utils/test/');
 
-const transformFn = x => ({ id: x });
+const transformFn = xs => xs.map(x => ({ id: x }));
 
 const dbSuccess = {
-  many: (_, assetIdArr) => promiseResolve(assetIdArr[0].map(transformFn), 100),
+  many: (_, assetIdArr) => promiseResolve(transformFn(assetIdArr[0]), 100),
 };
 
 const dbFail = {
