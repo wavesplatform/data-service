@@ -16,10 +16,10 @@
   "dependencies": {
     "ajv": "^6.4.0",
     "chalk": "^2.3.2",
+    "folktale": "^2.1.0",
     "jest": "^22.4.3",
     "koa": "^2.5.0",
     "koa-router": "^7.4.0",
-    "ramda": "^0.25.0",
     "pg-promise": "^8.2.3",
     "ramda": "^0.25.0",
     "yamljs": "^0.3.0"
