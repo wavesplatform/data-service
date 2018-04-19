@@ -1,15 +1,12 @@
 const pgt = require('../driver');
 
-const driverConnectMock = () => ({
-  many: a => Promise.resolve(a),
-  none: () => Promise.resolve(),
-});
+const { driverConnectMock } = require('./mocks');
 
 test('pgt works', done => {
   const taskedDbDriver = pgt({}, driverConnectMock);
 
   taskedDbDriver
-    .many([1, 2, 3])
+    .many('some sql', [1, 2, 3])
     .run()
     .listen({
       onResolved: xs => {
@@ -18,3 +15,5 @@ test('pgt works', done => {
       },
     });
 });
+
+module.exports = { driverConnectMock };
