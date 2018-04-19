@@ -8,7 +8,7 @@ const inputSchema = {
         type: 'string',
       },
     },
-    api: { type: 'object', properties: { getAssets: { typeof: 'function' } } },
+    api: { type: 'object', properties: { assets: { typeof: 'function' } } },
   },
 };
 

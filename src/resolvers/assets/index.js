@@ -23,8 +23,8 @@ const validateResult = result =>
       );
 
 const getResults = optionsOrError => {
-  const { value, isRight } = optionsOrError;
-  if (!isRight) return Task.rejected(optionsOrError);
+  const { value, isRightValue } = optionsOrError;
+  if (!isRightValue) return Task.rejected(value);
   const { api, ids } = value;
   return api.assets(ids);
 };
