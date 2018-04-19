@@ -1,4 +1,4 @@
-const db = require('../../db/index.mock')();
+const db = require('../../db/index.mock');
 const createAssetsResolver = require('./createResolver');
 
 const { Either } = require('monet');
