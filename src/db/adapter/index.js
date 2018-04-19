@@ -1,3 +1,5 @@
+const { propEq } = require('ramda');
+
 // db init
 const convertDbToTasked = require('./convertDbToTasked');
 
@@ -16,13 +18,8 @@ const createDbAdapter = db => {
     assets: assetIdArr =>
       taskDb
         .many(sql.assets, [assetIdArr])
-        .map(batchQuery((reqId, { id }) => reqId === id, assetIdArr))
+        .map(batchQuery(propEq('asset_id'), assetIdArr))
         .mapRejected(toDbError({ request: 'assets' })),
-    // compose(
-    // batchQuery((reqId, { id }) => reqId === id, assetIdArr),
-    // a => { console.log(a); return a},
-    // bind(db.many)
-    // )(sql.assets, [assetIdArr]),
     // volumes: pairs => db.many(sql.volumes, formatPairs(pairs)),
   };
 };
