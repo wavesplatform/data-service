@@ -1,22 +1,4 @@
-const { of, rejected } = require('folktale/concurrency/task');
-const createAdapter = require('../adapter');
-
-const goodResponseDriver = {
-  many: (_, a) => of(a),
-};
-const badResponseDriver = {
-  many: (_, a) => rejected(a),
-};
-
-const createMockAdapter = driver =>
-  createAdapter({
-    taskedDbDriver: driver,
-    batchQueryFn: () => x => x,
-    errorFactory: () => x => x,
-  });
-
-const goodAdapter = createMockAdapter(goodResponseDriver);
-const badAdapter = createMockAdapter(badResponseDriver);
+const { goodAdapter, badAdapter } = require('./mocks/');
 
 test('Adapter returns resolving task ', done => {
   goodAdapter

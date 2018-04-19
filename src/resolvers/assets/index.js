@@ -25,14 +25,12 @@ const validateResult = result =>
 const getResults = ({ ids, api }) => {
   return api.assets(ids);
 };
-const logger = label => a => {
-  console.log(label, a);
-  return a;
-};
+// assetsResolver :: Options {} -> Task
 const assetsResolver = (options = {}) =>
   Either.Right(options)
-    .chain(validateInput)
-    .chain(getResults);
+    .chain(validateInput) // Either
+    .chain(getResults); // Task
+
 // .chain(validateResult);
 
 module.exports = assetsResolver;

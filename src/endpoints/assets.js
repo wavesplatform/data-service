@@ -7,5 +7,9 @@ module.exports = async ctx => {
     level: 'info',
     message: 'Assets endpoint hit',
   });
-  ctx.body = await assetsResolver({ ids, api: ctx.state.db });
+  let error, task, res;
+  res = assetsResolver({ ids, api: ctx.state.db });
+  console.log(res);
+  res.cata(e => (error = e), t => (task = t));
+  ctx.body = task ? await task.run().promise() : error;
 };
