@@ -10,7 +10,6 @@ test('Resolver works', done => {
     ids,
     api: db,
   });
-
   result.run().listen({
     onResolved: data => {
       expect(data).toEqual([ids]);

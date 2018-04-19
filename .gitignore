@@ -14,3 +14,4 @@ config.yml
 npm-debug.log
 yarn-error.log
 prepros.cfg
+*.log

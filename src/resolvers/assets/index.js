@@ -3,7 +3,7 @@ const { ResolverError } = require('../../utils/error');
 var Ajv = require('ajv');
 var ajv = new Ajv({ allErrors: true });
 const { inputSchema, outputSchema } = require('./schema');
-
+const Task = require('folktale/concurrency/task');
 const { Either } = require('monet');
 
 const AssetsResolverError = message => new ResolverError('assets', message);
@@ -22,14 +22,20 @@ const validateResult = result =>
         AssetsResolverError(`Wrong result shape: ${JSON.stringify(result)}`)
       );
 
-const getResults = ({ ids, api }) => {
+const getResults = optionsOrError => {
+  const { value, isRight } = optionsOrError;
+  if (!isRight) return Task.rejected(optionsOrError);
+  const { api, ids } = value;
   return api.assets(ids);
 };
+
 // assetsResolver :: Options {} -> Task
 const assetsResolver = (options = {}) =>
-  Either.Right(options)
-    .chain(validateInput) // Either
-    .chain(getResults); // Task
+  Task.of(options)
+
+    .map(validateInput) // Task -> Either
+
+    .chain(getResults); // Either -> Task
 
 // .chain(validateResult);
 
