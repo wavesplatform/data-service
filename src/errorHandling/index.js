@@ -1,1 +1,3 @@
-module.exports = { ...require('./AppError'), ...require('./factories') };
+const AppError = require('./AppError');
+
+module.exports = { AppError, ...require('./factories') };
