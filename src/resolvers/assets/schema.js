@@ -1,6 +1,6 @@
 const inputSchema = {
   type: 'object',
-  required: ['ids', 'api'],
+  required: ['ids', 'db'],
   properties: {
     ids: {
       type: 'array',
@@ -8,7 +8,7 @@ const inputSchema = {
         type: 'string',
       },
     },
-    api: { type: 'object', properties: { getAssets: { typeof: 'function' } } },
+    db: { type: 'object', properties: { assets: { typeof: 'function' } } },
   },
 };
 

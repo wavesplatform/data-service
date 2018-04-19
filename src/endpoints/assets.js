@@ -7,5 +7,16 @@ module.exports = async ctx => {
     level: 'info',
     message: 'Assets endpoint hit',
   });
-  ctx.body = await assetsResolver({ ids, api: ctx.state.db });
+  try {
+    const res = await assetsResolver({ ids, db: ctx.db });
+    ctx.logger.log({
+      level: 'info',
+      message: res,
+    });
+  } catch (e) {
+    ctx.logger.log({
+      level: 'error',
+      message: JSON.stringify(e),
+    });
+  }
 };
