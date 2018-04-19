@@ -1,3 +1,16 @@
-const { compose } = require('ramda');
+const createTaskedDriver = require('./driver');
+const createAdapter = require('./adapter');
 
-module.exports = compose(require('./adapter'), require('./connect'));
+// adapter dependencies
+const { toDbError } = require('../errorHandling');
+const { batchQuery } = require('./utils');
+
+module.exports = options => {
+  const taskedDbDriver = createTaskedDriver(options);
+  const adapter = createAdapter({
+    taskedDbDriver,
+    errorFactory: toDbError,
+    batchQueryFn: batchQuery,
+  });
+  return adapter;
+};

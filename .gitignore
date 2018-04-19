@@ -7,7 +7,6 @@ dist/
 bld/
 
 logs/
-__test.js
 
 *.env
 config.yml
