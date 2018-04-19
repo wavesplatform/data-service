@@ -1,3 +1,3 @@
 SELECT * FROM assets
-WHERE id IN ($1:csv);
+WHERE asset_id IN ($1:csv);
 

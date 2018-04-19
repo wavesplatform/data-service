@@ -1,2 +1,3 @@
-module.exports.connect = require('./connect');
-module.exports.createDbAdapter = require('./adapter');
+const { compose } = require('ramda');
+
+module.exports = compose(require('./adapter'), require('./connect'));
