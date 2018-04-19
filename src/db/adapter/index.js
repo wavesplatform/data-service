@@ -1,6 +1,3 @@
-// db init
-const convertDbToTasked = require('./convertDbToTasked');
-
 // query and formatting
 const sql = require('../sql');
 const { formatPairs, batchQuery } = require('../utils');
@@ -9,14 +6,12 @@ const { formatPairs, batchQuery } = require('../utils');
 const { toDbError } = require('../../errorHandling');
 
 // db adapter factory
-const createDbAdapter = db => {
-  const taskDb = convertDbToTasked(db);
-
+const createDbAdapter = taskedDBDriver => {
   return {
     assets: assetIdArr =>
-      taskDb
+      taskedDBDriver
         .many(sql.assets, [assetIdArr])
-        .map(batchQuery((reqId, { id }) => reqId === id, assetIdArr))
+        // .map(batchQuery((reqId, { id }) => reqId === id, assetIdArr))
         .mapRejected(toDbError({ request: 'assets' })),
     // compose(
     // batchQuery((reqId, { id }) => reqId === id, assetIdArr),

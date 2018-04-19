@@ -5,34 +5,44 @@ var ajv = new Ajv({ allErrors: true });
 const { inputSchema, outputSchema } = require('./schema');
 
 const { Either } = require('monet');
+const {
+  of: taskOf,
+  rejected: taskRejected,
+} = require('folktale/concurrency/task');
 
-const AssetsResolverError = message => new ResolverError('assets', message);
+const createError = type => message => {
+  let error = new Error(message);
+  error.type = type;
+  return error;
+};
+const ValidationError = createError('Validation');
+const validate = (schema, what) => error =>
+  ajv.validate(inputSchema, what) ? Either.Right(what) : Either.Left(error);
 
 const validateInput = options =>
-  ajv.validate(inputSchema, options)
-    ? Either.Right(options)
-    : Either.Left(
-        AssetsResolverError(`Wrong arguments: ${JSON.stringify(options)}`)
-      );
+  validate(inputSchema, options)(
+    ValidationError(`Wrong arguments: ${JSON.stringify(options)}`)
+  );
 
-const validateResult = result =>
-  ajv.validate(outputSchema, result)
-    ? Either.Right(result)
-    : Either.Left(
-        AssetsResolverError(`Wrong result shape: ${JSON.stringify(result)}`)
-      );
-
-const getResults = ({ ids, api }) => {
-  return api.assets(ids);
+// const validateResult = result =>
+//   validate(outputSchema, result)(
+//     ValidationError(`Wrong result shape: ${JSON.stringify(result)}`)
+//   );
+const getResults = ({ ids, db }) => {
+  const res = db.assets(ids);
+  return res.run().promise();
 };
 const logger = label => a => {
   console.log(label, a);
   return a;
 };
+
+// assetsResolver :: { ids: string[], api } -> Task(Error, Asset[])
 const assetsResolver = (options = {}) =>
   Either.Right(options)
     .chain(validateInput)
     .chain(getResults);
+// .cata(taskRejected, taskOf);
 // .chain(validateResult);
 
 module.exports = assetsResolver;
