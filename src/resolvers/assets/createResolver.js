@@ -3,7 +3,7 @@ const Task = require('folktale/concurrency/task');
 const eitherToTask = require('../../utils/eitherToTask');
 const { compose, chain, map } = require('ramda');
 
-// query :: Options -> Task(Asset[], AppError.Db)
+// query :: Options -> Task Asset[] AppError.Db
 const query = ({ api, ids }) => api.assets(ids);
 
 // chainET :: (a -> Either b c) -> Task a d -> Task b c
