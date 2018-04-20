@@ -1,4 +1,4 @@
-const assetsResolver = require('../resolvers/assets');
+const createAssetsResolver = require('../resolvers/assets');
 const { getIdsFromCtx } = require('../utils/getters');
 
 module.exports = async (ctx, next) => {
@@ -7,8 +7,9 @@ module.exports = async (ctx, next) => {
     level: 'info',
     message: 'Assets endpoint hit',
   });
-  const task = assetsResolver({ ids, api: ctx.state.db, logger: ctx.logger });
-  await task
+  const resolver = createAssetsResolver({ db: ctx.state.db });
+
+  await resolver(ids)
     .run()
     .promise()
     .then(assets => {
@@ -25,5 +26,6 @@ module.exports = async (ctx, next) => {
       });
       ctx.body = err;
     });
+
   await next();
 };

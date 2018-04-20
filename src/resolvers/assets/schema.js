@@ -1,26 +1,15 @@
 const inputSchema = {
-  type: 'object',
-  required: ['ids', 'api'],
-  properties: {
-    ids: {
-      type: 'array',
-      items: {
-        type: 'string',
-      },
-    },
-    api: { type: 'object', properties: { assets: { typeof: 'function' } } },
+  type: 'array',
+  items: {
+    type: 'string',
   },
 };
 
 const outputSchema = {
-  type: 'object',
-  required: ['assets'],
-  properties: {
-    assets: {
-      type: 'array',
-      items: {
-        type: 'object',
-      },
+  assets: {
+    type: 'array',
+    items: {
+      type: 'object',
     },
   },
 };
