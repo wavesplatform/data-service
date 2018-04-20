@@ -1,4 +1,6 @@
 const Koa = require('koa');
+const chalk = require('chalk');
+
 const loadConfig = require('./loadConfig');
 const router = require('./endpoints/');
 const injectDb = require('./middleware/injectDb');
@@ -27,4 +29,5 @@ app
   .use(router.routes())
   .listen(PORT);
 
-console.log(`App has started on http://localhost:${PORT}/`);
+// eslint-disable-next-line
+console.log(chalk.green(`App has started on http://localhost:${PORT}/`));
