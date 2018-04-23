@@ -11,7 +11,6 @@ module.exports = options => {
     taskedDbDriver,
     errorFactory: toDbError,
     batchQueryFn: batchQuery,
-    log: options.log,
   });
   return adapter;
 };
