@@ -13,7 +13,9 @@ const outputSchema = Joi.array().items(
       total_quantity: Joi.string().required(),
       decimals: Joi.number().required(),
       reissuable: Joi.boolean().required(),
-      ticker: Joi.string(),
+      ticker: Joi.string()
+        .required()
+        .allow(null),
       issue_timestamp: Joi.object()
         .type(Date)
         .required(),

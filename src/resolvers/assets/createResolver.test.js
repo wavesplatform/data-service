@@ -20,6 +20,7 @@ const createMockResolver = (validateInput, validateResult) =>
     transformResult: identity,
   })({
     db,
+    log: () => {},
   });
 
 describe('Resolver', () => {
