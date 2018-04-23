@@ -9,11 +9,20 @@ const { mapTapLog } = require('../../utils/log');
 const chainET = f => compose(chain(eitherToTask), map(f));
 
 /** createResolver :: Dependencies -> RuntimeOptions -> AssetId[] -> Task Result[] AppError */
-const createResolver = ({ validateInput, validateResult }) => ({
-  db,
-  log: logFn,
-}) =>
+const createResolver = ({
+  validateInput,
+  validateResult,
+  transformResult,
+}) => ({ db, log: logFn }) =>
   compose(
+    mapTapLog(
+      logFn,
+      transformedAssets =>
+        `Assets resolver: Transformed assets: ${JSON.stringify(
+          transformedAssets
+        )}`
+    ),
+    map(transformResult),
     mapTapLog(logFn, () => `Asset resolver: Output validation ok`),
     chainET(validateResult),
     mapTapLog(

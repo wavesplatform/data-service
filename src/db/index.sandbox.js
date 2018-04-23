@@ -10,6 +10,6 @@ db
   ])
   .run()
   .listen({
-    onResolved: console.log,
-    onRejected: console.error,
+    onResolved: console.log, // eslint-disable-line
+    onRejected: console.error, // eslint-disable-line
   });
