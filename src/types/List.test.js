@@ -1,7 +1,5 @@
 const List = require('./List');
 
-const { prop } = require('ramda');
-
 const items = [{ id: 'qwe', f: 0 }, { id: 'asd', f: 1 }];
 
 describe('List type should be', () => {
