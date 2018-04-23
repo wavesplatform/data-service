@@ -1,7 +1,5 @@
 const Task = require('folktale/concurrency/task');
 
-const trace = require('../../utils/trace');
-
 const eitherToTask = require('../../utils/eitherToTask');
 const { compose, chain, map } = require('ramda');
 
