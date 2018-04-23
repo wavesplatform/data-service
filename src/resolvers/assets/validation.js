@@ -3,16 +3,20 @@ const { AppError } = require('../../errorHandling');
 const validate = require('../../utils/validate');
 
 // validateInput :: Options -> Boolean
-const validateInput = validate(inputSchema, opts =>
-  AppError.Resolver(`Wrong arguments: ${JSON.stringify(opts)}`, {
+const validateInput = validate(inputSchema, (error, value) =>
+  AppError.Resolver('Input validation failed', {
     resolving: 'assets',
+    error,
+    value,
   })
 );
 
 // validateResult :: Result -> Boolean
-const validateResult = validate(outputSchema, res =>
-  AppError.Resolver(`Wrong result shape: ${JSON.stringify(res)}`, {
+const validateResult = validate(outputSchema, (error, value) =>
+  AppError.Resolver('Result validation failed', {
     resolving: 'assets',
+    value,
+    error,
   })
 );
 

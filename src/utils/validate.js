@@ -1,13 +1,13 @@
-var Ajv = require('ajv');
-var ajv = new Ajv({ allErrors: true });
+const { validate: validateSchema } = require('joi');
 
 const { Either } = require('monet');
 
 const { curry } = require('ramda');
 
-const validate = (schema, errorFactory, value) =>
-  ajv.validate(schema, value)
-    ? Either.Right(value)
-    : Either.Left(errorFactory(value));
+/** validate :: JoiSchema -> (ValidationError v -> AppError) -> v -> Either v AppError */
+const validate = curry((schema, errorFactory, value) => {
+  const { error } = validateSchema(value, schema);
+  return error ? Either.Left(errorFactory(error, value)) : Either.Right(value);
+});
 
-module.exports = curry(validate);
+module.exports = validate;

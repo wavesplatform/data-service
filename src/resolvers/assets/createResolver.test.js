@@ -1,3 +1,5 @@
+const { identity } = require('ramda');
+
 const db = require('../../db/index.mock');
 const createAssetsResolver = require('./createResolver');
 
@@ -12,29 +14,39 @@ const ok = x => Either.Right(x);
 const notOk = x => Either.Left(x);
 
 const createMockResolver = (validateInput, validateResult) =>
-  createAssetsResolver({ validateInput, validateResult })({ ids, api: db });
+  createAssetsResolver({
+    validateInput,
+    validateResult,
+    transformResult: identity,
+  })({
+    db,
+  });
 
 describe('Resolver', () => {
   it('should return result if all validation pass', done => {
     const goodResolver = createMockResolver(ok, ok);
 
-    goodResolver.run().listen({
-      onResolved: data => {
-        expect(data).toEqual([ids]);
-        done();
-      },
-    });
+    goodResolver(ids)
+      .run()
+      .listen({
+        onResolved: data => {
+          expect(data).toEqual([ids]);
+          done();
+        },
+      });
   });
 
   it('should take left branch if input validation fails', done => {
     const badInputResolver = createMockResolver(notOk, ok);
 
-    badInputResolver.run().listen({
-      onRejected: data => {
-        expect(data.ids).toEqual(ids);
-        done();
-      },
-    });
+    badInputResolver(ids)
+      .run()
+      .listen({
+        onRejected: data => {
+          expect(data).toEqual(ids);
+          done();
+        },
+      });
   });
 
   it('should NOT call db query if input validation fails', done => {
@@ -42,24 +54,29 @@ describe('Resolver', () => {
     const badInputResolver = createAssetsResolver({
       validateInput: notOk,
       validateResult: ok,
-    })({ ids, api: spiedDb });
+      transformResult: identity,
+    })({ db: spiedDb });
 
-    badInputResolver.run().listen({
-      onRejected: () => {
-        expect(spiedDb.assets).not.toBeCalled();
-        done();
-      },
-    });
+    badInputResolver(ids)
+      .run()
+      .listen({
+        onRejected: () => {
+          expect(spiedDb.assets).not.toBeCalled();
+          done();
+        },
+      });
   });
 
   it('should take left branch if output validation fails', done => {
     const badOutputResolver = createMockResolver(ok, notOk);
 
-    badOutputResolver.run().listen({
-      onRejected: data => {
-        expect(data).toEqual([ids]);
-        done();
-      },
-    });
+    badOutputResolver(ids)
+      .run()
+      .listen({
+        onRejected: data => {
+          expect(data).toEqual([ids]);
+          done();
+        },
+      });
   });
 });

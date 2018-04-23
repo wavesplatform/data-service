@@ -2,7 +2,7 @@ const { union } = require('folktale/adt/union');
 
 const defaultFactory = (errorOrMessage, meta = {}) => {
   meta.timestamp = meta.timestamp || new Date();
-  errorOrMessage instanceof Error
+  return errorOrMessage instanceof Error
     ? {
         error: errorOrMessage,
         meta,
