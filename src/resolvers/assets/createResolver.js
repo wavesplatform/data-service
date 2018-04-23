@@ -7,8 +7,13 @@ const { compose, chain, map } = require('ramda');
 const chainET = f => compose(chain(eitherToTask), map(f));
 
 /** createResolver :: Dependencies -> RuntimeOptions -> AssetId[] -> Task Result[] AppError */
-const createResolver = ({ validateInput, validateResult }) => ({ db }) =>
+const createResolver = ({
+  validateInput,
+  validateResult,
+  transformResult,
+}) => ({ db }) =>
   compose(
+    map(transformResult),
     chainET(validateResult),
     chain(db.assets),
     chainET(validateInput),
