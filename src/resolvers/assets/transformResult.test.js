@@ -1,3 +1,4 @@
+const { Asset, List } = require('../../types');
 const transformResult = require('./transformResult');
 
 const assetsFromDb = [
@@ -16,9 +17,8 @@ const assetsFromDb = [
   null,
 ];
 
-const assets = [
-  {
-    __type: 'asset',
+const assetList = List([
+  Asset({
     id: 'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH',
     name: 'ETLxxx',
     description: 'ETLxxx',
@@ -28,12 +28,12 @@ const assets = [
     quantity: '100000000',
     precision: 8,
     reissuable: false,
-  },
-  null,
-];
+  }),
+  Asset(null),
+]);
 
 describe('outputTransform', () => {
   it('should create an Asset object from db object', () => {
-    expect(transformResult(assetsFromDb)).toEqual(assets);
+    expect(transformResult(assetsFromDb)).toEqual(assetList);
   });
 });

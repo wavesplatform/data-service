@@ -6,7 +6,7 @@ describe('List type should be', () => {
   it('constructed from array', () => {
     expect(List(items)).toEqual({
       __type: 'list',
-      items,
+      data: items,
     });
   });
 
@@ -15,7 +15,7 @@ describe('List type should be', () => {
 
     expect(List(items, hash)).toEqual({
       __type: 'list',
-      items: [
+      data: [
         {
           cursor: 'qwe_0',
           ...items[0],

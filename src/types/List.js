@@ -7,7 +7,7 @@ const addListInfo = (items, cursorHashFn) => {
 
 const List = (items, cursorHashFn) => ({
   __type: 'list',
-  items: addListInfo(items, cursorHashFn),
+  data: addListInfo(items, cursorHashFn),
 });
 
 module.exports = List;
