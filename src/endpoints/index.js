@@ -1,13 +1,13 @@
 const Router = require('koa-router');
 const router = new Router();
 
-const assets = require('./assets');
-const asset = require('./asset');
+const assetsMany = require('./assetsMany');
+const assetsOne = require('./assetsOne');
 
 const { RouterError, CustomError } = require('../utils/error');
 
-router.get('/assets', assets);
-router.get('/asset/:id', asset);
+router.get('/assets', assetsMany);
+router.get('/assets/:id', assetsOne);
 router.get('/endpoint-error', ctx => {
   ctx.throw(500, new RouterError(ctx));
 });
