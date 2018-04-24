@@ -4,8 +4,8 @@ const validate = require('../../utils/validate');
 
 // validateInput :: Options -> Boolean
 const validateInput = validate(inputSchema, (error, value) =>
-  AppError.Resolver('Input validation failed', {
-    resolving: 'assets',
+  AppError.Validation('Input validation failed', {
+    resolver: 'assets',
     error,
     value,
   })
@@ -13,8 +13,8 @@ const validateInput = validate(inputSchema, (error, value) =>
 
 // validateResult :: Result -> Boolean
 const validateResult = validate(outputSchema, (error, value) =>
-  AppError.Resolver('Result validation failed', {
-    resolving: 'assets',
+  AppError.Validation('Result validation failed', {
+    resolver: 'assets',
     value,
     error,
   })

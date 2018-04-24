@@ -15,6 +15,7 @@ const AppError = union('AppError', {
   Resolver: defaultFactory,
   Router: defaultFactory,
   Db: defaultFactory,
+  Validation: defaultFactory,
 });
 
 module.exports = AppError;

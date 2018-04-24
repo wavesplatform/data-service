@@ -9,6 +9,7 @@ const injectLogger = require('./middleware/logger');
 const PORT = 3000;
 
 const app = new Koa();
+require('koa-qs')(app);
 
 app
   .use(injectLogger)

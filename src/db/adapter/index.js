@@ -10,7 +10,7 @@ const createDbAdapter = ({ taskedDbDriver, batchQueryFn, errorFactory }) => {
       taskedDbDriver
         .many(sql.assets, [assetIdArr])
         .map(batchQueryFn(propEq('asset_id'), assetIdArr))
-        .mapRejected(errorFactory({ request: 'assets' })),
+        .mapRejected(errorFactory({ request: 'assets', params: assetIdArr })),
 
     // volumes: pairs => db.many(sql.volumes, formatPairs(pairs)),
   };
