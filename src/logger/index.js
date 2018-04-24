@@ -1,20 +1,21 @@
 const winston = require('winston');
+const chalk = require('chalk');
 // Delimiter
 const D = '\t|\t';
 
 const {
-  format: { combine, timestamp, colorize, printf },
+  format: { combine, timestamp, colorize, printf, json },
 } = winston;
 
 const myFormat = printf(({ level, timestamp, requestId, options, message }) => {
-  const commonPart = `${level}${D}${timestamp}${D}${requestId}`;
+  const commonPart = `${level}${D}${timestamp}${D}${chalk.yellow(requestId)}`;
 
   if (level.match(/error/)) {
     const { error, meta, type } = options.error;
 
-    return `${commonPart}${D}${type}${D}${error.message}${D}${JSON.stringify(
-      meta
-    )}
+    return `${commonPart}${D}${chalk.red(type)}${D}${
+      error.message
+    }${D}${JSON.stringify(meta)}
     ${error.stack}`;
   }
 
@@ -22,7 +23,7 @@ const myFormat = printf(({ level, timestamp, requestId, options, message }) => {
 });
 
 const consoleFormat = combine(colorize(), timestamp(), myFormat);
-const fileFormat = combine(timestamp(), myFormat);
+const fileFormat = combine(timestamp(), json());
 
 const logger = winston.createLogger({
   level: 'info',
