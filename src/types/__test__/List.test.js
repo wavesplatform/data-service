@@ -1,4 +1,4 @@
-const List = require('./List');
+const List = require('../List');
 
 const items = [{ id: 'qwe', f: 0 }, { id: 'asd', f: 1 }];
 

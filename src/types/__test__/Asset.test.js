@@ -1,4 +1,4 @@
-const Asset = require('./Asset');
+const Asset = require('../Asset');
 
 const asset = { id: 'qwe', timestamp: new Date() };
 
