@@ -1,4 +1,6 @@
 const createResolver = require('../createResolver');
+const { curryN } = require('ramda');
+const curriedEmit = emit => curryN(2, emit);
 
 const oneConfig = {
   ...require('./validation/one'),
@@ -13,6 +15,6 @@ const manyConfig = {
 };
 
 module.exports = ({ db, emitEvent }) => ({
-  many: createResolver(manyConfig)({ db, emitEvent }),
-  one: createResolver(oneConfig)({ db, emitEvent }),
+  many: createResolver(manyConfig)({ db, emitEvent: curriedEmit(emitEvent) }),
+  one: createResolver(oneConfig)({ db, emitEvent: curriedEmit(emitEvent) }),
 });

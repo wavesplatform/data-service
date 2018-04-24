@@ -15,16 +15,13 @@ const createResolver = ({
   dbQuery,
 }) => ({ db, emitEvent = always(identity) }) =>
   compose(
-    map(tap(emitEvent('RESOLVE'))),
+    map(tap(emitEvent('RESOLVER_OK'))),
     map(transformResult),
-    map(tap(emitEvent('OUTPUT_VALIDATION'))),
-    // mapTap(emitEvent('OUTPUT_VALIDATION')),
+    map(tap(emitEvent('OUTPUT_VALIDATION_OK'))),
     chainET(validateResult),
-    map(tap(emitEvent('DB_QUERY'))),
-    // mapTap(emitEvent('DB_QUERY')),
+    map(tap(emitEvent('DB_QUERY_OK'))),
     chain(dbQuery(db)),
-    map(tap(emitEvent('INPUT_VALIDATION'))),
-    // mapTap(emitEvent('INPUT_VALIDATION')),
+    map(tap(emitEvent('INPUT_VALIDATION_OK'))),
     chainET(validateInput),
     Task.of
   );

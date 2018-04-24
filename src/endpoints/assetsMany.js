@@ -4,13 +4,13 @@ const { captureErrors } = require('../utils/captureErrors');
 
 const assetsResolver = async ctx => {
   const ids = getIdsFromCtx(ctx);
-  ctx.log({
-    level: 'info',
-    message: `Assets endpoint hit: ${JSON.stringify(ctx.originalUrl)}`,
+  ctx.state.eventBus.emit('ENDPOINT_HIT', {
+    url: ctx.originalUrl,
+    resolver: 'assets',
   });
   const resolver = createAssetsResolver({
     db: ctx.state.db,
-    log: ctx.log,
+    emitEvent: ctx.state.eventBus.emit,
   });
 
   const assets = await resolver
@@ -18,39 +18,27 @@ const assetsResolver = async ctx => {
     .run()
     .promise();
 
-  ctx.log({
-    level: 'info',
-    message: 'Assets endpoint resolved:' + JSON.stringify(assets),
+  ctx.state.eventBus.emit('ENDPOINT_RESOLVED', {
+    value: assets,
   });
   ctx.body = assets;
 };
 
-const handleError = ({ ctx, error }) =>
+const handleError = ({ ctx, error }) => {
+  ctx.state.eventBus.emit('ERROR', error);
   error.matchWith({
-    Db: ({ error, meta }) => {
-      ctx.log({
-        level: 'error',
-        message: `DbError\t${error.message}\t${JSON.stringify(meta)}`,
-      });
+    Db: () => {
       ctx.status = 500;
       ctx.body = 'Database Error';
     },
-    Resolver: ({ error, meta }) => {
-      ctx.log({
-        level: 'error',
-        message: `ResolverError\t${meta.resolver}\t${error.message}`,
-      });
+    Resolver: () => {
       ctx.status = 500;
       ctx.body = 'Error resolving /assets';
     },
-    Validation: ({ error, meta }) => {
-      ctx.log({
-        level: 'error',
-        message: `${meta.error}, got ${meta.value}\n${error.stack}`,
-      });
+    Validation: () => {
       ctx.status = 400;
       ctx.body = `Invalid query, check params, got: ${ctx.querystring}`;
     },
   });
-
+};
 module.exports = captureErrors(handleError)(assetsResolver);
