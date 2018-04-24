@@ -1,8 +1,6 @@
 const Joi = require('joi');
 
-const inputSchema = Joi.array().items(Joi.string());
-
-const outputSchema = Joi.array().items(
+const output = Joi.array().items(
   Joi.object()
     .keys({
       asset_id: Joi.string().required(),
@@ -23,4 +21,4 @@ const outputSchema = Joi.array().items(
     .allow(null)
 );
 
-module.exports = { inputSchema, outputSchema };
+module.exports = { output };

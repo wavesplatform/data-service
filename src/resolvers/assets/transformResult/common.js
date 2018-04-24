@@ -1,7 +1,5 @@
-const { Asset, List } = require('../../types');
-
 const { renameKeys } = require('ramda-adjunct');
-const { compose, map, reject, isNil, cond, T, identity } = require('ramda');
+const { compose, reject, isNil, cond, T, identity } = require('ramda');
 
 /**
  * transform raw data if necessary
@@ -25,8 +23,4 @@ const transformAssetInfo = cond([
   ],
 ]);
 
-/**
- * apply types to transformed data
- * transformResults :: (RawAssetInfo | null)[] -> List Asset
- */
-module.exports = compose(List, map(Asset), map(transformAssetInfo));
+module.exports = { transformAssetInfo };
