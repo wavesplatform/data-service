@@ -5,10 +5,6 @@ const getIdsFromCtx = pipe(
   x => x.toString(),
   str => (str === '' ? null : str.split(','))
 );
-const getIdFromCtx = pipe(
-  pathOr('', ['params', 'id']),
-  x => x.toString(),
-  str => (str === '' ? null : str.split(','))
-);
+const getIdFromCtx = pipe(pathOr('', ['params', 'id']), x => x.toString());
 
 module.exports = { getIdsFromCtx, getIdFromCtx };

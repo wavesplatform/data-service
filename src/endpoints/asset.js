@@ -13,7 +13,8 @@ const assetResolver = async (ctx, next) => {
     log: ctx.log,
   });
 
-  const assets = await resolver(id)
+  const assets = await resolver
+    .one(id)
     .run()
     .promise();
 

@@ -1,4 +1,4 @@
-const { input, output } = require('../schema/many');
+const { input, output } = require('./schema/many');
 const { AppError } = require('../../../errorHandling');
 const validate = require('../../../utils/validate');
 
