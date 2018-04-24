@@ -1,6 +1,6 @@
-const { identity } = require('ramda');
+const { identity, prop } = require('ramda');
 
-const db = require('../../db/index.mock');
+const db = require('../db/index.mock');
 const createAssetsResolver = require('./createResolver');
 
 const { Either } = require('monet');
@@ -18,9 +18,9 @@ const createMockResolver = (validateInput, validateResult) =>
     validateInput,
     validateResult,
     transformResult: identity,
+    dbQuery: prop('assets'),
   })({
     db,
-    log: () => {},
   });
 
 describe('Resolver', () => {
@@ -56,6 +56,7 @@ describe('Resolver', () => {
       validateInput: notOk,
       validateResult: ok,
       transformResult: identity,
+      dbQuery: prop('assets'),
     })({ db: spiedDb });
 
     badInputResolver(ids)
