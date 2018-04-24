@@ -12,7 +12,7 @@ const createResolver = ({
   validateInput,
   validateResult,
   transformResult,
-  dbQuery,
+  dbQuery, // db -> Request -> Result
 }) => ({ db, emitEvent = always(identity) }) =>
   compose(
     map(tap(emitEvent('RESOLVE'))),
