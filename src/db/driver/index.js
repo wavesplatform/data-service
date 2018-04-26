@@ -6,7 +6,7 @@ const { evolve, compose, memoizeWith, always } = require('ramda');
 
 const createTaskedDriver = (options, connect = pgpConnect) => {
   const createDriver = compose(
-    evolve({ many: fromPromised, none: fromPromised }),
+    evolve({ many: fromPromised, none: fromPromised, any: fromPromised }),
     connect
   );
 

@@ -12,7 +12,7 @@ const createDbAdapter = ({ taskedDbDriver, batchQueryFn, errorFactory }) => {
     /** assets :: AssetId[] -> Task (Maybe Result) AppError.Db */
     assets: assetIdArr =>
       taskedDbDriver
-        .many(sql.assets, [assetIdArr])
+        .any(sql.assets, [assetIdArr])
         .map(batchQueryFn(propEq('asset_id'), assetIdArr))
         .map(map(Maybe.fromNullable))
         .mapRejected(errorFactory({ request: 'assets', params: assetIdArr })),

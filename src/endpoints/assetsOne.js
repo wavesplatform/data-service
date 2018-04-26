@@ -1,4 +1,4 @@
-const createAssetsResolver = require('../resolvers/assets');
+const { one: createResolver } = require('../resolvers/assets');
 const { getIdFromCtx } = require('../utils/getters');
 const { captureErrors } = require('../utils/captureErrors');
 
@@ -8,13 +8,12 @@ const assetResolver = async (ctx, next) => {
     url: ctx.originalUrl,
     resolver: 'assets',
   });
-  const resolver = createAssetsResolver({
+  const resolver = createResolver({
     db: ctx.state.db,
     emitEvent: ctx.state.eventBus.emit,
   });
 
-  const asset = await resolver
-    .one(id)
+  const asset = await resolver(id)
     .run()
     .promise();
 
