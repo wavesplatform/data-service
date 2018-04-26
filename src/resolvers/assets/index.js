@@ -12,7 +12,7 @@ const manyConfig = {
   dbQuery: db => ids => db.assets(ids),
 };
 
-module.exports = ({ db, emitEvent }) => ({
-  many: create.many(manyConfig)({ db, emitEvent }),
-  one: create.one(oneConfig)({ db, emitEvent }),
-});
+module.exports = {
+  many: create.many(manyConfig),
+  one: create.one(oneConfig),
+};
