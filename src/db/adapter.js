@@ -3,7 +3,7 @@ const { propEq, map } = require('ramda');
 const Maybe = require('folktale/maybe');
 
 // query and formatting
-const sql = require('../sql');
+const sql = require('./sql');
 // const { formatPairs } = require('../utils');
 
 // db adapter factory

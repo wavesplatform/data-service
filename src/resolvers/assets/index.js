@@ -1,4 +1,4 @@
-const createResolver = require('../createResolver');
+const create = require('../create');
 
 const oneConfig = {
   ...require('./validation/one'),
@@ -13,6 +13,6 @@ const manyConfig = {
 };
 
 module.exports = ({ db, emitEvent }) => ({
-  many: createResolver(manyConfig)({ db, emitEvent }),
-  one: createResolver(oneConfig)({ db, emitEvent }),
+  many: create.many(manyConfig)({ db, emitEvent }),
+  one: create.one(oneConfig)({ db, emitEvent }),
 });

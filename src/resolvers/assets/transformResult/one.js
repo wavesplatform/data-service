@@ -1,10 +1,14 @@
 const { transformAssetInfo } = require('./common');
 
-const { Asset } = require('../../../types');
+const { Asset, fromMaybe } = require('../../../types');
 
-const { head, compose, isNil, cond, T, identity } = require('ramda');
+const { head, compose, map } = require('ramda');
 
-module.exports = compose(
-  cond([[isNil, identity], [T, compose(Asset, transformAssetInfo)]]),
+/** transformResults :: (Maybe RawAssetInfo)[] -> Asset */
+const transformResults = compose(
+  fromMaybe(Asset),
+  map(transformAssetInfo),
   head
 );
+
+module.exports = transformResults;
