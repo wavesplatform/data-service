@@ -22,7 +22,6 @@
     "koa-qs": "^2.0.0",
     "koa-requestid": "^2.0.1",
     "koa-router": "^7.4.0",
-    "monet": "^0.8.10",
     "pg-promise": "^8.2.3",
     "ramda": "^0.25.0",
     "ramda-adjunct": "^2.6.0",
