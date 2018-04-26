@@ -19,5 +19,9 @@ module.exports = {
   many: ({ db, emitEvent }) =>
     create.many(manyConfig)({ db, emitEvent: curriedEmit(emitEvent) }),
   one: ({ db, emitEvent }) =>
-    create.one(oneConfig)({ db, emitEvent: curriedEmit(emitEvent) }),
+    /**
+     * Calling for many, since we have
+     * magic transformation in config
+     */
+    create.many(oneConfig)({ db, emitEvent: curriedEmit(emitEvent) }),
 };

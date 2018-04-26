@@ -32,13 +32,13 @@ const createResolver = oneOrMany => {
     dbQuery, // db -> Request -> Result
   }) => ({ db, emitEvent = always(identity) }) =>
     compose(
-      map(tap(emitEvent('TRANSFORM_RESULT'))),
+      map(tap(emitEvent('TRANSFORM_RESULT_OK'))),
       map(transformResult), // Task AppError Result
-      map(tap(emitEvent('RESULT_VALIDATION'))),
+      map(tap(emitEvent('RESULT_VALIDATION_OK'))),
       chainRT(toValidateM(validateResult)), // Task AppError Maybe DbResult
-      map(tap(emitEvent('DB_QUERY'))),
+      map(tap(emitEvent('DB_QUERY_OK'))),
       chain(dbQuery(db)), // Task AppError Maybe DbResult
-      map(tap(emitEvent('INPUT_VALIDATION'))),
+      map(tap(emitEvent('INPUT_VALIDATION_OK'))),
       chainRT(validateInput), // Task AppError Request
       Task.of // Task * Request
     );
