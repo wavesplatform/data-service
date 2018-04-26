@@ -1,6 +1,8 @@
-const createResolver = require('../createResolver');
 const { curryN } = require('ramda');
+const createResolver = require('../createResolver');
+
 const curriedEmit = emit => curryN(2, emit);
+const create = require('../create');
 
 const oneConfig = {
   ...require('./validation/one'),
@@ -14,7 +16,9 @@ const manyConfig = {
   dbQuery: db => ids => db.assets(ids),
 };
 
-module.exports = ({ db, emitEvent }) => ({
-  many: createResolver(manyConfig)({ db, emitEvent: curriedEmit(emitEvent) }),
-  one: createResolver(oneConfig)({ db, emitEvent: curriedEmit(emitEvent) }),
-});
+module.exports = {
+  many: ({ db, emitEvent }) =>
+    createResolver(manyConfig)({ db, emitEvent: curriedEmit(emitEvent) }),
+  one: ({ db, emitEvent }) =>
+    createResolver(oneConfig)({ db, emitEvent: curriedEmit(emitEvent) }),
+};
