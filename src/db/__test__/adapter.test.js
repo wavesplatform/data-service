@@ -1,12 +1,14 @@
 const { goodAdapter, badAdapter } = require('./mocks/');
 
+const { Just } = require('folktale/maybe');
+
 test('Adapter returns resolving task ', done => {
   goodAdapter
     .assets([1, 2, 3])
     .run()
     .listen({
       onResolved: xs => {
-        expect(xs).toEqual([[1, 2, 3]]);
+        expect(xs).toEqual([Just([1, 2, 3])]);
         done();
       },
     });

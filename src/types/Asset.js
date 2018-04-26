@@ -1,4 +1,4 @@
-const Asset = data => ({
+const Asset = (data = null) => ({
   __type: 'asset',
   data,
 });

@@ -5,7 +5,7 @@ const addListInfo = (items, cursorHashFn) => {
   else return items;
 };
 
-const List = (items, cursorHashFn) => ({
+const List = (items = [], cursorHashFn) => ({
   __type: 'list',
   data: addListInfo(items, cursorHashFn),
 });

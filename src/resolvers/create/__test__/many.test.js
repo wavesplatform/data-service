@@ -1,27 +1,32 @@
-const { identity } = require('ramda');
+const Task = require('folktale/concurrency/task');
+const Maybe = require('folktale/maybe');
+const Result = require('folktale/result');
 
-const db = require('../../db/index.mock');
-const createAssetsResolver = require('./createResolver');
+const { identity, prop, map } = require('ramda');
 
-const { Either } = require('monet');
+const create = require('../');
 
 const ids = [
   'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH',
   '5ZUsD93EbK1SZZa2GXYZx3SjhcXWDvMKqzWoJZjNGkW8',
 ];
 
-const ok = x => Either.Right(x);
-const notOk = x => Either.Left(x);
+const ok = Result.Ok;
+const notOk = Result.Error;
+
+const mockDbQuery = ids => Task.of(ids.map(Maybe.of));
+
+const commonConfig = {
+  transformResult: map(prop('value')),
+  dbQuery: identity,
+};
 
 const createMockResolver = (validateInput, validateResult) =>
-  createAssetsResolver({
+  create.many({
+    ...commonConfig,
     validateInput,
     validateResult,
-    transformResult: identity,
-  })({
-    db,
-    log: () => {},
-  });
+  })({ db: mockDbQuery });
 
 describe('Resolver', () => {
   it('should return result if all validation pass', done => {
@@ -31,7 +36,25 @@ describe('Resolver', () => {
       .run()
       .listen({
         onResolved: data => {
-          expect(data).toEqual([ids]);
+          expect(data).toEqual(ids);
+          done();
+        },
+      });
+  });
+
+  it('should call db query is everything is ok', done => {
+    const spiedDbQuery = jest.fn(mockDbQuery);
+    const goodResolver = create.many({
+      ...commonConfig,
+      validateInput: ok,
+      validateResult: ok,
+    })({ db: spiedDbQuery });
+
+    goodResolver(ids)
+      .run()
+      .listen({
+        onResolved: () => {
+          expect(spiedDbQuery).toBeCalled();
           done();
         },
       });
@@ -51,18 +74,18 @@ describe('Resolver', () => {
   });
 
   it('should NOT call db query if input validation fails', done => {
-    const spiedDb = { assets: jest.fn(db.assets) };
-    const badInputResolver = createAssetsResolver({
+    const spiedDbQuery = jest.fn(mockDbQuery);
+    const badInputResolver = create.many({
+      ...commonConfig,
       validateInput: notOk,
       validateResult: ok,
-      transformResult: identity,
-    })({ db: spiedDb });
+    })({ db: spiedDbQuery });
 
     badInputResolver(ids)
       .run()
       .listen({
         onRejected: () => {
-          expect(spiedDb.assets).not.toBeCalled();
+          expect(spiedDbQuery).not.toBeCalled();
           done();
         },
       });
@@ -75,7 +98,7 @@ describe('Resolver', () => {
       .run()
       .listen({
         onRejected: data => {
-          expect(data).toEqual([ids]);
+          expect(data).toEqual('G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH');
           done();
         },
       });

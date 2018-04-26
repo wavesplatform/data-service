@@ -1,20 +1,23 @@
 const { union } = require('folktale/adt/union');
 
-const defaultFactory = (errorOrMessage, meta = {}) =>
+const defaultFactory = type => (errorOrMessage, meta = {}) =>
   errorOrMessage instanceof Error
     ? {
       error: errorOrMessage,
+      type,
       meta,
     }
     : {
       error: new Error(errorOrMessage),
+      type,
       meta,
     };
 
 const AppError = union('AppError', {
-  Resolver: defaultFactory,
-  Router: defaultFactory,
-  Db: defaultFactory,
+  Resolver: defaultFactory('ResolverError'),
+  Router: defaultFactory('RouterError'),
+  Db: defaultFactory('DBError'),
+  Validation: defaultFactory('ValidationError'),
 });
 
 module.exports = AppError;

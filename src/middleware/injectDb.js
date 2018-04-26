@@ -1,6 +1,4 @@
 const createDb = require('../db');
+const inject = require('./inject');
 
-module.exports = options => async (ctx, next) => {
-  ctx.state.db = createDb(options);
-  await next();
-};
+module.exports = options => inject(['db'], createDb(options));
