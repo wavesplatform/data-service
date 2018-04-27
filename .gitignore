@@ -9,7 +9,6 @@ bld/
 logs/
 
 *.env
-config.yml
 
 npm-debug.log
 yarn-error.log
