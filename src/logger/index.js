@@ -45,8 +45,8 @@ const logger = winston.createLogger({
   level: 'info',
 
   transports: [
-    fileTransport,
-    ...(process.env.NODE_ENV !== 'production' ? [consoleTransport] : []),
+    consoleTransport,
+    ...(process.env.NODE_ENV === 'production' ? [fileTransport] : []),
   ],
 });
 
