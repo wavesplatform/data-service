@@ -1,5 +1,6 @@
 const winston = require('winston');
 const chalk = require('chalk');
+require('winston-daily-rotate-file');
 // Delimiter
 const D = '\t|\t';
 
@@ -7,6 +8,7 @@ const {
   format: { combine, timestamp, colorize, printf, json },
 } = winston;
 
+// Formats
 const myFormat = printf(({ level, timestamp, requestId, options, message }) => {
   const commonPart = `${level}${D}${timestamp}${D}${chalk.yellow(requestId)}`;
 
@@ -21,23 +23,31 @@ const myFormat = printf(({ level, timestamp, requestId, options, message }) => {
 
   return `${commonPart}${D}${message}${D}${JSON.stringify(options)}`;
 });
-
 const consoleFormat = combine(colorize(), timestamp(), myFormat);
 const fileFormat = combine(timestamp(), json());
 
+// Transports
+const fileTransport = new winston.transports.DailyRotateFile({
+  filename: 'logs/%DATE%.log',
+  format: fileFormat,
+  datePattern: 'YYYY-MM-DD',
+  zippedArchive: true,
+  maxSize: '20m',
+  maxFiles: '14d',
+});
+
+const consoleTransport = new winston.transports.Console({
+  format: consoleFormat,
+});
+
+// Initialization
 const logger = winston.createLogger({
   level: 'info',
 
   transports: [
-    new winston.transports.File({
-      filename: 'combined.log',
-      format: fileFormat,
-    }),
+    consoleTransport,
+    ...(process.env.NODE_ENV === 'production' ? [fileTransport] : []),
   ],
 });
-
-if (process.env.NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({ format: consoleFormat }));
-}
 
 module.exports = logger;
