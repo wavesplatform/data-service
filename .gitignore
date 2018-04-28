@@ -6,10 +6,9 @@ node_modules/
 dist/
 bld/
 
-logs/
+log/
 
 *.env
-config.yml
 
 npm-debug.log
 yarn-error.log
