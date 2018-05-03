@@ -1,5 +1,6 @@
 const Koa = require('koa');
 const chalk = require('chalk');
+const cors = require('koa-cors');
 
 const loadConfig = require('./loadConfig');
 const router = require('./endpoints/');
@@ -17,6 +18,7 @@ const app = new Koa();
 require('koa-qs')(app);
 
 app
+  .use(cors())
   .use(requestId())
   .use(inject(['eventBus'], eventBus))
   .use(subscribeLogger(logger))

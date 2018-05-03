@@ -3,8 +3,10 @@ const Joi = require('joi');
 const output = Joi.object().keys({
   asset_id: Joi.string().required(),
   asset_name: Joi.string().required(),
-  description: Joi.string().required(),
-  sender: Joi.string().required(),
+  description: Joi.string().allow(''),
+  sender: Joi.string()
+    .allow('')
+    .required(),
   issue_height: Joi.number().required(),
   total_quantity: Joi.string().required(),
   decimals: Joi.number().required(),
