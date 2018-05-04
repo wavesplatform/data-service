@@ -8,8 +8,10 @@ const injectDb = require('./middleware/injectDb');
 const inject = require('./middleware/inject');
 const requestId = require('koa-requestid');
 const createEventBus = require('./eventBus/');
-const logger = require('./logger');
+const createLogger = require('./logger');
 const subscribeLogger = require('./middleware/loggerSubscription');
+const serializer = require('./middleware/serializer');
+
 const PORT = 3000;
 
 const eventBus = createEventBus();
@@ -17,12 +19,15 @@ const eventBus = createEventBus();
 const app = new Koa();
 require('koa-qs')(app);
 
+const options = loadConfig();
+
 app
   .use(cors())
+  .use(serializer)
   .use(requestId())
   .use(inject(['eventBus'], eventBus))
-  .use(subscribeLogger(logger))
-  .use(injectDb(loadConfig()))
+  .use(subscribeLogger(createLogger(options)))
+  .use(injectDb(options))
   .use(router.routes())
   .listen(PORT);
 

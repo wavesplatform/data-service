@@ -27,27 +27,31 @@ const consoleFormat = combine(colorize(), timestamp(), myFormat);
 const fileFormat = combine(timestamp(), json());
 
 // Transports
-const fileTransport = new winston.transports.DailyRotateFile({
-  filename: 'logs/%DATE%.log',
-  format: fileFormat,
-  datePattern: 'YYYY-MM-DD',
-  zippedArchive: true,
-  maxSize: '20m',
-  maxFiles: '14d',
-});
+const createFileTransport = logsDirectory =>
+  new winston.transports.DailyRotateFile({
+    filename: `${logsDirectory}/%DATE%.log`,
+    format: fileFormat,
+    datePattern: 'YYYY-MM-DD',
+    zippedArchive: true,
+    maxSize: '20m',
+    maxFiles: '14d',
+  });
 
 const consoleTransport = new winston.transports.Console({
   format: consoleFormat,
 });
 
 // Initialization
-const logger = winston.createLogger({
-  level: 'info',
+const createLogger = options =>
+  winston.createLogger({
+    level: 'info',
 
-  transports: [
-    fileTransport,
-    ...(process.env.NODE_ENV !== 'production' ? [consoleTransport] : []),
-  ],
-});
+    transports: [
+      consoleTransport,
+      ...(process.env.NODE_ENV === 'production'
+        ? [createFileTransport(options.logsDirectory)]
+        : []),
+    ],
+  });
 
-module.exports = logger;
+module.exports = createLogger;
