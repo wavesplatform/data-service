@@ -2,7 +2,7 @@ const { one: createResolver } = require('../resolvers/assets');
 const { getIdFromCtx } = require('../utils/getters');
 const { captureErrors } = require('../utils/captureErrors');
 
-const assetResolver = async (ctx, next) => {
+const assetResolver = async ctx => {
   const id = getIdFromCtx(ctx);
   ctx.state.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
@@ -20,8 +20,7 @@ const assetResolver = async (ctx, next) => {
   ctx.state.eventBus.emit('ENDPOINT_RESOLVED', {
     value: asset,
   });
-  ctx.body = asset;
-  await next();
+  ctx.state.returnValue = asset;
 };
 
 const handleError = ({ ctx, error }) => {
