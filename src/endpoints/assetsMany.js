@@ -20,7 +20,7 @@ const assetsResolver = async ctx => {
   ctx.state.eventBus.emit('ENDPOINT_RESOLVED', {
     value: assets,
   });
-  ctx.body = assets;
+  ctx.state.returnValue = assets;
 };
 
 const handleError = ({ ctx, error }) => {

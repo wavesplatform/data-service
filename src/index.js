@@ -9,6 +9,8 @@ const requestId = require('koa-requestid');
 const createEventBus = require('./eventBus/');
 const createLogger = require('./logger');
 const subscribeLogger = require('./middleware/loggerSubscription');
+const serializer = require('./middleware/serializer');
+
 const PORT = 3000;
 
 const eventBus = createEventBus();
@@ -19,6 +21,7 @@ require('koa-qs')(app);
 const options = loadConfig();
 
 app
+  .use(serializer)
   .use(requestId())
   .use(inject(['eventBus'], eventBus))
   .use(subscribeLogger(createLogger(options)))
