@@ -1,6 +1,7 @@
 const { one: createResolver } = require('../resolvers/assets');
 const { getIdFromCtx } = require('../utils/getters');
 const { captureErrors } = require('../utils/captureErrors');
+const JSONbig = require('@waves/json-bigint');
 
 const assetResolver = async (ctx, next) => {
   const id = getIdFromCtx(ctx);
@@ -20,7 +21,7 @@ const assetResolver = async (ctx, next) => {
   ctx.state.eventBus.emit('ENDPOINT_RESOLVED', {
     value: asset,
   });
-  ctx.body = asset;
+  ctx.body = JSONbig.stringify(asset);
   await next();
 };
 
