@@ -1,6 +1,6 @@
 const Koa = require('koa');
 const chalk = require('chalk');
-const cors = require('koa-cors');
+const cors = require('@koa/cors');
 
 const loadConfig = require('./loadConfig');
 const router = require('./endpoints/');
