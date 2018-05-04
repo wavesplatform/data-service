@@ -17,10 +17,10 @@
     js-tokens "^3.0.0"
 
 "@waves/data-entities@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@waves/data-entities/-/data-entities-1.0.2.tgz#60fe4787fca21b8e8a45c034694a5041b5701e94"
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@waves/data-entities/-/data-entities-1.1.0.tgz#f1300eef4c4bfb9dd0fd18987e8bb604269004da"
   dependencies:
-    bignumber.js "6.0.0"
+    bignumber.js "7.0.1"
 
 "@waves/json-bigint@git+https://github.com/wavesplatform/json-bigint.git":
   version "0.2.3"
@@ -416,11 +416,7 @@ bcrypt-pbkdf@^1.0.0:
   dependencies:
     tweetnacl "^0.14.3"
 
-bignumber.js@6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-6.0.0.tgz#bbfa047644609a5af093e9cbd83b0461fa3f6002"
-
-bignumber.js@^7.0.0, bignumber.js@^7.0.1:
+bignumber.js@7.0.1, bignumber.js@^7.0.0, bignumber.js@^7.0.1:
   version "7.0.1"
   resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-7.0.1.tgz#8d2ff74fb2e7a78cbfc3a57bd63cd6106bf8903a"
 
