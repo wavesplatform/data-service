@@ -74,22 +74,22 @@ describe('Resolver', () => {
       .listen({
         onResolved: () => {
           expect(innerSpy.mock.calls[0]).toEqual([
-            'INPUT_VALIDATION',
+            'INPUT_VALIDATION_OK',
             'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH',
           ]);
 
           expect(innerSpy.mock.calls[1]).toEqual([
-            'DB_QUERY',
+            'DB_QUERY_OK',
             Maybe.of('G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH'),
           ]);
 
           expect(innerSpy.mock.calls[2]).toEqual([
-            'RESULT_VALIDATION',
+            'RESULT_VALIDATION_OK',
             Maybe.of('G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH'),
           ]);
 
           expect(innerSpy.mock.calls[3]).toEqual([
-            'TRANSFORM_RESULT',
+            'TRANSFORM_RESULT_OK',
             'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH',
           ]);
 
