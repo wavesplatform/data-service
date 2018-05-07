@@ -31,5 +31,7 @@ app
   .use(router.routes())
   .listen(PORT);
 
-// eslint-disable-next-line
-console.log(chalk.yellow(`App has started on http://localhost:${PORT}/`));
+if (process.env.NODE_ENV === 'development') {
+  // eslint-disable-next-line
+  console.log(chalk.yellow(`App has started on http://localhost:${PORT}/`));
+}
