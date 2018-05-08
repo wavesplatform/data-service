@@ -1,57 +1,26 @@
 const winston = require('winston');
-const chalk = require('chalk');
-require('winston-daily-rotate-file');
+const { omit } = require('ramda');
 // Delimiter
-const D = '\t|\t';
 
 const {
-  format: { combine, timestamp, colorize, printf, json },
+  format: { combine, timestamp, printf },
 } = winston;
-
-// Formats
-const myFormat = printf(({ level, timestamp, requestId, options, message }) => {
-  const commonPart = `${level}${D}${timestamp}${D}${chalk.yellow(requestId)}`;
-
-  if (level.match(/error/)) {
-    const { error, meta, type } = options.error;
-
-    return `${commonPart}${D}${chalk.red(type)}${D}${
-      error.message
-    }${D}${JSON.stringify(meta)}
-    ${error.stack}`;
-  }
-
-  return `${commonPart}${D}${message}${D}${JSON.stringify(options)}`;
-});
-const consoleFormat = combine(colorize(), timestamp(), myFormat);
-const fileFormat = combine(timestamp(), json());
-
-// Transports
-const createFileTransport = logsDirectory =>
-  new winston.transports.DailyRotateFile({
-    filename: `${logsDirectory}/%DATE%.log`,
-    format: fileFormat,
-    datePattern: 'YYYY-MM-DD',
-    zippedArchive: true,
-    maxSize: '20m',
-    maxFiles: '14d',
-  });
+const omitLevel = omit(['level']);
+const myFormat =
+  process.env.NODE_ENV === 'development'
+    ? printf(obj => JSON.stringify(omitLevel(obj), null, 2))
+    : printf(obj => JSON.stringify(omitLevel(obj)));
+const JSONFormat = combine(timestamp(), myFormat);
 
 const consoleTransport = new winston.transports.Console({
-  format: consoleFormat,
+  format: JSONFormat,
 });
 
 // Initialization
-const createLogger = options =>
+const createLogger = () =>
   winston.createLogger({
-    level: 'info',
-
-    transports: [
-      consoleTransport,
-      ...(process.env.NODE_ENV === 'production'
-        ? [createFileTransport(options.logsDirectory)]
-        : []),
-    ],
+    level: 'debug',
+    transports: [consoleTransport],
   });
 
 module.exports = createLogger;

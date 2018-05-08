@@ -1,34 +1,36 @@
+const { pick } = require('ramda');
+const { performance } = require('perf_hooks');
 const loggerSubscriptionMiddleware = logger => async (ctx, next) => {
+  const startTime = performance.now();
   const eventBus = ctx.state.eventBus;
-  const log = (msgType, ...args) => {
-    switch (msgType) {
-      case 'ERROR': {
-        logger.log({
-          level: 'error',
-          requestId: ctx.state.id,
-          options: {
-            error: args[0],
-          },
-        });
-        break;
-      }
-      default:
-        logger.log({
-          level: 'info',
-          message: msgType,
-          requestId: ctx.state.id,
-          options: {
-            args,
-          },
-        });
-    }
+  const requestData = pick(
+    ['headers', 'httpVersion', 'method', 'url'],
+    ctx.request
+  );
+  const request = { ...requestData, requestId: ctx.state.id };
+  const log = (msgType, e) => {
+    logger.log({
+      level: 'info',
+      request,
+      event: createEvent(msgType, e),
+    });
   };
+  const createEvent = (msgType, e) => ({
+    name: msgType === 'ERROR' ? e.type : msgType,
+    level: msgType === 'ERROR' ? 'error' : 'debug',
+    meta:
+      msgType === 'ERROR'
+        ? { stack: e.error.stack, message: e.error.message }
+        : e,
+  });
 
   eventBus.on('event', log);
-  eventBus.emit('LOGGER_SUBSCRIBED');
+  eventBus.emit('REQUEST');
 
   await next();
-  eventBus.emit('LOGGER_UNSUBSCRIBED');
+  eventBus.emit('RESPONSE', {
+    timeElapsed: performance.now() - startTime,
+  });
   eventBus.removeListener('event', log);
 };
 
