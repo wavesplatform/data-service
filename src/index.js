@@ -10,6 +10,7 @@ const requestId = require('koa-requestid');
 const createEventBus = require('./eventBus/');
 const createLogger = require('./logger');
 const subscribeLogger = require('./middleware/loggerSubscription');
+const removeErrorBodyProd = require('./middleware/removeErrorBodyProd');
 const serializer = require('./middleware/serializer');
 
 const PORT = 3000;
@@ -22,6 +23,7 @@ require('koa-qs')(app);
 const options = loadConfig();
 
 app
+  .use(removeErrorBodyProd)
   .use(cors())
   .use(serializer)
   .use(requestId())
