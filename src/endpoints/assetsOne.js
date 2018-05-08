@@ -17,10 +17,11 @@ const assetResolver = async ctx => {
     .run()
     .promise();
 
+  ctx.state.eventBus.emit('ENDPOINT_RESOLVED', {
+    value: asset,
+  });
+
   if (asset) {
-    ctx.state.eventBus.emit('ENDPOINT_RESOLVED', {
-      value: asset,
-    });
     ctx.state.returnValue = asset;
   } else {
     ctx.status = 404;

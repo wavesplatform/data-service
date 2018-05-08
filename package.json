@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "start": "dotenv -e variables.env nodemon index.js",
-    "dev": "NODE_ENV=development nodemon --inspect",
+    "dev": "NODE_ENV=development dotenv -e variables.env nodemon --inspect",
     "test": "jest"
   },
   "devDependencies": {
