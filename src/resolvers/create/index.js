@@ -1,15 +1,11 @@
 const Task = require('folktale/concurrency/task');
 const Result = require('folktale/result');
 
-const {
-  compose,
-  chain,
-  map,
-  always,
-  identity,
-  traverse,
-  tap,
-} = require('ramda');
+const { compose, chain, map, always, identity, traverse } = require('ramda');
+// @hack because of ramda 'tap' not working with null values
+// https://github.com/ramda/ramda/issues/2421
+// @todo refactor after ramda fix
+const tap = require('../../utils/tap');
 
 const { resultToTask, liftInnerMaybe } = require('../../utils/fp');
 
