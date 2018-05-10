@@ -1,4 +1,18 @@
-const createEventBus = require('../eventBus');
-const inject = require('./inject');
+const { pick } = require('ramda');
 
-module.exports = inject(['eventBus'], createEventBus());
+const collectRequestData = ctx => ({
+  ...pick(['headers', 'httpVersion', 'method', 'url'])(ctx.request),
+  requestId: ctx.state.id,
+  headers: Object.entries(ctx.request.headers)
+    .map(h => h.join(':'))
+    .join(';'),
+});
+
+module.exports = eventBus => async (ctx, next) => {
+  // Add request info to all logs
+  const request = collectRequestData(ctx);
+  const emit = (message, data) =>
+    eventBus.emit('log', { message, request, data });
+  ctx.eventBus = { emit };
+  await next();
+};
