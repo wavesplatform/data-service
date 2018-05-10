@@ -10,6 +10,7 @@ const accessLogMiddleware = require('./middleware/accessLog');
 const requestId = require('koa-requestid');
 const createEventBus = require('./eventBus/');
 const createAndSubscribeLogger = require('./logger');
+const removeErrorBodyProd = require('./middleware/removeErrorBodyProd');
 const serializer = require('./middleware/serializer');
 
 const PORT = 3000;
@@ -23,6 +24,7 @@ const options = loadConfig();
 createAndSubscribeLogger({ options, eventBus });
 
 app
+  .use(removeErrorBodyProd)
   .use(cors())
   .use(requestId())
   .use(injectEventBus(eventBus))

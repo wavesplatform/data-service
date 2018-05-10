@@ -20,7 +20,13 @@ const assetResolver = async ctx => {
   ctx.eventBus.emit('ENDPOINT_RESOLVED', {
     value: asset,
   });
-  ctx.state.returnValue = asset;
+
+  if (asset) {
+    ctx.state.returnValue = asset;
+  } else {
+    ctx.status = 404;
+    ctx.body = `Asset ${id} not found`;
+  }
 };
 
 const handleError = ({ ctx, error }) => {

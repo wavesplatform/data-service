@@ -1,4 +1,4 @@
-const { transformAssetInfo } = require('./common');
+const { transformAsset } = require('./common');
 
 const { Asset, List, fromMaybe } = require('../../../types');
 
@@ -8,7 +8,7 @@ const { map, compose } = require('ramda');
 const transformResults = compose(
   List,
   map(fromMaybe(Asset)),
-  map(map(transformAssetInfo))
+  map(map(transformAsset))
 );
 
 module.exports = transformResults;

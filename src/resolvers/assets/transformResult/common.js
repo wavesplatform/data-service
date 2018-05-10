@@ -3,7 +3,7 @@ const { compose, reject, isNil } = require('ramda');
 const { Asset } = require('@waves/data-entities');
 
 /** transformAssetInfo:: RawAssetInfo -> AssetInfo */
-const transformAssetInfo = compose(
+const transformAsset = compose(
   obj => new Asset(obj),
   renameKeys({
     asset_id: 'id',
@@ -16,4 +16,4 @@ const transformAssetInfo = compose(
   reject(isNil)
 );
 
-module.exports = { transformAssetInfo };
+module.exports = { transformAsset };
