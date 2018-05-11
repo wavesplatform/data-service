@@ -16,6 +16,7 @@ const createTaskedDriver = (options, connect = pgpConnect) => {
     database: options.postgresDatabase,
     user: options.postgresUser,
     password: options.postgresPassword,
+    max: options.postgresPoolSize, // max connection pool size
   });
 };
 
