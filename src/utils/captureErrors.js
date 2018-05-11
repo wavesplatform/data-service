@@ -4,9 +4,8 @@ const captureErrors = errorHandler => middleware => (ctx, next) =>
       return errorHandler({ ctx, error });
     ctx.status = error.status || 500;
     ctx.body = 'Something went wrong';
-    ctx.state.eventBus.emit('ERROR', {
+    ctx.eventBus.emit('ERROR', {
       error: error,
-      meta: {},
       type: 'UnhandledError',
     });
   });

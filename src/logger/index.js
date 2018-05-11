@@ -1,26 +1,30 @@
-const winston = require('winston');
-const { omit } = require('ramda');
-// Delimiter
+const createLogger = require('./winston');
 
-const {
-  format: { combine, timestamp, printf },
-} = winston;
-const omitLevel = omit(['level']);
-const myFormat =
-  process.env.NODE_ENV === 'development'
-    ? printf(obj => JSON.stringify(omitLevel(obj), null, 2))
-    : printf(obj => JSON.stringify(omitLevel(obj)));
-const JSONFormat = combine(timestamp(), myFormat);
+const createAndSubscribeLogger = ({ options, eventBus }) => {
+  const logger = createLogger(options);
 
-const consoleTransport = new winston.transports.Console({
-  format: JSONFormat,
-});
+  const log = ({ message, request, data }) => {
+    message === 'ERROR'
+      ? logger.log({
+        level: 'error',
+        request,
+        event: {
+          name: message,
+          meta: JSON.stringify({
+            type: data.type,
+            stack: data.error.stack,
+            message: data.error.message,
+          }),
+        },
+      })
+      : logger.log({
+        level: 'info',
+        request,
+        event: { name: message, meta: JSON.stringify(data) },
+      });
+  };
 
-// Initialization
-const createLogger = () =>
-  winston.createLogger({
-    level: 'debug',
-    transports: [consoleTransport],
-  });
+  eventBus.on('log', log);
+};
 
-module.exports = createLogger;
+module.exports = createAndSubscribeLogger;

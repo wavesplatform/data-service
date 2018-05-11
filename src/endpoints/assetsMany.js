@@ -4,27 +4,27 @@ const { captureErrors } = require('../utils/captureErrors');
 
 const assetsResolver = async ctx => {
   const ids = getIdsFromCtx(ctx);
-  ctx.state.eventBus.emit('ENDPOINT_HIT', {
+  ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
     resolver: 'assets',
   });
   const resolver = createResolver({
     db: ctx.state.db,
-    emitEvent: ctx.state.eventBus.emit,
+    emitEvent: ctx.eventBus.emit,
   });
 
   const assets = await resolver(ids)
     .run()
     .promise();
 
-  ctx.state.eventBus.emit('ENDPOINT_RESOLVED', {
+  ctx.eventBus.emit('ENDPOINT_RESOLVED', {
     value: assets,
   });
   ctx.state.returnValue = assets;
 };
 
 const handleError = ({ ctx, error }) => {
-  ctx.state.eventBus.emit('ERROR', error);
+  ctx.eventBus.emit('ERROR', error);
   error.matchWith({
     Db: () => {
       ctx.status = 500;
