@@ -13,4 +13,4 @@ RUN cd /opt/dataservice
 
 ENV NODE_ENV production
 
-CMD ["node", "src/index.js"]
+CMD ["node", "--max-old-space-size=2048", "src/index.js"]

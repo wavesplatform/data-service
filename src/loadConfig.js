@@ -18,6 +18,7 @@ const loadConfig = () => {
     postgresDatabase: process.env.POSTGRES_DATABASE,
     postgresUser: process.env.POSTGRES_USER,
     postgresPassword: process.env.POSTGRES_PASSWORD,
+    postgresPoolSize: process.env.POSTGRES_POOL_SIZE || 70,
   };
 };
 
