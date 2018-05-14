@@ -10,7 +10,7 @@ const getId1Id2FromCtx = getFromCtxParams(['id1', 'id2']);
  * @name /candles/id1/id2?...params
  */
 const candlesOneEndpoint = async ctx => {
-  const [id1, id2] = getId1Id2FromCtx(ctx);
+  const pair = getId1Id2FromCtx(ctx);
   const params = getParamsFromQuery(getQueryFromCtx(ctx));
 
   ctx.eventBus.emit('ENDPOINT_HIT', {
@@ -23,7 +23,7 @@ const candlesOneEndpoint = async ctx => {
   //   emitEvent: ctx.eventBus.emit,
   // });
 
-  // const candles = await resolver(id1, id2, params)
+  // const candles = await resolver({ pairs: [pair], ...params })
   //   .run()
   //   .promise();
 

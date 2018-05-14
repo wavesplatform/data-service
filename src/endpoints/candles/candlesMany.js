@@ -20,7 +20,7 @@ const candlesManyEndpoint = async ctx => {
   //   emitEvent: ctx.eventBus.emit,
   // });
 
-  // const candles = await resolver(pairs, params)
+  // const candles = await resolver({ pairs, ...params })
   //   .run()
   //   .promise();
 
