@@ -1,6 +1,6 @@
-const { many: createResolver } = require('../resolvers/assets');
-const { getIdsFromCtx } = require('../utils/getters');
-const { captureErrors } = require('../utils/captureErrors');
+const { many: createResolver } = require('../../resolvers/assets');
+const { getIdsFromCtx } = require('../../utils/getters');
+const { captureErrors } = require('../../utils/captureErrors');
 
 const assetsResolver = async ctx => {
   const ids = getIdsFromCtx(ctx);
