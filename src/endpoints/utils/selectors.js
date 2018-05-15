@@ -50,8 +50,8 @@ const select = ctx => ({
   get query() {
     return selectQuery(ctx);
   },
-  get fromParams() {
-    return what => selectFromParams(what)(ctx);
+  fromParams(what) {
+    return selectFromParams(what)(ctx);
   },
 });
 
