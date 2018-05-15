@@ -1,6 +1,6 @@
 const ONE_DAY = 1000 * 3600 * 24;
 
-const getParamsFromQuery = ({
+const selectParamsFromQuery = ({
   interval = '1d',
   timeStart = Date.now() - ONE_DAY,
   timeEnd = Date.now(),
@@ -10,4 +10,4 @@ const getParamsFromQuery = ({
   timeEnd,
 });
 
-module.exports = { getParamsFromQuery };
+module.exports = { selectParamsFromQuery };

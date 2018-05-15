@@ -1,9 +1,9 @@
 // const { createResolver } = require('../../resolvers/transactions/exchange');
-const { captureErrors } = require('../../utils/captureErrors');
-const { getIdFromCtx } = require('../../utils/getters');
+const { captureErrors } = require('../../../utils/captureErrors');
+const { selectors } = require('../../utils/selectors');
 
 const exchangeTxsResolver = async ctx => {
-  const id = getIdFromCtx(ctx);
+  const { id } = selectors(ctx);
 
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,

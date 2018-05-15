@@ -1,5 +1,5 @@
 // const { createResolver } = require('../../resolvers/transactions/exchange');
-const { captureErrors } = require('../../utils/captureErrors');
+const { captureErrors } = require('../../../utils/captureErrors');
 
 const exchangeTxsResolver = async ctx => {
   // Get params from user

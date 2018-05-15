@@ -1,9 +1,10 @@
 const { many: createResolver } = require('../../resolvers/assets');
-const { getIdsFromCtx } = require('../../utils/getters');
+const { select } = require('../utils/selectors');
 const { captureErrors } = require('../../utils/captureErrors');
 
 const assetsResolver = async ctx => {
-  const ids = getIdsFromCtx(ctx);
+  const { ids } = select(ctx);
+
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
     resolver: 'assets',
