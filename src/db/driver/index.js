@@ -2,15 +2,10 @@
 const pgpConnect = require('./pgp');
 
 const { fromPromised } = require('folktale/concurrency/task');
-const { evolve, compose, memoizeWith, always } = require('ramda');
+const { map, pick, compose, memoizeWith, always } = require('ramda');
 
 const createTaskedDriver = (options, connect = pgpConnect) => {
-  const createDriver = compose(
-    evolve({ many: fromPromised, none: fromPromised, any: fromPromised }),
-    connect
-  );
-
-  return createDriver({
+  const promiseDriver = connect({
     host: options.postgresHost,
     port: options.postgresPort,
     database: options.postgresDatabase,
@@ -18,6 +13,11 @@ const createTaskedDriver = (options, connect = pgpConnect) => {
     password: options.postgresPassword,
     max: options.postgresPoolSize, // max connection pool size
   });
+
+  return compose(
+    map(fromPromised),
+    pick(['none', 'one', 'many', 'any', 'oneOrNone', 'task', 'tx'])
+  )(promiseDriver);
 };
 
 module.exports = memoizeWith(always('taskedDb'), createTaskedDriver);
