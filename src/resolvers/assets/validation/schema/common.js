@@ -1,3 +1,4 @@
+const { BigNumber } = require('@waves/data-entities');
 const Joi = require('joi');
 
 const output = Joi.object().keys({
@@ -8,7 +9,7 @@ const output = Joi.object().keys({
     .allow('')
     .required(),
   issue_height: Joi.number().required(),
-  total_quantity: Joi.string().required(),
+  total_quantity: Joi.object().type(BigNumber),
   decimals: Joi.number().required(),
   reissuable: Joi.boolean().required(),
   ticker: Joi.string()

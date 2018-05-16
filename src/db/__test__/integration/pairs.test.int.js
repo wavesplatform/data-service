@@ -1,3 +1,5 @@
+const { BigNumber } = require('@waves/data-entities');
+
 const { Nothing } = require('folktale/maybe');
 const pair = require('../mocks/pair');
 
@@ -9,9 +11,11 @@ const db = createDb(loadConfig());
 const isPair = mx => {
   if (typeof mx !== 'object') return false;
 
-  const isNumber = x => typeof x === 'number';
+  const isBigNumber = x => x instanceof BigNumber;
   return (
-    isNumber(mx.first_price) && isNumber(mx.last_price) && isNumber(mx.volume)
+    isBigNumber(mx.first_price) &&
+    isBigNumber(mx.last_price) &&
+    isBigNumber(mx.volume)
   );
 };
 
