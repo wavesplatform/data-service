@@ -9,5 +9,5 @@ function sql(file) {
 
 module.exports = {
   assets: sql('./query/assets.sql'),
-  volumes: sql('./query/volumes.sql'),
+  pair: sql('./query/pair.sql'),
 };

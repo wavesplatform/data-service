@@ -1,19 +1,98 @@
 const pgt = require('../driver');
 
-const { driverConnectMock } = require('./mocks');
+const { driverP } = require('./mocks');
 
-test('pgt works', done => {
-  const taskedDbDriver = pgt({}, driverConnectMock);
+describe('Tasked driver method', () => {
+  const driverT = pgt({}, () => driverP);
 
-  taskedDbDriver
-    .many('some sql', [1, 2, 3])
-    .run()
-    .listen({
-      onResolved: xs => {
-        expect(xs).toEqual([1, 2, 3]);
-        done();
-      },
-    });
+  test('none works', done => {
+    driverT
+      .none('some sql', [1, 2, 3])
+      .run()
+      .listen({
+        onResolved: xs => {
+          expect(xs).toEqual(undefined);
+          done();
+        },
+      });
+  });
+
+  test('any works', done => {
+    driverT
+      .any('some sql', [1, 2, 3])
+      .run()
+      .listen({
+        onResolved: xs => {
+          expect(xs).toEqual([1, 2, 3]);
+          done();
+        },
+      });
+    driverT
+      .any('some sql', [1, 2, 3])
+      .run()
+      .listen({
+        onResolved: xs => {
+          expect(xs).toEqual([1, 2, 3]);
+          done();
+        },
+      });
+  });
+
+  test('one works', done => {
+    driverT
+      .one('some sql', 'single_value')
+      .run()
+      .listen({
+        onResolved: xs => {
+          expect(xs).toEqual('single_value');
+          done();
+        },
+      });
+  });
+
+  test('oneOrNone works', done => {
+    driverT
+      .oneOrNone('some sql', 'single_value')
+      .run()
+      .listen({
+        onResolved: xs => {
+          expect(xs).toEqual('single_value');
+          done();
+        },
+      });
+
+    driverT
+      .oneOrNone('some sql')
+      .run()
+      .listen({
+        onResolved: xs => {
+          expect(xs).toEqual(undefined);
+          done();
+        },
+      });
+  });
+
+  test('many works', done => {
+    driverT
+      .many('some sql', [1, 2, 3])
+      .run()
+      .listen({
+        onResolved: xs => {
+          expect(xs).toEqual([1, 2, 3]);
+          done();
+        },
+      });
+  });
+
+  test('task works with batch query', done => {
+    driverT
+      .task(t => t.batch([1, 2, 3]))
+      .run()
+      .listen({
+        onResolved: xs => {
+          expect(xs).toEqual([1, 2, 3]);
+          done();
+        },
+      });
+  });
 });
-
-module.exports = { driverConnectMock };

@@ -2,7 +2,7 @@ const { transformAsset } = require('./common');
 
 const { Asset } = require('../../../types');
 
-const { head, compose, map } = require('ramda');
+const { compose, map } = require('ramda');
 
 const assetOrNull = maybeAsset =>
   maybeAsset.matchWith({
@@ -11,6 +11,6 @@ const assetOrNull = maybeAsset =>
   });
 
 /** transformResults :: (Maybe RawAssetInfo)[] -> Asset | null */
-const transformResults = compose(assetOrNull, map(transformAsset), head);
+const transformResults = compose(assetOrNull, map(transformAsset));
 
 module.exports = transformResults;

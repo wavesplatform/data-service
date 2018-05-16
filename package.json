@@ -7,12 +7,14 @@
   "author": "Dmitry Shuranov <dvshur@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "dotenv -e variables.env nodemon index.js",
-    "dev": "NODE_ENV=development dotenv -e variables.env nodemon -- --inspect",
-    "test": "jest"
+    "start": "export $(cat variables.env | xargs) && nodemon index.js",
+    "lint": "eslint src",
+    "dev": "export $(cat variables.env | xargs) && NODE_ENV=development nodemon --inspect",
+    "test": "yarn test:u && yarn test:i",
+    "test:u": "jest --config=config/jest.config.unit.json",
+    "test:i": "export $(cat variables.env | xargs) && jest --config=config/jest.config.integration.json"
   },
   "devDependencies": {
-    "dotenv-cli": "^1.4.0",
     "eslint": "^4.19.1",
     "jest": "^22.4.3"
   },
