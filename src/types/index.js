@@ -11,5 +11,6 @@ const fromMaybe = curry((Type, mb) =>
 module.exports = {
   Asset: require('./Asset'),
   List: require('./List'),
+  Pair: require('./Pair'),
   fromMaybe,
 };
