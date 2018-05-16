@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "start": "dotenv -e variables.env nodemon index.js",
-    "dev": "NODE_ENV=development dotenv -e variables.env nodemon --inspect",
+    "dev": "NODE_ENV=development dotenv -e variables.env nodemon -- --inspect",
     "test": "jest"
   },
   "devDependencies": {
@@ -19,7 +19,8 @@
   "dependencies": {
     "@koa/cors": "^2.2.1",
     "@waves/data-entities": "^1.1.0",
-    "@waves/json-bigint": "git+https://github.com/wavesplatform/json-bigint.git",
+    "@waves/json-bigint":
+      "git+https://github.com/wavesplatform/json-bigint.git",
     "bignumber.js": "^7.0.1",
     "chalk": "^2.3.2",
     "check-env": "^1.3.0",

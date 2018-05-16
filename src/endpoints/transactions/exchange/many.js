@@ -1,10 +1,8 @@
 // const { createResolver } = require('../../resolvers/transactions/exchange');
-const { captureErrors } = require('../../utils/captureErrors');
-const { getIdFromCtx } = require('../../utils/getters');
+const { captureErrors } = require('../../../utils/captureErrors');
 
 const exchangeTxsResolver = async ctx => {
-  const id = getIdFromCtx(ctx);
-
+  // Get params from user
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
     resolver: 'assets',
@@ -15,7 +13,7 @@ const exchangeTxsResolver = async ctx => {
   // });
 
   // Run resolver with params
-  // const asset = await resolver(id)
+  // const asset = await resolver(params)
   //   .run()
   //   .promise();
 
@@ -23,7 +21,7 @@ const exchangeTxsResolver = async ctx => {
   //   value: asset,
   // });
 
-  ctx.body = 'Exchange one transactions result';
+  ctx.body = 'Exchange many transactions result';
 };
 
 const handleError = ({ ctx, error }) => {

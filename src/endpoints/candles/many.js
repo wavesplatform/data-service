@@ -1,14 +1,14 @@
 const { createResolver } = require('../../resolvers/candles');
-const { getQueryFromCtx, getPairsFromCtx } = require('../../utils/getters');
+const { select } = require('../utils/selectors');
 const { captureErrors } = require('../../utils/captureErrors');
-const { getParamsFromQuery } = require('./utils');
+const { selectParamsFromQuery } = require('./utils');
 /**
  * Endpoint
  * @name /candles?pairs[]‌="{asset_id_1}/{asset_id_2}"&pairs[]="{asset_id_1}/{asset_id_2}" ...other params
  */
 const candlesManyEndpoint = async ctx => {
-  const pairs = getPairsFromCtx(ctx);
-  const params = getParamsFromQuery(getQueryFromCtx(ctx));
+  const { pairs, query } = select(ctx);
+  const params = selectParamsFromQuery(query);
 
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,

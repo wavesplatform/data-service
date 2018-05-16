@@ -2,8 +2,8 @@ const Router = require('koa-router');
 
 const subrouter = new Router();
 
-const exchangeOne = require('./exchangeOne');
-const exchangeMany = require('./exchangeMany');
+const exchangeOne = require('./exchange/one');
+const exchangeMany = require('./exchange/many');
 
 subrouter.get('/transactions/exchange/:id', exchangeOne);
 subrouter.get('/transactions/exchange', exchangeMany);
