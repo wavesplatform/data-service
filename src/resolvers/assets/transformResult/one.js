@@ -2,7 +2,7 @@ const { transformAsset } = require('./common');
 
 const { Asset } = require('../../../types');
 
-const { head, compose, map } = require('ramda');
+const { compose, map } = require('ramda');
 
 const assetOrNull = maybeAsset =>
   maybeAsset.matchWith({

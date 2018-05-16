@@ -8,6 +8,7 @@
   "license": "MIT",
   "scripts": {
     "start": "export $(cat variables.env | xargs) && nodemon index.js",
+    "lint": "eslint src",
     "dev": "export $(cat variables.env | xargs) && NODE_ENV=development nodemon --inspect",
     "test": "yarn test:u && yarn test:i",
     "test:u": "jest --config=config/jest.config.unit.json",
