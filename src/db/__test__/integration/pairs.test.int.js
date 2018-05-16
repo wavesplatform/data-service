@@ -1,4 +1,5 @@
 const { Nothing } = require('folktale/maybe');
+const pair = require('../mocks/pair');
 
 const loadConfig = require('../../../loadConfig');
 const createDb = require('../../index');
@@ -17,7 +18,7 @@ const isPair = mx => {
 describe('Pair request should return ', () => {
   it('Maybe(data) for `one` pair correctly', done => {
     db.pairs
-      .one('WAVES/8LQW8f7P5d5PZM7GtZEBgaqRPGSzS3DfPuiXrURJ4AJS')
+      .one(pair('WAVES', 'BTC'))
       .run()
       .listen({
         onResolved: maybeX => {
@@ -40,11 +41,7 @@ describe('Pair request should return ', () => {
 
   it('Maybe(data)[] for `many` pairs request', done => {
     db.pairs
-      .many([
-        'WAVES/8LQW8f7P5d5PZM7GtZEBgaqRPGSzS3DfPuiXrURJ4AJS',
-        'NON_EXISTING_PAIR',
-        '474jTeYx2r2Va35794tCScAXWJG9hU2HcgxzMowaZUnu/8LQW8f7P5d5PZM7GtZEBgaqRPGSzS3DfPuiXrURJ4AJS',
-      ])
+      .many([pair('WAVES', 'BTC'), 'NON_EXISTING_PAIR', pair('ETH', 'BTC')])
       .run()
       .listen({
         onResolved: mxs => {
