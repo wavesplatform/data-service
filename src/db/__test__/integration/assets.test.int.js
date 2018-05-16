@@ -1,3 +1,5 @@
+const { BigNumber } = require('@waves/data-entities');
+
 const { Nothing } = require('folktale/maybe');
 
 const loadConfig = require('../../../loadConfig');
@@ -13,10 +15,13 @@ describe('Assets should return', () => {
       .listen({
         onResolved: maybeX => {
           const x = maybeX.getOrElse();
+
           expect(x.asset_id).toEqual(
             'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH'
           );
           expect(x.decimals).toEqual(8);
+          expect(x.total_quantity).toEqual(new BigNumber('100000000'));
+
           done();
         },
       });
@@ -46,6 +51,8 @@ describe('Assets should return', () => {
             'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH'
           );
           expect(x.decimals).toEqual(8);
+          expect(x.total_quantity).toEqual(new BigNumber('100000000'));
+          
           expect(mxs[1]).toEqual(Nothing());
           done();
         },
