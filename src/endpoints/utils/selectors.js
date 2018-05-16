@@ -32,10 +32,7 @@ const selectFromParams = what =>
 
 const selectId = selectFromParams('id');
 const selectIds = selectArrayFromQuery('ids');
-const selectPairs = pipe(
-  selectArrayFromQuery('pairs'),
-  map(pair => pair.split('/'))
-);
+const selectPairs = selectArrayFromQuery('pairs');
 
 const select = ctx => ({
   get id() {
