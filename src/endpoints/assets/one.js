@@ -1,9 +1,9 @@
-const { many: createResolver } = require('../../resolvers/assets');
-const { getIdsFromCtx } = require('../../utils/getters');
+const { one: createResolver } = require('../../resolvers/assets');
+const { select } = require('../utils/selectors');
 const { captureErrors } = require('../../utils/captureErrors');
 
-const assetsResolver = async ctx => {
-  const ids = getIdsFromCtx(ctx);
+const assetResolver = async ctx => {
+  const { id } = select(ctx);
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
     resolver: 'assets',
@@ -13,14 +13,20 @@ const assetsResolver = async ctx => {
     emitEvent: ctx.eventBus.emit,
   });
 
-  const assets = await resolver(ids)
+  const asset = await resolver(id)
     .run()
     .promise();
 
   ctx.eventBus.emit('ENDPOINT_RESOLVED', {
-    value: assets,
+    value: asset,
   });
-  ctx.state.returnValue = assets;
+
+  if (asset) {
+    ctx.state.returnValue = asset;
+  } else {
+    ctx.status = 404;
+    ctx.body = `Asset ${id} not found`;
+  }
 };
 
 const handleError = ({ ctx, error }) => {
@@ -32,7 +38,7 @@ const handleError = ({ ctx, error }) => {
     },
     Resolver: () => {
       ctx.status = 500;
-      ctx.body = 'Error resolving /assets';
+      ctx.body = 'Error resolving /asset';
     },
     Validation: () => {
       ctx.status = 400;
@@ -40,4 +46,4 @@ const handleError = ({ ctx, error }) => {
     },
   });
 };
-module.exports = captureErrors(handleError)(assetsResolver);
+module.exports = captureErrors(handleError)(assetResolver);
