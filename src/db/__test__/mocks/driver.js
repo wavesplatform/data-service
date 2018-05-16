@@ -1,3 +1,5 @@
+const { identity } = require('ramda');
+
 const Task = require('folktale/concurrency/task');
 
 const createSimpleDriver = resolve => {
@@ -15,7 +17,8 @@ const createSimpleDriver = resolve => {
 // mock pgp-like driver
 const createDriver = resolve => {
   const taskLike = fn =>
-    fn({ ...createSimpleDriver(Promise.resolve), batch: xs => resolve(xs) });
+    resolve(fn({ ...createSimpleDriver(identity), batch: identity }));
+
   return {
     ...createSimpleDriver(resolve),
     task: taskLike,
@@ -23,7 +26,7 @@ const createDriver = resolve => {
   };
 };
 
-const driverP = createDriver(Promise.resolve);
+const driverP = createDriver(x => Promise.resolve(x));
 const driverT = createDriver(Task.of);
 const driverTBad = createDriver(Task.rejected);
 

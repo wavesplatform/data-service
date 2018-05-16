@@ -5,7 +5,7 @@ const { fromPromised } = require('folktale/concurrency/task');
 const { map, pick, compose, memoizeWith, always } = require('ramda');
 
 const createTaskedDriver = (options, connect = pgpConnect) => {
-  const promiseDriver = connect({
+  const driverP = connect({
     host: options.postgresHost,
     port: options.postgresPort,
     database: options.postgresDatabase,
@@ -17,7 +17,7 @@ const createTaskedDriver = (options, connect = pgpConnect) => {
   return compose(
     map(fromPromised),
     pick(['none', 'one', 'many', 'any', 'oneOrNone', 'task', 'tx'])
-  )(promiseDriver);
+  )(driverP);
 };
 
-module.exports = memoizeWith(always('taskedDb'), createTaskedDriver);
+module.exports = memoizeWith(always('driverT'), createTaskedDriver);

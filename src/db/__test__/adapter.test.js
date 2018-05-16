@@ -1,62 +1,104 @@
-const { pathOr } = require('ramda');
-
 const Maybe = require('folktale/maybe');
 const { goodAdapter, badAdapter } = require('./mocks/');
 
-const createGoodTestForMethod = methodPath => {
-  const selectMethod = pathOr(() => {
-    throw new Error(`No method found on path ${methodPath.join('.')}`);
-  }, methodPath);
-
-  it(methodPath.join('.') + ' resolves correctly', done => {
-    selectMethod(goodAdapter)([1, 2, 3])
+// ASSETS
+describe('Asset method should correctly', () => {
+  it('resolve many', done => {
+    goodAdapter.assets
+      .many([1, 2, 3])
       .run()
       .listen({
         onResolved: xs => {
-          expect(xs).toEqual([Maybe.Just([1, 2, 3])]);
+          expect(xs).toEqual([Maybe.Just([1, 2, 3])]); // because of sql query accepting [[1, 2, 3]]
           done();
         },
       });
   });
 
-  it(methodPath.join('.') + ' rejects correctly', done => {
-    selectMethod(badAdapter)([1, 2, 3])
+  it('reject many', done => {
+    badAdapter.assets
+      .many([1, 2, 3])
       .run()
       .listen({
         onRejected: xs => {
-          expect(xs).toEqual([[1, 2, 3]]);
+          expect(xs).toEqual([[1, 2, 3]]); // because of sql query accepting [[1, 2, 3]]
           done();
         },
       });
   });
-};
 
-// todo rewrite to unit
-describe('Adapter should', () => {
-  // createGoodTestForMethod(['assets', 'one']);
-  createGoodTestForMethod(['assets', 'many']);
-  createGoodTestForMethod(['pairs', 'many']);
+  it('resolve one', done => {
+    goodAdapter.assets
+      .one(1)
+      .run()
+      .listen({
+        onResolved: xs => {
+          expect(xs).toEqual(Maybe.Just([1])); // because of sql query accepting [[1, 2, 3]]
+          done();
+        },
+      });
+  });
+
+  it('reject one', done => {
+    badAdapter.assets
+      .many(1)
+      .run()
+      .listen({
+        onRejected: xs => {
+          expect(xs).toEqual([1]);
+          done();
+        },
+      });
+  });
 });
 
-// test('Adapter returns resolving task ', done => {
-//   goodAdapter
-//     .assets([1, 2, 3])
-//     .run()
-//     .listen({
-//       onResolved: xs => {
-//         expect(xs).toEqual([Just([1, 2, 3])]);
-//         done();
-//       },
-//     });
-// });
-// test('Adapter returns rejecting task', done => {
-//   badAdapter
-//     .assets([1, 2, 3])
-//     .run()
-//     .listen({
-//       onRejected: xs => {
-//         expect(xs).toEqual([[1, 2, 3]]);
-//         done();
-//       },
-//     });
-// });
+// PAIRS
+describe('Pairs method should correctly', () => {
+  it('resolve one', done => {
+    goodAdapter.pairs
+      .one(1)
+      .run()
+      .listen({
+        onResolved: xs => {
+          expect(xs).toEqual(Maybe.Just(1));
+          done();
+        },
+      });
+  });
+
+  it('reject one', done => {
+    badAdapter.pairs
+      .one(1)
+      .run()
+      .listen({
+        onRejected: xs => {
+          expect(xs).toEqual(1);
+          done();
+        },
+      });
+  });
+
+  it('resolve many', done => {
+    goodAdapter.pairs
+      .many([1, 2, 3])
+      .run()
+      .listen({
+        onResolved: xs => {
+          expect(xs).toEqual([1, 2, 3].map(Maybe.Just));
+          done();
+        },
+      });
+  });
+
+  it('reject many', done => {
+    badAdapter.pairs
+      .many([1, 2, 3])
+      .run()
+      .listen({
+        onRejected: xs => {
+          expect(xs).toEqual([1, 2, 3]);
+          done();
+        },
+      });
+  });
+});

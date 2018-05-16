@@ -57,15 +57,5 @@ describe('Pair request should', () => {
           done();
         },
       });
-
-    db.pairs
-      .one('NON_EXISTING_PAIR')
-      .run()
-      .listen({
-        onResolved: maybeX => {
-          expect(maybeX).toEqual(Nothing());
-          done();
-        },
-      });
   });
 });

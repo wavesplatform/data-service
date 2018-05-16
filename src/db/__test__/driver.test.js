@@ -3,7 +3,7 @@ const pgt = require('../driver');
 const { driverP } = require('./mocks');
 
 describe('Tasked driver method', () => {
-  const driverT = pgt({}, driverP);
+  const driverT = pgt({}, () => driverP);
 
   test('none works', done => {
     driverT
@@ -32,7 +32,7 @@ describe('Tasked driver method', () => {
       .run()
       .listen({
         onResolved: xs => {
-          expect(xs).toEqual(undefined);
+          expect(xs).toEqual([1, 2, 3]);
           done();
         },
       });
