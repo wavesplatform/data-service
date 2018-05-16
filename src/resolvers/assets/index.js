@@ -6,22 +6,18 @@ const curriedEmit = emit => curryN(2, emit);
 const oneConfig = {
   ...require('./validation/one'),
   transformResult: require('./transformResult/one'),
-  dbQuery: db => id => db.assets([id]),
+  dbQuery: db => id => db.assets.one(id),
 };
 
 const manyConfig = {
   ...require('./validation/many'),
   transformResult: require('./transformResult/many'),
-  dbQuery: db => ids => db.assets(ids),
+  dbQuery: db => ids => db.assets.many(ids),
 };
 
 module.exports = {
   many: ({ db, emitEvent }) =>
     create.many(manyConfig)({ db, emitEvent: curriedEmit(emitEvent) }),
   one: ({ db, emitEvent }) =>
-    /**
-     * Calling for many, since we have
-     * magic transformation in config
-     */
-    create.many(oneConfig)({ db, emitEvent: curriedEmit(emitEvent) }),
+    create.one(oneConfig)({ db, emitEvent: curriedEmit(emitEvent) }),
 };

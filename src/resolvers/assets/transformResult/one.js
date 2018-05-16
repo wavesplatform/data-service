@@ -11,6 +11,6 @@ const assetOrNull = maybeAsset =>
   });
 
 /** transformResults :: (Maybe RawAssetInfo)[] -> Asset | null */
-const transformResults = compose(assetOrNull, map(transformAsset), head);
+const transformResults = compose(assetOrNull, map(transformAsset));
 
 module.exports = transformResults;
