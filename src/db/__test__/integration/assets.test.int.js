@@ -6,7 +6,7 @@ const createDb = require('../../index');
 const db = createDb(loadConfig());
 
 describe('Assets should return', () => {
-  it('return Maybe(data) for `one` correctly', done => {
+  it('Maybe(data) for `one` correctly', done => {
     db.assets
       .one('G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH')
       .run()
@@ -32,7 +32,7 @@ describe('Assets should return', () => {
       });
   });
 
-  it('return Maybe(data)[] for `many` request', done => {
+  it('Maybe(data)[] for `many` request', done => {
     db.assets
       .many([
         'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH',

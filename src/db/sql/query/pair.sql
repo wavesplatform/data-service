@@ -7,7 +7,7 @@ with t as (
 	join asset_decimals aa on (amount_asset = aa.asset_id)
 	join asset_decimals pa on (price_asset = pa.asset_id)
 	where txs_7.time_stamp between timezone('utc', now() - interval '1 day') and timezone('utc', now())
-		and 	amount_asset || '/' || price_asset = $1
+		and amount_asset || '/' || price_asset = $1
 )
 select
 	first_price,

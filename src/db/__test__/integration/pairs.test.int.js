@@ -14,8 +14,8 @@ const isPair = mx => {
   );
 };
 
-describe('Pair request should', () => {
-  it('return Maybe(data) for `one` pair correctly', done => {
+describe('Pair request should return ', () => {
+  it('Maybe(data) for `one` pair correctly', done => {
     db.pairs
       .one('WAVES/8LQW8f7P5d5PZM7GtZEBgaqRPGSzS3DfPuiXrURJ4AJS')
       .run()
@@ -38,7 +38,7 @@ describe('Pair request should', () => {
       });
   });
 
-  it('return Maybe(data)[] for `many` pairs request', done => {
+  it('Maybe(data)[] for `many` pairs request', done => {
     db.pairs
       .many([
         'WAVES/8LQW8f7P5d5PZM7GtZEBgaqRPGSzS3DfPuiXrURJ4AJS',
