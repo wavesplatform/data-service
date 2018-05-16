@@ -8,7 +8,7 @@ const { captureErrors } = require('../../utils/captureErrors');
  */
 const pairsOneEndpoint = async ctx => {
   const { fromParams } = select(ctx);
-  const pair = fromParams(['id1', 'id2']);
+  const [id1, id2] = fromParams(['id1', 'id2']);
 
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
@@ -20,7 +20,7 @@ const pairsOneEndpoint = async ctx => {
   //   emitEvent: ctx.eventBus.emit,
   // });
 
-  // const pairs = await resolver(pair)
+  // const pairs = await resolver(`${id1}/${id2}`)
   //   .run()
   //   .promise();
 
