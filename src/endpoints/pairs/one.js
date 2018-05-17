@@ -1,4 +1,4 @@
-const { createResolver } = require('../../resolvers/pairs');
+const { one: createResolver } = require('../../resolvers/pairs');
 const { select } = require('../utils/selectors');
 const { captureErrors } = require('../../utils/captureErrors');
 
@@ -15,26 +15,25 @@ const pairsOneEndpoint = async ctx => {
     resolver: 'pairsOne',
   });
 
-  // const resolver = createResolver({
-  //   db: ctx.state.db,
-  //   emitEvent: ctx.eventBus.emit,
-  // });
+  const resolver = createResolver({
+    db: ctx.state.db,
+    emitEvent: ctx.eventBus.emit,
+  });
 
-  // const pairs = await resolver(`${id1}/${id2}`)
-  //   .run()
-  //   .promise();
+  const pairs = await resolver(`${id1}/${id2}`)
+    .run()
+    .promise();
 
-  // ctx.eventBus.emit('ENDPOINT_RESOLVED', {
-  //   value: pairs,
-  // });
+  ctx.eventBus.emit('ENDPOINT_RESOLVED', {
+    value: pairs,
+  });
 
-  // if (pairs) {
-  //   ctx.state.returnValue = pairs;
-  // } else {
-  //   ctx.status = 404;
-  //   ctx.body = `pairs for ${id1}/${id2} not found`;
-  // }
-  ctx.body = 'Invoked pairs one endpoint';
+  if (pairs) {
+    ctx.state.returnValue = pairs;
+  } else {
+    ctx.status = 404;
+    ctx.body = `pairs for ${id1}/${id2} not found`;
+  }
 };
 
 const handleError = ({ ctx, error }) => {

@@ -25,8 +25,8 @@ const selectQuery = pathOr({}, ['query']);
 
 const selectFromParams = what =>
   ifElse(
-    Array.isArray,
-    pipe(selectParams, pickAll(what), values, String),
+    () => Array.isArray(what),
+    pipe(selectParams, pickAll(what), values),
     pipe(selectParams, pathOr('', [what]), String)
   );
 

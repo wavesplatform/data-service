@@ -1,4 +1,4 @@
-const { createResolver } = require('../../resolvers/pairs');
+const { many: createResolver } = require('../../resolvers/pairs');
 const { select } = require('../utils/selectors');
 const { captureErrors } = require('../../utils/captureErrors');
 /**
@@ -13,21 +13,20 @@ const pairsManyEndpoint = async ctx => {
     resolver: 'pairsMany',
   });
 
-  // const resolver = createResolver({
-  //   db: ctx.state.db,
-  //   emitEvent: ctx.eventBus.emit,
-  // });
+  const resolver = createResolver({
+    db: ctx.state.db,
+    emitEvent: ctx.eventBus.emit,
+  });
 
-  // const pairs = await resolver(pairs)
-  //   .run()
-  //   .promise();
+  const result = await resolver(pairs)
+    .run()
+    .promise();
 
-  // ctx.eventBus.emit('ENDPOINT_RESOLVED', {
-  //   value: pairs,
-  // });
+  ctx.eventBus.emit('ENDPOINT_RESOLVED', {
+    value: result,
+  });
 
-  // ctx.state.returnValue = pairs;
-  ctx.body = 'Invoked pairs many endpoint';
+  ctx.state.returnValue = result;
 };
 
 const handleError = ({ ctx, error }) => {
