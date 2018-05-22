@@ -12,5 +12,6 @@ module.exports = {
   Asset: require('./Asset'),
   List: require('./List'),
   Pair: require('./Pair'),
+  Transaction: require('./Transaction'),
   fromMaybe,
 };
