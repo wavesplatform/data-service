@@ -32,6 +32,12 @@ const createResolver = oneOrMany => {
       map(transformResult), // Task AppError Result
       map(tap(emitEvent('RESULT_VALIDATION_OK'))),
       chainRT(toValidateM(validateResult)), // Task AppError Maybe DbResult
+      map(
+        tap(v => {
+          // eslint-disable-next-line
+          debugger;
+        })
+      ),
       map(tap(emitEvent('DB_QUERY_OK'))),
       chain(dbQuery(db)), // Task AppError Maybe DbResult
       map(tap(emitEvent('INPUT_VALIDATION_OK'))),
