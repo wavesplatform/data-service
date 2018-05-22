@@ -44,6 +44,17 @@ const createDbAdapter = ({
           .mapRejected(errorFactory({ request: 'pairs.many', params: xs }));
       },
     },
+
+    transactions: {
+      exchange: {
+        one() {
+          return dbT
+            .any(sql.assets, ['WAVES'])
+            .map(() => require('./exchange.mock'))
+            .map(Maybe.of);
+        },
+      },
+    },
   };
 };
 
