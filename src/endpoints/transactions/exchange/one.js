@@ -24,7 +24,6 @@ const exchangeTxsEndpointOne = async ctx => {
     value: tx,
   });
   ctx.state.returnValue = tx;
-  // ctx.body = 'Exchange one transactions result';
 };
 
 const handleError = ({ ctx, error }) => {
