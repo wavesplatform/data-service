@@ -21,13 +21,13 @@
   "dependencies": {
     "@koa/cors": "^2.2.1",
     "@waves/data-entities": "^1.1.0",
-    "@waves/json-bigint":
-      "git+https://github.com/wavesplatform/json-bigint.git",
+    "@waves/json-bigint": "git+https://github.com/wavesplatform/json-bigint.git",
     "bignumber.js": "^7.0.1",
     "chalk": "^2.3.2",
     "check-env": "^1.3.0",
     "folktale": "^2.1.0",
     "joi": "^13.2.0",
+    "knex": "^0.14.6",
     "koa": "^2.5.0",
     "koa-qs": "^2.0.0",
     "koa-requestid": "^2.0.1",
