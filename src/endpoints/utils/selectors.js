@@ -1,7 +1,6 @@
 const {
   pipe,
   pickAll,
-  map,
   ifElse,
   values,
   always,
