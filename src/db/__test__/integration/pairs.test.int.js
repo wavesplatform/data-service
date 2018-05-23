@@ -29,7 +29,7 @@ describe('Pair request should return ', () => {
           const x = maybeX.getOrElse();
           expect(isPair(x)).toBe(true);
           done();
-        }
+        },
       });
 
     db.pairs
@@ -39,7 +39,7 @@ describe('Pair request should return ', () => {
         onResolved: maybeX => {
           expect(maybeX).toEqual(Nothing());
           done();
-        }
+        },
       });
   });
 
