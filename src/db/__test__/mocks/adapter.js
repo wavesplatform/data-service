@@ -1,19 +1,13 @@
 const createAdapter = require('../../adapter');
 
-const { driverT, driverTBad } = require('./driver');
+const createSqlProxy = require('./sql');
 
-const createMockAdapter = driver =>
+const createMockAdapter = (driver, sql = createSqlProxy()) =>
   createAdapter({
     taskedDbDriver: driver,
     batchQueryFn: () => x => x,
     errorFactory: () => x => x,
+    sql,
   });
 
-const goodAdapter = createMockAdapter(driverT);
-const badAdapter = createMockAdapter(driverTBad);
-
-module.exports = {
-  createMockAdapter,
-  goodAdapter,
-  badAdapter,
-};
+module.exports = createMockAdapter;

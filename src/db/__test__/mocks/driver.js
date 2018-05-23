@@ -1,37 +1,20 @@
-const { identity } = require('ramda');
+const { reduce, curry } = require('ramda');
 
-const Task = require('folktale/concurrency/task');
+const createDriver = curry((resolve, fn) => {
+  const m = (...args) => resolve(fn(...args));
 
-const createSimpleDriver = resolve => {
-  const anyLike = (sql, x) => resolve(x);
+  const ms = [
+    'none',
+    'any',
+    'one',
+    'many',
+    'oneOrNone',
+    'oneOrMany',
+    'task',
+    'tx',
+  ];
 
-  return {
-    any: anyLike,
-    many: anyLike,
-    oneOrNone: anyLike,
-    one: anyLike,
-    none: () => resolve(),
-  };
-};
+  return reduce((acc, x) => ((acc[x] = m), acc), {}, ms);
+});
 
-// mock pgp-like driver
-const createDriver = resolve => {
-  const taskLike = fn =>
-    resolve(fn({ ...createSimpleDriver(identity), batch: identity }));
-
-  return {
-    ...createSimpleDriver(resolve),
-    task: taskLike,
-    tx: taskLike,
-  };
-};
-
-const driverP = createDriver(x => Promise.resolve(x));
-const driverT = createDriver(Task.of);
-const driverTBad = createDriver(Task.rejected);
-
-module.exports = {
-  driverP,
-  driverT,
-  driverTBad,
-};
+module.exports = createDriver;

@@ -1,17 +1,19 @@
 const pgt = require('../driver');
 
-const { driverP } = require('./mocks');
+const { driver } = require('./mocks');
 
 describe('Tasked driver method', () => {
-  const driverT = pgt({}, () => driverP);
+  const driverT = pgt({}, () =>
+    driver.create(x => Promise.resolve(x), (...args) => args)
+  );
 
   test('none works', done => {
     driverT
-      .none('some sql', [1, 2, 3])
+      .none('some sql')
       .run()
       .listen({
         onResolved: xs => {
-          expect(xs).toEqual(undefined);
+          expect(xs).toEqual(['some sql']);
           done();
         },
       });
@@ -23,16 +25,7 @@ describe('Tasked driver method', () => {
       .run()
       .listen({
         onResolved: xs => {
-          expect(xs).toEqual([1, 2, 3]);
-          done();
-        },
-      });
-    driverT
-      .any('some sql', [1, 2, 3])
-      .run()
-      .listen({
-        onResolved: xs => {
-          expect(xs).toEqual([1, 2, 3]);
+          expect(xs).toEqual(['some sql', [1, 2, 3]]);
           done();
         },
       });
@@ -44,7 +37,7 @@ describe('Tasked driver method', () => {
       .run()
       .listen({
         onResolved: xs => {
-          expect(xs).toEqual('single_value');
+          expect(xs).toEqual(['some sql', 'single_value']);
           done();
         },
       });
@@ -56,7 +49,7 @@ describe('Tasked driver method', () => {
       .run()
       .listen({
         onResolved: xs => {
-          expect(xs).toEqual('single_value');
+          expect(xs).toEqual(['some sql', 'single_value']);
           done();
         },
       });
@@ -66,7 +59,7 @@ describe('Tasked driver method', () => {
       .run()
       .listen({
         onResolved: xs => {
-          expect(xs).toEqual(undefined);
+          expect(xs).toEqual(['some sql']);
           done();
         },
       });
@@ -78,7 +71,7 @@ describe('Tasked driver method', () => {
       .run()
       .listen({
         onResolved: xs => {
-          expect(xs).toEqual([1, 2, 3]);
+          expect(xs).toEqual(['some sql', [1, 2, 3]]);
           done();
         },
       });
@@ -86,11 +79,11 @@ describe('Tasked driver method', () => {
 
   test('task works with batch query', done => {
     driverT
-      .task(t => t.batch([1, 2, 3]))
+      .task('CALLBACK_ARG')
       .run()
       .listen({
         onResolved: xs => {
-          expect(xs).toEqual([1, 2, 3]);
+          expect(xs).toEqual(['CALLBACK_ARG']);
           done();
         },
       });

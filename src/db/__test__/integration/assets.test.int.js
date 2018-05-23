@@ -52,7 +52,7 @@ describe('Assets should return', () => {
           );
           expect(x.decimals).toEqual(8);
           expect(x.total_quantity).toEqual(new BigNumber('100000000'));
-          
+
           expect(mxs[1]).toEqual(Nothing());
           done();
         },
