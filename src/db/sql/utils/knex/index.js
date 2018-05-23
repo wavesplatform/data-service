@@ -1,5 +1,5 @@
-const { where } = require('./lib');
+const { omit } = require('ramda');
 
-module.exports = {
-  where,
-};
+const K = require('./lib');
+
+module.exports = omit('hasMethod', K);

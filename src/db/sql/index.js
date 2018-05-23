@@ -7,7 +7,11 @@ function sql(file) {
   return new QueryFile(fullPath, { minify: true });
 }
 
+// @todo refactor — remove different ways to construct sql
 module.exports = {
-  assets: sql('./query/assets.sql'),
-  pair: sql('./query/pair.sql'),
+  raw: {
+    assets: sql('./raw/assets.sql'),
+    pair: sql('./raw/pair.sql'),
+  },
+  build: require('./build'),
 };
