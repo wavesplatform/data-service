@@ -53,6 +53,12 @@ const createDbAdapter = ({
             .map(() => require('./exchange.mock'))
             .map(Maybe.of);
         },
+        many() {
+          return dbT
+            .any(sql.assets, ['WAVES'])
+            .map(() => [require('./exchange.mock'), require('./exchange.mock')])
+            .map(map(Maybe.of));
+        },
       },
     },
   };
