@@ -33,7 +33,7 @@ describe('Exchange transactions should return ', () => {
       });
   });
 
-  it('Maybe(data)[] for `many` pairs request', done => {
+  it('Maybe(data)[] for `many` txs request', done => {
     db.transactions.exchange
       .many()
       .run()
