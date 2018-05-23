@@ -1,31 +1,33 @@
-// const { createResolver } = require('../../resolvers/transactions/exchange');
+const {
+  many: createResolver,
+} = require('../../../resolvers/transactions/exchange');
 const { captureErrors } = require('../../../utils/captureErrors');
 const { select } = require('../../utils/selectors');
 const { selectFilters } = require('./utils');
 
 const exchangeTxsEndpointMany = async ctx => {
-  const { query, ids } = select(ctx);
+  const { query } = select(ctx);
   const filters = selectFilters(query);
 
   // Get params from user
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
-    resolver: 'assets',
+    resolver: 'txsExchangeMany',
   });
-  // const resolver = createResolver({
-  //   db: ctx.state.db,
-  //   emitEvent: ctx.eventBus.emit,
-  // });
+  const resolver = createResolver({
+    db: ctx.state.db,
+    emitEvent: ctx.eventBus.emit,
+  });
 
-  // const asset = await resolver(ids, filters)
-  //   .run()
-  //   .promise();
+  const txs = await resolver(filters)
+    .run()
+    .promise();
 
-  // ctx.eventBus.emit('ENDPOINT_RESOLVED', {
-  //   value: asset,
-  // });
+  ctx.eventBus.emit('ENDPOINT_RESOLVED', {
+    value: txs,
+  });
 
-  ctx.body = 'Exchange transactions many result';
+  ctx.state.returnValue = txs;
 };
 
 const handleError = ({ ctx, error }) => {
