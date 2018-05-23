@@ -12,7 +12,7 @@
     "dev": "export $(cat variables.env | xargs) && NODE_ENV=development nodemon --inspect",
     "test": "yarn test:u && yarn test:i",
     "test:u": "jest --config=config/jest.config.unit.json",
-    "test:i": "export $(cat variables.env | xargs) && jest --config=config/jest.config.integration.json"
+    "test:i": "export $(cat variables.stage.env | xargs) && jest --config=config/jest.config.integration.json"
   },
   "devDependencies": {
     "eslint": "^4.19.1",
