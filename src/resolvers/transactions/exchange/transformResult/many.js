@@ -1,14 +1,14 @@
-// const { transformAsset } = require('./common');
+const { transformTx } = require('./common');
 
-// const { Asset, List, fromMaybe } = require('../../../types');
+const { Transaction, List, fromMaybe } = require('../../../../types');
 
-// const { map, compose } = require('ramda');
+const { map, compose } = require('ramda');
 
-// /** transformResults :: (Maybe RawAssetInfo)[] -> List Asset */
-// const transformResults = compose(
-//   List,
-//   map(fromMaybe(Asset)),
-//   map(map(transformAsset))
-// );
+/** transformResults :: (Maybe RawTxInfo)[] -> List Tx */
+const transformResults = compose(
+  List,
+  map(fromMaybe(Transaction)),
+  map(map(transformTx))
+);
 
-// module.exports = transformResults;
+module.exports = transformResults;
