@@ -13,7 +13,7 @@ describe('Asset methods should correctly', () => {
       .run()
       .listen({
         onResolved: xs => {
-          expect(xs).toEqual([1, 2, 3].map(Maybe.of)); // because of sql query accepting [[1, 2, 3]]
+          expect(xs).toEqual([1, 2, 3].map(Maybe.of));
           done();
         },
       });
@@ -25,7 +25,7 @@ describe('Asset methods should correctly', () => {
       .run()
       .listen({
         onRejected: xs => {
-          expect(xs).toEqual([1, 2, 3]); // because of sql query accepting [[1, 2, 3]]
+          expect(xs).toEqual([1, 2, 3]);
           done();
         },
       });
@@ -37,7 +37,7 @@ describe('Asset methods should correctly', () => {
       .run()
       .listen({
         onResolved: xs => {
-          expect(xs).toEqual(Maybe.Just(1)); // because of sql query accepting [[1, 2, 3]]
+          expect(xs).toEqual(Maybe.Just(1));
           done();
         },
       });

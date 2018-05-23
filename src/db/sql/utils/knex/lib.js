@@ -1,18 +1,4 @@
-const {
-  propOr,
-  findIndex,
-  slice,
-  concat,
-  equals,
-  type,
-  compose,
-  prop,
-  curryN,
-} = require('ramda');
-
-// const hasMethod = curryN(2, (method, x) =>
-//   compose(equals('Function'), type, propOr(undefined, method))(x)
-// );
+const { findIndex, slice, concat, type, curryN } = require('ramda');
 
 const hasMethod = curryN(
   2,
