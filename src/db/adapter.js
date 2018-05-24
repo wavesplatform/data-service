@@ -1,20 +1,19 @@
 const { propEq, map, head } = require('ramda');
 const Maybe = require('folktale/maybe');
 
-const sql = require('./sql');
-
 // db adapter factory
 const createDbAdapter = ({
   taskedDbDriver: dbT,
   batchQueryFn,
   errorFactory,
+  sql,
 }) => {
   return {
     assets: {
       /** assets.many :: AssetId[] -> Task (Maybe Result)[] AppError.Db */
       many(assetIds) {
         return dbT
-          .any(sql.assets, [assetIds])
+          .any(sql.raw.assets, [assetIds])
           .map(batchQueryFn(propEq('asset_id'), assetIds))
           .map(map(Maybe.fromNullable))
           .mapRejected(errorFactory({ request: 'assets', params: assetIds }));
@@ -31,7 +30,7 @@ const createDbAdapter = ({
       /** pairs.one :: Pair -> Task (Maybe Result) AppError.Db */
       one(x) {
         return dbT
-          .oneOrNone(sql.pair, x)
+          .oneOrNone(sql.raw.pair, x)
           .map(Maybe.fromNullable)
           .mapRejected(errorFactory({ request: 'pairs.one', params: x }));
       },
@@ -39,7 +38,7 @@ const createDbAdapter = ({
       /** pairs.many :: Pair -> Task (Maybe Result) AppError.Db */
       many(xs) {
         return dbT
-          .task(t => t.batch(xs.map(x => t.oneOrNone(sql.pair, x))))
+          .task(t => t.batch(xs.map(x => t.oneOrNone(sql.raw.pair, x))))
           .map(map(Maybe.fromNullable))
           .mapRejected(errorFactory({ request: 'pairs.many', params: xs }));
       },
@@ -47,17 +46,25 @@ const createDbAdapter = ({
 
     transactions: {
       exchange: {
-        one() {
+        one(x) {
           return dbT
-            .any(sql.assets, ['WAVES'])
-            .map(() => require('./exchange.mock'))
-            .map(Maybe.of);
+            .oneOrNone(sql.build.transactions.exchange.one(x))
+            .map(Maybe.fromNullable)
+            .mapRejected(
+              errorFactory({ request: 'transactions.exchange.one', params: x })
+            );
         },
-        many() {
+
+        many(filters) {
           return dbT
-            .any(sql.assets, ['WAVES'])
-            .map(() => [require('./exchange.mock'), require('./exchange.mock')])
-            .map(map(Maybe.of));
+            .any(sql.build.transactions.exchange.many(filters))
+            .map(map(Maybe.of))
+            .mapRejected(
+              errorFactory({
+                request: 'transactions.exchange.many',
+                params: filters,
+              })
+            );
         },
       },
     },
