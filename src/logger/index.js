@@ -1,5 +1,5 @@
 const createLogger = require('./winston');
-const { stringifyInProd } = require('./utils');
+const { stringifyMetaInProd } = require('./utils');
 
 const createAndSubscribeLogger = ({ options, eventBus }) => {
   const logger = createLogger(options);
@@ -11,7 +11,7 @@ const createAndSubscribeLogger = ({ options, eventBus }) => {
         request,
         event: {
           name: message,
-          meta: stringifyInProd({
+          meta: stringifyMetaInProd({
             type: data.type,
             stack: data.error.stack,
             message: data.error.message,
@@ -22,7 +22,7 @@ const createAndSubscribeLogger = ({ options, eventBus }) => {
       : logger.log({
         level: 'info',
         request,
-        event: { name: message, meta: stringifyInProd(data) },
+        event: { name: message, meta: stringifyMetaInProd(data) },
       });
   };
 

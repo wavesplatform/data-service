@@ -10,6 +10,7 @@ const exchangeTxsEndpointOne = async ctx => {
     url: ctx.originalUrl,
     resolver: 'txsExchangeOne',
   });
+
   const resolver = createResolver({
     db: ctx.state.db,
     emitEvent: ctx.eventBus.emit,

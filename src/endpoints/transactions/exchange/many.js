@@ -9,11 +9,11 @@ const exchangeTxsEndpointMany = async ctx => {
   const { query } = select(ctx);
   const filters = selectFilters(query);
 
-  // Get params from user
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
     resolver: 'txsExchangeMany',
   });
+
   const resolver = createResolver({
     db: ctx.state.db,
     emitEvent: ctx.eventBus.emit,

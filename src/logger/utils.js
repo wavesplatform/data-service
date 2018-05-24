@@ -2,7 +2,7 @@ const { identity, pathEq, ifElse } = require('ramda');
 var colorize = require('json-colorizer');
 
 const isDev = pathEq(['env', 'NODE_ENV'], 'development');
-const stringifyInProd = ifElse(
+const stringifyMetaInProd = ifElse(
   isDev,
   () => identity,
   () => JSON.stringify.bind(JSON)
@@ -17,6 +17,6 @@ const stringify = ifElse(
 
 module.exports = {
   isDev,
-  stringifyInProd,
+  stringifyMetaInProd,
   stringify,
 };
