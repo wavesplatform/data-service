@@ -2,7 +2,7 @@ const { findIndex, slice, concat, type, curryN } = require('ramda');
 
 const hasMethod = curryN(
   2,
-  (method, x) => type(x) === 'Object' && type(x[method]) === 'Function'
+  (method, x) => x && x[method] && type(x[method]) === 'Function' || false
 );
 
 const createPointfree = method => (...args) => {
