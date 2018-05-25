@@ -67,7 +67,7 @@ module.exports = {
       sender ? q => F.sender(sender, q) : identity,
       matcher ? q => F.matcher(matcher, q) : identity,
       q => F.limit(limit, q),
-      q => F.timeEnd(timeEnd, q),
+      timeEnd ? q => F.timeEnd(timeEnd, q) : identity,
       q => F.timeStart(timeStart, q)
     )(q),
 };

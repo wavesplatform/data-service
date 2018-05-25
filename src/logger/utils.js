@@ -1,11 +1,13 @@
 const { identity, pathEq, ifElse } = require('ramda');
 var colorize = require('json-colorizer');
 
+const bindedStringify = JSON.stringify.bind(JSON);
+
 const isDev = pathEq(['env', 'NODE_ENV'], 'development');
 const stringifyMetaInProd = ifElse(
   isDev,
   () => identity,
-  () => JSON.stringify.bind(JSON)
+  () => bindedStringify
 )(process);
 const separator = () => new Array(64).fill('-').join('');
 

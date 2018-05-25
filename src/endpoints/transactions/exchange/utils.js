@@ -2,14 +2,14 @@ const ONE_DAY = 1000 * 3600 * 24;
 
 const selectFilters = ({
   timeStart = new Date(Date.now() - ONE_DAY),
-  timeEnd = new Date(),
+  timeEnd,
   matcher,
   sender,
   limit = 100,
-  sort = '+id',
+  sort = '-timestamp',
 }) => ({
   timeStart: new Date(+timeStart),
-  timeEnd: new Date(+timeEnd),
+  timeEnd: timeEnd && new Date(+timeEnd),
   limit,
   sort,
   matcher,
