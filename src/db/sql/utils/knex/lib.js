@@ -18,5 +18,6 @@ const createPointfree = method => (...args) => {
 module.exports = {
   hasMethod,
   where: createPointfree('where'),
+  limit: createPointfree('limit'),
   orWhere: createPointfree('orWhere'),
 };

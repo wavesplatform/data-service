@@ -1,20 +1,20 @@
 const Maybe = require('folktale/maybe');
 
-const { Asset } = require('../../../../types');
+const { Transaction } = require('../../../../../types');
 const transformResult = require('../one');
 
-const { asset, transformedAsset } = require('../../mocks/asset');
+const {
+  txExchange,
+  transformedTxExchange,
+} = require('../../../mocks/exchange');
 
-const assetsFromDb = Maybe.of({
-  ...asset,
-  ticker: null,
-});
+const txFromDb = Maybe.of(txExchange);
 
-const assetObject = Asset(transformedAsset);
+const txObject = Transaction(transformedTxExchange);
 
-describe('outputTransform for one asset', () => {
-  it('should create an Asset object from db singleton array', () => {
-    expect(transformResult(assetsFromDb)).toEqual(assetObject);
+describe('outputTransform for one tx', () => {
+  it('should create an Transaction object from db', () => {
+    expect(transformResult(txFromDb)).toEqual(txObject);
   });
   it('should return null if db returns null', () => {
     expect(transformResult(Maybe.empty())).toEqual(null);

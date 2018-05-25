@@ -1,5 +1,5 @@
 const F = require('./filters');
-
+const { compose, identity } = require('ramda');
 const pg = require('knex')({ client: 'pg' });
 
 // @todo — support `proofs` as well as `signature`
@@ -60,5 +60,14 @@ const q = pg({ t: 'txs_7' })
 // many — apply filters
 module.exports = {
   one: id => F.id(id, q).toString(),
-  many: () => q.toString(),
+  many: ({ timeStart, timeEnd, limit, /* sort, */ matcher, sender }) =>
+    compose(
+      String,
+      // q => F.sort(timeStart, q),
+      sender ? q => F.sender(sender, q) : identity,
+      matcher ? q => F.matcher(matcher, q) : identity,
+      q => F.limit(limit, q),
+      q => F.timeEnd(timeEnd, q),
+      q => F.timeStart(timeStart, q)
+    )(q),
 };

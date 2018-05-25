@@ -9,6 +9,7 @@ const exchangeTxsEndpointOne = async ctx => {
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
     resolver: 'txsExchangeOne',
+    id,
   });
 
   const resolver = createResolver({
@@ -20,11 +21,16 @@ const exchangeTxsEndpointOne = async ctx => {
   const tx = await resolver(id)
     .run()
     .promise();
-
   ctx.eventBus.emit('ENDPOINT_RESOLVED', {
     value: tx,
   });
-  ctx.state.returnValue = tx;
+
+  if (tx) {
+    ctx.state.returnValue = tx;
+  } else {
+    ctx.status = 404;
+    ctx.body = `Exchange tx ${id} not found`;
+  }
 };
 
 const handleError = ({ ctx, error }) => {

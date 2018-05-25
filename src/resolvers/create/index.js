@@ -28,6 +28,7 @@ const createResolver = oneOrMany => {
     dbQuery, // db -> Request -> Result
   }) => ({ db, emitEvent = always(identity) }) =>
     compose(
+      map(tap(tx => console.log(tx))),
       map(tap(emitEvent('TRANSFORM_RESULT_OK'))),
       map(transformResult), // Task AppError Result
       map(tap(emitEvent('RESULT_VALIDATION_OK'))),

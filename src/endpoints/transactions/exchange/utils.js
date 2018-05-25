@@ -8,8 +8,8 @@ const selectFilters = ({
   limit = 100,
   sort = '+id',
 }) => ({
-  timeStart,
-  timeEnd,
+  timeStart: new Date(+timeStart),
+  timeEnd: new Date(+timeEnd),
   limit,
   sort,
   matcher,

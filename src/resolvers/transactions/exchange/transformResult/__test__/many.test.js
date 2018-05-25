@@ -1,22 +1,19 @@
 const Maybe = require('folktale/maybe');
 
-const { Asset, List } = require('../../../../types');
+const { Transaction, List } = require('../../../../../types');
 const transformResult = require('../many');
 
-const { asset, transformedAsset } = require('../../mocks/asset');
+const {
+  txExchange,
+  transformedTxExchange,
+} = require('../../../mocks/exchange');
 
-const assetsFromDb = [
-  Maybe.of({
-    ...asset,
-    ticker: null,
-  }),
-  Maybe.Nothing(),
-];
+const txsFromDb = [Maybe.of(txExchange), Maybe.Nothing()];
 
-const assetList = List([Asset(transformedAsset), Asset()]);
+const txList = List([Transaction(transformedTxExchange), Transaction()]);
 
 describe('outputTransform', () => {
-  it('should create an Asset object from db object', () => {
-    expect(transformResult(assetsFromDb)).toEqual(assetList);
+  it('should create a List(Transaction) object from db array', () => {
+    expect(transformResult(txsFromDb)).toEqual(txList);
   });
 });

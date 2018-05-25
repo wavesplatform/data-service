@@ -12,6 +12,7 @@ const exchangeTxsEndpointMany = async ctx => {
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
     resolver: 'txsExchangeMany',
+    filters,
   });
 
   const resolver = createResolver({
