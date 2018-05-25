@@ -5,7 +5,7 @@ const {
   limit,
 } = require('../../sql/utils/knex/lib');
 
-const createProxy = require('../../../utils/test/proxy');
+const { create: createProxy } = require('../../../utils/test/proxy');
 
 const knexMock = {
   clone() {
