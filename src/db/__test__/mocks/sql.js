@@ -1,1 +1,1 @@
-module.exports = require('../../../utils/test/proxy');
+module.exports = require('../../../utils/test/proxy').create;

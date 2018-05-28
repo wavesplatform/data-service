@@ -1,4 +1,4 @@
-const { where } = require('../../../utils/knex');
+const { where, limit } = require('../../../utils/knex');
 
 const { curryN } = require('ramda');
 
@@ -16,5 +16,6 @@ module.exports = {
   matcher: where('t.sender'),
   timeStart: where('t.time_stamp', '>='),
   timeEnd: where('t.time_stamp', '<='),
+  limit,
   sender: bySender,
 };
