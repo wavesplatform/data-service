@@ -53,8 +53,7 @@ const q = pg({ t: 'txs_7' })
   // to get decimals
   .innerJoin({ a_dec: 'asset_decimals' }, 't.amount_asset', 'a_dec.asset_id')
   .innerJoin({ p_dec: 'asset_decimals' }, 't.price_asset', 'p_dec.asset_id')
-  .orderBy('t.time_stamp', 'desc')
-  .limit(100);
+  .orderBy('t.time_stamp', 'desc');
 
 // one — get by id
 // many — apply filters
