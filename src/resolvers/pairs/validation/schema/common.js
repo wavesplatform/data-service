@@ -11,6 +11,8 @@ const output = Joi.object().keys({
   volume: Joi.object()
     .type(BigNumber)
     .required(),
+  amount_asset: Joi.string().required(),
+  price_asset: Joi.string().required(),
 });
 
 const assetsIdRegex = /[0-9A-Za-z]+\/[0-9A-Za-z]+/;

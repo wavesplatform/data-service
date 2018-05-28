@@ -2,7 +2,9 @@ with t as (
 	select
 		txs_7.time_stamp,
 		amount * 10^(-aa.decimals) as amount,
-		price * 10^(-8 + aa.decimals - pa.decimals) as price
+		price * 10^(-8 + aa.decimals - pa.decimals) as price,
+    amount_asset,
+    price_asset
 	from txs_7
 	join asset_decimals aa on (amount_asset = aa.asset_id)
 	join asset_decimals pa on (price_asset = pa.asset_id)
@@ -12,9 +14,16 @@ with t as (
 select
 	first_price,
 	last_price,
-	volume
+	volume,
+  amount_asset,
+  price_asset
 from (
-	select sum(amount) as volume from t
+	select
+    sum(amount) as volume,
+    amount_asset,
+    price_asset
+  from t
+	group by amount_asset, price_asset
 ) v
 cross join (
 	select price as last_price from t
