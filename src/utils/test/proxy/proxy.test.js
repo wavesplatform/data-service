@@ -1,3 +1,5 @@
+const { compose } = require('ramda');
+
 const P = require('./');
 
 describe('Test proxy should', () => {
@@ -51,27 +53,6 @@ describe('Test proxy should', () => {
     ]);
   });
 
-  it('`has` any field returns true for anything if no keys provided', () => {
-    const p = P.create();
-    expect('anykey' in p).toBe(true);
-    expect('anykey2' in p).toBe(true);
-  });
-
-  it('`has` any field returns true for provided keys only', () => {
-    const p = P.create({ keys: ['key1', 'key2'] });
-    expect('key1' in p).toBe(true);
-    expect('key2' in p).toBe(true);
-    expect('wrong_key' in p).toBe(false);
-  });
-
-  it('`ownKeys` returns provided keys or empty array', () => {
-    const p1 = P.create();
-    const p2 = P.create({ keys: ['key1', 'key2'] });
-
-    expect(Reflect.ownKeys(p1)).toEqual([]);
-    expect(Reflect.ownKeys(p2)).toEqual(['key1', 'key2']);
-  });
-
   it('gets constructed from object`', () => {
     const spy = jest.fn();
     const p = P.create({ fn: spy });
@@ -86,20 +67,50 @@ describe('Test proxy should', () => {
     ]);
   });
 
-  it('should correctly convert to primitives', () => {
+  it('correctly convert to primitives', () => {
     const p = P.create({ name: '@custom-name' });
 
-    expect(p.toString()).toBe('@custom-name');
-    expect(p.valueOf()).toBe('@custom-name');
+    // expect(p.toString()).toBe('@custom-name');
+    // expect(p.valueOf()).toBe('@custom-name');
     expect(p[Symbol.toPrimitive]()).toBe('@custom-name');
   });
 
-  it('should not blow up on nested proxy in arguments', () => {
+  it('not blow up on nested proxy in arguments', () => {
     const spy = jest.fn();
     const p1 = P.create(spy);
     const p2 = P.create();
 
     p1.callSmth(p2);
     expect(spy.mock.calls).toEqual([[{ get: 'callSmth' }], [{ apply: [p2] }]]);
+  });
+
+  it('accept reserverFields map', () => {
+    const p = P.create({
+      reservedFields: {
+        length: 10,
+      },
+    });
+
+    expect(p.length).toBe(10);
+  });
+
+  it('be composable', () => {
+    const spy = jest.fn();
+    const p = P.create({
+      fn: spy,
+      reservedFields: {
+        length: 1,
+        call: Function.prototype.call,
+        apply: Function.prototype.apply,
+      },
+    });
+    const s = P.select(spy);
+
+    const calls = compose(p.method2, p.method1);
+
+    calls(24);
+
+    expect(s.callIndex([24])).not.toEqual(-1);
+    expect(s.callIndex([p])).not.toEqual(-1);
   });
 });

@@ -2,7 +2,7 @@ const createProxy = (fnOrObj = () => {}) => {
   const defaults = {
     fn: () => {},
     name: '@proxy',
-    keys: null,
+    reservedFields: {},
   };
   let params;
   if (typeof fnOrObj === 'function') {
@@ -17,11 +17,13 @@ const createProxy = (fnOrObj = () => {}) => {
     };
   }
 
+  let toPrimitive;
+
   const p = new Proxy(params.fn, {
     get: (_, prop) => {
-      if (prop === Symbol.toPrimitive) return (() => params.name).bind(p);
-      if (prop === 'toString') return (() => params.name).bind(p);
-      if (prop === 'valueOf') return (() => params.name).bind(p);
+      if (prop === Symbol.toPrimitive) return toPrimitive;
+      if (typeof params.reservedFields[prop] !== 'undefined')
+        return params.reservedFields[prop];
 
       params.fn({ get: prop });
       return p;
@@ -31,13 +33,9 @@ const createProxy = (fnOrObj = () => {}) => {
       params.fn({ apply: argumentsList });
       return p;
     },
-    has(_, key) {
-      return params.keys ? params.keys.includes(key) : true;
-    },
-    ownKeys() {
-      return params.keys || [];
-    },
   });
+
+  toPrimitive = () => params.name;
 
   return p;
 };
