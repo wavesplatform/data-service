@@ -9,7 +9,9 @@ const input = Joi.object()
     limit: Joi.number(),
     sort: Joi.string(),
     matcher: Joi.string(),
-    sender: Joi.string()
+    sender: Joi.string(),
+    amountAsset: Joi.string(),
+    priceAsset: Joi.string(),
   })
   .required();
 
