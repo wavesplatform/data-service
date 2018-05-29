@@ -18,9 +18,9 @@ const selectFields = {
   tx_price: 't.price',
   tx_amount: 't.amount',
 
-  tx_fee: 't.fee',
-  tx_sell_matcher_fee: 't.sell_matcher_fee',
-  tx_buy_matcher_fee: 't.buy_matcher_fee',
+  tx_fee: pg.raw('t.fee * 10^(-8)'),
+  tx_sell_matcher_fee: pg.raw('t.sell_matcher_fee * 10^(-8)'),
+  tx_buy_matcher_fee: pg.raw('t.buy_matcher_fee * 10^(-8)'),
 
   // o1
   o1_id: 'o1.id',
@@ -32,7 +32,7 @@ const selectFields = {
   o1_type: 'o1.order_type',
   o1_price: 'o1.price',
   o1_amount: 'o1.amount',
-  o1_matcher_fee: 'o1.matcher_fee',
+  o1_matcher_fee: pg.raw('o1.matcher_fee * 10^(-8)'),
 
   // o2
   o2_id: 'o2.id',
@@ -44,7 +44,7 @@ const selectFields = {
   o2_type: 'o2.order_type',
   o2_price: 'o2.price',
   o2_amount: 'o2.amount',
-  o2_matcher_fee: 'o2.matcher_fee',
+  o2_matcher_fee: pg.raw('o2.matcher_fee * 10^(-8)'),
 };
 
 // @todo — support `proofs` as well as `signature`
