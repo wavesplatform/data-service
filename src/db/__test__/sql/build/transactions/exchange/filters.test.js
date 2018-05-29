@@ -51,4 +51,24 @@ describe('transactions.exchange filter', () => {
     F.matcher('qwe', p);
     expect(P.select(f).lastCall).toEqual({ where: ['t.sender', 'qwe'] });
   });
+
+  it('amountAsset', () => {
+    const f = jest.fn();
+    const p = P.create(f);
+
+    F.amountAsset('ASSET_ID', p);
+    expect(P.select(f).lastCall).toEqual({
+      where: ['t.amount_asset', 'ASSET_ID'],
+    });
+  });
+
+  it('priceAsset', () => {
+    const f = jest.fn();
+    const p = P.create(f);
+
+    F.priceAsset('ASSET_ID', p);
+    expect(P.select(f).lastCall).toEqual({
+      where: ['t.price_asset', 'ASSET_ID'],
+    });
+  });
 });
