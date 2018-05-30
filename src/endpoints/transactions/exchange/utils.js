@@ -1,8 +1,9 @@
 const { reject, isNil } = require('ramda');
 const ONE_DAY = 1000 * 3600 * 24;
+const { parseDate } = require('../../../utils/parseDate');
 
 const selectFilters = ({
-  timeStart = new Date(Date.now() - ONE_DAY),
+  timeStart = `${new Date(Date.now() - ONE_DAY)}`,
   timeEnd,
   matcher,
   sender,
@@ -12,8 +13,8 @@ const selectFilters = ({
   sort = '-timestamp',
 }) =>
   reject(isNil, {
-    timeStart: new Date(+timeStart),
-    timeEnd: timeEnd && new Date(+timeEnd),
+    timeStart: parseDate(timeStart),
+    timeEnd: timeEnd && parseDate(timeEnd),
     limit,
     sort,
     matcher,
