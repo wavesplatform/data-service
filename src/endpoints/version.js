@@ -7,5 +7,5 @@ module.exports = async ctx => {
   ctx.eventBus.emit('ENDPOINT_RESOLVED', {
     value: version,
   });
-  ctx.body = version;
+  ctx.state.returnValue = { version };
 };
