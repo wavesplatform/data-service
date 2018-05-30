@@ -35,6 +35,7 @@ const transformTx = tx => {
 const createOrder = prefix => ({
   [`${prefix}_id`]: id,
   [`${prefix}_sender_public_key`]: senderPublicKey,
+  [`${prefix}_sender`]: sender,
   [`${prefix}_type`]: orderType,
   [`${prefix}_price`]: price,
   [`${prefix}_amount`]: amount,
@@ -55,6 +56,7 @@ const createOrder = prefix => ({
   },
   orderType,
   price,
+  sender,
   amount,
   timestamp,
   expiration,
