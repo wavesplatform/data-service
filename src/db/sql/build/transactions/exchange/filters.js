@@ -14,6 +14,8 @@ const bySender = curryN(2, (sender, q) =>
 module.exports = {
   id: where('t.id'),
   matcher: where('t.sender'),
+  amountAsset: where('t.amount_asset'),
+  priceAsset: where('t.price_asset'),
   timeStart: where('t.time_stamp', '>='),
   timeEnd: where('t.time_stamp', '<='),
   limit,
