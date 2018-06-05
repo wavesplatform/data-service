@@ -1,6 +1,5 @@
 const Koa = require('koa');
 const chalk = require('chalk');
-const cors = require('@koa/cors');
 
 const loadConfig = require('./loadConfig');
 const router = require('./endpoints/');
@@ -12,6 +11,7 @@ const createEventBus = require('./eventBus/');
 const createAndSubscribeLogger = require('./logger');
 const removeErrorBodyProd = require('./middleware/removeErrorBodyProd');
 const serializer = require('./middleware/serializer');
+const setHeadersMiddleware = require('./middleware/setHeaders');
 
 const PORT = 3000;
 
@@ -25,7 +25,7 @@ createAndSubscribeLogger({ options, eventBus });
 
 app
   .use(removeErrorBodyProd)
-  .use(cors())
+  .use(setHeadersMiddleware)
   .use(requestId())
   .use(injectEventBus(eventBus))
   .use(accessLogMiddleware)

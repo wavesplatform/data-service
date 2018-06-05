@@ -1,4 +1,11 @@
-const { where, orWhere, hasMethod } = require('../sql/utils/knex/lib');
+const {
+  where,
+  orWhere,
+  hasMethod,
+  limit,
+} = require('../../sql/utils/knex/lib');
+
+const { create: createProxy } = require('../../../utils/test/proxy');
 
 const knexMock = {
   clone() {
@@ -8,7 +15,7 @@ const knexMock = {
   orWhere: (...args) => args.concat('orWhere'),
 };
 
-test('hasMethod should accept knexMock with specified method', () => {
+test('hasMethod should work for different types', () => {
   const hasWhereMethod = hasMethod('where');
 
   expect(hasWhereMethod(undefined)).toBe(false);
@@ -16,6 +23,11 @@ test('hasMethod should accept knexMock with specified method', () => {
   expect(hasWhereMethod('qwe')).toBe(false);
   expect(hasWhereMethod({})).toBe(false);
   expect(hasWhereMethod(knexMock)).toBe(true);
+});
+
+test('hasMethod should accept test proxy as correct Knex mock', () => {
+  const p = createProxy();
+  expect(hasMethod('where', p)).toBe(true);
 });
 
 describe('Knex pointfree `where` should', () => {
@@ -57,5 +69,33 @@ describe('Knex pointfree `orWhere` should', () => {
     expect(typeof orWhere1234).toBe('function');
 
     expect(orWhere1234(knexMock)).toEqual([1, 2, 3, 4, 'orWhere']);
+  });
+});
+
+describe('Knex pointfree `limit` should', () => {
+  it('cover simple case without currying', () => {
+    const f = jest.fn();
+    const p = createProxy(f);
+    limit(100, p);
+
+    expect(f.mock.calls.slice(-2)).toEqual([
+      [{ get: 'limit' }],
+      [{ apply: [100] }],
+    ]);
+  });
+
+  it('cover curried use', () => {
+    expect(typeof limit()).toBe('function');
+
+    const limit100 = limit(100);
+    expect(typeof limit100).toBe('function');
+
+    const f = jest.fn();
+    const p = createProxy(f);
+    limit100(p);
+    expect(f.mock.calls.slice(-2)).toEqual([
+      [{ get: 'limit' }],
+      [{ apply: [100] }],
+    ]);
   });
 });
