@@ -12,6 +12,7 @@ const oneConfig = {
 const manyConfig = {
   ...require('./validation/many'),
   transformResult: require('./transformResult/many'),
+  transformInput: require('./transformInput'),
   dbQuery: db => filters => db.transactions.exchange.many(filters),
 };
 

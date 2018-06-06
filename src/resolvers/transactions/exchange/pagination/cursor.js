@@ -1,12 +1,13 @@
-const { pathEq } = require('ramda');
+const { last, head } = require('ramda');
 
-const encode = object => object.tx_time_stamp + '::' + object.tx_id;
-
-const decode = (cursor, sort) => {
-  const filter = pathEq([0, 'timestamp'], 'desc', sort)
-    ? 'timeEnd'
-    : 'timeStart';
-  return { [filter]: cursor.split('::')[0] };
+const cursorHashFn = request => items => {
+  const item = (request.sort === 'desc' ? last(items) : head(items)).data;
+  return `${item.timestamp.toISOString()}::${item.id}::${request.sort}`;
 };
 
-module.exports = { encode, decode };
+const decode = cursor => cursor.split('::');
+
+module.exports = {
+  cursorHashFn,
+  decode,
+};

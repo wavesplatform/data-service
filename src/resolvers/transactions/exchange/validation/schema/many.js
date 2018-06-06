@@ -12,6 +12,7 @@ const input = Joi.object()
     sender: Joi.string(),
     amountAsset: Joi.string(),
     priceAsset: Joi.string(),
+    after: Joi.string(),
   })
   .required();
 
