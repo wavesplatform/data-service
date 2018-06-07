@@ -17,12 +17,12 @@ const resolverMany = createResolver.many({
 });
 
 describe('Exchange transaction resolver for one', () => {
-  it('fetches real tx', async () => {
-    const tx = await resolverOne(TX_ID)
+  it('fetches real tx', async done => {
+    resolverOne(TX_ID)
       .run()
-      .promise();
-
-    expect(tx).toBeDefined();
+      .promise()
+      .then(() => done())
+      .catch(e => done(JSON.stringify(e)));
   });
   it('returns null for unreal tx', async () => {
     const tx = await resolverOne('unreal')
@@ -42,6 +42,102 @@ describe('Exchange transaction resolver for many', () => {
       .promise();
     expect(tx).toBeDefined();
     expect(tx.data).toHaveLength(20);
+  });
+  describe('Pagination ', async () => {
+    const Cursor = require('../pagination/cursor');
+    const { parseDate } = require('../../../../utils/parseDate');
+    const START = '2018-06-02T10:59:43.000Z';
+    const END = '2018-06-03T23:59:48.000Z';
+    const LIMIT = 21;
+    const createCursor = sort => ({ data }) => Cursor.encode(sort, data);
+    it(' works asc', async () => {
+      const SORT = 'asc';
+
+      const baseParams = {
+        limit: LIMIT,
+        timeEnd: parseDate(END),
+        timeStart: parseDate(START),
+        sort: SORT,
+      };
+
+      const fetchAndGetNextCursor = cursor =>
+        resolverMany({
+          ...baseParams,
+          limit: 5,
+          after: cursor,
+        })
+          .run()
+          .promise()
+          .then(x => [x.lastCursor, x.data.map(createCursor(SORT))]);
+
+      const firstCursor = await resolverMany({ ...baseParams, limit: 1 })
+        .run()
+        .promise()
+        .then(x => x.data.map(createCursor(SORT))[0]);
+      var i = 0;
+      var cursors = [firstCursor];
+      var curCursor = firstCursor;
+
+      while (i++ < (LIMIT - 1) / 5) {
+        var [nextCursor, cs] = await fetchAndGetNextCursor(curCursor);
+        curCursor = nextCursor;
+        cursors = [...cursors, ...cs];
+      }
+
+      const expectedCursors = await resolverMany({
+        ...baseParams,
+        limit: LIMIT,
+      })
+        .run()
+        .promise()
+        .then(x => x.data.map(createCursor(SORT)));
+
+      expect(cursors).toEqual(expectedCursors);
+    });
+    it(' works desc', async () => {
+      const SORT = 'desc';
+
+      const baseParams = {
+        limit: LIMIT,
+        timeEnd: parseDate(END),
+        timeStart: parseDate(START),
+        sort: SORT,
+      };
+
+      const fetchAndGetNextCursor = cursor =>
+        resolverMany({
+          ...baseParams,
+          limit: 5,
+          after: cursor,
+        })
+          .run()
+          .promise()
+          .then(x => [x.lastCursor, x.data.map(createCursor(SORT))]);
+
+      const firstCursor = await resolverMany({ ...baseParams, limit: 1 })
+        .run()
+        .promise()
+        .then(x => x.data.map(createCursor(SORT))[0]);
+      var i = 0;
+      var cursors = [firstCursor];
+      var curCursor = firstCursor;
+
+      while (i++ < (LIMIT - 1) / 5) {
+        var [nextCursor, curCursors] = await fetchAndGetNextCursor(curCursor);
+        curCursor = nextCursor;
+        cursors = [...cursors, ...curCursors];
+      }
+
+      const expectedCursors = await resolverMany({
+        ...baseParams,
+        limit: LIMIT,
+      })
+        .run()
+        .promise()
+        .then(x => x.data.map(createCursor(SORT)));
+
+      expect(cursors).toEqual(expectedCursors);
+    });
   });
 
   it('fails if timeEnd < 0', done =>

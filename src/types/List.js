@@ -1,13 +1,7 @@
-const { map, assoc } = require('ramda');
-
-const addListInfo = (items, cursorHashFn) => {
-  if (cursorHashFn) return map(d => assoc('cursor', cursorHashFn(d), d), items);
-  else return items;
-};
-
-const List = (items = [], cursorHashFn) => ({
+const List = (items = [], meta = {}) => ({
   __type: 'list',
-  data: addListInfo(items, cursorHashFn),
+  ...meta,
+  data: items,
 });
 
 module.exports = List;

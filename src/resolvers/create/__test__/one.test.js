@@ -10,7 +10,10 @@ const assetId = 'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH';
 const ok = Result.Ok;
 const notOk = Result.Error;
 
-const mockDbQuery = compose(Task.of, Maybe.of);
+const mockDbQuery = compose(
+  Task.of,
+  Maybe.of
+);
 
 const commonConfig = {
   transformResult: prop('value'),
@@ -73,24 +76,27 @@ describe('Resolver', () => {
       .run()
       .listen({
         onResolved: () => {
-          expect(innerSpy.mock.calls[0]).toEqual([
-            'INPUT_VALIDATION_OK',
-            'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH',
-          ]);
-
-          expect(innerSpy.mock.calls[1]).toEqual([
-            'DB_QUERY_OK',
-            Maybe.of('G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH'),
-          ]);
-
-          expect(innerSpy.mock.calls[2]).toEqual([
-            'RESULT_VALIDATION_OK',
-            Maybe.of('G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH'),
-          ]);
-
-          expect(innerSpy.mock.calls[3]).toEqual([
-            'TRANSFORM_RESULT_OK',
-            'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH',
+          expect(innerSpy.mock.calls).toEqual([
+            [
+              'INPUT_VALIDATION_OK',
+              'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH',
+            ],
+            [
+              'TRANSFORM_INPUT_OK',
+              'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH',
+            ],
+            [
+              'DB_QUERY_OK',
+              Maybe.of('G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH'),
+            ],
+            [
+              'RESULT_VALIDATION_OK',
+              Maybe.of('G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH'),
+            ],
+            [
+              'TRANSFORM_RESULT_OK',
+              'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH',
+            ],
           ]);
 
           done();

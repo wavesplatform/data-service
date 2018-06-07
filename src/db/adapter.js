@@ -58,7 +58,7 @@ const createDbAdapter = ({
         many(filters) {
           return dbT
             .any(sql.build.transactions.exchange.many(filters))
-            .map(map(Maybe.of))
+            .map(map(Maybe.fromNullable))
             .mapRejected(
               errorFactory({
                 request: 'transactions.exchange.many',

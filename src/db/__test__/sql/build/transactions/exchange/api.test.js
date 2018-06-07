@@ -22,9 +22,7 @@ describe('transactions.exchange api method', () => {
 
       const sql = api({ filters });
       sql.one('EXCHANGE_TX_ID');
-
       expect(idFilterSpy.mock.calls[0][0]).toBe('EXCHANGE_TX_ID');
-      expect(isKnex(idFilterSpy.mock.calls[0][1])).toBe(true);
     });
   });
 
