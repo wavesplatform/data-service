@@ -11,8 +11,13 @@ const bySender = curryN(2, (sender, q) =>
     .where('o.sender', sender)
 );
 
-const after = ({ timestamp, id, sortDirection }) => q =>
-  q.whereRaw(`(t.time_stamp, t.id) ${sortDirection} (?, ?)`, [timestamp, id]);
+const after = ({ timestamp, id, sortDirection }) => q => {
+  const comparator = sortDirection === 'desc' ? '<' : '>';
+  return q.whereRaw(`(t.time_stamp, t.id) ${comparator} (?, ?)`, [
+    timestamp,
+    id,
+  ]);
+};
 
 module.exports = {
   id: where('t.id'),

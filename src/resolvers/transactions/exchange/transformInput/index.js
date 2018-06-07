@@ -9,7 +9,7 @@ const decodeAfter = cursor => {
     after: {
       timestamp: parsedDate,
       id: maybeId,
-      sortDirection: sort === 'desc' ? '<' : '>',
+      sortDirection: sort,
     },
     ...(sort ? { sort } : {}),
   };
