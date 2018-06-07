@@ -2,10 +2,20 @@ const { compose, map, merge, pick, filter, has, __, pipe } = require('ramda');
 
 const { select, withDecimals, withOrders, renameFields } = require('./query');
 
+const commonQuery = pipe(
+  withOrders,
+  renameFields,
+  withDecimals
+);
 // one — get by id
 // many — apply filters
 module.exports = ({ filters: F }) => ({
-  one: id => withDecimals(F.id(id, select)).toString(),
+  one: id =>
+    pipe(
+      F.id(id),
+      commonQuery,
+      String
+    )(select),
   many: fValues => {
     const defaultValues = { limit: 100 };
     const order = [
@@ -31,9 +41,7 @@ module.exports = ({ filters: F }) => ({
     )(order);
     return pipe(
       ...appliedFs,
-      withOrders,
-      renameFields,
-      withDecimals,
+      commonQuery,
       F.sortOuter(withDefaults.sort),
       String
     )(select);

@@ -9,22 +9,11 @@ describe('List type should be', () => {
       data: items,
     });
   });
-
-  it('apply a hash function', () => {
-    const hash = item => item.id + '_' + item.f;
-
-    expect(List(items, hash)).toEqual({
+  it('adds meta', () => {
+    expect(List(items, { someValue: true })).toEqual({
       __type: 'list',
-      data: [
-        {
-          cursor: 'qwe_0',
-          ...items[0],
-        },
-        {
-          cursor: 'asd_1',
-          ...items[1],
-        },
-      ],
+      data: items,
+      someValue: true,
     });
   });
 });

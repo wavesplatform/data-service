@@ -1,10 +1,6 @@
-const List = (items = [], cursorHashFn) => ({
+const List = (items = [], meta = {}) => ({
   __type: 'list',
-  ...(cursorHashFn && items.length > 0
-    ? {
-      lastCursor: cursorHashFn(items),
-    }
-    : {}),
+  ...meta,
   data: items,
 });
 

@@ -1,18 +1,15 @@
-const { last, head } = require('ramda');
+const { curryN } = require('ramda');
 
-const cursorHashFn = request => items => {
-  const item = (request.sort === 'desc' ? last(items) : head(items)).data;
-  return Buffer.from(
-    `${item.timestamp.toISOString()}::${item.id}::${request.sort}`
-  ).toString('base64');
-};
+const encode = curryN(2, (sort, item) =>
+  Buffer.from(`${item.timestamp}::${item.id}::${sort}`).toString('base64')
+);
 
 const decode = cursor =>
   Buffer.from(cursor, 'base64')
-    .toString('ascii')
+    .toString('utf8')
     .split('::');
 
 module.exports = {
-  cursorHashFn,
+  encode,
   decode,
 };

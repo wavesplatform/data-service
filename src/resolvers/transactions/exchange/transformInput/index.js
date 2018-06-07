@@ -1,14 +1,14 @@
 const { omit } = require('ramda');
 const { parseDate } = require('../../../../utils/parseDate');
-const { decode } = require('../pagination/cursor');
+const Cursor = require('../pagination/cursor');
 
 const decodeAfter = cursor => {
-  const [maybeDate, maybeId, sort] = decode(cursor);
-  const parsedDate = parseDate(maybeDate);
+  const [date, id, sort] = Cursor.decode(cursor);
+  const parsedDate = parseDate(date);
   return {
     after: {
       timestamp: parsedDate,
-      id: maybeId,
+      id: id,
       sortDirection: sort,
     },
     ...(sort ? { sort } : {}),
