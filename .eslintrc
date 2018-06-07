@@ -26,6 +26,7 @@
     "__dirname": false,
     "__filename": false,
     "process": false,
-    "NODE_ENV": false
+    "NODE_ENV": false,
+    "Buffer": true
   }
 }
