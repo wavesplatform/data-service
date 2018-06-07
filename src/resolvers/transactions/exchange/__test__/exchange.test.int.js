@@ -48,7 +48,7 @@ describe('Exchange transaction resolver for many', () => {
     const { parseDate } = require('../../../../utils/parseDate');
     const START = '2018-06-02T10:59:43.000Z';
     const END = '2018-06-03T23:59:48.000Z';
-    const LIMIT = 10;
+    const LIMIT = 21;
     const createCursor = sort => ({ data }) => Cursor.encode(sort, data);
     it(' works asc', async () => {
       const SORT = 'asc';
@@ -63,12 +63,12 @@ describe('Exchange transaction resolver for many', () => {
       const fetchAndGetNextCursor = cursor =>
         resolverMany({
           ...baseParams,
-          limit: 1,
+          limit: 5,
           after: cursor,
         })
           .run()
           .promise()
-          .then(x => x.lastCursor);
+          .then(x => [x.lastCursor, x.data.map(createCursor(SORT))]);
 
       const firstCursor = await resolverMany({ ...baseParams, limit: 1 })
         .run()
@@ -78,9 +78,10 @@ describe('Exchange transaction resolver for many', () => {
       var cursors = [firstCursor];
       var curCursor = firstCursor;
 
-      while (i++ < LIMIT - 1) {
-        curCursor = await fetchAndGetNextCursor(curCursor);
-        cursors.push(curCursor);
+      while (i++ < (LIMIT - 1) / 5) {
+        var [nextCursor, cs] = await fetchAndGetNextCursor(curCursor);
+        curCursor = nextCursor;
+        cursors = [...cursors, ...cs];
       }
 
       const expectedCursors = await resolverMany({
@@ -106,12 +107,12 @@ describe('Exchange transaction resolver for many', () => {
       const fetchAndGetNextCursor = cursor =>
         resolverMany({
           ...baseParams,
-          limit: 1,
+          limit: 5,
           after: cursor,
         })
           .run()
           .promise()
-          .then(x => x.lastCursor);
+          .then(x => [x.lastCursor, x.data.map(createCursor(SORT))]);
 
       const firstCursor = await resolverMany({ ...baseParams, limit: 1 })
         .run()
@@ -121,9 +122,10 @@ describe('Exchange transaction resolver for many', () => {
       var cursors = [firstCursor];
       var curCursor = firstCursor;
 
-      while (i++ < LIMIT - 1) {
-        curCursor = await fetchAndGetNextCursor(curCursor);
-        cursors.push(curCursor);
+      while (i++ < (LIMIT - 1) / 5) {
+        var [nextCursor, curCursors] = await fetchAndGetNextCursor(curCursor);
+        curCursor = nextCursor;
+        cursors = [...cursors, ...curCursors];
       }
 
       const expectedCursors = await resolverMany({

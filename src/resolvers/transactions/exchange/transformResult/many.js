@@ -10,24 +10,17 @@ const {
   objOf,
   pipe,
   isNil,
-  propEq,
   last,
-  head,
   prop,
 } = require('ramda');
 
 const Cursor = require('../pagination/cursor');
 const getItem = pipe(
-  ifElse(
-    request => propEq('sort', 'desc')(request),
-    (_, items) => last(items),
-    (_, items) => head(items)
-  ),
+  last,
   prop('data')
 );
 const createCursorMeta = pipe(
-  (request, xs) => [request.sort, getItem(request, xs)],
-  ([sort, x]) => Cursor.encode(sort, x),
+  (request, xs) => Cursor.encode(request.sort, getItem(xs)),
   ifElse(isNil, always({}), objOf('lastCursor'))
 );
 
