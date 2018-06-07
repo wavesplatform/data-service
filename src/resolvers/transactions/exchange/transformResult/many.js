@@ -15,12 +15,12 @@ const {
 } = require('ramda');
 
 const Cursor = require('../pagination/cursor');
-const getItem = pipe(
+const lastItem = pipe(
   last,
   prop('data')
 );
 const createCursorMeta = pipe(
-  (request, xs) => Cursor.encode(request.sort, getItem(xs)),
+  (request, xs) => Cursor.encode(request.sort, lastItem(xs)),
   ifElse(isNil, always({}), objOf('lastCursor'))
 );
 
