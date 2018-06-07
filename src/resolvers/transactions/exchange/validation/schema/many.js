@@ -1,7 +1,7 @@
 const rawJoi = require('joi');
 const { output } = require('./common');
 const Cursor = require('../../pagination/cursor');
-
+const DATE0 = new Date(0);
 const Joi = rawJoi.extend(joi => ({
   base: joi.string().base64({ paddingRequired: false }),
   name: 'cursor',
@@ -22,9 +22,15 @@ const Joi = rawJoi.extend(joi => ({
 
 const input = Joi.object()
   .keys({
-    timeStart: Joi.object().type(Date),
-    timeEnd: Joi.object().type(Date),
-    limit: Joi.number(),
+    timeStart: Joi.date().min(DATE0),
+    timeEnd: Joi.when('timeStart', {
+      is: Joi.exist(),
+      then: Joi.date().min(Joi.ref('timeStart')),
+      otherwise: Joi.date().min(0),
+    }),
+    limit: Joi.number()
+      .min(1)
+      .max(100),
     sort: Joi.string(),
     matcher: Joi.string(),
     sender: Joi.string(),
