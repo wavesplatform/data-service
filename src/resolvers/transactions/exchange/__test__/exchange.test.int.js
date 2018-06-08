@@ -220,4 +220,17 @@ describe('Exchange transaction resolver for many', () => {
       .promise()
       .then(() => done())
       .catch(() => done('Wrong branch, error')));
+  it('doesnt try to create a cursor for empty response', done =>
+    resolverMany({
+      limit: 1,
+      timeEnd: parseDate('1525132800000'),
+      priceAsset: 'incorrect value',
+    })
+      .run()
+      .promise()
+      .then(d => {
+        expect(d).not.toHaveProperty('lastCursor');
+        done();
+      })
+      .catch(() => done('Wrong branch, error')));
 });
