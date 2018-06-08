@@ -2,17 +2,17 @@ const Maybe = require('folktale/maybe');
 const Result = require('folktale/result');
 const Task = require('folktale/concurrency/task');
 
-const swapMaybeM = require('./');
+const swapMaybeF = require('./');
 
-test('swapMaybeM with Result as M', () => {
+test('swapMaybeF with Result as M', () => {
   const a = Maybe.of(Result.of(1));
 
-  expect(swapMaybeM(Result.of, a)).toEqual(Result.of(Maybe.of(1)));
+  expect(swapMaybeF(Result.of, a)).toEqual(Result.of(Maybe.of(1)));
 });
 
-test('swapMaybeM with Task as M', () => {
+test('swapMaybeF with Task as M', () => {
   Task.waitAll([
-    swapMaybeM(Task.of, Maybe.of(Task.of(1))),
+    swapMaybeF(Task.of, Maybe.of(Task.of(1))),
     Task.of(Maybe.of(1)),
   ])
     .run()
