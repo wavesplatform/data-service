@@ -1,28 +1,21 @@
 const { transformTx } = require('./common');
 
 const { Transaction, List, fromMaybe } = require('../../../../types');
-
-const {
-  map,
-  compose,
-  ifElse,
-  always,
-  objOf,
-  pipe,
-  isNil,
-  last,
-  prop,
-} = require('ramda');
+const Maybe = require('folktale/maybe');
+const { map, compose, pipe, objOf, last, prop } = require('ramda');
 
 const Cursor = require('../pagination/cursor');
 const lastItem = pipe(
   last,
-  prop('data')
+  prop('data'),
+  Maybe.fromNullable
 );
-const createCursorMeta = pipe(
-  (request, xs) => Cursor.encode(request.sort, lastItem(xs)),
-  ifElse(isNil, always({}), objOf('lastCursor'))
-);
+
+const createCursorMeta = (request, xs) =>
+  lastItem(xs)
+    .map(Cursor.encode(request.sort))
+    .map(objOf('lastCursor'))
+    .getOrElse({});
 
 /** transformResults :: (Maybe RawTxInfo)[] -> List Tx */
 const transformResults = (result, request) =>
