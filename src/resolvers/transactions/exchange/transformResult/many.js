@@ -20,7 +20,8 @@ const lastItem = pipe(
   prop('data')
 );
 const createCursorMeta = pipe(
-  (request, xs) => Cursor.encode(request.sort, lastItem(xs)),
+  (request, xs) => [request, lastItem(xs)],
+  (request, item) => item && Cursor.encode(request.sort, item),
   ifElse(isNil, always({}), objOf('lastCursor'))
 );
 
