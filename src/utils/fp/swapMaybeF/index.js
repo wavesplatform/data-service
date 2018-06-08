@@ -1,7 +1,7 @@
 const Maybe = require('folktale/maybe');
 const { curry } = require('ramda');
 
-/** mOf -> Maybe F a -> F Maybe a */
+/** (a -> F a) -> Maybe F a -> F Maybe a */
 const swapMaybeF = (F, maybeM) =>
   maybeM.matchWith({
     Nothing: () => F(maybeM), // M Maybe r
