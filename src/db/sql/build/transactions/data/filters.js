@@ -1,4 +1,4 @@
-const { curry, compose } = require('ramda');
+const { curry } = require('ramda');
 
 const { where, limit, orderBy } = require('../../../utils/knex');
 
