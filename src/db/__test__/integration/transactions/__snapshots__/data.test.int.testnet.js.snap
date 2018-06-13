@@ -48,7 +48,7 @@ Object {
           "value": "base64:VGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdA==",
         },
       ],
-      "fee": "100000",
+      "fee": "0.001",
       "height": 369361,
       "id": "2jnH9e2KvEEAiWKHgwocD9arjK3AvBz6DbqwK8GUHdXA",
       "proofs": Array [
