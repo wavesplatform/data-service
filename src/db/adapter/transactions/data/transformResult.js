@@ -14,6 +14,7 @@ const {
   always,
   isEmpty,
   identity,
+  either,
   T,
 } = require('ramda');
 
@@ -53,8 +54,7 @@ const appendRowToTx = (tx, row) =>
  * txAttributes and putting data objects nested into the tx
  */
 const dataEntriesToTxs = cond([
-  [isNil, always([])],
-  [isEmpty, always([])],
+  [either(isNil, isEmpty), always([])],
   [
     T,
     compose(
