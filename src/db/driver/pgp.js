@@ -2,10 +2,18 @@ const { BigNumber } = require('@waves/data-entities');
 const { compose, tail, init, split, map } = require('ramda');
 
 const pgp = require('pg-promise')();
+const moment = require('moment');
 
 const toBigNumber = x => new BigNumber(x);
-const parsePgArray = compose(split(','), init, tail);
-const toBigNumberAll = compose(map(toBigNumber), parsePgArray);
+const parsePgArray = compose(
+  split(','),
+  init,
+  tail
+);
+const toBigNumberAll = compose(
+  map(toBigNumber),
+  parsePgArray
+);
 
 const types = pgp.pg.types;
 
@@ -17,6 +25,8 @@ types.setTypeParser(1016, toBigNumberAll); // array/bigint
 types.setTypeParser(1022, toBigNumberAll); // array/double precision
 types.setTypeParser(1231, toBigNumberAll); // array/numeric
 
+// 1114 is OID for timestamp in Postgres
+types.setTypeParser(1114, str => moment.utc(str).toDate());
 // @hack
 // for some reason float4/real does not matter to pg-promise
 // as seems to parse it with 'double precision' parser anyway

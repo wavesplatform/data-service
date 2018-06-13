@@ -50,6 +50,28 @@ describe('Exchange transaction resolver for many', () => {
     const END = '2018-06-03T23:59:48.000Z';
     const LIMIT = 21;
     const createCursor = sort => ({ data }) => Cursor.encode(sort, data);
+    it(' doesnt get 2 identical entries for limit 1 asc with next page fetching', async () => {
+      const baseParams = {
+        limit: 1,
+        timeStart: parseDate('Mon Jun 11 2018 12:34:52 GMT+0300 (MSK)'),
+        sort: 'asc',
+      };
+
+      const firstTx = await resolverMany(baseParams)
+        .run()
+        .promise();
+
+      const secondTx = await resolverMany({
+        after: firstTx.lastCursor,
+        limit: 1,
+      })
+        .run()
+        .promise();
+      // const log = obj => console.log(JSON.stringify(obj, null, 2));
+      // log(firstTx);
+      // log(secondTx);
+      expect(firstTx.data).not.toEqual(secondTx.data);
+    });
     it(' works asc', async () => {
       const SORT = 'asc';
 
