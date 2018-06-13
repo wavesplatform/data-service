@@ -1,13 +1,13 @@
 const { propEq, map, head } = require('ramda');
 const Maybe = require('folktale/maybe');
 
+const createExchangeAdapter = require('./transactions/exchange');
+const createDataAdapter = require('./transactions/data');
+
 // db adapter factory
-const createDbAdapter = ({
-  taskedDbDriver: dbT,
-  batchQueryFn,
-  errorFactory,
-  sql,
-}) => {
+const createDbAdapter = options => {
+  const { taskedDbDriver: dbT, batchQueryFn, errorFactory, sql } = options;
+
   return {
     assets: {
       /** assets.many :: AssetId[] -> Task (Maybe Result)[] AppError.Db */
@@ -45,28 +45,8 @@ const createDbAdapter = ({
     },
 
     transactions: {
-      exchange: {
-        one(x) {
-          return dbT
-            .oneOrNone(sql.build.transactions.exchange.one(x))
-            .map(Maybe.fromNullable)
-            .mapRejected(
-              errorFactory({ request: 'transactions.exchange.one', params: x })
-            );
-        },
-
-        many(filters) {
-          return dbT
-            .any(sql.build.transactions.exchange.many(filters))
-            .map(map(Maybe.fromNullable))
-            .mapRejected(
-              errorFactory({
-                request: 'transactions.exchange.many',
-                params: filters,
-              })
-            );
-        },
-      },
+      exchange: createExchangeAdapter(options),
+      data: createDataAdapter(options),
     },
   };
 };

@@ -1,0 +1,66 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Data transactions should return Maybe(data) for \`one\` tx correctly 1`] = `
+Object {
+  "@@tag": "Just",
+  "@@type": "folktale:Maybe",
+  "@@value": Object {
+    "value": Object {
+      "data": Array [
+        Object {
+          "key": "test",
+          "type": "integer",
+          "value": "11",
+        },
+        Object {
+          "key": "neg",
+          "type": "integer",
+          "value": "-9223372036854775808",
+        },
+        Object {
+          "key": "max",
+          "type": "integer",
+          "value": "9223372036854775807",
+        },
+        Object {
+          "key": "somestring",
+          "type": "string",
+          "value": "Some silly string",
+        },
+        Object {
+          "key": "longstring",
+          "type": "string",
+          "value": "ver long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long string",
+        },
+        Object {
+          "key": "testboolF",
+          "type": "boolean",
+          "value": false,
+        },
+        Object {
+          "key": "testboolT",
+          "type": "boolean",
+          "value": true,
+        },
+        Object {
+          "key": "testbytes",
+          "type": "binary",
+          "value": "base64:VGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdA==",
+        },
+      ],
+      "fee": "100000",
+      "height": 369361,
+      "id": "2jnH9e2KvEEAiWKHgwocD9arjK3AvBz6DbqwK8GUHdXA",
+      "proofs": Array [
+        "n5DqbcCtusm6LVqhE5hghY98joLeTSqRpoXsbiZQuskXVNh1HZTDpx6mDcsoyjeuGCYVaFsv7Tyy1tzJKzZn6jm",
+      ],
+      "sender": "3Mz9N7YPfZPWGd4yYaX6H53Gcgrq6ifYiH7",
+      "sender_public_key": "2M25DqL2W4rGFLCFadgATboS8EPqyWAN3DjH12AH5Kdr",
+      "signature": null,
+      "time_stamp": 2018-06-07T05:37:09.025Z,
+      "tx_type": 12,
+      "tx_version": 1,
+    },
+  },
+}
+`;
