@@ -39,28 +39,30 @@ const before = [
   },
 ];
 
-const after = [
-  {
-    id: 'qwe',
-    data: [
-      { key: 'testint', type: 'integer', value: 11 },
-      { key: 'testbool', type: 'boolean', value: false },
-    ],
-  },
-  {
-    id: 'asd',
-    data: [
-      { key: 'teststring', type: 'string', value: 'some string' },
-      { key: 'testbinary', type: 'binary', value: 'base64:qwerqwer' },
-    ],
-  },
-];
-
 describe('Data transactions db result transform', () => {
   it('should group raw results by transaction and put nested `data` inside', () => {
-    expect(transformResult(before)).toEqual(after);
+    expect(transformResult(before)).toMatchSnapshot();
+  });
 
-    expect(transformResult([])).toEqual(null);
-    expect(transformResult(null)).toEqual(null);
+  it('should handle case when there is no data in tx (all nulls in a row)', () => {
+    expect(
+      transformResult([
+        {
+          id: 'asd',
+          data_key: null,
+          data_type: null,
+          data_value_integer: null,
+          data_value_boolean: null,
+          data_value_string: null,
+          data_value_binary: null,
+        },
+      ])
+    ).toMatchSnapshot();
+  });
+
+  it('should return empty list for undefined, null or []', () => {
+    expect(transformResult()).toEqual([]);
+    expect(transformResult(null)).toEqual([]);
+    expect(transformResult([])).toEqual([]);
   });
 });

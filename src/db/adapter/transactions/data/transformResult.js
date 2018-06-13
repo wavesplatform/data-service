@@ -11,9 +11,10 @@ const {
   merge,
   isNil,
   cond,
-  identity,
   always,
   isEmpty,
+  identity,
+  either,
   T,
 } = require('ramda');
 
@@ -34,9 +35,15 @@ const removeDataEntryFromRow = omit([
   'position_in_tx',
 ]);
 
-const rowsToTx = (tx, row) =>
+const appendRowToTx = (tx, row) =>
   compose(
-    assoc('data', append(getDataObject(row), tx.data)),
+    cond([
+      [
+        always(!isNil(row.data_type)),
+        assoc('data', append(getDataObject(row), tx.data)),
+      ],
+      [T, identity],
+    ]),
     merge(removeDataEntryFromRow(row))
   )(tx);
 
@@ -47,12 +54,11 @@ const rowsToTx = (tx, row) =>
  * txAttributes and putting data objects nested into the tx
  */
 const dataEntriesToTxs = cond([
-  [isNil, identity],
-  [isEmpty, always(null)],
+  [either(isNil, isEmpty), always([])],
   [
     T,
     compose(
-      map(reduce(rowsToTx, { data: [] })),
+      map(reduce(appendRowToTx, { data: [] })),
       values,
       groupBy(prop('id'))
     ),
