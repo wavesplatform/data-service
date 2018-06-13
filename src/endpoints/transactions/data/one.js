@@ -28,7 +28,7 @@ const dataTxsEndpointOne = async ctx => {
     ctx.state.returnValue = tx;
   } else {
     ctx.status = 404;
-    ctx.body = `Exchange tx ${id} not found`;
+    ctx.body = `Data tx ${id} not found`;
   }
 };
 
