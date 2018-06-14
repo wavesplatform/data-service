@@ -1,0 +1,79 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Aliases should return Maybe(alias) for \`one\` correctly 1`] = `
+Object {
+  "@@tag": "Just",
+  "@@type": "folktale:Maybe",
+  "@@value": Object {
+    "value": anonymous {
+      "address": "3PQqCXNPoTRsHRK2nZyXWENaZwLmxrUZPBi",
+      "alias": "sexy-boys",
+    },
+  },
+}
+`;
+
+exports[`Aliases should return Maybe(data)[] for \`many\` aliases request 1`] = `
+Array [
+  anonymous {
+    "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+    "alias": "jeffrey",
+  },
+  anonymous {
+    "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+    "alias": "hans",
+  },
+  anonymous {
+    "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+    "alias": "hansch",
+  },
+  anonymous {
+    "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+    "alias": "liqio.io",
+  },
+  anonymous {
+    "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+    "alias": "trextracker",
+  },
+  anonymous {
+    "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+    "alias": "maid",
+  },
+  anonymous {
+    "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+    "alias": "jveldt",
+  },
+  anonymous {
+    "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+    "alias": "bunq",
+  },
+  anonymous {
+    "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+    "alias": "tikkie",
+  },
+  anonymous {
+    "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+    "alias": "rijksoverheid",
+  },
+  anonymous {
+    "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+    "alias": "burned",
+  },
+  anonymous {
+    "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+    "alias": "j.veldt",
+  },
+  anonymous {
+    "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+    "alias": "shapeshift.io",
+  },
+  anonymous {
+    "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+    "alias": "changelly.com",
+  },
+  anonymous {
+    "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+    "alias": "changelly",
+  },
+]
+`;
