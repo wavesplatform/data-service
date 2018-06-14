@@ -67,9 +67,7 @@ describe('Exchange transaction resolver for many', () => {
       })
         .run()
         .promise();
-      // const log = obj => console.log(JSON.stringify(obj, null, 2));
-      // log(firstTx);
-      // log(secondTx);
+        
       expect(firstTx.data).not.toEqual(secondTx.data);
     });
     it(' works asc', async () => {
