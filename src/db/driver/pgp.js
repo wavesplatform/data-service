@@ -2,10 +2,16 @@ const { BigNumber } = require('@waves/data-entities');
 const { compose, tail, init, split, map } = require('ramda');
 
 const pgp = require('pg-promise')();
-
 const toBigNumber = x => new BigNumber(x);
-const parsePgArray = compose(split(','), init, tail);
-const toBigNumberAll = compose(map(toBigNumber), parsePgArray);
+const parsePgArray = compose(
+  split(','),
+  init,
+  tail
+);
+const toBigNumberAll = compose(
+  map(toBigNumber),
+  parsePgArray
+);
 
 const types = pgp.pg.types;
 

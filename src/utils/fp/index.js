@@ -1,5 +1,5 @@
 module.exports = {
   resultToTask: require('./resultToTask'),
-  swapMaybeM: require('./swapMaybeM'),
+  swapMaybeF: require('./swapMaybeF'),
   liftInnerMaybe: require('./liftInnerMaybe'),
 };

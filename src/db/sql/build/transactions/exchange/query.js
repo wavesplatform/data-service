@@ -2,27 +2,31 @@ const pg = require('knex')({ client: 'pg' });
 
 const { compose, keys, omit } = require('ramda');
 
-const selectFields = {
-  // tx
-  tx_id: 't.id',
-  tx_time_stamp: 't.time_stamp',
-  tx_height: 't.height',
-  tx_signature: 't.signature',
+const selectFields = [
+  't.id',
+  't.time_stamp',
+  't.height',
+  't.signature',
 
-  tx_sender: 't.sender',
-  tx_sender_public_key: 't.sender_public_key',
+  't.sender',
+  't.sender_public_key',
 
-  tx_amount_asset: 't.amount_asset',
-  tx_price_asset: 't.price_asset',
+  't.amount_asset',
+  't.price_asset',
+  't.price',
+  't.amount',
 
-  tx_price: 't.price',
-  tx_amount: 't.amount',
+  't.fee',
+  't.sell_matcher_fee',
+  't.buy_matcher_fee',
 
-  tx_fee: pg.raw('t.fee * 10^(-8)'),
-  tx_sell_matcher_fee: pg.raw('t.sell_matcher_fee * 10^(-8)'),
-  tx_buy_matcher_fee: pg.raw('t.buy_matcher_fee * 10^(-8)'),
+  't.order1',
+  't.order2',
+];
+// @todo — support 'proofs' as well as 'signature'
+const select = pg({ t: 'txs_7' }).select(selectFields);
 
-  // o1
+const orderFields = {
   o1_id: 'o1.id',
   o1_time_stamp: 'o1.time_stamp',
   o1_expiration: 'o1.expiration',
@@ -46,14 +50,75 @@ const selectFields = {
   o2_amount: 'o2.amount',
   o2_matcher_fee: pg.raw('o2.matcher_fee * 10^(-8)'),
 };
+/**
+ * Adds orders to query
+ * @param {Query} q
+ */
+const withOrders = q => {
+  return pg({ t: q })
+    .columns(selectFields)
+    .columns(orderFields)
+    .select()
+    .innerJoin({ o1: 'orders' }, 't.order1', 'o1.id')
+    .innerJoin({ o2: 'orders' }, 't.order2', 'o2.id');
+};
 
-// @todo — support `proofs` as well as `signature`
-const select = pg({ t: 'txs_7' })
-  .select(selectFields)
-  .innerJoin({ o1: 'orders' }, 't.order1', 'o1.id')
-  .innerJoin({ o2: 'orders' }, 't.order2', 'o2.id')
-  .orderBy('t.time_stamp', 'desc');
+const renameMap = {
+  tx_id: 't.id',
+  tx_time_stamp: 't.time_stamp',
+  tx_height: 't.height',
+  tx_signature: 't.signature',
 
+  tx_sender: 't.sender',
+  tx_sender_public_key: 't.sender_public_key',
+
+  tx_amount_asset: 't.amount_asset',
+  tx_price_asset: 't.price_asset',
+
+  tx_price: 't.price',
+  tx_amount: 't.amount',
+
+  tx_fee: pg.raw('t.fee * 10^(-8)'),
+  tx_sell_matcher_fee: pg.raw('t.sell_matcher_fee * 10^(-8)'),
+  tx_buy_matcher_fee: pg.raw('t.buy_matcher_fee * 10^(-8)'),
+
+  // o1
+  o1_id: 'o1_id',
+  o1_time_stamp: 'o1_time_stamp',
+  o1_expiration: 'o1_expiration',
+  o1_signature: 'o1_signature',
+  o1_sender: 'o1_sender',
+  o1_sender_public_key: 'o1_sender_public_key',
+  o1_type: 'o1_type',
+  o1_price: 'o1_price',
+  o1_amount: 'o1_amount',
+  o1_matcher_fee: 'o1_matcher_fee',
+
+  // o2
+  o2_id: 'o2_id',
+  o2_time_stamp: 'o2_time_stamp',
+  o2_expiration: 'o2_expiration',
+  o2_signature: 'o2_signature',
+  o2_sender: 'o2_sender',
+  o2_sender_public_key: 'o2_sender_public_key',
+  o2_type: 'o2_type',
+  o2_price: 'o2_price',
+  o2_amount: 'o2_amount',
+  o2_matcher_fee: 'o2_matcher_fee',
+};
+/**
+ * Renames fields according
+ * to output validation schema
+ * @param {Query} q
+ */
+const renameFields = q => pg({ t: q }).select(renameMap);
+
+/**
+ * Removes fields for decimal's
+ * calculation and adds decimals fields
+ * for both orders
+ * @param {Query} q
+ */
 const withDecimals = q => {
   const fieldsExceptSatoshi = compose(
     keys,
@@ -65,7 +130,7 @@ const withDecimals = q => {
       'o2_price',
       'o2_amount',
     ])
-  )(selectFields);
+  )(renameMap);
 
   return (
     pg({ t: q })
@@ -101,5 +166,7 @@ const withDecimals = q => {
 
 module.exports = {
   select,
+  renameFields,
   withDecimals,
+  withOrders,
 };

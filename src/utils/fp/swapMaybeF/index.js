@@ -1,11 +1,11 @@
 const Maybe = require('folktale/maybe');
 const { curry } = require('ramda');
 
-/** mOf -> Maybe M a -> M Maybe a */
-const swapMaybeM = (mOf, maybeM) =>
+/** (a -> F a) -> Maybe F a -> F Maybe a */
+const swapMaybeF = (F, maybeM) =>
   maybeM.matchWith({
-    Nothing: () => mOf(maybeM), // M Maybe r
+    Nothing: () => F(maybeM), // M Maybe r
     Just: ({ value }) => value.map(Maybe.of), // M Maybe r
   });
 
-module.exports = curry(swapMaybeM);
+module.exports = curry(swapMaybeF);
