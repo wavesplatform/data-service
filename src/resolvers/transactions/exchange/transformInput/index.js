@@ -14,9 +14,11 @@ const decodeAfter = cursor => {
     ...(sort ? { sort } : {}),
   };
 };
-const transformInput = filters =>
-  filters.after
-    ? { ...omit(['after'], filters), ...decodeAfter(filters.after) }
-    : filters;
+const transformInput = filters => {
+  if (!filters.after) {
+    return filters;
+  }
+  return { ...filters, ...decodeAfter(filters.after) };
+};
 
 module.exports = transformInput;

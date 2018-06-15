@@ -1,7 +1,9 @@
 const { curryN } = require('ramda');
 
 const encode = curryN(2, (sort, item) =>
-  Buffer.from(`${item.timestamp}::${item.id}::${sort}`).toString('base64')
+  Buffer.from(`${item.timestamp.toISOString()}::${item.id}::${sort}`).toString(
+    'base64'
+  )
 );
 
 const decode = cursor =>
