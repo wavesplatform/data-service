@@ -3,7 +3,7 @@ const { select } = require('../utils/selectors');
 const { captureErrors } = require('../../utils/captureErrors');
 
 const resolver = async ctx => {
-  const { id } = select(ctx).params;
+  const { alias: aliasName } = select(ctx).params;
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
     resolver: 'aliases',
@@ -14,19 +14,19 @@ const resolver = async ctx => {
     emitEvent: ctx.eventBus.emit,
   });
 
-  const asset = await resolver(id)
+  const alias = await resolver(aliasName)
     .run()
     .promise();
 
   ctx.eventBus.emit('ENDPOINT_RESOLVED', {
-    value: asset,
+    value: alias,
   });
 
-  if (asset) {
-    ctx.state.returnValue = asset;
+  if (alias) {
+    ctx.state.returnValue = alias;
   } else {
     ctx.status = 404;
-    ctx.body = `Alias ${id} not found`;
+    ctx.body = `Alias ${aliasName} not found`;
   }
 };
 
