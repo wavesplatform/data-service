@@ -34,8 +34,7 @@ describe('Aliases should return', () => {
       .run()
       .listen({
         onResolved: mxs => {
-          const xs = mxs.map(x => x.getOrElse(-1));
-          expect(xs).toMatchSnapshot();
+          expect(mxs).toMatchSnapshot();
           done();
         },
       });

@@ -1,5 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Alias sql query build \`many\` should build select by address with order by time 1`] = `"select \\"sender\\" as \\"address\\", \\"alias\\" as \\"alias\\" from \\"txs_11\\" where \\"sender\\" = 'SOME_ADDRESS' order by \\"timeStamp\\" asc limit 1000"`;
+exports[`Alias sql query build \`many\` should build select by address with order by time 1`] = `"select \\"sender\\" as \\"address\\", \\"alias\\" as \\"alias\\" from \\"txs_10\\" where \\"sender\\" = 'SOME_ADDRESS' order by \\"time_stamp\\" asc limit 1000"`;
 
-exports[`Alias sql query build \`one\` should build select by alias 1`] = `"select \\"sender\\" as \\"address\\", \\"alias\\" as \\"alias\\" from \\"txs_11\\" where \\"alias\\" = 'SOME_ALIAS' limit 1000"`;
+exports[`Alias sql query build \`one\` should build select by alias 1`] = `"select \\"sender\\" as \\"address\\", \\"alias\\" as \\"alias\\" from \\"txs_10\\" where \\"alias\\" = 'SOME_ALIAS' limit 1000"`;
