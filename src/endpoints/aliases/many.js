@@ -7,7 +7,7 @@ const resolver = async ctx => {
 
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
-    resolver: 'assets',
+    resolver: 'aliases',
   });
   const resolver = createResolver({
     db: ctx.state.db,

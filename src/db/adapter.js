@@ -81,7 +81,7 @@ const createDbAdapter = ({
           .any(sql.build.aliases.many({ address }))
           .map(map(Maybe.fromNullable))
           .mapRejected(
-            errorFactory({ request: 'aliases.many', params: address })
+            errorFactory({ request: 'aliases.many', params: { address } })
           );
       },
     },
