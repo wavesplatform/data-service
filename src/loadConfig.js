@@ -11,7 +11,9 @@ const loadConfig = () => {
     'PGPASSWORD',
   ]);
 
+
   return {
+    port: parseInt(process.env.PORT) || 3000,
     postgresHost: process.env.PGHOST,
     postgresPort: parseInt(process.env.PGPORT) || 5432,
     postgresDatabase: process.env.PGDATABASE,
