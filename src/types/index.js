@@ -1,5 +1,7 @@
 const { curry } = require('ramda');
 
+const createNamedType = require('./createNamedType');
+
 /** fromMaybe :: Type -> Maybe a -> (Type a | Type Nil) */
 const fromMaybe = curry((Type, mb) =>
   mb.matchWith({
@@ -9,9 +11,10 @@ const fromMaybe = curry((Type, mb) =>
 );
 
 module.exports = {
-  Asset: require('./Asset'),
+  Asset: createNamedType('asset'),
+  Alias: createNamedType('alias'),
+  Pair: createNamedType('pair'),
+  Transaction: createNamedType('transaction'),
   List: require('./List'),
-  Pair: require('./Pair'),
-  Transaction: require('./Transaction'),
   fromMaybe,
 };

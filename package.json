@@ -1,6 +1,6 @@
 {
   "name": "data-service",
-  "version": "0.2.0",
+  "version": "0.3.1",
   "description": "Waves data service",
   "main": "src/index.js",
   "repository": "git@github.com:wavesplatform/data-service.git",
@@ -9,14 +9,15 @@
   "scripts": {
     "start": "export $(cat variables.env | xargs) && nodemon index.js",
     "lint": "eslint src",
-    "dev": "export $(cat variables.env | xargs) && NODE_ENV=development nodemon --inspect",
+    "dev": "export $(cat variables.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect",
     "test": "yarn test:u && yarn test:i",
     "test:u": "jest --config=config/jest.config.unit.json",
     "test:i": "export $(cat variables.stage.env | xargs) && jest --config=config/jest.config.integration.json"
   },
   "devDependencies": {
     "eslint": "^4.19.1",
-    "jest": "^22.4.3"
+    "jest": "^22.4.3",
+    "nodemon": "^1.17.5"
   },
   "dependencies": {
     "@koa/cors": "^2.2.1",

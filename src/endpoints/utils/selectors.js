@@ -25,8 +25,16 @@ const selectQuery = pathOr({}, ['query']);
 const selectFromParams = what =>
   ifElse(
     () => Array.isArray(what),
-    pipe(selectParams, pickAll(what), values),
-    pipe(selectParams, pathOr('', [what]), String)
+    pipe(
+      selectParams,
+      pickAll(what),
+      values
+    ),
+    pipe(
+      selectParams,
+      pathOr('', [what]),
+      String
+    )
   );
 
 const selectId = selectFromParams('id');
@@ -45,6 +53,9 @@ const select = ctx => ({
   },
   get query() {
     return selectQuery(ctx);
+  },
+  get params() {
+    return selectParams(ctx);
   },
   fromParams(what) {
     return selectFromParams(what)(ctx);
