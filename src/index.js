@@ -13,8 +13,6 @@ const removeErrorBodyProd = require('./middleware/removeErrorBodyProd');
 const serializer = require('./middleware/serializer');
 const setHeadersMiddleware = require('./middleware/setHeaders');
 
-const PORT = 3000;
-
 const eventBus = createEventBus();
 
 const app = new Koa();
@@ -32,9 +30,9 @@ app
   .use(serializer)
   .use(injectDb(options))
   .use(router.routes())
-  .listen(PORT);
+  .listen(options.port);
 
 if (process.env.NODE_ENV === 'development') {
   // eslint-disable-next-line
-  console.log(chalk.yellow(`App has started on http://localhost:${PORT}/`));
+  console.log(chalk.yellow(`App has started on http://localhost:${options.port}/`));
 }

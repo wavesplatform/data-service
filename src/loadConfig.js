@@ -5,20 +5,21 @@ const { memoizeWith, always } = require('ramda');
 const loadConfig = () => {
   // assert all necessary env vars are set
   checkEnv([
-    'POSTGRES_HOST',
-    'POSTGRES_DATABASE',
-    'POSTGRES_USER',
-    'POSTGRES_PASSWORD',
+    'PGHOST',
+    'PGDATABASE',
+    'PGUSER',
+    'PGPASSWORD',
   ]);
 
+
   return {
-    logsDirectory: process.env.LOGS_DIRECTORY || 'log',
-    postgresHost: process.env.POSTGRES_HOST,
-    postgresPort: parseInt(process.env.POSTGRES_PORT) || 5432,
-    postgresDatabase: process.env.POSTGRES_DATABASE,
-    postgresUser: process.env.POSTGRES_USER,
-    postgresPassword: process.env.POSTGRES_PASSWORD,
-    postgresPoolSize: parseInt(process.env.POSTGRES_POOL_SIZE) || 70,
+    port: parseInt(process.env.PORT) || 3000,
+    postgresHost: process.env.PGHOST,
+    postgresPort: parseInt(process.env.PGPORT) || 5432,
+    postgresDatabase: process.env.PGDATABASE,
+    postgresUser: process.env.PGUSER,
+    postgresPassword: process.env.PGPASSWORD,
+    postgresPoolSize: parseInt(process.env.PGPOOLSIZE) || 20,
   };
 };
 
