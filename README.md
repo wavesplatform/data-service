@@ -2,7 +2,7 @@
 
 **⚠️ This service is currently in /v0. Breaking changes are coming in /v1 (also possible, but not likely, within /v0 releases). Please use with caution.**
 
-This is an API aimed at retrieving data from blockchain quickly and comfortably. We  support public APIs for: 
+This is an API aimed at retrieving data from blockchain quickly and conveniently. We  support public APIs for: 
 - Mainnet
   - [https://api.wavesplatform.com/v0/](https://api.wavesplatform.com/v0/)
 - Testnet
@@ -79,4 +79,4 @@ If you decide to use NodeJS directly (without Docker), we recommend using a proc
 - Implement a caching strategy. Different endpoints may need different cache time (or no cache at all)
 - Run several process instances behind a load balancer per machine. `docker-compose --scale` can help with that, or it can be done manually. A good rule of thumb is to use as many instances as CPU cores available.
 - Use several machines in different data centers and a balancer to minimize downtime
-- Experiment with PostgreSQL settings to find out what works best for your configuration. Tweaking `PGPOOLSIZE` also can help.
+- Experiment with PostgreSQL settings to find out what works best for your configuration. Tweaking `PGPOOLSIZE` also can help performance.
