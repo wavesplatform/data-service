@@ -4,13 +4,7 @@ const { memoizeWith, always } = require('ramda');
 
 const loadConfig = () => {
   // assert all necessary env vars are set
-  checkEnv([
-    'PGHOST',
-    'PGDATABASE',
-    'PGUSER',
-    'PGPASSWORD',
-  ]);
-
+  checkEnv(['PGHOST', 'PGDATABASE', 'PGUSER', 'PGPASSWORD']);
 
   return {
     port: parseInt(process.env.PORT) || 3000,
@@ -20,6 +14,7 @@ const loadConfig = () => {
     postgresUser: process.env.PGUSER,
     postgresPassword: process.env.PGPASSWORD,
     postgresPoolSize: parseInt(process.env.PGPOOLSIZE) || 20,
+    logLevel: process.env.LOG_LEVEL || 'info',
   };
 };
 
