@@ -13,7 +13,7 @@ const selectTxs7 = ({ priceAsset, amountAsset }, selectStatement = '*') =>
 
 const volume = pair =>
   pg
-    .select({ amount: pg.raw('sum(amount::double precision)') })
+    .select({ volume: pg.raw('sum(amount::double precision)') })
     .from({ t: selectTxs7(pair, 'amount') });
 
 const price = sortDirection => pair =>
@@ -38,12 +38,23 @@ const decimals = assetId =>
     .select('decimals')
     .where('asset_id', assetId);
 
-const weightedAveragePrice = pair =>
-  selectTxs7(pair, {
-    avg_price: pg.raw(
-      'sum(amount :: DOUBLE PRECISION * price :: DOUBLE PRECISION) / sum(amount :: DOUBLE PRECISION)'
-    ),
-  });
+const weightedAveragePrice = ({ asset1, asset2 }) =>
+  pg({ t: 'txs_7' })
+    .select({
+      avg_price: pg.raw(
+        'sum(amount :: DOUBLE PRECISION * price :: DOUBLE PRECISION) / sum(amount :: DOUBLE PRECISION)'
+      ),
+      amount_asset: pg.min('amount_asset'),
+      price_asset: pg.min('price_asset'),
+    })
+    .whereRaw(
+      "t.time_stamp BETWEEN timezone('utc', now() - INTERVAL '1 day') AND timezone('utc', now())"
+    )
+    .whereRaw(
+      "(amount_asset || '/' || price_asset = ? OR amount_asset || '/' || price_asset = ?)",
+      [`${asset1}/${asset2}`, `${asset2}/${asset1}`]
+    )
+    .clone();
 
 module.exports = {
   volume,
