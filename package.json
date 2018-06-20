@@ -9,8 +9,8 @@
   "scripts": {
     "start": "export $(cat variables.env | xargs) && nodemon index.js",
     "lint": "eslint src",
-    "dev:t": "export $(cat variables.testnet.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect",
     "dev": "export $(cat variables.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect",
+    "dev:t": "export $(cat variables.testnet.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect",
     "test": "yarn test:u && yarn test:i",
     "test:t": "yarn test:u && yarn test:it",
     "test:u": "jest --config=config/jest.config.unit.json",
