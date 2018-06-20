@@ -10,7 +10,7 @@ const selectFilters = ({
   key,
   type,
   value,
-  // after,
+  after,
 }) =>
   reject(isNil, {
     timeStart: timeStart && parseDate(timeStart),
@@ -21,7 +21,7 @@ const selectFilters = ({
     key,
     type,
     value,
-    // after,
+    after,
   });
 
 module.exports = { selectFilters };

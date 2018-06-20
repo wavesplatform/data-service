@@ -4,10 +4,9 @@ const { where, limit, orderBy } = require('../../../utils/knex');
 
 const after = ({ timestamp, id, sortDirection }) => q => {
   const comparator = sortDirection === 'desc' ? '<' : '>';
-  return q.whereRaw(`(t.time_stamp, t.id) ${comparator} (?, ?)`, [
-    timestamp,
-    id,
-  ]);
+  return q
+    .clone()
+    .whereRaw(`(time_stamp, id) ${comparator} (?, ?)`, [timestamp, id]);
 };
 
 const sort = curry((s, q) =>
