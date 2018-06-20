@@ -1,0 +1,124 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Alias resolver for many fetches aliases for address 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "alias",
+      "data": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "jeffrey",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "hans",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "hansch",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "liqio.io",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "trextracker",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "maid",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "jveldt",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "bunq",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "tikkie",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "rijksoverheid",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "burned",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "j.veldt",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "shapeshift.io",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "changelly.com",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "changelly",
+      },
+    },
+  ],
+}
+`;
+
+exports[`Alias resolver for one fetches an alias 1`] = `
+Object {
+  "__type": "alias",
+  "data": anonymous {
+    "address": "3PQqCXNPoTRsHRK2nZyXWENaZwLmxrUZPBi",
+    "alias": "sexy-boys",
+  },
+}
+`;

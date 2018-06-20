@@ -48,6 +48,23 @@ const createDbAdapter = options => {
       exchange: createExchangeAdapter(options),
       data: createDataAdapter(options),
     },
+
+    aliases: {
+      one(x) {
+        return dbT
+          .oneOrNone(sql.build.aliases.one(x))
+          .map(Maybe.fromNullable)
+          .mapRejected(errorFactory({ request: 'aliases.one', params: x }));
+      },
+      many({ address }) {
+        return dbT
+          .any(sql.build.aliases.many({ address }))
+          .map(map(Maybe.fromNullable))
+          .mapRejected(
+            errorFactory({ request: 'aliases.many', params: { address } })
+          );
+      },
+    },
   };
 };
 
