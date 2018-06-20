@@ -1,0 +1,169 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Aliases should return Maybe(alias) for \`one\` correctly 1`] = `
+Object {
+  "@@tag": "Just",
+  "@@type": "folktale:Maybe",
+  "@@value": Object {
+    "value": anonymous {
+      "address": "3PQqCXNPoTRsHRK2nZyXWENaZwLmxrUZPBi",
+      "alias": "sexy-boys",
+    },
+  },
+}
+`;
+
+exports[`Aliases should return Maybe(data)[] for \`many\` aliases request 1`] = `
+Array [
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "jeffrey",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "hans",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "hansch",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "liqio.io",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "trextracker",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "maid",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "jveldt",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "bunq",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "tikkie",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "rijksoverheid",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "burned",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "j.veldt",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "shapeshift.io",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "changelly.com",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": anonymous {
+        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
+        "alias": "changelly",
+      },
+    },
+  },
+]
+`;
