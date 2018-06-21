@@ -12,8 +12,8 @@ const { map, split, zipObj, compose } = require('ramda');
 
 /**
  * @function
- * @param {string} pair {amoutAsset}/{priceAsset}
- * @returns PairRequest
+ * @param {string[]} pairs {amoutAsset}/{priceAsset}
+ * @returns PairRequest[]
  */
 const parsePairs = map(
   compose(
