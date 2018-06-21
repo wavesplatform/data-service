@@ -24,7 +24,8 @@ const output = Joi.object().keys({
     .required(),
   volume_waves: Joi.object()
     .type(BigNumber)
-    .required(),
+    .required()
+    .allow(null),
 });
 
 module.exports = { output, pairInput };
