@@ -1,6 +1,27 @@
 const { many: createResolver } = require('../../resolvers/pairs');
 const { select } = require('../utils/selectors');
 const { captureErrors } = require('../../utils/captureErrors');
+
+const { map, split, zipObj, compose } = require('ramda');
+
+/**
+ * @typedef {object} PairRequest
+ * @property {string} amountAsset
+ * @property {string} priceAsset
+ */
+
+/**
+ * @function
+ * @param {string} pair {amoutAsset}/{priceAsset}
+ * @returns PairRequest
+ */
+const parsePairs = map(
+  compose(
+    zipObj(['amountAsset, priceAsset']),
+    split('/')
+  )
+);
+
 /**
  * Endpoint
  * @name /pairs?pairs[]‌="{asset_id_1}/{asset_id_2}"&pairs[]="{asset_id_1}/{asset_id_2}" ...other params
@@ -18,7 +39,7 @@ const pairsManyEndpoint = async ctx => {
     emitEvent: ctx.eventBus.emit,
   });
 
-  const result = await resolver(pairs)
+  const result = await resolver(parsePairs(pairs))
     .run()
     .promise();
 
