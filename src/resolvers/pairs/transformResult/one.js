@@ -11,6 +11,9 @@ const pairOrNull = maybePair =>
   });
 
 /** transformResults :: Maybe RawPairInfo -> Pair | null */
-const transformResults = compose(pairOrNull, map(transformPairInfo));
+const transformResults = compose(
+  pairOrNull,
+  map(transformPairInfo)
+);
 
 module.exports = transformResults;
