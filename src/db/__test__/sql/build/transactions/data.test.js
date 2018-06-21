@@ -35,5 +35,16 @@ describe('transactions.data api method', () => {
     it('limit', () => {
       expect(sql.many({ limit: 11 })).toMatchSnapshot();
     });
+    it('after', () => {
+      expect(
+        sql.many({
+          after: {
+            timestamp: new Date('2018-04-07T08:36:52.149Z'),
+            id: '23sjEq5zNctBTGqrsapLrPxDkHFM8rJCKF1ti55NRpbF',
+            sortDirection: 'asc',
+          },
+        })
+      ).toMatchSnapshot();
+    });
   });
 });

@@ -12,6 +12,7 @@
     "dev": "export $(cat variables.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect",
     "dev:t": "export $(cat variables.testnet.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect",
     "test": "yarn test:u && yarn test:i",
+    "test:t": "yarn test:u && yarn test:it",
     "test:u": "jest --config=config/jest.config.unit.json",
     "test:i": "export $(cat variables.stage.env | xargs) && jest --config=config/jest.config.integration.json",
     "test:it": "export $(cat variables.testnet.env | xargs) && jest --config=config/jest.config.integration.testnet.json"

@@ -131,27 +131,24 @@ describe('Data transaction resolver for many', () => {
     });
   });
 
-  xdescribe('Pagination ', async () => {
+  describe('Pagination ', async () => {
     const Cursor = require('../pagination/cursor');
-    const { parseDate } = require('../../../../utils/parseDate');
-    const START = '2018-06-02T10:59:43.000Z';
-    const END = '2018-06-03T23:59:48.000Z';
-    const LIMIT = 21;
+    const LIMIT = 8;
     const createCursor = sort => ({ data }) => Cursor.encode(sort, data);
     it(' works asc', async () => {
       const SORT = 'asc';
 
       const baseParams = {
         limit: LIMIT,
-        timeEnd: parseDate(END),
-        timeStart: parseDate(START),
+        timeEnd: TIME_END,
+        timeStart: TIME_START,
         sort: SORT,
       };
 
       const fetchAndGetNextCursor = cursor =>
         resolverMany({
           ...baseParams,
-          limit: 5,
+          limit: 2,
           after: cursor,
         })
           .run()
@@ -166,7 +163,7 @@ describe('Data transaction resolver for many', () => {
       var cursors = [firstCursor];
       var curCursor = firstCursor;
 
-      while (i++ < (LIMIT - 1) / 5) {
+      while (i++ < (LIMIT - 1) / 2) {
         var [nextCursor, cs] = await fetchAndGetNextCursor(curCursor);
         curCursor = nextCursor;
         cursors = [...cursors, ...cs];
@@ -187,8 +184,8 @@ describe('Data transaction resolver for many', () => {
 
       const baseParams = {
         limit: LIMIT,
-        timeEnd: parseDate(END),
-        timeStart: parseDate(START),
+        timeEnd: TIME_END,
+        timeStart: TIME_START,
         sort: SORT,
       };
 
@@ -230,8 +227,7 @@ describe('Data transaction resolver for many', () => {
     it('doesnt try to create a cursor for empty response', done =>
       resolverMany({
         limit: 1,
-        timeEnd: parseDate('1525132800000'),
-        priceAsset: 'incorrect value',
+        key: 'someKeyThatDoesntExists' + new Date(),
       })
         .run()
         .promise()
@@ -239,6 +235,6 @@ describe('Data transaction resolver for many', () => {
           expect(d).not.toHaveProperty('lastCursor');
           done();
         })
-        .catch(() => done('Wrong branch, error')));
+        .catch(e => done(JSON.stringify(e))));
   });
 });
