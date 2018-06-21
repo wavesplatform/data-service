@@ -6,13 +6,14 @@ const WAVES_DECIMALS = 8;
 const aDecimals = 8;
 const pDecimals = 2;
 
-const resultCommon = [
-  { decimals: aDecimals },
-  { decimals: pDecimals },
-  { price: new BigNumber(10).pow(8) },
-  { price: new BigNumber(10).pow(8).multipliedBy(2) },
-  { volume: new BigNumber(10).pow(10) },
-];
+const resultCommon = {
+  a_decimals: aDecimals,
+  p_decimals: pDecimals,
+  first_price: new BigNumber(10).pow(8),
+  last_price: new BigNumber(10).pow(8).multipliedBy(2),
+  volume: new BigNumber(10).pow(10),
+  volume_price_asset: new BigNumber(10).pow(10).multipliedBy(12),
+};
 
 describe('Pairs transformResult function', () => {
   it('covers case when WAVES — amount asset', () => {
@@ -36,16 +37,12 @@ describe('Pairs transformResult function', () => {
       priceAsset: 'WAVES',
       amountAsset: '474jTeYx2r2Va35794tCScAXWJG9hU2HcgxzMowaZUnu',
     };
-
-    const result = [
-      ...resultCommon,
-      { volume_price_asset: new BigNumber(1200000000) },
-    ];
+    const result = resultCommon;
     const expected = {
       first_price: new BigNumber(10).pow(6),
       last_price: new BigNumber(10).pow(6).multipliedBy(2),
       volume: new BigNumber(10).pow(2),
-      volume_waves: new BigNumber(12),
+      volume_waves: new BigNumber(10).pow(2).multipliedBy(12),
     };
 
     expect(transformResults(pair)(result)).toEqual(expected);
@@ -61,15 +58,12 @@ describe('Pairs transformResult function', () => {
       const volumePriceAsset = new BigNumber(10).pow(10).multipliedBy(2);
       const avgPrice = new BigNumber(10).pow(6).multipliedBy(3);
 
-      const result = [
+      const result = {
         ...resultCommon,
-        { volume_price_asset: volumePriceAsset },
-        {
-          price_asset: 'WAVES',
-          amount_asset: 'Ft8X1v1LTa1ABafufpaCWyVj8KkaxUWE6xBhW6sNFJck',
-          avg_price: avgPrice,
-        },
-      ];
+        volume_price_asset: volumePriceAsset, // overriding for this test purposes
+        avg_price_with_waves: avgPrice,
+        price_asset_with_waves: 'WAVES',
+      };
 
       const expected = {
         first_price: new BigNumber(10).pow(6),
@@ -88,15 +82,12 @@ describe('Pairs transformResult function', () => {
       const volumePriceAsset = new BigNumber(10).pow(10).multipliedBy(6);
       const avgPrice = new BigNumber(10).pow(6).multipliedBy(3);
 
-      const result = [
+      const result = {
         ...resultCommon,
-        { volume_price_asset: volumePriceAsset },
-        {
-          price_asset: 'Ft8X1v1LTa1ABafufpaCWyVj8KkaxUWE6xBhW6sNFJck',
-          amount_asset: 'WAVES',
-          avg_price: avgPrice,
-        },
-      ];
+        volume_price_asset: volumePriceAsset, // overriding for this test purposes
+        avg_price_with_waves: avgPrice,
+        price_asset_with_waves: 'Ft8X1v1LTa1ABafufpaCWyVj8KkaxUWE6xBhW6sNFJck',
+      };
 
       const expected = {
         first_price: new BigNumber(10).pow(6),
@@ -113,14 +104,13 @@ describe('Pairs transformResult function', () => {
   });
 
   describe('corner cases', () => {
-    const resultCommonNull = [null, null, null, null, { volume: null }];
     it('WAVES — amount asset, no transactions happened within a day', () => {
       const pair = {
         amountAsset: 'WAVES',
         priceAsset: 'Ft8X1v1LTa1ABafufpaCWyVj8KkaxUWE6xBhW6sNFJck',
       };
 
-      expect(transformResults(pair)(resultCommonNull)).toEqual(null);
+      expect(transformResults(pair)(null)).toEqual(null);
     });
 
     it('WAVES — price asset, no transactions happened within a day', () => {
@@ -129,7 +119,7 @@ describe('Pairs transformResult function', () => {
         priceAsset: 'WAVES',
       };
 
-      expect(transformResults(pair)(resultCommonNull)).toEqual(null);
+      expect(transformResults(pair)(null)).toEqual(null);
     });
 
     it('WAVES is neither price nor amount, transactions within pair occured, but no transactions priceAsset--WAVES happened', () => {
@@ -137,15 +127,11 @@ describe('Pairs transformResult function', () => {
         amountAsset: '474jTeYx2r2Va35794tCScAXWJG9hU2HcgxzMowaZUnu',
         priceAsset: 'Ft8X1v1LTa1ABafufpaCWyVj8KkaxUWE6xBhW6sNFJck',
       };
-      const result = [
+      const result = {
         ...resultCommon,
-        { volume_price_asset: new BigNumber(1000000) },
-        {
-          price_asset: null,
-          amount_asset: null,
-          avg_price: null,
-        },
-      ];
+        avg_price_with_waves: null,
+        price_asset_with_waves: null,
+      };
       const expected = {
         first_price: new BigNumber(10).pow(6),
         last_price: new BigNumber(10).pow(6).multipliedBy(2),

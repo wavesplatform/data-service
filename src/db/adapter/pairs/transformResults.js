@@ -1,8 +1,20 @@
-const { head, curry } = require('ramda');
+const { curry } = require('ramda');
 
 const { convertPrice, convertAmount } = require('../../../utils/satoshi');
 
 const WAVES_DECIMALS = 8;
+
+/**
+ * @typedef {object} PairDbResponse
+ * @property {BigNumber} a_decimals
+ * @property {BigNumber} p_decimals
+ * @property {BigNumber} first_price
+ * @property {BigNumber} last_price
+ * @property {BigNumber} volume
+ * @property {BigNumber} volume_price_asset
+ * @property {BigNumber} [avg_price_with_waves]
+ * @property {BigNumber} [price_asset_with_waves]
+ */
 
 /**
  * @typedef {object} PairInfoRaw
@@ -26,17 +38,17 @@ const WAVES_DECIMALS = 8;
  * @returns PairInfoRaw
  */
 const transformResults = curry(({ amountAsset, priceAsset }, result) => {
-  if (result.slice(0, 4).some(x => x === null)) return null;
-  if (result[4].volume === null) return null;
+  if (result === null) return null;
 
-  const [
-    { decimals: aDecimals },
-    { decimals: pDecimals },
-    { price: firstPrice },
-    { price: lastPrice },
-    { volume },
-    ...tail
-  ] = result;
+  const {
+    a_decimals: aDecimals,
+    p_decimals: pDecimals,
+    last_price: lastPrice,
+    first_price: firstPrice,
+    volume,
+    volume_price_asset: volumePriceAsset,
+    ...withWaves
+  } = result;
 
   const resultCommon = {
     first_price: convertPrice(aDecimals, pDecimals, firstPrice),
@@ -51,19 +63,18 @@ const transformResults = curry(({ amountAsset, priceAsset }, result) => {
         volume_waves: resultCommon.volume,
       };
     case priceAsset === 'WAVES': {
-      const { volume_price_asset: volumePriceAsset } = head(tail);
       return {
         ...resultCommon,
-        volume_waves: convertAmount(8, volumePriceAsset),
+        volume_waves: convertAmount(WAVES_DECIMALS, volumePriceAsset),
       };
     }
     default: {
-      const [
-        { volume_price_asset: volumePriceAsset },
-        { price_asset, avg_price },
-      ] = tail;
+      const {
+        avg_price_with_waves: avgPriceWithWaves,
+        price_asset_with_waves: priceAssetWithWaves,
+      } = withWaves;
 
-      if (avg_price === null)
+      if (avgPriceWithWaves === null)
         return {
           ...resultCommon,
           volume_waves: null,
@@ -71,11 +82,11 @@ const transformResults = curry(({ amountAsset, priceAsset }, result) => {
 
       const volumeConverted = convertAmount(pDecimals, volumePriceAsset);
 
-      if (price_asset === 'WAVES') {
+      if (priceAssetWithWaves === 'WAVES') {
         const priceConverted = convertPrice(
           pDecimals,
           WAVES_DECIMALS,
-          avg_price
+          avgPriceWithWaves
         );
         return {
           ...resultCommon,
@@ -85,7 +96,7 @@ const transformResults = curry(({ amountAsset, priceAsset }, result) => {
         const priceConverted = convertPrice(
           WAVES_DECIMALS,
           pDecimals,
-          avg_price
+          avgPriceWithWaves
         );
         return {
           ...resultCommon,
