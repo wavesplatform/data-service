@@ -6,13 +6,13 @@ const curriedEmit = emit => curryN(2, emit);
 const oneConfig = {
   ...require('./validation/one'),
   transformResult: require('./transformResult/one'),
-  dbQuery: db => id => db.pairs.one(id),
+  dbQuery: db => pair => db.pairs.one(pair),
 };
 
 const manyConfig = {
   ...require('./validation/many'),
   transformResult: require('./transformResult/many'),
-  dbQuery: db => ids => db.pairs.many(ids),
+  dbQuery: db => pairs => db.pairs.many(pairs),
 };
 
 module.exports = {

@@ -8,7 +8,9 @@ const ASSET_IDS = {
   MRT: '4uK8i4ThRGbehENwa6MxyLtxAjAo1Rj9fduborGExarC',
 };
 
-const pair = (amountAsset, priceAsset) =>
-  `${ASSET_IDS[amountAsset]}/${ASSET_IDS[priceAsset]}`;
+const pair = (amountAssetTicker, priceAssetTicker) => ({
+  amountAsset: ASSET_IDS[amountAssetTicker],
+  priceAsset: ASSET_IDS[priceAssetTicker],
+});
 
 module.exports = pair;

@@ -23,8 +23,8 @@ createAndSubscribeLogger({ options, eventBus });
 
 app
   .use(removeErrorBodyProd)
-  .use(setHeadersMiddleware)
   .use(requestId())
+  .use(setHeadersMiddleware)
   .use(injectEventBus(eventBus))
   .use(accessLogMiddleware)
   .use(serializer)
@@ -34,5 +34,7 @@ app
 
 if (process.env.NODE_ENV === 'development') {
   // eslint-disable-next-line
-  console.log(chalk.yellow(`App has started on http://localhost:${options.port}/`));
+  console.log(
+    chalk.yellow(`App has started on http://localhost:${options.port}/`)
+  );
 }

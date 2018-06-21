@@ -31,7 +31,7 @@ const input = Joi.object()
     limit: Joi.number()
       .min(1)
       .max(100),
-    sort: Joi.string(),
+    sort: Joi.string().valid('asc', 'desc'),
     matcher: Joi.string(),
     sender: Joi.string(),
     amountAsset: Joi.string(),

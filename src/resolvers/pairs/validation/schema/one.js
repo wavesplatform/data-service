@@ -1,8 +1,5 @@
-const Joi = require('joi');
-const { output, assetsIdRegex } = require('./common');
+const { output, pairInput } = require('./common');
 
-const input = Joi.string()
-  .regex(assetsIdRegex)
-  .required();
+const input = pairInput;
 
 module.exports = { input, output };
