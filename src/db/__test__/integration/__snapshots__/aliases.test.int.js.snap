@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Aliases should return Maybe(alias) for \`one\` correctly 1`] = `
+exports[`Aliases should return Maybe(data)[] for \`many\` aliases request 1`] = `
 Object {
   "@@tag": "Just",
   "@@type": "folktale:Maybe",
@@ -13,7 +13,7 @@ Object {
 }
 `;
 
-exports[`Aliases should return Maybe(data)[] for \`many\` aliases request 1`] = `
+exports[`Aliases should return Maybe(data)[] for \`many\` aliases request 2`] = `
 Array [
   Object {
     "@@tag": "Just",

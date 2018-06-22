@@ -1,11 +1,7 @@
 const Joi = require('joi');
 
-const { output, assetsIdRegex } = require('./common');
+const { output, pairInput } = require('./common');
 
-const input = Joi.array().items(
-  Joi.string()
-    .regex(assetsIdRegex)
-    .required()
-);
+const input = Joi.array().items(pairInput);
 
 module.exports = { input, output };

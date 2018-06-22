@@ -1,6 +1,17 @@
 const Joi = require('joi');
 const { BigNumber } = require('@waves/data-entities');
 
+const assetsIdRegex = /[0-9A-Za-z]+/;
+
+const pairInput = Joi.object().keys({
+  amountAsset: Joi.string()
+    .regex(assetsIdRegex)
+    .required(),
+  priceAsset: Joi.string()
+    .regex(assetsIdRegex)
+    .required(),
+});
+
 const output = Joi.object().keys({
   first_price: Joi.object()
     .type(BigNumber)
@@ -11,7 +22,10 @@ const output = Joi.object().keys({
   volume: Joi.object()
     .type(BigNumber)
     .required(),
+  volume_waves: Joi.object()
+    .type(BigNumber)
+    .required()
+    .allow(null),
 });
 
-const assetsIdRegex = /[0-9A-Za-z]+\/[0-9A-Za-z]+/;
-module.exports = { output, assetsIdRegex };
+module.exports = { output, pairInput };

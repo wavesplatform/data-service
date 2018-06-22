@@ -20,7 +20,10 @@ const pairsOneEndpoint = async ctx => {
     emitEvent: ctx.eventBus.emit,
   });
 
-  const pairs = await resolver(`${id1}/${id2}`)
+  const pairs = await resolver({
+    amountAsset: id1,
+    priceAsset: id2,
+  })
     .run()
     .promise();
 

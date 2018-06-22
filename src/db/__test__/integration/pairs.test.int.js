@@ -15,48 +15,88 @@ const isPair = mx => {
   return (
     isBigNumber(mx.first_price) &&
     isBigNumber(mx.last_price) &&
-    isBigNumber(mx.volume)
+    isBigNumber(mx.volume) &&
+    isBigNumber(mx.volume_waves)
   );
 };
 
-describe('Pair request should return ', () => {
-  it('Maybe(data) for `one` pair correctly', done => {
-    db.pairs
-      .one(pair('WAVES', 'BTC'))
-      .run()
-      .listen({
-        onResolved: maybeX => {
-          const x = maybeX.getOrElse();
-          expect(isPair(x)).toBe(true);
-          done();
-        },
-      });
+describe('Pair request ', () => {
+  describe('one pair', () => {
+    it('covers case: WAVES — amount asset', done => {
+      db.pairs
+        .one(pair('WAVES', 'BTC'))
+        .run()
+        .listen({
+          onResolved: maybeX => {
+            const x = maybeX.getOrElse();
+            expect(isPair(x)).toBe(true);
+            done();
+          },
+        });
+    });
 
-    db.pairs
-      .one('NON_EXISTING_PAIR')
-      .run()
-      .listen({
-        onResolved: maybeX => {
-          expect(maybeX).toEqual(Nothing());
-          done();
-        },
-      });
+    it('covers case: WAVES — price asset', done => {
+      db.pairs
+        .one(pair('ETH', 'WAVES'))
+        .run()
+        .listen({
+          onResolved: maybeX => {
+            const x = maybeX.getOrElse();
+            expect(isPair(x)).toBe(true);
+            done();
+          },
+        });
+    });
+
+    it('covers case: WAVES — neither price nor amount', done => {
+      db.pairs
+        .one(pair('ETH', 'BTC'))
+        .run()
+        .listen({
+          onResolved: maybeX => {
+            const x = maybeX.getOrElse();
+            expect(isPair(x)).toBe(true);
+            done();
+          },
+        });
+    });
+
+    it('covers non-existing assets', done => {
+      db.pairs
+        .one({ amountAsset: 'qwe', priceAsset: 'asd' })
+        .run()
+        .listen({
+          onResolved: maybeX => {
+            expect(maybeX).toEqual(Nothing());
+            done();
+          },
+        });
+    });
   });
 
-  it('Maybe(data)[] for `many` pairs request', done => {
-    db.pairs
-      .many([pair('WAVES', 'BTC'), 'NON_EXISTING_PAIR', pair('ETH', 'BTC')])
-      .run()
-      .listen({
-        onResolved: mxs => {
-          const xs = mxs.map(x => x.getOrElse(-1));
+  describe('many pairs', () => {
+    const pairs = [
+      pair('WAVES', 'BTC'),
+      pair('ETH', 'WAVES'),
+      pair('ETH', 'BTC'),
+      { amountAsset: 'qwe', priceAsset: 'asd' },
+    ];
 
-          expect(isPair(xs[0])).toBe(true);
-          expect(isPair(xs[2])).toBe(true);
+    it('returns array of results on all possible WAVES positions', done => {
+      db.pairs
+        .many(pairs)
+        .run()
+        .listen({
+          onResolved: msP => {
+            const ps = msP.map(mp => mp.getOrElse(-1));
 
-          expect(xs[1]).toBe(-1);
-          done();
-        },
-      });
+            expect(isPair(ps[0])).toBe(true);
+            expect(isPair(ps[1])).toBe(true);
+            expect(isPair(ps[2])).toBe(true);
+            expect(ps[3]).toBe(-1);
+            done();
+          },
+        });
+    });
   });
 });

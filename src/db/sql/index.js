@@ -11,7 +11,6 @@ function sql(file) {
 module.exports = {
   raw: {
     assets: sql('./raw/assets.sql'),
-    pair: sql('./raw/pair.sql'),
   },
   build: require('./build'),
 };

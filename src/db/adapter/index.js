@@ -1,13 +1,12 @@
 const { propEq, map, head } = require('ramda');
 const Maybe = require('folktale/maybe');
 
+const createPairsAdapter = require('./pairs');
+
 // db adapter factory
-const createDbAdapter = ({
-  taskedDbDriver: dbT,
-  batchQueryFn,
-  errorFactory,
-  sql,
-}) => {
+const createDbAdapter = options => {
+  const { taskedDbDriver: dbT, batchQueryFn, errorFactory, sql } = options;
+
   return {
     assets: {
       /** assets.many :: AssetId[] -> Task (Maybe Result)[] AppError.Db */
@@ -25,24 +24,7 @@ const createDbAdapter = ({
       },
     },
 
-    pairs: {
-      // Type Pair serialized as '{assetId1}/{assetId2}'
-      /** pairs.one :: Pair -> Task (Maybe Result) AppError.Db */
-      one(x) {
-        return dbT
-          .oneOrNone(sql.raw.pair, x)
-          .map(Maybe.fromNullable)
-          .mapRejected(errorFactory({ request: 'pairs.one', params: x }));
-      },
-
-      /** pairs.many :: Pair -> Task (Maybe Result) AppError.Db */
-      many(xs) {
-        return dbT
-          .task(t => t.batch(xs.map(x => t.oneOrNone(sql.raw.pair, x))))
-          .map(map(Maybe.fromNullable))
-          .mapRejected(errorFactory({ request: 'pairs.many', params: xs }));
-      },
-    },
+    pairs: createPairsAdapter(options),
 
     transactions: {
       exchange: {
