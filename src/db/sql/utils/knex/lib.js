@@ -2,7 +2,7 @@ const { findIndex, slice, concat, type, curryN } = require('ramda');
 
 const hasMethod = curryN(
   2,
-  (method, x) => x && x[method] && type(x[method]) === 'Function' || false
+  (method, x) => (x && x[method] && type(x[method]) === 'Function') || false
 );
 
 const createPointfree = method => (...args) => {
@@ -20,4 +20,5 @@ module.exports = {
   where: createPointfree('where'),
   limit: createPointfree('limit'),
   orWhere: createPointfree('orWhere'),
+  orderBy: createPointfree('orderBy'),
 };

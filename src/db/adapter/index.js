@@ -1,6 +1,8 @@
 const { propEq, map, head } = require('ramda');
 const Maybe = require('folktale/maybe');
 
+const createExchangeAdapter = require('./transactions/exchange');
+const createDataAdapter = require('./transactions/data');
 const createPairsAdapter = require('./pairs');
 
 // db adapter factory
@@ -27,28 +29,8 @@ const createDbAdapter = options => {
     pairs: createPairsAdapter(options),
 
     transactions: {
-      exchange: {
-        one(x) {
-          return dbT
-            .oneOrNone(sql.build.transactions.exchange.one(x))
-            .map(Maybe.fromNullable)
-            .mapRejected(
-              errorFactory({ request: 'transactions.exchange.one', params: x })
-            );
-        },
-
-        many(filters) {
-          return dbT
-            .any(sql.build.transactions.exchange.many(filters))
-            .map(map(Maybe.fromNullable))
-            .mapRejected(
-              errorFactory({
-                request: 'transactions.exchange.many',
-                params: filters,
-              })
-            );
-        },
-      },
+      exchange: createExchangeAdapter(options),
+      data: createDataAdapter(options),
     },
 
     aliases: {
