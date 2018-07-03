@@ -3,7 +3,7 @@ const { select } = require('../utils/selectors');
 const { captureErrors } = require('../../utils/captureErrors');
 
 const resolver = async ctx => {
-  const { address } = select(ctx).query;
+  const { address, showBroken } = select(ctx).query;
 
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
@@ -14,7 +14,7 @@ const resolver = async ctx => {
     emitEvent: ctx.eventBus.emit,
   });
 
-  const aliases = await resolver({ address })
+  const aliases = await resolver({ address, showBroken })
     .run()
     .promise();
 

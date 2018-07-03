@@ -4,6 +4,7 @@ const Maybe = require('folktale/maybe');
 const createExchangeAdapter = require('./transactions/exchange');
 const createDataAdapter = require('./transactions/data');
 const createPairsAdapter = require('./pairs');
+const createAliasesAdapter = require('./aliases');
 
 // db adapter factory
 const createDbAdapter = options => {
@@ -33,22 +34,7 @@ const createDbAdapter = options => {
       data: createDataAdapter(options),
     },
 
-    aliases: {
-      one(x) {
-        return dbT
-          .oneOrNone(sql.build.aliases.one(x))
-          .map(Maybe.fromNullable)
-          .mapRejected(errorFactory({ request: 'aliases.one', params: x }));
-      },
-      many({ address }) {
-        return dbT
-          .any(sql.build.aliases.many({ address }))
-          .map(map(Maybe.fromNullable))
-          .mapRejected(
-            errorFactory({ request: 'aliases.many', params: { address } })
-          );
-      },
-    },
+    aliases: createAliasesAdapter(options),
   };
 };
 
