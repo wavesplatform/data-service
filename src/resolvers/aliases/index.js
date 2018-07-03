@@ -1,4 +1,4 @@
-const { curryN } = require('ramda');
+const { curryN, path } = require('ramda');
 const create = require('../create');
 
 const curriedEmit = emit => curryN(2, emit);
@@ -6,13 +6,13 @@ const curriedEmit = emit => curryN(2, emit);
 const oneConfig = {
   ...require('./validation/one'),
   transformResult: require('./transformResult/one'),
-  dbQuery: db => alias => db.aliases.one(alias),
+  dbQuery: path(['aliases', 'one']),
 };
 
 const manyConfig = {
   ...require('./validation/many'),
   transformResult: require('./transformResult/many'),
-  dbQuery: db => ({ address }) => db.aliases.many({ address }),
+  dbQuery: path(['aliases', 'many']),
 };
 
 module.exports = {

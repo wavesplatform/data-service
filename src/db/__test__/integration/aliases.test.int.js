@@ -5,6 +5,8 @@ const createDb = require('../../index');
 
 const db = createDb(loadConfig());
 
+const ADDRESS = '3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy';
+
 describe('Aliases should return', () => {
   it('Maybe(alias) for `one` correctly', done => {
     db.aliases
@@ -31,7 +33,7 @@ describe('Aliases should return', () => {
   describe('request by address', () => {
     it('returns correct data if requested without `showBroken`', done => {
       db.aliases
-        .many({ address: '3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy' })
+        .many({ address: ADDRESS })
         .run()
         .listen({
           onResolved: mxs => {
@@ -41,10 +43,10 @@ describe('Aliases should return', () => {
         });
     });
 
-    it('returns correct data if requested without `showBroken`', done => {
+    it('returns correct data if requested with `showBroken`', done => {
       db.aliases
         .many({
-          address: '3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy',
+          address: ADDRESS,
           showBroken: true,
         })
         .run()
