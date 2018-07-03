@@ -1,11 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Aliases should return Maybe(data)[] for \`many\` aliases request 1`] = `
+exports[`Aliases should return request by address returns correct data if requested without \`showBroken\` 1`] = `
 Object {
   "@@tag": "Just",
   "@@type": "folktale:Maybe",
   "@@value": Object {
-    "value": anonymous {
+    "value": Object {
       "address": "3PQqCXNPoTRsHRK2nZyXWENaZwLmxrUZPBi",
       "alias": "sexy-boys",
     },
@@ -13,15 +13,15 @@ Object {
 }
 `;
 
-exports[`Aliases should return Maybe(data)[] for \`many\` aliases request 2`] = `
+exports[`Aliases should return request by address returns correct data if requested without \`showBroken\` 2`] = `
 Array [
   Object {
     "@@tag": "Just",
     "@@type": "folktale:Maybe",
     "@@value": Object {
-      "value": anonymous {
-        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
-        "alias": "jeffrey",
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "carl",
       },
     },
   },
@@ -29,9 +29,9 @@ Array [
     "@@tag": "Just",
     "@@type": "folktale:Maybe",
     "@@value": Object {
-      "value": anonymous {
-        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
-        "alias": "hans",
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "lmao",
       },
     },
   },
@@ -39,9 +39,9 @@ Array [
     "@@tag": "Just",
     "@@type": "folktale:Maybe",
     "@@value": Object {
-      "value": anonymous {
-        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
-        "alias": "hansch",
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "ubiq",
       },
     },
   },
@@ -49,9 +49,9 @@ Array [
     "@@tag": "Just",
     "@@type": "folktale:Maybe",
     "@@value": Object {
-      "value": anonymous {
-        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
-        "alias": "liqio.io",
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "payments",
       },
     },
   },
@@ -59,9 +59,9 @@ Array [
     "@@tag": "Just",
     "@@type": "folktale:Maybe",
     "@@value": Object {
-      "value": anonymous {
-        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
-        "alias": "trextracker",
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "wings",
       },
     },
   },
@@ -69,9 +69,9 @@ Array [
     "@@tag": "Just",
     "@@type": "folktale:Maybe",
     "@@value": Object {
-      "value": anonymous {
-        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
-        "alias": "maid",
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "matt",
       },
     },
   },
@@ -79,9 +79,9 @@ Array [
     "@@tag": "Just",
     "@@type": "folktale:Maybe",
     "@@value": Object {
-      "value": anonymous {
-        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
-        "alias": "jveldt",
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "jonathan",
       },
     },
   },
@@ -89,9 +89,9 @@ Array [
     "@@tag": "Just",
     "@@type": "folktale:Maybe",
     "@@value": Object {
-      "value": anonymous {
-        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
-        "alias": "bunq",
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "platinum",
       },
     },
   },
@@ -99,9 +99,9 @@ Array [
     "@@tag": "Just",
     "@@type": "folktale:Maybe",
     "@@value": Object {
-      "value": anonymous {
-        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
-        "alias": "tikkie",
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "silver",
       },
     },
   },
@@ -109,9 +109,9 @@ Array [
     "@@tag": "Just",
     "@@type": "folktale:Maybe",
     "@@value": Object {
-      "value": anonymous {
-        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
-        "alias": "rijksoverheid",
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "cobalt",
       },
     },
   },
@@ -119,9 +119,9 @@ Array [
     "@@tag": "Just",
     "@@type": "folktale:Maybe",
     "@@value": Object {
-      "value": anonymous {
-        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
-        "alias": "burned",
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "hydrogen",
       },
     },
   },
@@ -129,9 +129,9 @@ Array [
     "@@tag": "Just",
     "@@type": "folktale:Maybe",
     "@@value": Object {
-      "value": anonymous {
-        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
-        "alias": "j.veldt",
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "zinc",
       },
     },
   },
@@ -139,9 +139,9 @@ Array [
     "@@tag": "Just",
     "@@type": "folktale:Maybe",
     "@@value": Object {
-      "value": anonymous {
-        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
-        "alias": "shapeshift.io",
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "swift",
       },
     },
   },
@@ -149,9 +149,9 @@ Array [
     "@@tag": "Just",
     "@@type": "folktale:Maybe",
     "@@value": Object {
-      "value": anonymous {
-        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
-        "alias": "changelly.com",
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "rnsd",
       },
     },
   },
@@ -159,9 +159,934 @@ Array [
     "@@tag": "Just",
     "@@type": "folktale:Maybe",
     "@@value": Object {
-      "value": anonymous {
-        "address": "3PHXcxfQGAf3SgGGyg1Vendj5ZvjZxvC6KM",
-        "alias": "changelly",
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "happy",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "flux",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "abram",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "fortuna",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "gamb",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "first",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "fortune",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "national",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "haha",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "whenmoon",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "music",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "gaming",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "rubles",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "dollars",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "rail",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "surf",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "homo",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "noah",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "emma",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "emily",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "peace",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "vitamin",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "whalepool",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "eternal",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "tsunami",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "rocket",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "solid",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "hack",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "when",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "nudes",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "email",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "mail",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "messi",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "star",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "allah",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "jesus",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "banker",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "flight",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "bird",
+      },
+    },
+  },
+]
+`;
+
+exports[`Aliases should return request by address returns correct data if requested without \`showBroken\` 3`] = `
+Array [
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "carl",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "lmao",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "ubiq",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "payments",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "wings",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "matt",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "jonathan",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "platinum",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "silver",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "cobalt",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "hydrogen",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "zinc",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "swift",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "rnsd",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "happy",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "flux",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "abram",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "fortuna",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "gamb",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "first",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "fortune",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "national",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "haha",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "whenmoon",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "music",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "gaming",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "rubles",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "dollars",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "rail",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "surf",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "homo",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "noah",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "emma",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "emily",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "peace",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "vitamin",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "whalepool",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "eternal",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "tsunami",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "rocket",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "solid",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": null,
+        "alias": "scam",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "hack",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "when",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "nudes",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "email",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "mail",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "messi",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "star",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "allah",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "jesus",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "banker",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "flight",
+      },
+    },
+  },
+  Object {
+    "@@tag": "Just",
+    "@@type": "folktale:Maybe",
+    "@@value": Object {
+      "value": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "bird",
       },
     },
   },
