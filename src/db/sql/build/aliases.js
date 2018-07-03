@@ -29,7 +29,7 @@ module.exports = {
       .orderBy('time_stamp', 'asc')
       .limit(LIMIT);
 
-    // aliases are blocked if 'duplicates' not equal to 1
+    // aliases are considered broken if 'duplicates' not equal to 1
     if (showBroken) {
       return q.toString();
     } else {
