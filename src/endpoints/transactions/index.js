@@ -11,9 +11,7 @@ const dataMany = require('./data/many');
 subrouter.get('/transactions/exchange/:id', exchangeOne);
 subrouter.get('/transactions/exchange', exchangeMany);
 
-if (process.env.API_DATA_TXS_ENABLED) {
-  subrouter.get('/transactions/data/:id', dataOne);
-  subrouter.get('/transactions/data', dataMany);
-}
+subrouter.get('/transactions/data/:id', dataOne);
+subrouter.get('/transactions/data', dataMany);
 
 module.exports = subrouter;
