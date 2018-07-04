@@ -59,6 +59,17 @@ describe('Exchange transactions methods should correctly', () => {
           done();
         },
       });
+
+    // limit >= 5 do not get substituted
+    manyGood.transactions.exchange
+      .many({ limit: 8 })
+      .run()
+      .listen({
+        onResolved: () => {
+          expect(getSqlSpyArgs(spy)).toEqual([{ limit: 8 }]);
+          done();
+        },
+      });
   });
 
   it('reject many', done => {
@@ -71,6 +82,17 @@ describe('Exchange transactions methods should correctly', () => {
       .listen({
         onRejected: () => {
           expect(getSqlSpyArgs(spy)).toEqual([filtersWithLimit1Fix]);
+          done();
+        },
+      });
+
+    // limit >= 5 do not get substituted
+    manyBad.transactions.exchange
+      .many({ limit: 8 })
+      .run()
+      .listen({
+        onRejected: () => {
+          expect(getSqlSpyArgs(spy)).toEqual([{ limit: 8 }]);
           done();
         },
       });

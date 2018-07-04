@@ -1,4 +1,14 @@
-const { map, slice } = require('ramda');
+const {
+  map,
+  slice,
+  merge,
+  compose,
+  propSatisfies,
+  assoc,
+  identity,
+  ifElse,
+  gt
+} = require('ramda');
 const Maybe = require('folktale/maybe');
 
 // @hack — workaround of postgres limit 1 issue
@@ -15,21 +25,27 @@ const createAdapter = ({ taskedDbDriver: dbT, errorFactory, sql }) => ({
       );
   },
 
-  many({ limit, ...rest } = { limit: 100 }) {
+  many(filters = {}) {
+    const withDefaults = merge({ limit: 100 });
     // @hack — workaround of postgres limit 1 issue
+    const withLimit1Fix = ifElse(
+      propSatisfies(gt(MIN_LIMIT), 'limit'),
+      assoc('limit', MIN_LIMIT),
+      identity
+    );
+    const filtersModified = compose(
+      withLimit1Fix,
+      withDefaults
+    )(filters);
+
     return dbT
-      .any(
-        sql.build.transactions.exchange.many({
-          limit: Math.max(limit, MIN_LIMIT),
-          ...rest,
-        })
-      )
-      .map(slice(0, limit))
+      .any(sql.build.transactions.exchange.many(filtersModified))
+      .map(slice(0, withDefaults(filters).limit))
       .map(map(Maybe.fromNullable))
       .mapRejected(
         errorFactory({
           request: 'transactions.exchange.many',
-          params: { limit, ...rest },
+          params: filters,
         })
       );
   },

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Exchange transactions should return  filters empty filters should give last 100 1`] = `
+exports[`Exchange transactions should return  filters empty filters should give last 100 txs 1`] = `
 anonymous {
   "o1_amount": "1693.80213373",
   "o1_expiration": 2018-05-22T10:12:07.946Z,
