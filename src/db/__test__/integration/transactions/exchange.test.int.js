@@ -6,8 +6,6 @@ const createDb = require('../../../index');
 const db = createDb(loadConfig());
 
 describe('Exchange transactions should return ', () => {
-  console.log('REWRITE INTEGRATION TESTS TO SNAPSHOTS');
-
   it('Maybe(data) for `one` tx correctly', done => {
     db.transactions.exchange
       .one('4WtUXBF6i41ohva66KTaxJsJzooc8mo12hGV6cPbVDek')
@@ -15,11 +13,7 @@ describe('Exchange transactions should return ', () => {
       .listen({
         onResolved: maybeX => {
           const x = maybeX.getOrElse();
-
-          expect(x.tx_id).toBe('4WtUXBF6i41ohva66KTaxJsJzooc8mo12hGV6cPbVDek');
-          expect(x.tx_price.toString()).toBe('0.00065851');
-          expect(x.tx_amount.toString()).toBe('1693.80213373');
-
+          expect(x).toMatchSnapshot();
           done();
         },
       });
