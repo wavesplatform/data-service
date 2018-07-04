@@ -27,12 +27,9 @@ describe('transactions.exchange api method', () => {
   });
 
   describe('`many`', () => {
-    it('should call `limit` filter by default and explicitly', () => {
+    it('should call `limit` filter', () => {
       const spy = jest.spyOn(filters, 'limit');
       const filtersSpied = assoc('limit', spy, filters);
-
-      api({ filters: filtersSpied }).many();
-      expect(spy).toHaveBeenLastCalledWith(100);
 
       api({ filters: filtersSpied }).many({ limit: 50 });
       expect(spy).toHaveBeenLastCalledWith(50);
@@ -188,8 +185,7 @@ describe('transactions.exchange api method', () => {
       expect(spies.sender).not.toHaveBeenCalled();
       expect(spies.timeStart).not.toHaveBeenCalled();
       expect(spies.timeEnd).not.toHaveBeenCalled();
-      // limit is 100 by default
-      expect(spyCalledWith(spies.limit, 100)).toBe(true);
+      expect(spies.limit).not.toHaveBeenCalled();
     });
   });
 });

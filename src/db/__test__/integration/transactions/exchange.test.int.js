@@ -6,8 +6,6 @@ const createDb = require('../../../index');
 const db = createDb(loadConfig());
 
 describe('Exchange transactions should return ', () => {
-  console.log('REWRITE INTEGRATION TESTS TO SNAPSHOTS');
-
   it('Maybe(data) for `one` tx correctly', done => {
     db.transactions.exchange
       .one('4WtUXBF6i41ohva66KTaxJsJzooc8mo12hGV6cPbVDek')
@@ -15,11 +13,7 @@ describe('Exchange transactions should return ', () => {
       .listen({
         onResolved: maybeX => {
           const x = maybeX.getOrElse();
-
-          expect(x.tx_id).toBe('4WtUXBF6i41ohva66KTaxJsJzooc8mo12hGV6cPbVDek');
-          expect(x.tx_price.toString()).toBe('0.00065851');
-          expect(x.tx_amount.toString()).toBe('1693.80213373');
-
+          expect(x).toMatchSnapshot();
           done();
         },
       });
@@ -36,7 +30,7 @@ describe('Exchange transactions should return ', () => {
   });
 
   describe('filters', () => {
-    it('empty filters should give last 100', done => {
+    it('empty filters should give last 100 txs', done => {
       db.transactions.exchange
         .many()
         .run()
@@ -48,9 +42,49 @@ describe('Exchange transactions should return ', () => {
           },
         });
     });
+
+    describe('limit filter', () => {
+      it('should work with limit 1 (less than MIN_LIMIT of 5)', done => {
+        db.transactions.exchange
+          .many({ limit: 1 })
+          .run()
+          .listen({
+            onResolved: mxs => {
+              const xs = mxs.map(x => x.getOrElse(-1));
+              expect(xs.length).toBe(1);
+              done();
+            },
+          });
+      });
+
+      it('should work with limit 10 (more than MIN_LIMIT of 5)', done => {
+        db.transactions.exchange
+          .many({ limit: 10 })
+          .run()
+          .listen({
+            onResolved: mxs => {
+              const xs = mxs.map(x => x.getOrElse(-1));
+              expect(xs.length).toBe(10);
+              done();
+            },
+          });
+      });
+
+      it('should use default limit of 100 when when no limit specified', done => {
+        db.transactions.exchange
+          .many({ timeStart: new Date('2018-01-01') })
+          .run()
+          .listen({
+            onResolved: mxs => {
+              const xs = mxs.map(x => x.getOrElse(-1));
+              expect(xs.length).toBe(100);
+              done();
+            },
+          });
+      });
+    });
     xit('timeStart/timeEnd filter should work', () => {});
     xit('timeStart filter should work', () => {});
-    xit('limit should work', () => {});
   });
 
   xdescribe('Pagination', () => {
