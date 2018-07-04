@@ -1,0 +1,10 @@
+.vscode
+.idea
+.eslintrc
+node_modules
+
+error.log
+yarn-error.log
+
+README.md
+variables.env

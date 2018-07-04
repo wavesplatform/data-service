@@ -1,0 +1,861 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Data transaction resolver for many following filter combinations should work: key + type + value 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "data": Array [
+          Object {
+            "key": "test",
+            "type": "integer",
+            "value": "11",
+          },
+          Object {
+            "key": "neg",
+            "type": "integer",
+            "value": "101",
+          },
+          Object {
+            "key": "somestring",
+            "type": "string",
+            "value": "Some silly string",
+          },
+          Object {
+            "key": "testboolF",
+            "type": "boolean",
+            "value": false,
+          },
+          Object {
+            "key": "testboolT",
+            "type": "boolean",
+            "value": true,
+          },
+          Object {
+            "key": "testbytes",
+            "type": "binary",
+            "value": "base64:VGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdA==",
+          },
+        ],
+        "fee": "0.001",
+        "height": 369354,
+        "id": "3P1d12RRrd2ZnAidTRhx5a4TxgcULEa4CkHPQYuA36AZ",
+        "proofs": Array [
+          "5kR2mTaJo4w7qWXuBe5HXNszkwV6b2cCH6G6vyF713AYd1SK3nuYVm1WqR4D288bXusDKL3EhhCvVAewFjFwEy3B",
+        ],
+        "sender": "3Mz9N7YPfZPWGd4yYaX6H53Gcgrq6ifYiH7",
+        "senderPublicKey": "2M25DqL2W4rGFLCFadgATboS8EPqyWAN3DjH12AH5Kdr",
+        "timestamp": 2018-06-07T05:26:39.348Z,
+        "type": 12,
+        "version": 1,
+      },
+    },
+  ],
+  "lastCursor": "MjAxOC0wNi0wN1QwNToyNjozOS4zNDhaOjozUDFkMTJSUnJkMlpuQWlkVFJoeDVhNFR4Z2NVTEVhNENrSFBRWXVBMzZBWjo6dW5kZWZpbmVk",
+}
+`;
+
+exports[`Data transaction resolver for many following filter combinations should work: key + type + value 2`] = `
+Object {
+  "__type": "list",
+  "data": Array [],
+}
+`;
+
+exports[`Data transaction resolver for many following filter combinations should work: key 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "data": Array [
+          Object {
+            "key": "test",
+            "type": "integer",
+            "value": "11",
+          },
+          Object {
+            "key": "neg",
+            "type": "integer",
+            "value": "-9223372036854775808",
+          },
+          Object {
+            "key": "max",
+            "type": "integer",
+            "value": "9223372036854775807",
+          },
+          Object {
+            "key": "somestring",
+            "type": "string",
+            "value": "Some silly string",
+          },
+          Object {
+            "key": "longstring",
+            "type": "string",
+            "value": "ver long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long string",
+          },
+          Object {
+            "key": "testboolF",
+            "type": "boolean",
+            "value": false,
+          },
+          Object {
+            "key": "testboolT",
+            "type": "boolean",
+            "value": true,
+          },
+          Object {
+            "key": "testbytes",
+            "type": "binary",
+            "value": "base64:VGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdA==",
+          },
+        ],
+        "fee": "0.001",
+        "height": 369361,
+        "id": "2jnH9e2KvEEAiWKHgwocD9arjK3AvBz6DbqwK8GUHdXA",
+        "proofs": Array [
+          "n5DqbcCtusm6LVqhE5hghY98joLeTSqRpoXsbiZQuskXVNh1HZTDpx6mDcsoyjeuGCYVaFsv7Tyy1tzJKzZn6jm",
+        ],
+        "sender": "3Mz9N7YPfZPWGd4yYaX6H53Gcgrq6ifYiH7",
+        "senderPublicKey": "2M25DqL2W4rGFLCFadgATboS8EPqyWAN3DjH12AH5Kdr",
+        "timestamp": 2018-06-07T05:37:09.025Z,
+        "type": 12,
+        "version": 1,
+      },
+    },
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "data": Array [
+          Object {
+            "key": "test",
+            "type": "integer",
+            "value": "11",
+          },
+          Object {
+            "key": "neg",
+            "type": "integer",
+            "value": "-9223372036854775808",
+          },
+          Object {
+            "key": "max",
+            "type": "integer",
+            "value": "9223372036854775807",
+          },
+          Object {
+            "key": "somestring",
+            "type": "string",
+            "value": "Some silly string",
+          },
+          Object {
+            "key": "longstring",
+            "type": "string",
+            "value": "ver long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long string",
+          },
+          Object {
+            "key": "testboolF",
+            "type": "boolean",
+            "value": false,
+          },
+          Object {
+            "key": "testboolT",
+            "type": "boolean",
+            "value": true,
+          },
+          Object {
+            "key": "testbytes",
+            "type": "binary",
+            "value": "base64:VGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdA==",
+          },
+        ],
+        "fee": "0.001",
+        "height": 369360,
+        "id": "AxQ84kgTGwezbJFtTqTeEUCfn4Q59em71CDjuArbXBZc",
+        "proofs": Array [
+          "4SQ9BpfuSCbWBFB96FA9FHxYgamHdP6132dHPJQRsL62uF81iWte1JAvoTKgHvTiAM7oGW4hDYREvAFyFMusoojx",
+        ],
+        "sender": "3Mz9N7YPfZPWGd4yYaX6H53Gcgrq6ifYiH7",
+        "senderPublicKey": "2M25DqL2W4rGFLCFadgATboS8EPqyWAN3DjH12AH5Kdr",
+        "timestamp": 2018-06-07T05:35:37.157Z,
+        "type": 12,
+        "version": 1,
+      },
+    },
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "data": Array [
+          Object {
+            "key": "neg",
+            "type": "integer",
+            "value": "-9223372036854775808",
+          },
+          Object {
+            "key": "test",
+            "type": "integer",
+            "value": "11",
+          },
+          Object {
+            "key": "max",
+            "type": "integer",
+            "value": "9223372036854775807",
+          },
+          Object {
+            "key": "somestring",
+            "type": "string",
+            "value": "Some silly string",
+          },
+          Object {
+            "key": "longstring",
+            "type": "string",
+            "value": "ver long long long long long long long long long long long long long long long long long string",
+          },
+          Object {
+            "key": "testboolF",
+            "type": "boolean",
+            "value": false,
+          },
+          Object {
+            "key": "testboolT",
+            "type": "boolean",
+            "value": true,
+          },
+          Object {
+            "key": "testbytes",
+            "type": "binary",
+            "value": "base64:VGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdA==",
+          },
+        ],
+        "fee": "0.001",
+        "height": 369360,
+        "id": "A9S8od8GHT3SfhgEUgHoad8JjKQKSk8NtCrJ18vT7y8R",
+        "proofs": Array [
+          "4Q5J8Rm4NEcneiHP1wkjCs6PqLU4zZSgbFtC7s3mSBkmPiVpCNwXJ8w8DaHKjwHhQc6yZBBnQFXPb5Y1ibFQX633",
+        ],
+        "sender": "3Mz9N7YPfZPWGd4yYaX6H53Gcgrq6ifYiH7",
+        "senderPublicKey": "2M25DqL2W4rGFLCFadgATboS8EPqyWAN3DjH12AH5Kdr",
+        "timestamp": 2018-06-07T05:35:07.549Z,
+        "type": 12,
+        "version": 1,
+      },
+    },
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "data": Array [
+          Object {
+            "key": "testbytes",
+            "type": "binary",
+            "value": "base64:VGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdA==",
+          },
+          Object {
+            "key": "test",
+            "type": "integer",
+            "value": "11",
+          },
+          Object {
+            "key": "neg",
+            "type": "integer",
+            "value": "-9223372036854775808",
+          },
+          Object {
+            "key": "max",
+            "type": "integer",
+            "value": "9223372036854775807",
+          },
+          Object {
+            "key": "somestring",
+            "type": "string",
+            "value": "Some silly string",
+          },
+          Object {
+            "key": "testboolF",
+            "type": "boolean",
+            "value": false,
+          },
+          Object {
+            "key": "testboolT",
+            "type": "boolean",
+            "value": true,
+          },
+        ],
+        "fee": "0.001",
+        "height": 369360,
+        "id": "5qMqgUPP7gdea1BTYUwpZqaib76DDLfUUty5K9sURwnZ",
+        "proofs": Array [
+          "5mbu4jVrFcFV2P5zAEgxADbvuPDDDNxD669VtVcJGSCpdUM6hywstAHD9HPkmExiZLveyDg6sSXbysGyHPNtMojN",
+        ],
+        "sender": "3Mz9N7YPfZPWGd4yYaX6H53Gcgrq6ifYiH7",
+        "senderPublicKey": "2M25DqL2W4rGFLCFadgATboS8EPqyWAN3DjH12AH5Kdr",
+        "timestamp": 2018-06-07T05:34:28.631Z,
+        "type": 12,
+        "version": 1,
+      },
+    },
+  ],
+  "lastCursor": "MjAxOC0wNi0wN1QwNTozNDoyOC42MzFaOjo1cU1xZ1VQUDdnZGVhMUJUWVV3cFpxYWliNzZERExmVVV0eTVLOXNVUnduWjo6dW5kZWZpbmVk",
+}
+`;
+
+exports[`Data transaction resolver for many following filter combinations should work: key 2`] = `
+Object {
+  "__type": "list",
+  "data": Array [],
+}
+`;
+
+exports[`Data transaction resolver for many following filter combinations should work: timeStart/timeEnd 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "data": Array [
+          Object {
+            "key": "test",
+            "type": "integer",
+            "value": "11",
+          },
+          Object {
+            "key": "neg",
+            "type": "integer",
+            "value": "-9223372036854775808",
+          },
+          Object {
+            "key": "max",
+            "type": "integer",
+            "value": "9223372036854775807",
+          },
+          Object {
+            "key": "somestring",
+            "type": "string",
+            "value": "Some silly string",
+          },
+          Object {
+            "key": "longstring",
+            "type": "string",
+            "value": "ver long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long string",
+          },
+          Object {
+            "key": "testboolF",
+            "type": "boolean",
+            "value": false,
+          },
+          Object {
+            "key": "testboolT",
+            "type": "boolean",
+            "value": true,
+          },
+          Object {
+            "key": "testbytes",
+            "type": "binary",
+            "value": "base64:VGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdA==",
+          },
+        ],
+        "fee": "0.001",
+        "height": 369361,
+        "id": "2jnH9e2KvEEAiWKHgwocD9arjK3AvBz6DbqwK8GUHdXA",
+        "proofs": Array [
+          "n5DqbcCtusm6LVqhE5hghY98joLeTSqRpoXsbiZQuskXVNh1HZTDpx6mDcsoyjeuGCYVaFsv7Tyy1tzJKzZn6jm",
+        ],
+        "sender": "3Mz9N7YPfZPWGd4yYaX6H53Gcgrq6ifYiH7",
+        "senderPublicKey": "2M25DqL2W4rGFLCFadgATboS8EPqyWAN3DjH12AH5Kdr",
+        "timestamp": 2018-06-07T05:37:09.025Z,
+        "type": 12,
+        "version": 1,
+      },
+    },
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "data": Array [
+          Object {
+            "key": "test",
+            "type": "integer",
+            "value": "11",
+          },
+          Object {
+            "key": "neg",
+            "type": "integer",
+            "value": "-9223372036854775808",
+          },
+          Object {
+            "key": "max",
+            "type": "integer",
+            "value": "9223372036854775807",
+          },
+          Object {
+            "key": "somestring",
+            "type": "string",
+            "value": "Some silly string",
+          },
+          Object {
+            "key": "longstring",
+            "type": "string",
+            "value": "ver long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long string",
+          },
+          Object {
+            "key": "testboolF",
+            "type": "boolean",
+            "value": false,
+          },
+          Object {
+            "key": "testboolT",
+            "type": "boolean",
+            "value": true,
+          },
+          Object {
+            "key": "testbytes",
+            "type": "binary",
+            "value": "base64:VGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdA==",
+          },
+        ],
+        "fee": "0.001",
+        "height": 369360,
+        "id": "AxQ84kgTGwezbJFtTqTeEUCfn4Q59em71CDjuArbXBZc",
+        "proofs": Array [
+          "4SQ9BpfuSCbWBFB96FA9FHxYgamHdP6132dHPJQRsL62uF81iWte1JAvoTKgHvTiAM7oGW4hDYREvAFyFMusoojx",
+        ],
+        "sender": "3Mz9N7YPfZPWGd4yYaX6H53Gcgrq6ifYiH7",
+        "senderPublicKey": "2M25DqL2W4rGFLCFadgATboS8EPqyWAN3DjH12AH5Kdr",
+        "timestamp": 2018-06-07T05:35:37.157Z,
+        "type": 12,
+        "version": 1,
+      },
+    },
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "data": Array [
+          Object {
+            "key": "neg",
+            "type": "integer",
+            "value": "-9223372036854775808",
+          },
+          Object {
+            "key": "test",
+            "type": "integer",
+            "value": "11",
+          },
+          Object {
+            "key": "max",
+            "type": "integer",
+            "value": "9223372036854775807",
+          },
+          Object {
+            "key": "somestring",
+            "type": "string",
+            "value": "Some silly string",
+          },
+          Object {
+            "key": "longstring",
+            "type": "string",
+            "value": "ver long long long long long long long long long long long long long long long long long string",
+          },
+          Object {
+            "key": "testboolF",
+            "type": "boolean",
+            "value": false,
+          },
+          Object {
+            "key": "testboolT",
+            "type": "boolean",
+            "value": true,
+          },
+          Object {
+            "key": "testbytes",
+            "type": "binary",
+            "value": "base64:VGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdA==",
+          },
+        ],
+        "fee": "0.001",
+        "height": 369360,
+        "id": "A9S8od8GHT3SfhgEUgHoad8JjKQKSk8NtCrJ18vT7y8R",
+        "proofs": Array [
+          "4Q5J8Rm4NEcneiHP1wkjCs6PqLU4zZSgbFtC7s3mSBkmPiVpCNwXJ8w8DaHKjwHhQc6yZBBnQFXPb5Y1ibFQX633",
+        ],
+        "sender": "3Mz9N7YPfZPWGd4yYaX6H53Gcgrq6ifYiH7",
+        "senderPublicKey": "2M25DqL2W4rGFLCFadgATboS8EPqyWAN3DjH12AH5Kdr",
+        "timestamp": 2018-06-07T05:35:07.549Z,
+        "type": 12,
+        "version": 1,
+      },
+    },
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "data": Array [
+          Object {
+            "key": "testbytes",
+            "type": "binary",
+            "value": "base64:VGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdA==",
+          },
+          Object {
+            "key": "test",
+            "type": "integer",
+            "value": "11",
+          },
+          Object {
+            "key": "neg",
+            "type": "integer",
+            "value": "-9223372036854775808",
+          },
+          Object {
+            "key": "max",
+            "type": "integer",
+            "value": "9223372036854775807",
+          },
+          Object {
+            "key": "somestring",
+            "type": "string",
+            "value": "Some silly string",
+          },
+          Object {
+            "key": "testboolF",
+            "type": "boolean",
+            "value": false,
+          },
+          Object {
+            "key": "testboolT",
+            "type": "boolean",
+            "value": true,
+          },
+        ],
+        "fee": "0.001",
+        "height": 369360,
+        "id": "5qMqgUPP7gdea1BTYUwpZqaib76DDLfUUty5K9sURwnZ",
+        "proofs": Array [
+          "5mbu4jVrFcFV2P5zAEgxADbvuPDDDNxD669VtVcJGSCpdUM6hywstAHD9HPkmExiZLveyDg6sSXbysGyHPNtMojN",
+        ],
+        "sender": "3Mz9N7YPfZPWGd4yYaX6H53Gcgrq6ifYiH7",
+        "senderPublicKey": "2M25DqL2W4rGFLCFadgATboS8EPqyWAN3DjH12AH5Kdr",
+        "timestamp": 2018-06-07T05:34:28.631Z,
+        "type": 12,
+        "version": 1,
+      },
+    },
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "data": Array [
+          Object {
+            "key": "test",
+            "type": "integer",
+            "value": "11",
+          },
+          Object {
+            "key": "somestring",
+            "type": "string",
+            "value": "Some silly string",
+          },
+          Object {
+            "key": "testboolF",
+            "type": "boolean",
+            "value": false,
+          },
+          Object {
+            "key": "testboolT",
+            "type": "boolean",
+            "value": true,
+          },
+          Object {
+            "key": "testbytes",
+            "type": "binary",
+            "value": "base64:VGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdA==",
+          },
+          Object {
+            "key": "neg",
+            "type": "integer",
+            "value": "-9223372036854775808",
+          },
+        ],
+        "fee": "0.001",
+        "height": 369360,
+        "id": "6WPrVcCPVwGyR9FoGnyVnwEfnAakmHbNqdtXY1HM9jgz",
+        "proofs": Array [
+          "tKzNAogmwffRu29gPYve1PfgE1SRCxmS5xHDbLa1Au3hnCz9TQHfw3dHdzKMgzw9nPY2dbWfC9nJcBk57bp248o",
+        ],
+        "sender": "3Mz9N7YPfZPWGd4yYaX6H53Gcgrq6ifYiH7",
+        "senderPublicKey": "2M25DqL2W4rGFLCFadgATboS8EPqyWAN3DjH12AH5Kdr",
+        "timestamp": 2018-06-07T05:34:02.435Z,
+        "type": 12,
+        "version": 1,
+      },
+    },
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "data": Array [
+          Object {
+            "key": "test",
+            "type": "integer",
+            "value": "11",
+          },
+          Object {
+            "key": "neg",
+            "type": "integer",
+            "value": "-9223372036854775808",
+          },
+          Object {
+            "key": "somestring",
+            "type": "string",
+            "value": "Some silly string",
+          },
+          Object {
+            "key": "testboolF",
+            "type": "boolean",
+            "value": false,
+          },
+          Object {
+            "key": "testboolT",
+            "type": "boolean",
+            "value": true,
+          },
+          Object {
+            "key": "testbytes",
+            "type": "binary",
+            "value": "base64:VGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdA==",
+          },
+        ],
+        "fee": "0.001",
+        "height": 369359,
+        "id": "4yhgqbEAPEmM4gPDR1ULQqotex5G1ZUEEpKPpnyXmsma",
+        "proofs": Array [
+          "5eWXnKLejBD4vdPuuqeLrKcXNt5i5HNH9mj18bHVfGGhfnGqS3hUFfDNend5MiU6A2NxgxNcG9SCt9hSsoRQr45W",
+        ],
+        "sender": "3Mz9N7YPfZPWGd4yYaX6H53Gcgrq6ifYiH7",
+        "senderPublicKey": "2M25DqL2W4rGFLCFadgATboS8EPqyWAN3DjH12AH5Kdr",
+        "timestamp": 2018-06-07T05:32:54.866Z,
+        "type": 12,
+        "version": 1,
+      },
+    },
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "data": Array [
+          Object {
+            "key": "test",
+            "type": "integer",
+            "value": "11",
+          },
+          Object {
+            "key": "neg",
+            "type": "integer",
+            "value": "-101",
+          },
+          Object {
+            "key": "somestring",
+            "type": "string",
+            "value": "Some silly string",
+          },
+          Object {
+            "key": "testboolF",
+            "type": "boolean",
+            "value": false,
+          },
+          Object {
+            "key": "testboolT",
+            "type": "boolean",
+            "value": true,
+          },
+          Object {
+            "key": "testbytes",
+            "type": "binary",
+            "value": "base64:VGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdA==",
+          },
+        ],
+        "fee": "0.001",
+        "height": 369357,
+        "id": "97XdCTAYeTT14NpbVP2P4rGXBWkENWgJNM4QDwGt1Eyb",
+        "proofs": Array [
+          "5uWo17wunkU49DDjD2EMzCEwGbnyFZthwUDHgxTV5KS2HaQkKUqU4zNokBnDTYFRUw6UADLBd5nG3BvsURve4zRm",
+        ],
+        "sender": "3Mz9N7YPfZPWGd4yYaX6H53Gcgrq6ifYiH7",
+        "senderPublicKey": "2M25DqL2W4rGFLCFadgATboS8EPqyWAN3DjH12AH5Kdr",
+        "timestamp": 2018-06-07T05:30:56.578Z,
+        "type": 12,
+        "version": 1,
+      },
+    },
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "data": Array [
+          Object {
+            "key": "test",
+            "type": "integer",
+            "value": "11",
+          },
+          Object {
+            "key": "neg",
+            "type": "integer",
+            "value": "101",
+          },
+          Object {
+            "key": "somestring",
+            "type": "string",
+            "value": "Some silly string",
+          },
+          Object {
+            "key": "testboolF",
+            "type": "boolean",
+            "value": false,
+          },
+          Object {
+            "key": "testboolT",
+            "type": "boolean",
+            "value": true,
+          },
+          Object {
+            "key": "testbytes",
+            "type": "binary",
+            "value": "base64:VGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdA==",
+          },
+        ],
+        "fee": "0.001",
+        "height": 369354,
+        "id": "3P1d12RRrd2ZnAidTRhx5a4TxgcULEa4CkHPQYuA36AZ",
+        "proofs": Array [
+          "5kR2mTaJo4w7qWXuBe5HXNszkwV6b2cCH6G6vyF713AYd1SK3nuYVm1WqR4D288bXusDKL3EhhCvVAewFjFwEy3B",
+        ],
+        "sender": "3Mz9N7YPfZPWGd4yYaX6H53Gcgrq6ifYiH7",
+        "senderPublicKey": "2M25DqL2W4rGFLCFadgATboS8EPqyWAN3DjH12AH5Kdr",
+        "timestamp": 2018-06-07T05:26:39.348Z,
+        "type": 12,
+        "version": 1,
+      },
+    },
+  ],
+  "lastCursor": "MjAxOC0wNi0wN1QwNToyNjozOS4zNDhaOjozUDFkMTJSUnJkMlpuQWlkVFJoeDVhNFR4Z2NVTEVhNENrSFBRWXVBMzZBWjo6dW5kZWZpbmVk",
+}
+`;
+
+exports[`Data transaction resolver for many following filter combinations should work: type + value 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "data": Array [
+          Object {
+            "key": "test",
+            "type": "integer",
+            "value": "11",
+          },
+          Object {
+            "key": "neg",
+            "type": "integer",
+            "value": "101",
+          },
+          Object {
+            "key": "somestring",
+            "type": "string",
+            "value": "Some silly string",
+          },
+          Object {
+            "key": "testboolF",
+            "type": "boolean",
+            "value": false,
+          },
+          Object {
+            "key": "testboolT",
+            "type": "boolean",
+            "value": true,
+          },
+          Object {
+            "key": "testbytes",
+            "type": "binary",
+            "value": "base64:VGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdA==",
+          },
+        ],
+        "fee": "0.001",
+        "height": 369354,
+        "id": "3P1d12RRrd2ZnAidTRhx5a4TxgcULEa4CkHPQYuA36AZ",
+        "proofs": Array [
+          "5kR2mTaJo4w7qWXuBe5HXNszkwV6b2cCH6G6vyF713AYd1SK3nuYVm1WqR4D288bXusDKL3EhhCvVAewFjFwEy3B",
+        ],
+        "sender": "3Mz9N7YPfZPWGd4yYaX6H53Gcgrq6ifYiH7",
+        "senderPublicKey": "2M25DqL2W4rGFLCFadgATboS8EPqyWAN3DjH12AH5Kdr",
+        "timestamp": 2018-06-07T05:26:39.348Z,
+        "type": 12,
+        "version": 1,
+      },
+    },
+  ],
+  "lastCursor": "MjAxOC0wNi0wN1QwNToyNjozOS4zNDhaOjozUDFkMTJSUnJkMlpuQWlkVFJoeDVhNFR4Z2NVTEVhNENrSFBRWXVBMzZBWjo6dW5kZWZpbmVk",
+}
+`;
+
+exports[`Data transaction resolver for many following filter combinations should work: type + value 2`] = `
+Object {
+  "__type": "list",
+  "data": Array [],
+}
+`;
+
+exports[`Data transaction resolver for one fetches real tx 1`] = `
+Object {
+  "__type": "transaction",
+  "data": Object {
+    "data": Array [
+      Object {
+        "key": "test",
+        "type": "integer",
+        "value": "11",
+      },
+      Object {
+        "key": "neg",
+        "type": "integer",
+        "value": "-9223372036854775808",
+      },
+      Object {
+        "key": "max",
+        "type": "integer",
+        "value": "9223372036854775807",
+      },
+      Object {
+        "key": "somestring",
+        "type": "string",
+        "value": "Some silly string",
+      },
+      Object {
+        "key": "longstring",
+        "type": "string",
+        "value": "ver long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long string",
+      },
+      Object {
+        "key": "testboolF",
+        "type": "boolean",
+        "value": false,
+      },
+      Object {
+        "key": "testboolT",
+        "type": "boolean",
+        "value": true,
+      },
+      Object {
+        "key": "testbytes",
+        "type": "binary",
+        "value": "base64:VGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdA==",
+      },
+    ],
+    "fee": "0.001",
+    "height": 369361,
+    "id": "2jnH9e2KvEEAiWKHgwocD9arjK3AvBz6DbqwK8GUHdXA",
+    "proofs": Array [
+      "n5DqbcCtusm6LVqhE5hghY98joLeTSqRpoXsbiZQuskXVNh1HZTDpx6mDcsoyjeuGCYVaFsv7Tyy1tzJKzZn6jm",
+    ],
+    "sender": "3Mz9N7YPfZPWGd4yYaX6H53Gcgrq6ifYiH7",
+    "senderPublicKey": "2M25DqL2W4rGFLCFadgATboS8EPqyWAN3DjH12AH5Kdr",
+    "timestamp": 2018-06-07T05:37:09.025Z,
+    "type": 12,
+    "version": 1,
+  },
+}
+`;

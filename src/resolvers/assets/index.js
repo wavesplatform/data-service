@@ -1,31 +1,23 @@
-// RORO
-const { ResolverError } = require('../../utils/error');
-var Ajv = require('ajv');
-var ajv = new Ajv({ allErrors: true });
-const { inputSchema, outputSchema } = require('./schema');
+const { curryN } = require('ramda');
+const create = require('../create');
 
-const AssetsResolverError = message => new ResolverError('assets', message);
+const curriedEmit = emit => curryN(2, emit);
 
-const assetsResolver = async (options = {}) => {
-  // Validate input
-  const validOptions = ajv.validate(inputSchema, options);
-  if (!validOptions)
-    throw AssetsResolverError(`Wrong arguments: ${JSON.stringify(options)}`);
-  const { ids, api } = options;
-
-  // Get result from API
-  let result = await api
-    .assets(ids)
-    .then(assets => ({ assets }))
-    .catch(e => {
-      throw AssetsResolverError(`Error from api: ${e.message}`);
-    });
-
-  // Validate output
-  const validResult = ajv.validate(outputSchema, result);
-  if (!validResult)
-    throw AssetsResolverError(`Wrong result shape: ${JSON.stringify(result)}`);
-  return Promise.resolve(result);
+const oneConfig = {
+  ...require('./validation/one'),
+  transformResult: require('./transformResult/one'),
+  dbQuery: db => id => db.assets.one(id),
 };
 
-module.exports = assetsResolver;
+const manyConfig = {
+  ...require('./validation/many'),
+  transformResult: require('./transformResult/many'),
+  dbQuery: db => ids => db.assets.many(ids),
+};
+
+module.exports = {
+  many: ({ db, emitEvent }) =>
+    create.many(manyConfig)({ db, emitEvent: curriedEmit(emitEvent) }),
+  one: ({ db, emitEvent }) =>
+    create.one(oneConfig)({ db, emitEvent: curriedEmit(emitEvent) }),
+};

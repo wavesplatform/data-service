@@ -1,25 +1,18 @@
-const connect = require('./connect');
+const createTaskedDriver = require('./driver');
+const createAdapter = require('./adapter');
 
-const { formatPairs, batchQuery } = require('./utils');
-
+// adapter dependencies
+const { toDbError } = require('../errorHandling');
+const { batchQuery } = require('./utils');
 const sql = require('./sql');
 
-const { compose, bind } = require('ramda');
-
-const createDb = options => {
-  const db = connect(options);
-
-  return {
-    assets: assetIdArr => {
-      return db.many(sql.assets, [assetIdArr]);
-    },
-    // compose(
-    // batchQuery((reqId, { id }) => reqId === id, assetIdArr),
-    // a => { console.log(a); return a},
-    // bind(db.many)
-    // )(sql.assets, [assetIdArr]),
-    volumes: pairs => db.many(sql.volumes, formatPairs(pairs)),
-  };
+module.exports = options => {
+  const taskedDbDriver = createTaskedDriver(options);
+  const adapter = createAdapter({
+    taskedDbDriver,
+    errorFactory: toDbError,
+    batchQueryFn: batchQuery,
+    sql,
+  });
+  return adapter;
 };
-
-module.exports = createDb;

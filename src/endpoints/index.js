@@ -1,17 +1,18 @@
 const Router = require('koa-router');
 const router = new Router();
+
+const version = require('./version');
 const assets = require('./assets');
-const { RouterError, CustomError } = require('../utils/error');
+const pairs = require('./pairs');
+const transactions = require('./transactions');
+const aliases = require('./aliases');
+// const candles = require('./candles');
 
-router.get('/assets/:ids', assets);
-router.get('/endpoint-error', ctx => {
-  ctx.throw(500, new RouterError(ctx));
-});
-router.get('/custom-error', ctx => {
-  ctx.throw(500, new CustomError('custom messagee'));
-});
-router.get('/default-error', ctx => {
-  ctx.throw(500, new Error('custom messagee'));
-});
+router.use(assets.routes());
+router.use(pairs.routes());
+router.use(transactions.routes());
+router.use(aliases.routes());
+// router.use(candles.routes());
 
+router.get('/version', version);
 module.exports = router;

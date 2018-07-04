@@ -1,5 +1,5 @@
 const R = require('ramda');
-const pgp = require('pg-promise');
+const pgp = require('../driver/pgp');
 
 const addParens = s => `(${s})`;
 
