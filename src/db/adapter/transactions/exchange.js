@@ -1,14 +1,4 @@
-const {
-  map,
-  slice,
-  merge,
-  compose,
-  propSatisfies,
-  assoc,
-  identity,
-  ifElse,
-  gt
-} = require('ramda');
+const { map, slice, merge, compose } = require('ramda');
 const Maybe = require('folktale/maybe');
 
 // @hack — workaround of postgres limit 1 issue
@@ -28,11 +18,11 @@ const createAdapter = ({ taskedDbDriver: dbT, errorFactory, sql }) => ({
   many(filters = {}) {
     const withDefaults = merge({ limit: 100 });
     // @hack — workaround of postgres limit 1 issue
-    const withLimit1Fix = ifElse(
-      propSatisfies(gt(MIN_LIMIT), 'limit'),
-      assoc('limit', MIN_LIMIT),
-      identity
-    );
+    const withLimit1Fix = ({ limit, ...rest }) => ({
+      ...rest,
+      limit: Math.max(limit, MIN_LIMIT),
+    });
+
     const filtersModified = compose(
       withLimit1Fix,
       withDefaults
