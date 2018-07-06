@@ -8,6 +8,7 @@ const {
   pathSatisfies,
   T,
   always,
+  omit,
 } = require('ramda');
 
 const isNotNil = complement(isNil);
@@ -41,7 +42,13 @@ const createAndSubscribeLogger = ({ options, eventBus }) => {
       : logger.log({
         level: getLevelOrDefault('debug')(data),
         request,
-        event: { name: message, meta: stringifyMetaInProd(data) },
+        event: {
+          name: message,
+          meta: stringifyMetaInProd(
+            data.responseTime ? omit(['responseTime'], data) : data
+          ),
+          ...(data.responseTime ? { responseTime: data.responseTime } : {}),
+        },
       });
   };
 
