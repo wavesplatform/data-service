@@ -1,6 +1,6 @@
 const { curry } = require('ramda');
 
-const { convertPrice, convertAmount } = require('../../../utils/satoshi');
+const { convertPrice, convertAmount } = require('../../../../../utils/satoshi');
 
 const WAVES_DECIMALS = 8;
 

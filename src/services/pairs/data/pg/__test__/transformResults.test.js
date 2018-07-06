@@ -1,6 +1,6 @@
 const { BigNumber } = require('@waves/data-entities');
 
-const transformResults = require('../../../adapter/pairs/transformResults');
+const transformResults = require('../adapter/transformResults');
 
 const WAVES_DECIMALS = 8;
 const aDecimals = 8;

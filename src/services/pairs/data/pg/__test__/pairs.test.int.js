@@ -1,12 +1,14 @@
 const { BigNumber } = require('@waves/data-entities');
 
 const { Nothing } = require('folktale/maybe');
-const pair = require('../mocks/pair');
+const pair = require('./mocks/pair');
 
-const loadConfig = require('../../../loadConfig');
-const createDb = require('../../index');
+// runtime dependencies
+const loadConfig = require('../../../../../loadConfig');
+const { createDriver } = require('../../../../../db');
+const pg = createDriver(loadConfig());
 
-const db = createDb(loadConfig());
+const pgAdapter = require('../index')({ pg });
 
 const isPair = mx => {
   if (typeof mx !== 'object') return false;
@@ -23,8 +25,8 @@ const isPair = mx => {
 describe('Pair request ', () => {
   describe('one pair', () => {
     it('covers case: WAVES — amount asset', done => {
-      db.pairs
-        .one(pair('WAVES', 'BTC'))
+      pgAdapter
+        .get(pair('WAVES', 'BTC'))
         .run()
         .listen({
           onResolved: maybeX => {
@@ -36,8 +38,8 @@ describe('Pair request ', () => {
     });
 
     it('covers case: WAVES — price asset', done => {
-      db.pairs
-        .one(pair('ETH', 'WAVES'))
+      pgAdapter
+        .get(pair('ETH', 'WAVES'))
         .run()
         .listen({
           onResolved: maybeX => {
@@ -49,8 +51,8 @@ describe('Pair request ', () => {
     });
 
     it('covers case: WAVES — neither price nor amount', done => {
-      db.pairs
-        .one(pair('ETH', 'BTC'))
+      pgAdapter
+        .get(pair('ETH', 'BTC'))
         .run()
         .listen({
           onResolved: maybeX => {
@@ -62,8 +64,8 @@ describe('Pair request ', () => {
     });
 
     it('covers non-existing assets', done => {
-      db.pairs
-        .one({ amountAsset: 'qwe', priceAsset: 'asd' })
+      pgAdapter
+        .get({ amountAsset: 'qwe', priceAsset: 'asd' })
         .run()
         .listen({
           onResolved: maybeX => {
@@ -83,8 +85,8 @@ describe('Pair request ', () => {
     ];
 
     it('returns array of results on all possible WAVES positions', done => {
-      db.pairs
-        .many(pairs)
+      pgAdapter
+        .mget(pairs)
         .run()
         .listen({
           onResolved: msP => {
