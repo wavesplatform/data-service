@@ -1,9 +1,6 @@
 const { Nothing } = require('folktale/maybe');
 
-const loadConfig = require('../../../../loadConfig');
-const createDb = require('../../../index');
-
-const db = createDb(loadConfig());
+const db = require('../createDb')();
 
 describe('Data transactions', () => {
   it('should return Maybe(data) for `one` tx correctly', done => {

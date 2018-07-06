@@ -1,9 +1,6 @@
 const { Nothing } = require('folktale/maybe');
 
-const loadConfig = require('../../../loadConfig');
-const createDb = require('../../index');
-
-const db = createDb(loadConfig());
+const db = require('./createDb')();
 
 const ADDRESS = '3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy';
 

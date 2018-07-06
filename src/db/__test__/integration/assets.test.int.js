@@ -2,10 +2,7 @@ const { BigNumber } = require('@waves/data-entities');
 
 const { Nothing } = require('folktale/maybe');
 
-const loadConfig = require('../../../loadConfig');
-const createDb = require('../../index');
-
-const db = createDb(loadConfig());
+const db = require('./createDb')();
 
 describe('Assets should return', () => {
   it('Maybe(data) for `one` correctly', done => {

@@ -1,12 +1,10 @@
 const createResolver = require('../');
 
-const loadConfig = require('../../../loadConfig');
-const createDb = require('../../../db');
+const db = require('../../../db/__test__/integration/createDb')();
 
 const ADDRESS = '3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy';
 const ALIAS = 'sexy-boys';
 
-const db = createDb(loadConfig());
 const resolverOne = createResolver.one({
   db,
   emitEvent: () => () => null,
