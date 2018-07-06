@@ -35,7 +35,7 @@ const pairsManyEndpoint = async ctx => {
   });
 
   const service = createService({
-    postgres: ctx.state.db,
+    drivers: ctx.state.drivers,
     emitEvent: ctx.eventBus.emit,
   });
 

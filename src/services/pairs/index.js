@@ -2,8 +2,8 @@
 const createData = require('./data');
 const createResolvers = require('./resolver');
 
-module.exports = ({ postgres, emitEvent }) => {
-  const data = createData({ postgres });
+module.exports = ({ drivers, emitEvent }) => {
+  const data = createData(drivers);
 
   return {
     get: createResolvers.one({

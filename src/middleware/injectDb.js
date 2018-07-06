@@ -6,7 +6,7 @@ const inject = require('./inject');
 module.exports = options => {
   const driver = createDriver(options);
   return compose([
-    inject(['dbDrivers', 'pg'], driver),
+    inject(['drivers', 'pg'], driver),
     inject(['db'], createAdapter(driver)),
   ]);
 };
