@@ -1,7 +1,7 @@
 const { BigNumber } = require('@waves/data-entities');
 
 const loadConfig = require('../../../loadConfig');
-const createDriverT = require('../../driver');
+const { pg: createDriverT } = require('../../driver');
 
 const dbT = createDriverT(loadConfig());
 

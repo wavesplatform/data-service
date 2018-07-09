@@ -1,12 +1,12 @@
 const { BigNumber } = require('@waves/data-entities');
 
 const { Nothing } = require('folktale/maybe');
-const pair = require('./mocks/pair');
+const pair = require('../../__test__/mocks/pair');
 
 // runtime dependencies
 const loadConfig = require('../../../../../loadConfig');
-const { createDriver } = require('../../../../../db');
-const pg = createDriver(loadConfig());
+const { createPgDriver } = require('../../../../../db');
+const pg = createPgDriver(loadConfig());
 
 const pgAdapter = require('../index')({ pg });
 
@@ -22,7 +22,7 @@ const isPair = mx => {
   );
 };
 
-describe('Pair request ', () => {
+describe('Pair Postgres request ', () => {
   describe('one pair', () => {
     it('covers case: WAVES — amount asset', done => {
       pgAdapter

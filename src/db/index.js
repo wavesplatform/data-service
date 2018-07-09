@@ -1,4 +1,4 @@
-const createTaskedDriver = require('./driver');
+const { pg, redis } = require('./driver');
 const createAdapter = require('./adapter');
 
 // adapter dependencies
@@ -7,7 +7,8 @@ const { batchQuery } = require('./utils');
 const sql = require('./sql');
 
 module.exports = {
-  createDriver: createTaskedDriver,
+  createPgDriver: pg,
+  createRedisDriver: redis,
   createAdapter: driver =>
     createAdapter({
       taskedDbDriver: driver,

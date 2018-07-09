@@ -3,7 +3,7 @@ const createData = require('./data');
 const createResolvers = require('./resolver');
 
 module.exports = ({ drivers, emitEvent }) => {
-  const data = createData(drivers);
+  const data = createData({ drivers, emitEvent });
 
   return {
     get: createResolvers.one({
