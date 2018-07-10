@@ -6,8 +6,9 @@ const { map } = require('ramda');
 const { toDbError } = require('../../../../errorHandling');
 
 const getKey = require('./key');
-const { parse } = require('./serialization');
-const transformToCache = require('./transformToCache');
+const { parse, stringify } = require('./serialization');
+
+const CACHE_EXPIRATION_SECONDS = 10;
 
 module.exports = ({ redis }) => {
   return {
@@ -28,8 +29,19 @@ module.exports = ({ redis }) => {
     cache: toCache => {
       if (!toCache || !toCache.length) return Task.of(null);
 
-      return redis
-        .mset(transformToCache(toCache))
+      const transaction = toCache.reduce(
+        (tx, objToCache) =>
+          tx.set([
+            getKey(objToCache[0]),
+            stringify(objToCache[1]),
+            'EX',
+            CACHE_EXPIRATION_SECONDS,
+          ]),
+        redis.multi()
+      );
+
+      return transaction
+        .exec()
         .mapRejected(
           toDbError({ request: 'redis.pairs.cache', params: toCache })
         );
