@@ -5,14 +5,174 @@ const { map, always, identity } = require('ramda');
 
 const createData = require('../create');
 
-const pairs = ['p1', 'p2', 'p3'];
 const toJustResp = p => Maybe.of({ id: p });
 const toNothingResp = () => Maybe.Nothing();
-
 const mockEmitEvent = jest.fn(always(identity));
 
 describe('Data module', () => {
+  describe('get func', () => {
+    const PAIR = 'p1';
+    const createMockAdapter = transformFn => ({
+      get: pair => Task.of(transformFn(pair)),
+      cache: () => Task.of(null),
+    });
+
+    it('handles cache hit', done => {
+      const hitCacheAdapter = createMockAdapter(toJustResp); // Task Maybe p
+      const emptyPgAdapter = {}; // Task []
+
+      const data = createData({
+        redisAdapter: hitCacheAdapter,
+        pgAdapter: emptyPgAdapter,
+        emitEvent: mockEmitEvent,
+      });
+
+      data
+        .get(PAIR)
+        .run()
+        .listen({
+          onResolved: mX => {
+            expect(mX).toEqual(toJustResp(PAIR));
+            done();
+          },
+        });
+    });
+
+    it('does not call db on cache hit', done => {
+      const hitCacheAdapter = createMockAdapter(toJustResp); // Task Maybe p
+      const fullPgAdapter = createMockAdapter(toJustResp);
+
+      const cacheSpy = jest.spyOn(hitCacheAdapter, 'get');
+      const pgSpy = jest.spyOn(fullPgAdapter, 'get');
+
+      const data = createData({
+        redisAdapter: hitCacheAdapter,
+        pgAdapter: fullPgAdapter,
+        emitEvent: mockEmitEvent,
+      });
+
+      data
+        .get(PAIR)
+        .run()
+        .listen({
+          onResolved: () => {
+            expect(cacheSpy).toHaveBeenCalledTimes(1);
+            expect(pgSpy).not.toHaveBeenCalled();
+            done();
+          },
+        });
+    });
+
+    it('handles cache miss', done => {
+      const missCacheAdapter = createMockAdapter(toNothingResp);
+      const fullPgAdapter = createMockAdapter(toJustResp);
+      const cacheSpy = jest.spyOn(missCacheAdapter, 'get');
+      const pgSpy = jest.spyOn(fullPgAdapter, 'get');
+
+      const data = createData({
+        redisAdapter: missCacheAdapter,
+        pgAdapter: fullPgAdapter,
+        emitEvent: mockEmitEvent,
+      });
+
+      data
+        .get(PAIR)
+        .run()
+        .listen({
+          onResolved: mX => {
+            expect(mX).toEqual(toJustResp(PAIR));
+            expect(cacheSpy).toHaveBeenCalledTimes(1);
+            expect(pgSpy).toHaveBeenCalledTimes(1);
+            done();
+          },
+        });
+    });
+
+    it('writes data to cache on cache miss', done => {
+      const missCacheAdapter = createMockAdapter(toNothingResp);
+      const fullPgAdapter = createMockAdapter(toJustResp);
+
+      const cacheWriteSpy = jest.spyOn(missCacheAdapter, 'cache');
+
+      const data = createData({
+        redisAdapter: missCacheAdapter,
+        pgAdapter: fullPgAdapter,
+        emitEvent: mockEmitEvent,
+      });
+
+      data
+        .get(PAIR)
+        .run()
+        .listen({
+          onResolved: () => {
+            expect(cacheWriteSpy).toHaveBeenCalledTimes(1);
+            expect(cacheWriteSpy).toHaveBeenCalledWith([
+              [PAIR, toJustResp(PAIR).getOrElse()],
+            ]);
+            done();
+          },
+        });
+    });
+
+    it('handles cache failure', done => {
+      const failingCacheAdapter = {
+        get: () => Task.rejected(-1),
+        cache: () => Task.of(null),
+      };
+      const fullPgAdapter = createMockAdapter(toJustResp);
+
+      const cacheSpy = jest.spyOn(failingCacheAdapter, 'get');
+      const pgSpy = jest.spyOn(fullPgAdapter, 'get');
+
+      const data = createData({
+        redisAdapter: failingCacheAdapter,
+        pgAdapter: fullPgAdapter,
+        emitEvent: mockEmitEvent,
+      });
+
+      data
+        .get(PAIR)
+        .run()
+        .listen({
+          onResolved: mX => {
+            expect(mX).toEqual(toJustResp(PAIR));
+            expect(cacheSpy).toHaveBeenCalledTimes(1);
+            expect(pgSpy).toHaveBeenCalledTimes(1);
+            done();
+          },
+        });
+    });
+
+    it('fails on db failure', done => {
+      const missCacheAdapter = createMockAdapter(toNothingResp);
+      const failingPgAdapter = {
+        get: () => Task.rejected(-1),
+      };
+      const cacheSpy = jest.spyOn(missCacheAdapter, 'get');
+      const pgSpy = jest.spyOn(failingPgAdapter, 'get');
+
+      const data = createData({
+        redisAdapter: missCacheAdapter,
+        pgAdapter: failingPgAdapter,
+        emitEvent: mockEmitEvent,
+      });
+
+      data
+        .get(PAIR)
+        .run()
+        .listen({
+          onRejected: err => {
+            expect(err).toEqual(-1);
+            expect(cacheSpy).toHaveBeenCalledTimes(1);
+            expect(pgSpy).toHaveBeenCalledTimes(1);
+            done();
+          },
+        });
+    });
+  });
+
   describe('mget func', () => {
+    const pairs = ['p1', 'p2', 'p3'];
     const createMockAdapter = transformFn => ({
       mget: pairs => Task.of(transformFn(pairs)),
       cache: () => Task.of(null),

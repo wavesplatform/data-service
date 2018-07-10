@@ -12,19 +12,19 @@ const CACHE_EXPIRATION_SECONDS = 10;
 
 module.exports = ({ redis }) => {
   return {
-    // get: pair =>
-    //   Task.fromPromised(() => redis.get(getKey(pair)))
-    //     .map(Maybe.fromNullable)
-    //     .map(tap(console.log))
-    //     .mapRejected(toDbError({ request: 'redis.pairs.get', params: pair })),
-    get: pair => Task.of(Maybe.Nothing()),
-    mget: pairs => {
-      return redis
+    get: pair =>
+      redis
+        .get(getKey(pair))
+        .map(Maybe.fromNullable) // Task Maybe
+        .map(map(parse))
+        .mapRejected(toDbError({ request: 'redis.pairs.get', params: pair })),
+
+    mget: pairs =>
+      redis
         .mget(pairs.map(getKey))
         .map(map(Maybe.fromNullable))
         .map(map(map(parse))) // Task List Maybe
-        .mapRejected(toDbError({ request: 'redis.pairs.mget', params: pairs }));
-    },
+        .mapRejected(toDbError({ request: 'redis.pairs.mget', params: pairs })),
 
     cache: toCache => {
       if (!toCache || !toCache.length) return Task.of(null);
