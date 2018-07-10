@@ -1,4 +1,4 @@
-const getKey = require('../redis/key');
+const getKey = require('../key');
 
 describe('Redis key encoding', () => {
   it('should correctly encode a pair', () => {

@@ -15,6 +15,7 @@ describe('Data module', () => {
   describe('mget func', () => {
     const createMockAdapter = transformFn => ({
       mget: pairs => Task.of(transformFn(pairs)),
+      cache: () => Task.of(null),
     });
 
     it('handles full cache hit', done => {
@@ -109,6 +110,7 @@ describe('Data module', () => {
     it('handles cache failure and full db resp', done => {
       const rejectingCacheAdapter = {
         mget: pairs => Task.rejected(pairs),
+        cache: () => Task.of(null),
       };
       const fullPgAdapter = createMockAdapter(map(toJustResp));
 
