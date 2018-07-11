@@ -1,9 +1,9 @@
-const pgt = require('../driver');
+const { pg } = require('../driver');
 
 const { driver } = require('./mocks');
 
 describe('Tasked driver method', () => {
-  const driverT = pgt({}, () =>
+  const driverT = pg({}, () =>
     driver.create(x => Promise.resolve(x), (...args) => args)
   );
 

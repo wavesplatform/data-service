@@ -2,7 +2,7 @@ const swapMaybeF = require('../swapMaybeF');
 
 const { compose, map, curry } = require('ramda');
 
-/** liftInnerM :: M -> (v -> M * v) -> Maybe v -> M * Maybe v */
+/** liftInnerMaybe :: M -> (v -> M * v) -> Maybe v -> M * Maybe v */
 const liftInnerMaybe = curry((mOf, fn, mb) =>
   compose(swapMaybeF(mOf), map(fn))(mb)
 );

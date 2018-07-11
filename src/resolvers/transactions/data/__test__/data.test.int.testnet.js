@@ -1,7 +1,6 @@
 const createResolver = require('../');
 
-const loadConfig = require('../../../../loadConfig');
-const createDb = require('../../../../db/index');
+const db = require('../../../../db/__test__/integration/createDb')();
 
 // testnet id
 const TX_ID = '2jnH9e2KvEEAiWKHgwocD9arjK3AvBz6DbqwK8GUHdXA';
@@ -9,7 +8,6 @@ const TX_ID = '2jnH9e2KvEEAiWKHgwocD9arjK3AvBz6DbqwK8GUHdXA';
 const TIME_START = new Date('2018-06-07 08:26:00');
 const TIME_END = new Date('2018-06-07 08:50:00');
 
-const db = createDb(loadConfig());
 const resolverOne = createResolver.one({
   db,
   emitEvent: () => () => null,

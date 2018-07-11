@@ -1,13 +1,10 @@
 const { Nothing } = require('folktale/maybe');
 
-const loadConfig = require('../../../../loadConfig');
-const createDb = require('../../../index');
-
 const {
   MIN_LIMIT,
 } = require('../../../adapter/transactions/exchange/constants');
 
-const db = createDb(loadConfig());
+const db = require('../createDb')();
 
 describe('Exchange transactions should return ', () => {
   it('Maybe(data) for `one` tx correctly', done => {

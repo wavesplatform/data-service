@@ -3,7 +3,6 @@ const Maybe = require('folktale/maybe');
 
 const createExchangeAdapter = require('./transactions/exchange');
 const createDataAdapter = require('./transactions/data');
-const createPairsAdapter = require('./pairs');
 const createAliasesAdapter = require('./aliases');
 
 // db adapter factory
@@ -26,8 +25,6 @@ const createDbAdapter = options => {
         return this.many([id]).map(head);
       },
     },
-
-    pairs: createPairsAdapter(options),
 
     transactions: {
       exchange: createExchangeAdapter(options),

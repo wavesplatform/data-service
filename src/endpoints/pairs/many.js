@@ -1,4 +1,4 @@
-const { many: createResolver } = require('../../resolvers/pairs');
+const createService = require('../../services/pairs');
 const { select } = require('../utils/selectors');
 const { captureErrors } = require('../../utils/captureErrors');
 
@@ -34,12 +34,13 @@ const pairsManyEndpoint = async ctx => {
     resolver: 'pairsMany',
   });
 
-  const resolver = createResolver({
-    db: ctx.state.db,
+  const service = createService({
+    drivers: ctx.state.drivers,
     emitEvent: ctx.eventBus.emit,
   });
 
-  const result = await resolver(parsePairs(pairs))
+  const result = await service
+    .mget(parsePairs(pairs))
     .run()
     .promise();
 
