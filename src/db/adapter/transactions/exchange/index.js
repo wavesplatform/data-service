@@ -2,7 +2,7 @@ const { map, slice, merge, compose } = require('ramda');
 const Maybe = require('folktale/maybe');
 
 // @hack — workaround of postgres limit 1 issue
-const MIN_LIMIT = 5;
+const { MIN_LIMIT } = require('./constants');
 
 // db adapter factory
 const createAdapter = ({ taskedDbDriver: dbT, errorFactory, sql }) => ({
