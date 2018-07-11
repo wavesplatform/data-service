@@ -23,7 +23,8 @@ const taskifyDriver = driver => {
 
   const multi = compose(
     // @impure
-    // mutates original `Multi` object
+    // mutates original `Multi` object but that's OK
+    // since a new instance gets created each time
     multiObj => {
       multiObj.exec = taskifyMethod(multiObj)(multiObj.exec);
       return multiObj;
