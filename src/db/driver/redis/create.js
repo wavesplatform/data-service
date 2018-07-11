@@ -2,8 +2,8 @@ const redis = require('redis');
 
 const { memoizeWith, always } = require('ramda');
 
-const createDriver = options => {
-  return redis.createClient({
+const createDriver = options =>
+  redis.createClient({
     host: options.redisHost,
     port: options.redisPort,
     enable_offline_queue: false,
@@ -16,6 +16,5 @@ const createDriver = options => {
       return Math.min(options.attempt * 100, 3000);
     },
   });
-};
 
 module.exports = memoizeWith(always('driver'), createDriver);
