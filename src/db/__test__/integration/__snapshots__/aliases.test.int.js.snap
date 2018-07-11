@@ -1,19 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Aliases should return Maybe(alias) for \`one\` correctly 1`] = `
-Object {
-  "@@tag": "Just",
-  "@@type": "folktale:Maybe",
-  "@@value": Object {
-    "value": Object {
-      "address": "3PQqCXNPoTRsHRK2nZyXWENaZwLmxrUZPBi",
-      "alias": "sexy-boys",
-    },
-  },
-}
-`;
-
-exports[`Aliases should return request by address returns correct data if requested with \`showBroken\` 1`] = `
+exports[`Aliases request by address should return correct data if requested with \`showBroken\` 1`] = `
 Array [
   Object {
     "@@tag": "Just",
@@ -558,7 +545,7 @@ Array [
 ]
 `;
 
-exports[`Aliases should return request by address returns correct data if requested without \`showBroken\` 1`] = `
+exports[`Aliases request by address should return correct data if requested without \`showBroken\` 1`] = `
 Array [
   Object {
     "@@tag": "Just",
@@ -1091,4 +1078,17 @@ Array [
     },
   },
 ]
+`;
+
+exports[`Aliases should return Maybe(alias) for \`one\` correctly 1`] = `
+Object {
+  "@@tag": "Just",
+  "@@type": "folktale:Maybe",
+  "@@value": Object {
+    "value": Object {
+      "address": "3PQqCXNPoTRsHRK2nZyXWENaZwLmxrUZPBi",
+      "alias": "sexy-boys",
+    },
+  },
+}
 `;

@@ -1,9 +1,9 @@
 const Maybe = require('folktale/maybe');
 
-const { Pair } = require('../../../../types');
+const { Pair } = require('../../../../../types');
 const transformResult = require('../one');
 
-const { pair, transformedPair } = require('../../mocks/pair');
+const { pair, transformedPair } = require('./mocks/pair');
 
 const pairsFromDb = Maybe.of(pair);
 

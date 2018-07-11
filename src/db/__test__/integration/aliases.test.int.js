@@ -1,14 +1,11 @@
 const { Nothing } = require('folktale/maybe');
 
-const loadConfig = require('../../../loadConfig');
-const createDb = require('../../index');
-
-const db = createDb(loadConfig());
+const db = require('./createDb')();
 
 const ADDRESS = '3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy';
 
-describe('Aliases should return', () => {
-  it('Maybe(alias) for `one` correctly', done => {
+describe('Aliases', () => {
+  it('should return Maybe(alias) for `one` correctly', done => {
     db.aliases
       .one('sexy-boys')
       .run()
@@ -31,7 +28,7 @@ describe('Aliases should return', () => {
   });
 
   describe('request by address', () => {
-    it('returns correct data if requested without `showBroken`', done => {
+    it('should return correct data if requested without `showBroken`', done => {
       db.aliases
         .many({ address: ADDRESS })
         .run()
@@ -43,7 +40,7 @@ describe('Aliases should return', () => {
         });
     });
 
-    it('returns correct data if requested with `showBroken`', done => {
+    it('should return correct data if requested with `showBroken`', done => {
       db.aliases
         .many({
           address: ADDRESS,

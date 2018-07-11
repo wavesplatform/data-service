@@ -14,6 +14,10 @@ const loadConfig = () => {
     postgresUser: process.env.PGUSER,
     postgresPassword: process.env.PGPASSWORD,
     postgresPoolSize: parseInt(process.env.PGPOOLSIZE) || 20,
+
+    redisPort: parseInt(process.env.REDIS_PORT) || undefined,
+    redisHost: process.env.REDIS_HOST,
+
     logLevel: process.env.LOG_LEVEL || 'info',
   };
 };

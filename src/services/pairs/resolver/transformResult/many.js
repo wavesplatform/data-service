@@ -1,6 +1,6 @@
 const { transformPairInfo } = require('./common');
 
-const { Pair, List, fromMaybe } = require('../../../types');
+const { Pair, List, fromMaybe } = require('../../../../types');
 
 const { map, compose } = require('ramda');
 

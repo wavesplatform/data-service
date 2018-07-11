@@ -1,6 +1,6 @@
 {
   "name": "data-service",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Waves data service",
   "main": "src/index.js",
   "repository": "git@github.com:wavesplatform/data-service.git",
@@ -41,6 +41,7 @@
     "pg-promise": "^8.2.3",
     "ramda": "^0.25.0",
     "ramda-adjunct": "^2.6.0",
+    "redis": "^2.8.0",
     "winston": "^3.0.0-rc4"
   }
 }

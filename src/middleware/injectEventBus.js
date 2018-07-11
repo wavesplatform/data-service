@@ -1,4 +1,4 @@
-const { pick } = require('ramda');
+const { pick, curryN } = require('ramda');
 
 const collectRequestData = ctx => ({
   ...pick(['headers', 'httpVersion', 'method', 'url'])(ctx.request),
@@ -11,8 +11,8 @@ const collectRequestData = ctx => ({
 module.exports = eventBus => async (ctx, next) => {
   // Add request info to all logs
   const request = collectRequestData(ctx);
-  const emit = (message, data) =>
-    eventBus.emit('log', { message, request, data });
+  const emit = curryN(2, (message, data) =>
+    eventBus.emit('log', { message, request, data }));
   ctx.eventBus = { emit };
   await next();
 };
