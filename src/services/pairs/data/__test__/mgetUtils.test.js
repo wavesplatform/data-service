@@ -1,4 +1,4 @@
-const Maybe = require('folktale/Maybe');
+const Maybe = require('folktale/maybe');
 const { stateToResult, prepareForCaching } = require('../create/mgetUtils');
 
 const pair = require('./mocks/pair');

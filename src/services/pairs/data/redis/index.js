@@ -1,5 +1,5 @@
 const Task = require('folktale/concurrency/task');
-const Maybe = require('folktale/Maybe');
+const Maybe = require('folktale/maybe');
 
 const { map } = require('ramda');
 
