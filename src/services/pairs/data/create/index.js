@@ -6,21 +6,22 @@ const { assoc, always } = require('ramda');
 const tap = require('../../../../utils/tap');
 
 const { stateToResult, prepareForCaching } = require('./mgetUtils');
+const logRedisError = require('./logRedisError');
 
 module.exports = ({ pgAdapter, redisAdapter, emitEvent }) => {
   return {
     get: pair =>
       redisAdapter
         .get(pair)
+        .mapRejected(logRedisError(emitEvent)) // log cache error
         .chain(maybeCached =>
           maybeCached.matchWith({
             Nothing: () =>
-              Task.rejected(pair),
+              Task.rejected(pair).mapRejected(tap(emitEvent('CACHE_MISS'))), // log cache miss,
             Just: () => Task.of(maybeCached), // Task Maybe r
           })
         )
         .map(tap(emitEvent('CACHE_HIT'))) // log cache hit
-        .mapRejected(tap(emitEvent('CACHE_MISS'))) // log cache miss
         .orElse(() =>
           pgAdapter
             .get(pair)
@@ -44,7 +45,7 @@ module.exports = ({ pgAdapter, redisAdapter, emitEvent }) => {
             redisAdapter
               .mget(s.request)
               .map(resp => assoc('cacheResp', resp, s))
-              .mapRejected(tap(emitEvent('CACHE_ERROR'))) // log cache failure
+              .mapRejected(logRedisError(emitEvent)) // log cache error
               .orElse(always(Task.of(s))) // but continue chain as if cache returned nothing
         )
         .map(s => (emitEvent('CACHE_RETURNED', s.cacheResp), s))
