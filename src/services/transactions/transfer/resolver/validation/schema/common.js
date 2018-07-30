@@ -33,6 +33,6 @@ const output = Joi.object()
     sender_public_key: Joi.string().required(),
     recipient: Joi.string().required(),
   })
-  .or('proofs', 'signature');
+  .xor('proofs', 'signature');
 
 module.exports = { output, hashRegex };
