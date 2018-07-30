@@ -35,6 +35,7 @@ const input = Joi.object()
     after: Joi.cursor().valid(),
 
     sender: Joi.string(),
+    assetId: Joi.string(),
     recipient: Joi.string(),
   })
   .required();

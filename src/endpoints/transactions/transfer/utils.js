@@ -9,6 +9,7 @@ const selectFilters = ({
   timeEnd,
   sort,
   limit,
+  assetId,
 }) =>
   reject(isNil, {
     timeStart: timeStart && parseDate(timeStart),
@@ -18,6 +19,7 @@ const selectFilters = ({
     recipient,
     sender,
     after,
+    assetId,
   });
 
 module.exports = { selectFilters };

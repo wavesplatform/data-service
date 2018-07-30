@@ -8,12 +8,14 @@ const commonQuery = require('./query');
 module.exports = {
   one: id =>
     pipe(
+      q => q.clone(),
       F.id(id),
       String
     )(commonQuery),
   many: fValues => {
     const order = [
       'id',
+      'assetId',
       'sender',
       'recipient',
       'after',
@@ -30,6 +32,7 @@ module.exports = {
       filter(has(__, fValuesPicked))
     )(order);
     return pipe(
+      q => q.clone(),
       ...appliedFs,
       String
     )(commonQuery);

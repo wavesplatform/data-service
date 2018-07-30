@@ -1,6 +1,7 @@
 const { where, limit } = require('../../../../../../db/sql/utils/knex');
 
 const id = where('id');
+const assetId = where('asset_id');
 const sender = where('sender');
 const recipient = where('recipient');
 
@@ -23,6 +24,7 @@ module.exports = {
   sender,
   recipient,
   after,
+  assetId,
   timeStart,
   timeEnd,
   sort,
