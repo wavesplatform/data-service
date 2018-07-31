@@ -30,7 +30,7 @@ const input = Joi.object()
     }),
     limit: Joi.number()
       .min(1)
-      .max(100),
+      .max(100).required(),
     sort: Joi.string(),
     after: Joi.cursor().valid(),
 

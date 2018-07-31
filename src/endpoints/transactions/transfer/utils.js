@@ -8,7 +8,7 @@ const selectFilters = ({
   timeStart,
   timeEnd,
   sort,
-  limit,
+  limit = 100,
   assetId,
 }) =>
   reject(isNil, {
