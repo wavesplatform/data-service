@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Sql builder  many covers case with all filters (without after) 1`] = `"select * from \\"txs_4\\" as \\"t\\" where \\"sender\\" = 'sender' and \\"recipient\\" = 'recipient' and \\"t\\".\\"time_stamp\\" >= 'timeStart' and \\"t\\".\\"time_stamp\\" <= 'timeEnd' order by \\"t\\".\\"time_stamp\\" asc, \\"t\\".\\"id\\" asc limit 1"`;
+
+exports[`Sql builder  many covers case with all filters with after 1`] = `"select * from \\"txs_4\\" as \\"t\\" where \\"sender\\" = 'sender' and \\"recipient\\" = 'recipient' and (t.time_stamp, t.id) > ('timestamp', 'id') and \\"t\\".\\"time_stamp\\" >= 'timeStart' and \\"t\\".\\"time_stamp\\" <= 'timeEnd' order by \\"t\\".\\"time_stamp\\" asc, \\"t\\".\\"id\\" asc limit 1"`;
+
+exports[`Sql builder  one works 1`] = `"select * from \\"txs_4\\" as \\"t\\" where \\"id\\" = 'id'"`;
