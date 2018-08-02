@@ -16,7 +16,7 @@ const createPgAdapter = ({ pg, sql }) => {
     },
 
     // /** mget :: filters -> Task (Maybe Result)[] AppError.Db */
-    mget(filters) {
+    search(filters) {
       return pg
         .any(sql.many(filters))
         .map(map(Maybe.fromNullable))

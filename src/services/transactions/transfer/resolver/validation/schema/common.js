@@ -6,7 +6,9 @@ const hashRegex = /[0-9A-Za-z]+/;
 const output = Joi.object().keys({
   height: Joi.number().required(),
   tx_type: Joi.number().required(),
-  tx_version: Joi.number().required(),
+  tx_version: Joi.number()
+    .required()
+    .allow(null),
   fee: Joi.object()
     .type(BigNumber)
     .required(),

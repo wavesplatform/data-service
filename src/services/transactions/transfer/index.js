@@ -9,8 +9,8 @@ module.exports = ({ drivers, emitEvent }) => {
       getData: data.get,
       emitEvent,
     }),
-    mget: createResolvers.many({
-      getData: data.mget,
+    search: createResolvers.many({
+      getData: data.search,
       emitEvent,
     }),
   };
