@@ -12,6 +12,7 @@ const createAndSubscribeLogger = require('./logger');
 const removeErrorBodyProd = require('./middleware/removeErrorBodyProd');
 const serializer = require('./middleware/serializer');
 const setHeadersMiddleware = require('./middleware/setHeaders');
+var bodyParser = require('koa-bodyparser');
 
 const eventBus = createEventBus();
 
@@ -24,6 +25,7 @@ const requestId = createRequestId({ expose: 'X-Request-Id', header: false });
 
 app
   .use(removeErrorBodyProd)
+  .use(bodyParser())
   .use(requestId)
   .use(setHeadersMiddleware)
   .use(injectEventBus(eventBus))
