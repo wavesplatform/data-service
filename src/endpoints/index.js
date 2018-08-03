@@ -2,6 +2,7 @@ const Router = require('koa-router');
 const router = new Router();
 
 const version = require('./version');
+const root = require('./root');
 const assets = require('./assets');
 const pairs = require('./pairs');
 const transactions = require('./transactions');
@@ -15,4 +16,5 @@ router.use(aliases.routes());
 // router.use(candles.routes());
 
 router.get('/version', version);
+router.get('/', root);
 module.exports = router;
