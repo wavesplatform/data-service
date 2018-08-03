@@ -39,7 +39,7 @@ describe('Transfer transaction resolver for one', () => {
 describe('Transfer transaction resolver for many', () => {
   it('fetches real tx', async () => {
     const tx = await service
-      .mget({
+      .search({
         limit: 20,
         timeStart: YESTERDAY,
       })
@@ -61,12 +61,12 @@ describe('Transfer transaction resolver for many', () => {
       };
 
       const firstTx = await service
-        .mget(baseParams)
+        .search(baseParams)
         .run()
         .promise();
 
       const secondTx = await service
-        .mget({
+        .search({
           after: firstTx.lastCursor,
           limit: 1,
         })
@@ -87,7 +87,7 @@ describe('Transfer transaction resolver for many', () => {
 
       const fetchAndGetNextCursor = cursor =>
         service
-          .mget({
+          .search({
             ...baseParams,
             limit: 5,
             after: cursor,
@@ -97,7 +97,7 @@ describe('Transfer transaction resolver for many', () => {
           .then(x => [x.lastCursor, x.data.map(createCursor(SORT))]);
 
       const firstCursor = await service
-        .mget({ ...baseParams, limit: 1 })
+        .search({ ...baseParams, limit: 1 })
         .run()
         .promise()
         .then(x => x.data.map(createCursor(SORT))[0]);
@@ -112,7 +112,7 @@ describe('Transfer transaction resolver for many', () => {
       }
 
       const expectedCursors = await service
-        .mget({
+        .search({
           ...baseParams,
           limit: LIMIT,
         })
@@ -134,7 +134,7 @@ describe('Transfer transaction resolver for many', () => {
 
       const fetchAndGetNextCursor = cursor =>
         service
-          .mget({
+          .search({
             ...baseParams,
             limit: 5,
             after: cursor,
@@ -144,7 +144,7 @@ describe('Transfer transaction resolver for many', () => {
           .then(x => [x.lastCursor, x.data.map(createCursor(SORT))]);
 
       const firstCursor = await service
-        .mget({ ...baseParams, limit: 1 })
+        .search({ ...baseParams, limit: 1 })
         .run()
         .promise()
         .then(x => x.data.map(createCursor(SORT))[0]);
@@ -159,7 +159,7 @@ describe('Transfer transaction resolver for many', () => {
       }
 
       const expectedCursors = await service
-        .mget({
+        .search({
           ...baseParams,
           limit: LIMIT,
         })
@@ -173,7 +173,7 @@ describe('Transfer transaction resolver for many', () => {
 
   it('fails if timeEnd < 0', done =>
     service
-      .mget({
+      .search({
         timeEnd: parseDate('-1525132900000'),
       })
       .run()
@@ -185,7 +185,7 @@ describe('Transfer transaction resolver for many', () => {
       }));
   it('fails if timeStart < 0', done =>
     service
-      .mget({
+      .search({
         timeEnd: parseDate('1525132900000'),
         timeStart: parseDate('-1525132800000'),
       })
@@ -198,7 +198,7 @@ describe('Transfer transaction resolver for many', () => {
       }));
   it('fails if timeEnd < timeStart', done =>
     service
-      .mget({
+      .search({
         timeEnd: parseDate('1525132700000'),
         timeStart: parseDate('1525132800000'),
       })
@@ -211,7 +211,7 @@ describe('Transfer transaction resolver for many', () => {
       }));
   it('fails if timeStart->invalid Date', done =>
     service
-      .mget({
+      .search({
         timeStart: parseDate(''),
       })
       .run()
@@ -224,7 +224,7 @@ describe('Transfer transaction resolver for many', () => {
 
   it('doesnt try to create a cursor for empty response', done =>
     service
-      .mget({
+      .search({
         limit: 1,
         timeEnd: parseDate('1'),
       })

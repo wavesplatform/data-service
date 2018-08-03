@@ -1,11 +1,19 @@
 const { renameKeys } = require('ramda-adjunct');
-const { compose } = require('ramda');
+const { compose, ifElse, propEq, omit } = require('ramda');
+
+const hasEmptyProofs = propEq('proofs', []);
+const processProofsAndSignature = ifElse(
+  hasEmptyProofs,
+  omit(['proofs']),
+  omit(['signature'])
+);
 
 /** transformTxInfo:: RawTxInfo -> TxInfo */
 const transformTxInfo = compose(
+  processProofsAndSignature,
   renameKeys({
     tx_type: 'type',
-    tx_version: 'txVersion',
+    tx_version: 'version',
     sender_public_key: 'senderPublicKey',
     asset_id: 'assetId',
     fee_asset: 'feeAsset',

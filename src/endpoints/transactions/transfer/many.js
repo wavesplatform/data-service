@@ -24,7 +24,7 @@ const transferTxsManyEndpoint = async ctx => {
   });
 
   const txs = await service
-    .mget(filters)
+    .search(filters)
     .run()
     .promise();
 
