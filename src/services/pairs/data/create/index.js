@@ -21,7 +21,7 @@ module.exports = ({ pgAdapter, redisAdapter, emitEvent }) => {
             Just: () => Task.of(maybeCached), // Task Maybe r
           })
         )
-        .map(tap(emitEvent('CACHE_HIT'))) // log cache hit
+        .map(tap(meta => emitEvent('CACHE_HIT', { level: 'info', meta }))) // log cache hit
         .orElse(() =>
           pgAdapter
             .get(pair)
@@ -29,7 +29,10 @@ module.exports = ({ pgAdapter, redisAdapter, emitEvent }) => {
             .map(maybeResp =>
               maybeResp.map(resp => {
                 // only if db responded with actual data
-                redisAdapter.cache([[pair, resp]]).run();
+                redisAdapter
+                  .cache([[pair, resp]])
+                  .map(tap(() => emitEvent('CACHE_CACHED', { level: 'info' })))
+                  .run();
                 return resp;
               })
             )

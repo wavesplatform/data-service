@@ -6,6 +6,7 @@ const createDriver = options =>
   redis.createClient({
     host: options.redisHost,
     port: options.redisPort,
+    password: options.redisPassword,
     enable_offline_queue: false,
     retry_strategy: options => {
       // in 60 mins of downtime, stop trying
