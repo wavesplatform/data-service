@@ -17,7 +17,7 @@ It is possible to create your own instance of this service. To do so, follow the
 
 #### Requirements
 
-1. PostgreSQL 9.6 database with a table stricture found in [wavesplatform/blockchain-postgres-sync](https://github.com/wavesplatform/blockchain-postgres-sync)
+1. PostgreSQL 10 database with a table stricture found in [wavesplatform/blockchain-postgres-sync](https://github.com/wavesplatform/blockchain-postgres-sync)
 2. Downloaded and continuously updated blockchain data in the database
 2. NodeJS or Docker for either running the service directly, or in a container
 
