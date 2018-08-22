@@ -2,8 +2,6 @@ const { adapter, sql } = require('../mocks');
 
 const { identity, last, prop, compose, path } = require('ramda');
 
-const { MIN_LIMIT } = require('../../adapter/transactions/exchange/constants');
-
 describe('Exchange transactions methods should correctly', () => {
   const getSqlSpyArgs = compose(
     prop('apply'),
@@ -43,10 +41,7 @@ describe('Exchange transactions methods should correctly', () => {
       });
   });
 
-  // actual call occurs with the limit of no less than 5
-  // as a workaround of postgres limit 1 issue
   const filters = { limit: 1, timeStart: new Date('2018-01-01') };
-  const filtersWithLimit1Fix = { ...filters, limit: MIN_LIMIT };
 
   it('resolve many', done => {
     const spy = jest.fn();
@@ -57,18 +52,7 @@ describe('Exchange transactions methods should correctly', () => {
       .run()
       .listen({
         onResolved: () => {
-          expect(getSqlSpyArgs(spy)).toEqual([filtersWithLimit1Fix]);
-          done();
-        },
-      });
-
-    // limit >= 5 do not get substituted
-    manyGood.transactions.exchange
-      .many({ limit: MIN_LIMIT + 1 })
-      .run()
-      .listen({
-        onResolved: () => {
-          expect(getSqlSpyArgs(spy)).toEqual([{ limit: MIN_LIMIT + 1 }]);
+          expect(getSqlSpyArgs(spy)).toEqual([filters]);
           done();
         },
       });
@@ -83,18 +67,7 @@ describe('Exchange transactions methods should correctly', () => {
       .run()
       .listen({
         onRejected: () => {
-          expect(getSqlSpyArgs(spy)).toEqual([filtersWithLimit1Fix]);
-          done();
-        },
-      });
-
-    // limit >= 5 do not get substituted
-    manyBad.transactions.exchange
-      .many({ limit: MIN_LIMIT + 1 })
-      .run()
-      .listen({
-        onRejected: () => {
-          expect(getSqlSpyArgs(spy)).toEqual([{ limit: MIN_LIMIT + 1 }]);
+          expect(getSqlSpyArgs(spy)).toEqual([filters]);
           done();
         },
       });
