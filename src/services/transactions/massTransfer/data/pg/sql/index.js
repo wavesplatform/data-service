@@ -8,7 +8,6 @@ const { baseQuery, withTransfersDecimalsAndGrouping } = require('./query');
 module.exports = {
   one: id =>
     pipe(
-      q => q.clone(),
       F.id(id),
       withTransfersDecimalsAndGrouping,
       String
