@@ -5,7 +5,7 @@ const { Transaction, List, fromMaybe } = require('../../../../../types');
 
 const { map, compose, pipe, last, prop, objOf } = require('ramda');
 
-const Cursor = require('../pagination/cursor');
+const Cursor = require('../../../../../resolvers/pagination/cursor');
 const lastItem = pipe(
   last,
   prop('data'),

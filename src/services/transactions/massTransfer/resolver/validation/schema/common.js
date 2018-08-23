@@ -1,7 +1,7 @@
 const Joi = require('joi');
 const { BigNumber } = require('@waves/data-entities');
 
-const hashRegex = /[0-9A-Za-z]+/;
+const { base58 } = require('../../../../../../utils/regex');
 
 const output = Joi.object().keys({
   height: Joi.number().required(),
@@ -25,10 +25,10 @@ const output = Joi.object().keys({
     otherwise: Joi.array().length(0),
   }).required(),
   id: Joi.string()
-    .regex(hashRegex)
+    .regex(base58)
     .required(),
   asset_id: Joi.string()
-    .regex(hashRegex)
+    .regex(base58)
     .required(),
 
   attachment: Joi.string()
@@ -36,7 +36,7 @@ const output = Joi.object().keys({
     .allow(''),
   sender: Joi.string().required(),
   sender_public_key: Joi.string().required(),
-  recipients: Joi.array().items(Joi.string().regex(hashRegex)),
+  recipients: Joi.array().items(Joi.string().regex(base58)),
   amounts: Joi.array().items(
     Joi.object()
       .type(BigNumber)
@@ -44,4 +44,4 @@ const output = Joi.object().keys({
   ),
 });
 
-module.exports = { output, hashRegex };
+module.exports = { output };

@@ -1,9 +1,8 @@
 const createService = require('../');
 const { createPgDriver } = require('../../../../db/');
 const { parseDate } = require('../../../../utils/parseDate');
-const Cursor = require('../resolver/pagination/cursor');
+const Cursor = require('../../../../resolvers/pagination/cursor');
 
-const YESTERDAY = new Date(Date.now() - 60 * 60 * 24 * 1000);
 const TX_ID = '11ADYBQgLqK8GBpd8XRWVvHm3ZRFttq4T3NF3AjBijs';
 
 const loadConfig = require('../../../../loadConfig');
@@ -18,7 +17,7 @@ const service = createService({
   emitEvent: () => () => null,
 });
 
-describe('Transfer transaction resolver for one', () => {
+describe('MassTransfer transaction resolver for one', () => {
   it('fetches real tx', async done => {
     service
       .get(TX_ID)
@@ -36,7 +35,7 @@ describe('Transfer transaction resolver for one', () => {
     expect(tx).toBe(null);
   });
 });
-describe('Transfer transaction resolver for many', () => {
+describe('MassTransfer transaction resolver for many', () => {
   it('fetches real tx', async () => {
     const LIMIT = 1;
     const tx = await service

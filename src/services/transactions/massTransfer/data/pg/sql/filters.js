@@ -1,8 +1,8 @@
 const { where, limit } = require('../../../../../../db/sql/utils/knex');
-const { withRecipient } = require('./query');
+const { selectIdsWhereRecipient } = require('./query');
 
 const recipient = rec => q =>
-  q.clone().whereIn('txs_11.id', withRecipient(rec));
+  q.clone().whereIn('txs_11.id', selectIdsWhereRecipient(rec));
 const id = where('txs_11.id');
 const assetId = where('asset_id');
 const sender = where('sender');

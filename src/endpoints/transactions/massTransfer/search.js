@@ -6,15 +6,15 @@ const { selectFilters } = require('./utils');
 
 /**
  * Endpoint
- * @name /transactions/massTransfer
+ * @name /transactions/mass-transfer
  */
-const transferTxsManyEndpoint = async ctx => {
+const massTransferTxsManyEndpoint = async ctx => {
   const { query } = select(ctx);
   const filters = selectFilters(query);
 
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
-    resolver: 'transactions.transfer.many',
+    resolver: 'transactions.massTransfer.many',
     filters,
   });
 
@@ -44,7 +44,7 @@ const handleError = ({ ctx, error }) => {
     },
     Resolver: () => {
       ctx.status = 500;
-      ctx.body = 'Error resolving /transactions/transfer';
+      ctx.body = 'Error resolving /transactions/mass-transfer';
     },
     Validation: () => {
       ctx.status = 400;
@@ -52,4 +52,4 @@ const handleError = ({ ctx, error }) => {
     },
   });
 };
-module.exports = captureErrors(handleError)(transferTxsManyEndpoint);
+module.exports = captureErrors(handleError)(massTransferTxsManyEndpoint);

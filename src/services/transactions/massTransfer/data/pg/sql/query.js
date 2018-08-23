@@ -1,7 +1,7 @@
 const pg = require('knex')({ client: 'pg' });
 const { pipe } = require('ramda');
 
-const withRecipient = recipient =>
+const selectIdsWhereRecipient = recipient =>
   pg('txs_11_transfers')
     .where('recipient', '=', recipient)
     .select('tx_id');
@@ -55,8 +55,7 @@ const columns = {
   attachment: 'attachment',
 };
 
-const withAllThings = pipe(
-  q => q.clone(),
+const withTransfersDecimalsAndGrouping = pipe(
   renameToTxs,
   withTransfers,
   withDecimals,
@@ -65,6 +64,6 @@ const withAllThings = pipe(
 );
 module.exports = {
   baseQuery,
-  withAllThings,
-  withRecipient,
+  withTransfersDecimalsAndGrouping,
+  selectIdsWhereRecipient,
 };

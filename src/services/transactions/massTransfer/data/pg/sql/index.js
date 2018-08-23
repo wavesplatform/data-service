@@ -1,7 +1,7 @@
 const { pipe, compose, map, pick, filter, has, __, merge } = require('ramda');
 
 const F = require('./filters');
-const { baseQuery, withAllThings } = require('./query');
+const { baseQuery, withTransfersDecimalsAndGrouping } = require('./query');
 
 // one — get by id
 // search — apply filters
@@ -10,7 +10,7 @@ module.exports = {
     pipe(
       q => q.clone(),
       F.id(id),
-      withAllThings,
+      withTransfersDecimalsAndGrouping,
       String
     )(baseQuery),
   search: fValues => {
@@ -39,7 +39,7 @@ module.exports = {
     return pipe(
       q => q.clone(),
       ...appliedFs,
-      withAllThings,
+      withTransfersDecimalsAndGrouping,
       F.sort(fValuesPicked.sort),
       String
     )(baseQuery);

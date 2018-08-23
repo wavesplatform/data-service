@@ -10,11 +10,11 @@ const filters = {
 describe('Sql builder', () => {
   describe(' many', () => {
     it('covers case with all filters (without after)', () => {
-      expect(sql.many(filters)).toMatchSnapshot();
+      expect(sql.search(filters)).toMatchSnapshot();
     });
     it('covers case with all filters with after', () => {
       expect(
-        sql.many({
+        sql.search({
           ...filters,
           after: {
             timestamp: 'timestamp',

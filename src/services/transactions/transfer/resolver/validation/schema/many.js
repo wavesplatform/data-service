@@ -1,6 +1,6 @@
 const rawJoi = require('joi');
 const { output } = require('./common');
-const Cursor = require('../../pagination/cursor');
+const Cursor = require('../../../../../../resolvers/pagination/cursor');
 const DATE0 = new Date(0);
 const Joi = rawJoi.extend(joi => ({
   base: joi.string().base64({ paddingRequired: false }),
@@ -26,11 +26,12 @@ const input = Joi.object()
     timeEnd: Joi.when('timeStart', {
       is: Joi.exist(),
       then: Joi.date().min(Joi.ref('timeStart')),
-      otherwise: Joi.date().min(0),
+      otherwise: Joi.date().min(DATE0),
     }),
     limit: Joi.number()
       .min(1)
-      .max(100).required(),
+      .max(100)
+      .required(),
     sort: Joi.string(),
     after: Joi.cursor().valid(),
 

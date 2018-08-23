@@ -1,14 +1,5 @@
 const { renameKeys } = require('ramda-adjunct');
-const {
-  compose,
-  ifElse,
-  propEq,
-  omit,
-  zipWith,
-  __,
-  assoc,
-  pipe,
-} = require('ramda');
+const { ifElse, propEq, omit, zipWith, __, assoc, pipe } = require('ramda');
 
 const hasEmptyProofs = propEq('proofs', []);
 const processProofsAndSignature = ifElse(
@@ -38,10 +29,7 @@ const addZippedTransfers = tx =>
   )(tx);
 
 /** transformTxInfo:: RawTxInfo -> TxInfo */
-const transformTxInfo = compose(
-  omit(['amounts', 'recipients']),
-  addZippedTransfers,
-  processProofsAndSignature,
+const transformTxInfo = pipe(
   renameKeys({
     tx_type: 'type',
     tx_version: 'version',
@@ -50,7 +38,10 @@ const transformTxInfo = compose(
     fee_asset: 'feeAsset',
     time_stamp: 'timestamp',
     volume_waves: 'volumeWaves',
-  })
+  }),
+  processProofsAndSignature,
+  addZippedTransfers,
+  omit(['amounts', 'recipients'])
 );
 
 module.exports = { transformTxInfo };

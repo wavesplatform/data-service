@@ -4,7 +4,7 @@ const { captureErrors } = require('../../../utils/captureErrors');
 
 /**
  * Endpoint
- * @name /transactions/massTransfer/:id
+ * @name /transactions/mass-transfer/:id
  */
 const massTransferTxsOneEndpoint = async ctx => {
   const { id } = select(ctx);
@@ -46,7 +46,7 @@ const handleError = ({ ctx, error }) => {
     },
     Resolver: () => {
       ctx.status = 500;
-      ctx.body = 'Error resolving /transactions/massTransfer';
+      ctx.body = 'Error resolving /transactions/mass-transfer';
     },
     Validation: () => {
       ctx.status = 400;

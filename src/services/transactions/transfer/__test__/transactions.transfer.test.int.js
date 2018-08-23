@@ -1,7 +1,7 @@
 const createService = require('../');
 const { createPgDriver } = require('../../../../db/');
 const { parseDate } = require('../../../../utils/parseDate');
-const Cursor = require('../resolver/pagination/cursor');
+const Cursor = require('../../../../resolvers/pagination/cursor');
 
 const YESTERDAY = new Date(Date.now() - 60 * 60 * 24 * 1000);
 const TX_ID = 'GN5SSawWUwodvAcHV2d96pe7HgFqvxoEAU9FCW9MUphE';
