@@ -1,10 +1,11 @@
-const { transformTx } = require('./common');
-
-const { Transaction, List, fromMaybe } = require('../../../../types');
 const Maybe = require('folktale/maybe');
-const { map, compose, pipe, objOf, last, prop } = require('ramda');
+const { transformTxInfo } = require('./common');
 
-const Cursor = require('../../../../resolvers/pagination/cursor');
+const { Transaction, List, fromMaybe } = require('../../../../../types');
+
+const { map, compose, pipe, last, prop, objOf } = require('ramda');
+
+const Cursor = require('../../../../../resolvers/pagination/cursor');
 const lastItem = pipe(
   last,
   prop('data'),
@@ -17,12 +18,12 @@ const createCursorMeta = (request, xs) =>
     .map(objOf('lastCursor'))
     .getOrElse({});
 
-/** transformResults :: (Maybe RawTxInfo)[] -> List Tx */
+/** transformResults :: (Maybe RawTxsInfo)[] -> List Transaction */
 const transformResults = (result, request) =>
   compose(
     xs => List(xs, createCursorMeta(request, xs)),
     map(fromMaybe(Transaction)),
-    map(map(transformTx))
+    map(map(transformTxInfo))
   )(result);
 
 module.exports = transformResults;

@@ -1,9 +1,4 @@
 const { Nothing } = require('folktale/maybe');
-
-const {
-  MIN_LIMIT,
-} = require('../../../adapter/transactions/exchange/constants');
-
 const db = require('../createDb')();
 
 describe('Exchange transactions should return ', () => {
@@ -53,19 +48,6 @@ describe('Exchange transactions should return ', () => {
             onResolved: mxs => {
               const xs = mxs.map(x => x.getOrElse(-1));
               expect(xs.length).toBe(1);
-              done();
-            },
-          });
-      });
-
-      it('should work with limit 10 (more than MIN_LIMIT)', done => {
-        db.transactions.exchange
-          .many({ limit: MIN_LIMIT + 1 })
-          .run()
-          .listen({
-            onResolved: mxs => {
-              const xs = mxs.map(x => x.getOrElse(-1));
-              expect(xs.length).toBe(MIN_LIMIT + 1);
               done();
             },
           });

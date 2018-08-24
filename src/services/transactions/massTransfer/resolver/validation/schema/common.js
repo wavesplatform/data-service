@@ -12,16 +12,15 @@ const output = Joi.object().keys({
   fee: Joi.object()
     .type(BigNumber)
     .required(),
-  amount: Joi.object()
-    .type(BigNumber)
-    .required(),
+
   time_stamp: Joi.date().required(),
 
   signature: Joi.string()
     .required()
-    .allow(''),
+    .allow('')
+    .allow(null),
   proofs: Joi.when('signature', {
-    is: '',
+    is: Joi.only(['', null]),
     then: Joi.array().min(1),
     otherwise: Joi.array().length(0),
   }).required(),
@@ -31,15 +30,18 @@ const output = Joi.object().keys({
   asset_id: Joi.string()
     .regex(base58)
     .required(),
-  fee_asset: Joi.string()
-    .regex(base58)
-    .required(),
+
   attachment: Joi.string()
     .required()
     .allow(''),
   sender: Joi.string().required(),
   sender_public_key: Joi.string().required(),
-  recipient: Joi.string().required(),
+  recipients: Joi.array().items(Joi.string().regex(base58)),
+  amounts: Joi.array().items(
+    Joi.object()
+      .type(BigNumber)
+      .required()
+  ),
 });
 
 module.exports = { output };

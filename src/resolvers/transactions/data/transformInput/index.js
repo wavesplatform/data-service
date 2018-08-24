@@ -1,6 +1,6 @@
 const { omit } = require('ramda');
 const { parseDate } = require('../../../../utils/parseDate');
-const Cursor = require('../pagination/cursor');
+const Cursor = require('../../../../resolvers/pagination/cursor');
 
 const decodeAfter = cursor => {
   const [date, id, sort] = Cursor.decode(cursor);

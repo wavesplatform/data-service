@@ -6,6 +6,8 @@ const YESTERDAY = new Date(Date.now() - 60 * 60 * 24 * 1000);
 
 const db = require('../../../../db/__test__/integration/createDb')();
 
+const Cursor = require('../../../pagination/cursor');
+
 const resolverOne = createResolver.one({
   db,
   emitEvent: () => () => null,
@@ -43,8 +45,6 @@ describe('Exchange transaction resolver for many', () => {
     expect(tx.data).toHaveLength(20);
   });
   describe('Pagination ', async () => {
-    const Cursor = require('../pagination/cursor');
-    const { parseDate } = require('../../../../utils/parseDate');
     const START = '2018-06-02T10:59:43.000Z';
     const END = '2018-06-03T23:59:48.000Z';
     const LIMIT = 21;
