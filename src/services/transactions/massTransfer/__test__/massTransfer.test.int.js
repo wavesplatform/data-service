@@ -171,57 +171,6 @@ describe('MassTransfer transaction resolver for many', () => {
     });
   });
 
-  it('fails if timeEnd < 0', done =>
-    service
-      .search({
-        timeEnd: parseDate('-1525132900000'),
-      })
-      .run()
-      .promise()
-      .then(() => done('Wrong branch, error'))
-      .catch(e => {
-        expect(e.type).toBe('ValidationError');
-        done();
-      }));
-  it('fails if timeStart < 0', done =>
-    service
-      .search({
-        timeEnd: parseDate('1525132900000'),
-        timeStart: parseDate('-1525132800000'),
-      })
-      .run()
-      .promise()
-      .then(() => done('Wrong branch, error'))
-      .catch(e => {
-        expect(e.type).toBe('ValidationError');
-        done();
-      }));
-  it('fails if timeEnd < timeStart', done =>
-    service
-      .search({
-        timeEnd: parseDate('1525132700000'),
-        timeStart: parseDate('1525132800000'),
-      })
-      .run()
-      .promise()
-      .then(() => done('Wrong branch, error'))
-      .catch(e => {
-        expect(e.type).toBe('ValidationError');
-        done();
-      }));
-  it('fails if timeStart->invalid Date', done =>
-    service
-      .search({
-        timeStart: parseDate(''),
-      })
-      .run()
-      .promise()
-      .then(() => done('Wrong branch, error'))
-      .catch(e => {
-        expect(e.type).toBe('ValidationError');
-        done();
-      }));
-
   it('doesnt try to create a cursor for empty response', done =>
     service
       .search({
