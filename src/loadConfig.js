@@ -17,6 +17,7 @@ const loadConfig = () => {
 
     redisPort: parseInt(process.env.REDIS_PORT) || undefined,
     redisHost: process.env.REDIS_HOST,
+    redisPassword: process.env.REDIS_PASSWORD,
 
     logLevel: process.env.LOG_LEVEL || 'info',
   };
