@@ -1,4 +1,4 @@
-const { batchQuery } = require('../utils');
+const batchQuery = require('../batchQuery');
 
 const matchFn = (req, res) => res === req * 10;
 
