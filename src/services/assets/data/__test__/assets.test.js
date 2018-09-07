@@ -1,55 +1,92 @@
+const Task = require('folktale/concurrency/task');
+
 const Maybe = require('folktale/maybe');
-const { adapter } = require('../mocks');
+const { driver } = require('../../../../db/__test__/mocks/index');
+
+const create = require('../create');
+
+afterEach(() => jest.clearAllMocks());
 
 describe('Asset methods should correctly', () => {
-  const headSecondArg = (a, b) => b[0];
+  const dbManyResp = () => [1, 2, 3];
+  const dbOneResp = () => [1];
 
-  const goodAdapter = adapter.good(headSecondArg);
-  const badAdapter = adapter.bad(headSecondArg);
+  const deps = {
+    batchQuery: () => x => x,
+    sql: jest.fn(x => x),
+  };
+  // const dataBad = create({ ...deps, pg: driverTBad });
+
+  // const goodAdapter = adapter.good(headSecondArg);
+  // const badAdapter = adapter.bad(headSecondArg);
 
   it('resolve many', done => {
-    goodAdapter.assets
-      .many([1, 2, 3])
+    const pg = driver.create(Task.of, dbManyResp);
+    const pgAnySpy = jest.spyOn(pg, 'any');
+    const data = create({ ...deps, pg });
+
+    data
+      .mget([1, 2, 3])
       .run()
       .listen({
         onResolved: xs => {
-          expect(xs).toEqual([1, 2, 3].map(Maybe.of));
+          expect(xs).toMatchSnapshot();
+          expect(deps.sql).toHaveBeenCalledWith([1, 2, 3]);
+          expect(pgAnySpy).toHaveBeenCalledWith([1, 2, 3]);
           done();
         },
       });
   });
 
   it('reject many', done => {
-    badAdapter.assets
-      .many([1, 2, 3])
+    const pg = driver.create(Task.rejected, dbManyResp);
+    const pgAnySpy = jest.spyOn(pg, 'any');
+    const data = create({ ...deps, pg });
+
+    data
+      .mget([1, 2, 3])
       .run()
       .listen({
-        onRejected: xs => {
-          expect(xs).toEqual([1, 2, 3]);
+        onRejected: e => {
+          expect(e).toMatchSnapshot();
+          expect(deps.sql).toHaveBeenCalledWith([1, 2, 3]);
+          expect(pgAnySpy).toHaveBeenCalledWith([1, 2, 3]);
           done();
         },
       });
   });
 
   it('resolve one', done => {
-    goodAdapter.assets
-      .one(1)
+    const pg = driver.create(Task.of, dbOneResp);
+    const pgAnySpy = jest.spyOn(pg, 'any');
+    const data = create({ ...deps, pg });
+
+    data
+      .get(1)
       .run()
       .listen({
         onResolved: xs => {
-          expect(xs).toEqual(Maybe.Just(1));
+          expect(xs).toMatchSnapshot();
+          expect(deps.sql).toHaveBeenCalledWith([1]);
+          expect(pgAnySpy).toHaveBeenCalledWith([1]);
           done();
         },
       });
   });
 
   it('reject one', done => {
-    badAdapter.assets
-      .many(1)
+    const pg = driver.create(Task.rejected, dbOneResp);
+    const pgAnySpy = jest.spyOn(pg, 'any');
+    const data = create({ ...deps, pg });
+
+    data
+      .get(1)
       .run()
       .listen({
-        onRejected: xs => {
-          expect(xs).toEqual(1);
+        onRejected: e => {
+          expect(e).toMatchSnapshot();
+          expect(deps.sql).toHaveBeenCalledWith([1]);
+          expect(pgAnySpy).toHaveBeenCalledWith([1]);
           done();
         },
       });

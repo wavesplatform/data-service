@@ -1,4 +1,4 @@
-const { where, limit } = require('../../../utils/knex');
+const { where, limit } = require('../../utils/knex');
 
 const { curryN } = require('ramda');
 

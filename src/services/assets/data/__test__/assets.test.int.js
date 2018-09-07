@@ -2,12 +2,17 @@ const { BigNumber } = require('@waves/data-entities');
 
 const { Nothing } = require('folktale/maybe');
 
-const db = require('./createDb')();
+// runtime dependencies
+const loadConfig = require('../../../../loadConfig');
+const { createPgDriver } = require('../../../../db');
+const pg = createPgDriver(loadConfig());
+
+const data = require('..')({ pg });
 
 describe('Assets should return', () => {
   it('Maybe(data) for `one` correctly', done => {
-    db.assets
-      .one('G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH')
+    data
+      .get('G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH')
       .run()
       .listen({
         onResolved: maybeX => {
@@ -23,8 +28,8 @@ describe('Assets should return', () => {
         },
       });
 
-    db.assets
-      .one('NON_EXISTING_PAIR')
+    data
+      .get('NON_EXISTING_PAIR')
       .run()
       .listen({
         onResolved: maybeX => {
@@ -35,8 +40,8 @@ describe('Assets should return', () => {
   });
 
   it('Maybe(data)[] for `many` request', done => {
-    db.assets
-      .many([
+    data
+      .mget([
         'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH',
         'NON_EXISTING_ASSET',
       ])

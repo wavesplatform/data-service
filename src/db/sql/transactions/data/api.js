@@ -1,7 +1,7 @@
 const { compose, merge, pick, pipe, assoc } = require('ramda');
 
 const { select, fSelect, composeQuery } = require('./query');
-const { pickBindFilters } = require('../../../utils');
+const { pickBindFilters } = require('../../utils');
 
 // one — get by id
 // many — apply filters

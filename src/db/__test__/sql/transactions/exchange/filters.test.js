@@ -1,5 +1,5 @@
-const F = require('../../../../../sql/build/transactions/exchange/filters');
-const P = require('../../../../../../utils/test/proxy');
+const F = require('../../../../sql/transactions/exchange/filters');
+const P = require('../../../../../utils/test/proxy');
 
 describe('transactions.exchange filter', () => {
   it('id', () => {

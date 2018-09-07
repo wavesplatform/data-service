@@ -1,4 +1,4 @@
-const sql = require('../../../sql/build/aliases');
+const sql = require('../../sql/aliases');
 
 describe('Alias sql query build', () => {
   it('`one` should build select by alias', () => {

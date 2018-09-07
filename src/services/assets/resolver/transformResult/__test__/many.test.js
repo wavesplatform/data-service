@@ -1,6 +1,6 @@
 const Maybe = require('folktale/maybe');
 
-const { Asset, List } = require('../../../../types');
+const { Asset, List } = require('../../../../../types');
 const transformResult = require('../many');
 
 const { asset, transformedAsset } = require('./mocks');

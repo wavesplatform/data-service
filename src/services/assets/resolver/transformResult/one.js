@@ -1,6 +1,6 @@
 const { transformAsset } = require('./common');
 
-const { Asset } = require('../../../types');
+const { Asset } = require('../../../../types');
 
 const { compose, map } = require('ramda');
 

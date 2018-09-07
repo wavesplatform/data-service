@@ -1,7 +1,7 @@
 const { assoc, flatten, mapObjIndexed } = require('ramda');
 
-const api = require('../../../../../sql/build/transactions/exchange/api');
-const filters = require('../../../../../sql/build/transactions/exchange/filters');
+const api = require('../../../../sql/transactions/exchange/api');
+const filters = require('../../../../sql/transactions/exchange/filters');
 
 const { equals } = require('ramda');
 

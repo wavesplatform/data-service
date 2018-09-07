@@ -1,4 +1,4 @@
-const sql = require('../../../../sql/build/transactions/data');
+const sql = require('../../../sql/transactions/data');
 
 describe('transactions.data api method', () => {
   it('`one` matches snapshot', () => {

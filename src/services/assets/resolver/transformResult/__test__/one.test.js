@@ -1,9 +1,9 @@
 const Maybe = require('folktale/maybe');
 
-const { Asset } = require('../../../../types');
+const { Asset } = require('../../../../../types');
 const transformResult = require('../one');
 
-const { asset, transformedAsset } = require('../../mocks/asset');
+const { asset, transformedAsset } = require('./mocks');
 
 const assetsFromDb = Maybe.of({
   ...asset,
