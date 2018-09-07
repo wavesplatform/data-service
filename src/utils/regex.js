@@ -1,3 +1,3 @@
 module.exports = {
-  base58: /[0-9A-Za-z]+/,
+  base58: /^[1-9A-HJ-NP-Za-km-z]+$/,
 };
