@@ -1,6 +1,6 @@
 const { input, output } = require('./schema/many');
-const { AppError } = require('../../../errorHandling');
-const validate = require('../../../utils/validate');
+const { AppError } = require('../../../../errorHandling');
+const validate = require('../../../../utils/validate');
 
 // validateInput :: Options -> Boolean
 const validateInput = validate(input, (error, value) =>
