@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Aliases request by address should return correct data if requested with \`showBroken\` 1`] = `
+exports[`Aliases request by address should return correct data if requested with showBroken 1`] = `
 Array [
   Object {
     "@@tag": "Just",
@@ -545,7 +545,7 @@ Array [
 ]
 `;
 
-exports[`Aliases request by address should return correct data if requested without \`showBroken\` 1`] = `
+exports[`Aliases request by address should return correct data if requested without showBroken 1`] = `
 Array [
   Object {
     "@@tag": "Just",
@@ -1080,7 +1080,7 @@ Array [
 ]
 `;
 
-exports[`Aliases should return Maybe(alias) for \`one\` correctly 1`] = `
+exports[`Aliases should return Maybe(alias) for one correctly 1`] = `
 Object {
   "@@tag": "Just",
   "@@type": "folktale:Maybe",
