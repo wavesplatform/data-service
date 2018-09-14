@@ -1,0 +1,93 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Transfer transactions transformResult function works for many 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "amount": "46519",
+        "assetId": "AnERqFRffNVrCbviXbDEdzrU6ipXCP5Y1PKpFdRnyQAy",
+        "attachment": "",
+        "fee": "100000",
+        "feeAsset": "WAVES",
+        "height": 554168,
+        "id": "3hzxjLvZc2e92kTfMq37WnwHh9Z3zKufjuZNkmzdYgbe",
+        "recipient": "3PGt8w1RXz3HSvsrcYLY66yPNM334NGZg9h",
+        "sender": "3P23fi1qfVw6RVDn4CH2a5nNouEtWNQ4THs",
+        "senderPublicKey": "9pfdqs3WwYv3d4zN2ekHSqxcPnE7zKceMJXq1zZxAyd4",
+        "signature": "x5oTh7xvtiySnyaM4fjHc2j4sxBrhTaiDqMteoGPyA252GefjCW1UfcxD18SsRj93RiXBCtAzTekhogjZUQgrYy",
+        "timestamp": 2017-06-25T14:13:27.858Z,
+        "type": 4,
+        "version": 1,
+      },
+    },
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "amount": "46519",
+        "assetId": "AnERqFRffNVrCbviXbDEdzrU6ipXCP5Y1PKpFdRnyQAy",
+        "attachment": "",
+        "fee": "100000",
+        "feeAsset": "WAVES",
+        "height": 554168,
+        "id": "3hzxjLvZc2e92kTfMq37WnwHh9Z3zKufjuZNkmzdYgbe",
+        "recipient": "3PGt8w1RXz3HSvsrcYLY66yPNM334NGZg9h",
+        "sender": "3P23fi1qfVw6RVDn4CH2a5nNouEtWNQ4THs",
+        "senderPublicKey": "9pfdqs3WwYv3d4zN2ekHSqxcPnE7zKceMJXq1zZxAyd4",
+        "signature": "x5oTh7xvtiySnyaM4fjHc2j4sxBrhTaiDqMteoGPyA252GefjCW1UfcxD18SsRj93RiXBCtAzTekhogjZUQgrYy",
+        "timestamp": 2017-06-25T14:13:27.858Z,
+        "type": 4,
+        "version": 1,
+      },
+    },
+    Object {
+      "__type": "transaction",
+      "data": null,
+    },
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "amount": "46519",
+        "assetId": "AnERqFRffNVrCbviXbDEdzrU6ipXCP5Y1PKpFdRnyQAy",
+        "attachment": "",
+        "fee": "100000",
+        "feeAsset": "WAVES",
+        "height": 554168,
+        "id": "3hzxjLvZc2e92kTfMq37WnwHh9Z3zKufjuZNkmzdYgbe",
+        "recipient": "3PGt8w1RXz3HSvsrcYLY66yPNM334NGZg9h",
+        "sender": "3P23fi1qfVw6RVDn4CH2a5nNouEtWNQ4THs",
+        "senderPublicKey": "9pfdqs3WwYv3d4zN2ekHSqxcPnE7zKceMJXq1zZxAyd4",
+        "signature": "x5oTh7xvtiySnyaM4fjHc2j4sxBrhTaiDqMteoGPyA252GefjCW1UfcxD18SsRj93RiXBCtAzTekhogjZUQgrYy",
+        "timestamp": 2017-06-25T14:13:27.858Z,
+        "type": 4,
+        "version": 1,
+      },
+    },
+  ],
+  "lastCursor": "MjAxNy0wNi0yNVQxNDoxMzoyNy44NThaOjozaHp4akx2WmMyZTkya1RmTXEzN1dud0hoOVozekt1Zmp1Wk5rbXpkWWdiZTo6YXNj",
+}
+`;
+
+exports[`Transfer transactions transformResult function works for one 1`] = `
+Object {
+  "__type": "transaction",
+  "data": Object {
+    "amount": "46519",
+    "assetId": "AnERqFRffNVrCbviXbDEdzrU6ipXCP5Y1PKpFdRnyQAy",
+    "attachment": "",
+    "fee": "100000",
+    "feeAsset": "WAVES",
+    "height": 554168,
+    "id": "3hzxjLvZc2e92kTfMq37WnwHh9Z3zKufjuZNkmzdYgbe",
+    "recipient": "3PGt8w1RXz3HSvsrcYLY66yPNM334NGZg9h",
+    "sender": "3P23fi1qfVw6RVDn4CH2a5nNouEtWNQ4THs",
+    "senderPublicKey": "9pfdqs3WwYv3d4zN2ekHSqxcPnE7zKceMJXq1zZxAyd4",
+    "signature": "x5oTh7xvtiySnyaM4fjHc2j4sxBrhTaiDqMteoGPyA252GefjCW1UfcxD18SsRj93RiXBCtAzTekhogjZUQgrYy",
+    "timestamp": 2017-06-25T14:13:27.858Z,
+    "type": 4,
+    "version": 1,
+  },
+}
+`;

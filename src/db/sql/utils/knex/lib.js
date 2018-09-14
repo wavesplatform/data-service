@@ -21,4 +21,5 @@ module.exports = {
   limit: createPointfree('limit'),
   orWhere: createPointfree('orWhere'),
   orderBy: createPointfree('orderBy'),
+  raw: createPointfree('raw'),
 };
