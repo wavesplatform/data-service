@@ -1,0 +1,81 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Transfer transactions transformResult function works for many 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "amount": "10705754895",
+        "fee": "100000",
+        "height": 600887,
+        "id": "2rdiawoYXnwVieRgTkESYKAKwcRrnLZQ4abmC9JQSj7n",
+        "recipient": "3P2HNUd5VUPLMQkJmctTPEeeHumiPN2GkTb",
+        "sender": "3PMY5XbSpvcQnYNCMiLWAaHuTwQwN6sSoy4",
+        "senderPublicKey": "AiXERNpnVgGM25Au55kfcz39K9FUoysqD5nCSpew4MYo",
+        "signature": "5CVsdA6Weyx28MyGAQoFD8HdSBMmop3RQJvGv8w4k2axRyJ4f76oV4vWoCoV31B4Dv2dRcSfG6N88AzszccH9xV",
+        "timestamp": 2017-07-29T02:22:01.407Z,
+        "type": 8,
+        "version": 1,
+      },
+    },
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "amount": "10705754895",
+        "fee": "100000",
+        "height": 600887,
+        "id": "2rdiawoYXnwVieRgTkESYKAKwcRrnLZQ4abmC9JQSj7n",
+        "recipient": "3P2HNUd5VUPLMQkJmctTPEeeHumiPN2GkTb",
+        "sender": "3PMY5XbSpvcQnYNCMiLWAaHuTwQwN6sSoy4",
+        "senderPublicKey": "AiXERNpnVgGM25Au55kfcz39K9FUoysqD5nCSpew4MYo",
+        "signature": "5CVsdA6Weyx28MyGAQoFD8HdSBMmop3RQJvGv8w4k2axRyJ4f76oV4vWoCoV31B4Dv2dRcSfG6N88AzszccH9xV",
+        "timestamp": 2017-07-29T02:22:01.407Z,
+        "type": 8,
+        "version": 1,
+      },
+    },
+    Object {
+      "__type": "transaction",
+      "data": null,
+    },
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "amount": "10705754895",
+        "fee": "100000",
+        "height": 600887,
+        "id": "2rdiawoYXnwVieRgTkESYKAKwcRrnLZQ4abmC9JQSj7n",
+        "recipient": "3P2HNUd5VUPLMQkJmctTPEeeHumiPN2GkTb",
+        "sender": "3PMY5XbSpvcQnYNCMiLWAaHuTwQwN6sSoy4",
+        "senderPublicKey": "AiXERNpnVgGM25Au55kfcz39K9FUoysqD5nCSpew4MYo",
+        "signature": "5CVsdA6Weyx28MyGAQoFD8HdSBMmop3RQJvGv8w4k2axRyJ4f76oV4vWoCoV31B4Dv2dRcSfG6N88AzszccH9xV",
+        "timestamp": 2017-07-29T02:22:01.407Z,
+        "type": 8,
+        "version": 1,
+      },
+    },
+  ],
+  "lastCursor": "MjAxNy0wNy0yOVQwMjoyMjowMS40MDdaOjoycmRpYXdvWVhud1ZpZVJnVGtFU1lLQUt3Y1JybkxaUTRhYm1DOUpRU2o3bjo6YXNj",
+}
+`;
+
+exports[`Transfer transactions transformResult function works for one 1`] = `
+Object {
+  "__type": "transaction",
+  "data": Object {
+    "amount": "10705754895",
+    "fee": "100000",
+    "height": 600887,
+    "id": "2rdiawoYXnwVieRgTkESYKAKwcRrnLZQ4abmC9JQSj7n",
+    "recipient": "3P2HNUd5VUPLMQkJmctTPEeeHumiPN2GkTb",
+    "sender": "3PMY5XbSpvcQnYNCMiLWAaHuTwQwN6sSoy4",
+    "senderPublicKey": "AiXERNpnVgGM25Au55kfcz39K9FUoysqD5nCSpew4MYo",
+    "signature": "5CVsdA6Weyx28MyGAQoFD8HdSBMmop3RQJvGv8w4k2axRyJ4f76oV4vWoCoV31B4Dv2dRcSfG6N88AzszccH9xV",
+    "timestamp": 2017-07-29T02:22:01.407Z,
+    "type": 8,
+    "version": 1,
+  },
+}
+`;
