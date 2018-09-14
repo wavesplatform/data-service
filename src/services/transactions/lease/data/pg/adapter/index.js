@@ -11,20 +11,17 @@ const createPgAdapter = ({ pg, sql }) => {
         .oneOrNone(sql.one(id))
         .map(Maybe.fromNullable)
         .mapRejected(
-          toDbError({ request: 'transactions.massTransfer.get', params: id })
+          toDbError({ request: 'transactions.lease.get', params: id })
         );
     },
 
-    /** search :: filters -> Task (Maybe Result)[] AppError.Db */
+    // /** search :: filters -> Task (Maybe Result)[] AppError.Db */
     search(filters) {
       return pg
-        .any(sql.search(filters))
+        .any(sql.many(filters))
         .map(map(Maybe.fromNullable))
         .mapRejected(
-          toDbError({
-            request: 'transactions.massTransfer.search',
-            params: filters,
-          })
+          toDbError({ request: 'transactions.lease.mget', params: filters })
         );
     },
   };

@@ -29,7 +29,7 @@ describe('Transfer transaction resolver for one', () => {
   });
   it('returns null for unreal tx', async () => {
     const tx = await service
-      .get('unreal')
+      .get('UNREAL')
       .run()
       .promise();
 

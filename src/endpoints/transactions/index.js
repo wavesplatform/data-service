@@ -11,6 +11,9 @@ const dataMany = require('./data/many');
 const transferOne = require('./transfer/one');
 const transferMany = require('./transfer/many');
 
+const leaseOne = require('./lease/one');
+const leaseMany = require('./lease/many');
+
 const massTransferOne = require('./massTransfer/one');
 const massTransferSearch = require('./massTransfer/search');
 
@@ -27,6 +30,10 @@ subrouter.post('/transactions/data', postToGet(dataMany));
 subrouter.get('/transactions/transfer/:id', transferOne);
 subrouter.get('/transactions/transfer', transferMany);
 subrouter.post('/transactions/transfer', postToGet(transferMany));
+
+subrouter.get('/transactions/lease/:id', leaseOne);
+subrouter.get('/transactions/lease', leaseMany);
+subrouter.post('/transactions/lease', postToGet(leaseMany));
 
 subrouter.get('/transactions/mass-transfer/:id', massTransferOne);
 subrouter.get('/transactions/mass-transfer', massTransferSearch);
