@@ -5,7 +5,7 @@ const Maybe = require('folktale/maybe');
 const createAdapter = ({ taskedDbDriver: dbT, errorFactory, sql }) => ({
   one(x) {
     return dbT
-      .oneOrNone(sql.build.transactions.exchange.one(x))
+      .oneOrNone(sql.transactions.exchange.one(x))
       .map(Maybe.fromNullable)
       .mapRejected(
         errorFactory({ request: 'transactions.exchange.one', params: x })
@@ -18,7 +18,7 @@ const createAdapter = ({ taskedDbDriver: dbT, errorFactory, sql }) => ({
     const filtersModified = withDefaults(filters);
 
     return dbT
-      .any(sql.build.transactions.exchange.many(filtersModified))
+      .any(sql.transactions.exchange.many(filtersModified))
       .map(map(Maybe.fromNullable))
       .mapRejected(
         errorFactory({

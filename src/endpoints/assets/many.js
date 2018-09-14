@@ -1,4 +1,4 @@
-const { many: createResolver } = require('../../resolvers/assets');
+const createService = require('../../services/assets');
 const { select } = require('../utils/selectors');
 const { captureErrors } = require('../../utils/captureErrors');
 
@@ -9,12 +9,14 @@ const assetsResolver = async ctx => {
     url: ctx.originalUrl,
     resolver: 'assets',
   });
-  const resolver = createResolver({
-    db: ctx.state.db,
+
+  const service = createService({
+    drivers: ctx.state.drivers,
     emitEvent: ctx.eventBus.emit,
   });
 
-  const assets = await resolver(ids)
+  const assets = await service
+    .mget(ids)
     .run()
     .promise();
 

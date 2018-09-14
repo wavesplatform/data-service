@@ -7,7 +7,7 @@ const transformResult = require('./transformResult');
 const createAdapter = ({ taskedDbDriver: dbT, errorFactory, sql }) => ({
   one(x) {
     return dbT
-      .any(sql.build.transactions.data.one(x))
+      .any(sql.transactions.data.one(x))
       .map(transformResult)
       .map(head)
       .map(Maybe.fromNullable)
@@ -18,7 +18,7 @@ const createAdapter = ({ taskedDbDriver: dbT, errorFactory, sql }) => ({
 
   many(filters) {
     return dbT
-      .any(sql.build.transactions.data.many(filters))
+      .any(sql.transactions.data.many(filters))
       .map(transformResult)
       .map(map(Maybe.fromNullable))
       .mapRejected(
