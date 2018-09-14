@@ -1,10 +1,10 @@
-const createService = require('../');
-const { createPgDriver } = require('../../../../db/');
+const createService = require('..');
+const { createPgDriver } = require('../../../../db');
 const { parseDate } = require('../../../../utils/parseDate');
 const Cursor = require('../../../../resolvers/pagination/cursor');
 
 const YESTERDAY = new Date(Date.now() - 60 * 60 * 24 * 1000);
-const TX_ID = 'GN5SSawWUwodvAcHV2d96pe7HgFqvxoEAU9FCW9MUphE';
+const TX_ID = '9oQDeqq23NuaXmGu3o635QKrZbXizZsiTbagmDzkdUaa';
 
 const loadConfig = require('../../../../loadConfig');
 const options = loadConfig();
@@ -18,7 +18,7 @@ const service = createService({
   emitEvent: () => () => null,
 });
 
-describe('Transfer transaction resolver for one', () => {
+describe('leaseCancel transaction resolver for one', () => {
   it('fetches real tx', async done => {
     service
       .get(TX_ID)
@@ -39,7 +39,7 @@ describe('Transfer transaction resolver for one', () => {
     expect(tx).toBe(null);
   });
 });
-describe('Transfer transaction resolver for many', () => {
+describe('leaseCancel transaction resolver for many', () => {
   it('fetches real tx', async () => {
     const tx = await service
       .search({
@@ -173,57 +173,6 @@ describe('Transfer transaction resolver for many', () => {
       expect(cursors).toEqual(expectedCursors);
     });
   });
-
-  it('fails if timeEnd < 0', done =>
-    service
-      .search({
-        timeEnd: parseDate('-1525132900000'),
-      })
-      .run()
-      .promise()
-      .then(() => done('Wrong branch, error'))
-      .catch(e => {
-        expect(e.type).toBe('ValidationError');
-        done();
-      }));
-  it('fails if timeStart < 0', done =>
-    service
-      .search({
-        timeEnd: parseDate('1525132900000'),
-        timeStart: parseDate('-1525132800000'),
-      })
-      .run()
-      .promise()
-      .then(() => done('Wrong branch, error'))
-      .catch(e => {
-        expect(e.type).toBe('ValidationError');
-        done();
-      }));
-  it('fails if timeEnd < timeStart', done =>
-    service
-      .search({
-        timeEnd: parseDate('1525132700000'),
-        timeStart: parseDate('1525132800000'),
-      })
-      .run()
-      .promise()
-      .then(() => done('Wrong branch, error'))
-      .catch(e => {
-        expect(e.type).toBe('ValidationError');
-        done();
-      }));
-  it('fails if timeStart->invalid Date', done =>
-    service
-      .search({
-        timeStart: parseDate(''),
-      })
-      .run()
-      .promise()
-      .then(() => done('Wrong branch, error'))
-      .catch(e => {
-        expect(e.type).toBe('ValidationError');
-        done();
-      }));
 
   it('doesnt try to create a cursor for empty response', done =>
     service
