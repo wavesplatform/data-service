@@ -6,7 +6,7 @@ const Maybe = require('folktale/maybe');
 const request = {
   sort: 'asc',
 };
-describe('Transfer transactions transformResult function', () => {
+describe('Lease transactions transformResult function', () => {
   it('works for one', () => {
     expect(transformResultsOne(Maybe.Just(txRaw))).toMatchSnapshot();
   });
