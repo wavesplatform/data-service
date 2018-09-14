@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Lease transaction resolver for one fetches real tx 1`] = `
+Object {
+  "__type": "transaction",
+  "data": Object {
+    "amount": "107.05754895",
+    "fee": "0.001",
+    "height": 600887,
+    "id": "2rdiawoYXnwVieRgTkESYKAKwcRrnLZQ4abmC9JQSj7n",
+    "recipient": "3P2HNUd5VUPLMQkJmctTPEeeHumiPN2GkTb",
+    "sender": "3PMY5XbSpvcQnYNCMiLWAaHuTwQwN6sSoy4",
+    "senderPublicKey": "AiXERNpnVgGM25Au55kfcz39K9FUoysqD5nCSpew4MYo",
+    "signature": "5CVsdA6Weyx28MyGAQoFD8HdSBMmop3RQJvGv8w4k2axRyJ4f76oV4vWoCoV31B4Dv2dRcSfG6N88AzszccH9xV",
+    "timestamp": 2017-07-29T02:22:01.407Z,
+    "type": 8,
+    "version": 1,
+  },
+}
+`;

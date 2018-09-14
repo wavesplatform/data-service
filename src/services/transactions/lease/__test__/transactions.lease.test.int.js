@@ -24,7 +24,10 @@ describe('Lease transaction resolver for one', () => {
       .get(TX_ID)
       .run()
       .promise()
-      .then(() => done())
+      .then(x => {
+        expect(x).toMatchSnapshot();
+        done();
+      })
       .catch(e => done(JSON.stringify(e)));
   });
   it('returns null for unreal tx', async () => {

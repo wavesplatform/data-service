@@ -16,7 +16,7 @@ const resolverSearch = createResolver.search({
   emitEvent: () => () => null,
 });
 
-describe('Lease txs resolver validation', () => {
+describe('LeaseCancel txs resolver validation', () => {
   const assertValidationError = (done, r, v) =>
     r(v)
       .run()
@@ -37,15 +37,15 @@ describe('Lease txs resolver validation', () => {
       });
 
   describe('one', () => {
-    it('fails if /lease/{id} param is not provided', done =>
+    it('fails if /lease-cancel/{id} param is not provided', done =>
       assertValidationError(done, resolverOne));
-    it('fails if /lease/{id} param is not a string', done => {
+    it('fails if /lease-cancel/{id} param is not a string', done => {
       assertValidationError(done, resolverOne, null);
       assertValidationError(done, resolverOne, 1);
       assertValidationError(done, resolverOne, {});
       assertValidationError(done, resolverOne, []);
     });
-    it('passes if /lease/{id} param is a string', done =>
+    it('passes if /lease-cancel/{id} param is a string', done =>
       assertValidationPass(done, resolverOne, 'someidgoeshere2942415'));
   });
 

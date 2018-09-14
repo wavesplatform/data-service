@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MassTransfer transaction resolver for one fetches real tx 1`] = `
+Object {
+  "__type": "transaction",
+  "data": Object {
+    "assetId": "34ecwKB4JaZGKqYr9A986PFAEQ8zUhYoN4BZzM2tjaa8",
+    "attachment": "",
+    "fee": "0.0015",
+    "height": 1032978,
+    "id": "11ADYBQgLqK8GBpd8XRWVvHm3ZRFttq4T3NF3AjBijs",
+    "proofs": Array [
+      "5WxAcj6bybBfB8DixEgZUdJeVHY3y6m5Esj7wyZsGHK5ouz7sByPrQccAjPrivepvwDVNZuLF5sdk5E59FhoPTET",
+    ],
+    "sender": "3PJcFj7wVZkPMpzCRADRLW83m2Bw72MiLGv",
+    "senderPublicKey": "8kUYR2VMpZr95wxckvPbq4tXc3XA9Bmid8x6UTFSEisF",
+    "timestamp": 2018-06-08T05:35:51.280Z,
+    "transfers": Array [
+      Object {
+        "amount": "1000",
+        "recipient": "3P72LKkW8YZdzrairWfkk2r5JmnfVxApEGS",
+      },
+    ],
+    "type": 11,
+    "version": 1,
+  },
+}
+`;
