@@ -1,0 +1,52 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`transformTxInfo for exchange tx should correctly transform fields 1`] = `
+Object {
+  "amount": "1",
+  "buyMatcherFee": "1",
+  "fee": "1",
+  "height": 809923,
+  "id": "8rEwYY4wQ4bkEkk95EiyeQnvnonX6TAnU6eiBAbVSADk",
+  "order1": Object {
+    "amount": "1",
+    "assetPair": Object {
+      "amountAsset": "BkFyeRdrLquxds5FenxyonyfTwMVJJ6o6L7VTaPr5fs3",
+      "priceAsset": "WAVES",
+    },
+    "expiration": 2018-01-14T13:39:07.000Z,
+    "id": "7tBBYWEQN6BKTAxKMTnwfyyQMzowoukhQd2gbeG8iv4G",
+    "matcherFee": "1",
+    "matcherPublicKey": "7kPFrHDiGw1rCm7LPszuECwWYL3dMf6iMifLRDJQZMzy",
+    "orderType": "buy",
+    "price": "1",
+    "sender": "3PMqzPmPv42PmqsgCgVkUUjWqMpdHxmCmEM",
+    "senderPublicKey": "FqbiFJELWU8c3iSUEtqhtfRymQPU36FjvdEqSoJVCLFc",
+    "signature": "v3m2vPv6vAj2fzKAoJaPUKRJ3fezqeNUtne981h7gtyxu4ngrSW8sPr3KroZ9NFXza5hNsLzR9WUVYN7R264Vy8",
+    "timestamp": 2017-12-25T13:39:07.000Z,
+  },
+  "order2": Object {
+    "amount": "1",
+    "assetPair": Object {
+      "amountAsset": "BkFyeRdrLquxds5FenxyonyfTwMVJJ6o6L7VTaPr5fs3",
+      "priceAsset": "WAVES",
+    },
+    "expiration": 2018-01-15T09:32:28.000Z,
+    "id": "8JrPB7xdUJeDrjv1ea61qWiLSpPdpjgr6YVi9tmd8aTD",
+    "matcherFee": "1",
+    "matcherPublicKey": "7kPFrHDiGw1rCm7LPszuECwWYL3dMf6iMifLRDJQZMzy",
+    "orderType": "sell",
+    "price": "1",
+    "sender": "3PPAy5ivY9hvDerSZLyRmg3nVo5nKvMJrqV",
+    "senderPublicKey": "5Z8ELnG9f1XSJWPtpoBADApw5PQ1P5USvFnvk1HQW33h",
+    "signature": "62KNwbcfd5jJ3GDYsFxBDHR9SJXpiz9mcERkK7qNrVx4PTChYSoHycp1NNrNe7Hyy2RmtRcyDZtdHL8S5mKznqJN",
+    "timestamp": 2017-12-26T09:32:28.000Z,
+  },
+  "price": "1",
+  "sellMatcherFee": "1",
+  "sender": "3PJaDyprvekvPXPuAtxrapacuDJopgJRaU3",
+  "senderPublicKey": "7kPFrHDiGw1rCm7LPszuECwWYL3dMf6iMifLRDJQZMzy",
+  "signature": "N6p6eqNP8875kd8m3KxwH6MD7RUFA9epdShxSjPJt7YqKa8qF2K9UD2SGNERY9GdfMABRX2KBn1bCdHJym9wBHP",
+  "timestamp": 2017-12-26T09:32:29.000Z,
+  "type": 7,
+}
+`;

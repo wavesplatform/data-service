@@ -7,16 +7,15 @@ const commonQuery = pipe(
   renameFields,
   withDecimals
 );
-// one — get by id
-// many — apply filters
+
 module.exports = ({ filters: F }) => ({
-  one: id =>
+  get: id =>
     pipe(
       F.id(id),
       commonQuery,
       String
     )(select),
-  many: fValues => {
+  search: fValues => {
     const order = [
       'limit',
       'after',

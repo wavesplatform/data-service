@@ -1,5 +1,8 @@
-const { BigNumber } = require('@waves/data-entities');
 const Joi = require('joi');
+const { BigNumber } = require('@waves/data-entities');
+
+const commonFilters = require('../../presets/pg/searchWithPagination/commonFilterSchemas');
+
 const orderTypes = prefix => ({
   [`${prefix}_id`]: Joi.string().required(),
   [`${prefix}_type`]: Joi.string().required(),
@@ -23,7 +26,7 @@ const orderTypes = prefix => ({
     .required(),
 });
 
-const output = Joi.object().keys({
+const result = Joi.object().keys({
   tx_id: Joi.string().required(),
   tx_signature: Joi.string().required(),
   tx_price_asset: Joi.string().required(),
@@ -57,4 +60,14 @@ const output = Joi.object().keys({
   ...orderTypes('o2'),
 });
 
-module.exports = { output };
+const inputSearch = Joi.object()
+  .keys({
+    ...commonFilters,
+    matcher: Joi.string(),
+    sender: Joi.string(),
+    amountAsset: Joi.string(),
+    priceAsset: Joi.string(),
+  })
+  .required();
+
+module.exports = { result, inputSearch };

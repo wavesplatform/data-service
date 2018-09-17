@@ -1,5 +1,5 @@
 /** transformTx:: RawTxInfo -> TxInfo */
-const transformTx = tx => {
+const transformTxInfo = tx => {
   const {
     tx_id,
     tx_sender,
@@ -64,4 +64,4 @@ const createOrder = prefix => ({
   signature,
 });
 
-module.exports = { transformTx };
+module.exports = transformTxInfo;
