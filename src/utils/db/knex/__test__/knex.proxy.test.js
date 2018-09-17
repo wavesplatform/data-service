@@ -1,11 +1,6 @@
-const {
-  where,
-  orWhere,
-  hasMethod,
-  limit,
-} = require('../../sql/utils/knex/lib');
+const { where, orWhere, hasMethod, limit } = require('../lib');
 
-const { create: createProxy } = require('../../../utils/test/proxy');
+const { create: createProxy } = require('../../../test/proxy');
 
 const knexMock = {
   clone() {

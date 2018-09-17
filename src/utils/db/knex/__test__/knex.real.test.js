@@ -1,5 +1,5 @@
 const pg = require('knex')({ client: 'pg' });
-const { where, orWhere, hasMethod } = require('../../sql/utils/knex/lib');
+const { where, orWhere, hasMethod } = require('../lib');
 
 const { curryN, compose } = require('ramda');
 

@@ -1,4 +1,4 @@
-const { where, limit } = require('../../../../../../db/sql/utils/knex');
+const { where, limit } = require('../../../../../..//utils/db/knex');
 const { selectIdsWhereRecipient } = require('./query');
 
 const recipient = rec => q =>

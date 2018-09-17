@@ -1,6 +1,6 @@
 const { curry } = require('ramda');
 
-const { where, limit, orderBy } = require('../../utils/knex');
+const { where, limit, orderBy } = require('../../../../utils/db/knex');
 
 const after = ({ timestamp, id, sortDirection }) => q => {
   const comparator = sortDirection === 'desc' ? '<' : '>';
