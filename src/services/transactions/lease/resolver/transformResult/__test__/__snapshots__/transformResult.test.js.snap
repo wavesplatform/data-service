@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Transfer transactions transformResult function works for many 1`] = `
+exports[`Lease transactions transformResult function works for many 1`] = `
 Object {
   "__type": "list",
   "data": Array [
@@ -61,7 +61,7 @@ Object {
 }
 `;
 
-exports[`Transfer transactions transformResult function works for one 1`] = `
+exports[`Lease transactions transformResult function works for one 1`] = `
 Object {
   "__type": "transaction",
   "data": Object {
