@@ -1,6 +1,4 @@
-const { transformTxInfo } = require('./common');
-
-const { Transaction } = require('../../../../../types');
+const { Transaction } = require('../../../../types');
 
 const { compose, map } = require('ramda');
 
@@ -11,9 +9,10 @@ const txOrNull = maybeTx =>
   });
 
 /** transformResults :: Maybe RawTxInfo -> Transaction | null */
-const transformResults = compose(
-  txOrNull,
-  map(transformTxInfo)
-);
+const transformResults = transformTxInfo =>
+  compose(
+    txOrNull,
+    map(transformTxInfo)
+  );
 
 module.exports = transformResults;

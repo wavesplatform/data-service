@@ -19,4 +19,4 @@ const transformTxInfo = compose(
   })
 );
 
-module.exports = { transformTxInfo };
+module.exports = transformTxInfo;
