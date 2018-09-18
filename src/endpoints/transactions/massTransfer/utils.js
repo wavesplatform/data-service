@@ -14,7 +14,7 @@ const selectFilters = ({
   reject(isNil, {
     timeStart: timeStart && parseDate(timeStart),
     timeEnd: timeEnd && parseDate(timeEnd),
-    limit,
+    limit: parseInt(limit),
     sort,
     sender,
     after,

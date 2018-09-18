@@ -37,7 +37,7 @@ const input = Joi.object()
     sender: Joi.string(),
     key: Joi.string(),
     type: CORRECT_TYPE,
-    value: [BIGNUMBER, Joi.string().allow(''), Joi.boolean(), Joi.number()],
+    value: [BIGNUMBER, Joi.string().allow(''), Joi.boolean()],
   })
   .with('value', 'type')
   .required();
