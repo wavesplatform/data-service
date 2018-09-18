@@ -2,7 +2,7 @@ const transformTxInfo = require('./transformTxInfo');
 
 const txRaw = {
   tx_type: 8,
-  tx_version: null,
+  tx_version: 1,
   time_stamp: new Date('2017-07-29 05:22:01.407000'),
   signature:
     '5CVsdA6Weyx28MyGAQoFD8HdSBMmop3RQJvGv8w4k2axRyJ4f76oV4vWoCoV31B4Dv2dRcSfG6N88AzszccH9xV',
@@ -23,9 +23,20 @@ describe('Common transactions info transform', () => {
   it('handles proofs/signature', () => {
     expect(tx).toHaveProperty('signature');
     expect(tx).not.toHaveProperty('proofs');
+
+    const txWithProofs = transformTxInfo({
+      ...txRaw,
+      signature: null,
+      proofs: [
+        '5CVsdA6Weyx28MyGAQoFD8HdSBMmop3RQJvGv8w4k2axRyJ4f76oV4vWoCoV31B4Dv2dRcSfG6N88AzszccH9xV',
+      ],
+    });
+    expect(txWithProofs).not.toHaveProperty('signature');
+    expect(txWithProofs).toHaveProperty('proofs');
   });
 
-  it('if tx version is null substitutes it with 1', () => {
-    expect(tx.version).toBe(1);
+  it('if tx version is null removes it', () => {
+    const txVersionNull = { ...txRaw, tx_version: null };
+    expect(transformTxInfo(txVersionNull)).not.toHaveProperty('version');
   });
 });
