@@ -1,5 +1,5 @@
 const { renameKeys } = require('ramda-adjunct');
-const { compose, ifElse, propEq, omit } = require('ramda');
+const { compose, ifElse, propEq, omit, defaultTo, evolve } = require('ramda');
 
 const hasEmptyProofs = propEq('proofs', []);
 const processProofsAndSignature = ifElse(
@@ -11,6 +11,7 @@ const processProofsAndSignature = ifElse(
 /** transformTxInfo:: RawTxInfo -> TxInfo */
 const transformTxInfo = compose(
   processProofsAndSignature,
+  evolve({ version: defaultTo(1) }),
   renameKeys({
     tx_type: 'type',
     tx_version: 'version',
