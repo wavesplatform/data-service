@@ -1,8 +1,9 @@
-const createService = require('../');
-const { createPgDriver } = require('../../../../db/');
+const createService = require('..');
+const { createPgDriver } = require('../../../../db');
 const { parseDate } = require('../../../../utils/parseDate');
 const Cursor = require('../../../../resolvers/pagination/cursor');
 
+const YESTERDAY = new Date(Date.now() - 60 * 60 * 24 * 1000);
 const TX_ID = '11ADYBQgLqK8GBpd8XRWVvHm3ZRFttq4T3NF3AjBijs';
 
 const loadConfig = require('../../../../loadConfig');
@@ -17,7 +18,7 @@ const service = createService({
   emitEvent: () => () => null,
 });
 
-describe('MassTransfer transaction resolver for one', () => {
+describe('Lease cancel transaction service get', () => {
   it('fetches real tx', async done => {
     service
       .get(TX_ID)
@@ -38,28 +39,27 @@ describe('MassTransfer transaction resolver for one', () => {
     expect(tx).toBe(null);
   });
 });
-describe('MassTransfer transaction resolver for many', () => {
+describe('Lease cancel transaction service search', () => {
   it('fetches real tx', async () => {
-    const LIMIT = 1;
     const tx = await service
       .search({
-        limit: LIMIT,
+        limit: 20,
+        timeStart: YESTERDAY,
       })
       .run()
       .promise();
     expect(tx).toBeDefined();
-    expect(tx.data).toHaveLength(LIMIT);
+    expect(tx.data).toHaveLength(20);
   });
   describe('Pagination ', async () => {
-    const START = 0;
-    const END = '2018-08-03T23:59:48.000Z';
+    const START = '2018-06-02T10:59:43.000Z';
+    const END = '2018-06-03T23:59:48.000Z';
     const LIMIT = 21;
     const createCursor = sort => ({ data }) => Cursor.encode(sort, data);
-
     it(' doesnt get 2 identical entries for limit 1 asc with next page fetching', async () => {
       const baseParams = {
         limit: 1,
-        timeStart: parseDate(0),
+        timeStart: parseDate('Mon Jun 11 2018 12:34:52 GMT+0300 (MSK)'),
         sort: 'asc',
       };
 

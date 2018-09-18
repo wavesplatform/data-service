@@ -1,9 +1,11 @@
 const Joi = require('joi');
 const { BigNumber } = require('@waves/data-entities');
 
-const { base58 } = require('../../../../../../utils/regex');
+const { base58 } = require('../../../utils/regex');
 
-const output = Joi.object().keys({
+const commonFilters = require('../../presets/pg/searchWithPagination/commonFilterSchemas');
+
+const result = Joi.object().keys({
   height: Joi.number().required(),
   tx_type: Joi.number().required(),
   tx_version: Joi.number()
@@ -44,4 +46,13 @@ const output = Joi.object().keys({
   ),
 });
 
-module.exports = { output };
+const inputSearch = Joi.object()
+  .keys({
+    ...commonFilters,
+    sender: Joi.string(),
+    assetId: Joi.string(),
+    recipient: Joi.string(),
+  })
+  .required();
+
+module.exports = { result, inputSearch };

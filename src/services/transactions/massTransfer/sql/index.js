@@ -6,12 +6,13 @@ const { baseQuery, withTransfersDecimalsAndGrouping } = require('./query');
 // one — get by id
 // search — apply filters
 module.exports = {
-  one: id =>
+  get: id =>
     pipe(
       F.id(id),
       withTransfersDecimalsAndGrouping,
       String
     )(baseQuery),
+
   search: fValues => {
     const defaultValues = { limit: 100, sort: 'desc' };
     // { [fName]: fValue }

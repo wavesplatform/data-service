@@ -8,7 +8,7 @@ const filters = {
   limit: 1,
 };
 describe('Sql builder', () => {
-  describe(' many', () => {
+  describe('search', () => {
     it('covers case with all filters (without after)', () => {
       expect(sql.search(filters)).toMatchSnapshot();
     });
@@ -25,9 +25,9 @@ describe('Sql builder', () => {
       ).toMatchSnapshot();
     });
   });
-  describe(' one', () => {
+  describe(' get', () => {
     it('works', () => {
-      expect(sql.one('id')).toMatchSnapshot();
+      expect(sql.get('id')).toMatchSnapshot();
     });
   });
 });
