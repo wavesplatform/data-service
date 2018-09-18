@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Lease cancel transaction service get fetches real tx 1`] = `
+exports[`Mass transfer transaction service get fetches real tx 1`] = `
 Object {
   "__type": "transaction",
   "data": Object {

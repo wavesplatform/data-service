@@ -6,13 +6,14 @@ const commonQuery = require('./query');
 // one — get by id
 // many — apply filters
 module.exports = {
-  one: id =>
+  get: id =>
     pipe(
       q => q.clone(),
       F.id(id),
       String
     )(commonQuery),
-  many: fValues => {
+
+  search: fValues => {
     const order = [
       'id',
       'assetId',
