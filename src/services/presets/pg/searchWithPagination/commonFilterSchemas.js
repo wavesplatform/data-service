@@ -30,6 +30,6 @@ module.exports = {
     .min(1)
     .max(100)
     .required(),
-  sort: Joi.string().allow('asc', 'desc'),
+  sort: Joi.string().valid('asc', 'desc'),
   after: Joi.cursor().valid(),
 };
