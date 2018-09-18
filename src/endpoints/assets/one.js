@@ -1,4 +1,4 @@
-const { one: createResolver } = require('../../resolvers/assets');
+const createService = require('../../services/assets');
 const { select } = require('../utils/selectors');
 const { captureErrors } = require('../../utils/captureErrors');
 
@@ -8,12 +8,14 @@ const assetResolver = async ctx => {
     url: ctx.originalUrl,
     resolver: 'assets',
   });
-  const resolver = createResolver({
-    db: ctx.state.db,
+
+  const service = createService({
+    drivers: ctx.state.drivers,
     emitEvent: ctx.eventBus.emit,
   });
 
-  const asset = await resolver(id)
+  const asset = await service
+    .get(id)
     .run()
     .promise();
 

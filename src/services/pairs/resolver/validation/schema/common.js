@@ -1,14 +1,14 @@
 const Joi = require('joi');
 const { BigNumber } = require('@waves/data-entities');
 
-const assetsIdRegex = /[0-9A-Za-z]+/;
+const { base58 } = require('../../../../../utils/regex');
 
 const pairInput = Joi.object().keys({
   amountAsset: Joi.string()
-    .regex(assetsIdRegex)
+    .regex(base58)
     .required(),
   priceAsset: Joi.string()
-    .regex(assetsIdRegex)
+    .regex(base58)
     .required(),
 });
 

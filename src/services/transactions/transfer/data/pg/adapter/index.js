@@ -15,12 +15,12 @@ const createPgAdapter = ({ pg, sql }) => {
         );
     },
 
-    // /** mget :: filters -> Task (Maybe Result)[] AppError.Db */
+    // /** search :: filters -> Task (Maybe Result)[] AppError.Db */
     search(filters) {
       return pg
         .any(sql.many(filters))
         .map(map(Maybe.fromNullable))
-        .mapRejected(toDbError({ request: 'pairs.mget', params: filters }));
+        .mapRejected(toDbError({ request: 'transactions.transfer.mget', params: filters }));
     },
   };
 };

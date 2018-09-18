@@ -8,7 +8,7 @@ const createDbAdapter = ({ taskedDbDriver: dbT, errorFactory, sql }) => {
     /** aliases.one :: Alias -> Task (Maybe Result) AppError.Db */
     one(alias) {
       return dbT
-        .oneOrNone(sql.build.aliases.one(alias))
+        .oneOrNone(sql.aliases.one(alias))
         .map(Maybe.fromNullable)
         .map(map(transformResults))
         .mapRejected(errorFactory({ request: 'aliases.one', params: alias }));
@@ -17,7 +17,7 @@ const createDbAdapter = ({ taskedDbDriver: dbT, errorFactory, sql }) => {
     // /** aliases.many :: Filters -> Task (Maybe Result)[] AppError.Db */
     many(filters) {
       return dbT
-        .any(sql.build.aliases.many(filters))
+        .any(sql.aliases.many(filters))
         .map(map(transformResults))
         .map(map(Maybe.fromNullable))
         .mapRejected(
