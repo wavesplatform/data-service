@@ -38,11 +38,10 @@ module.exports = ({ filters: F }) => ({
       merge(defaultValues)
     )(fValues);
 
-    // const limit = fValues.limit || defaultValues.limit;
-
-    const withValueF = withDefaults.value
-      ? assoc('value', F.value(withDefaults.type), F)
-      : F;
+    const withValueF =
+      withDefaults.value !== undefined
+        ? assoc('value', F.value(withDefaults.type), F)
+        : F;
 
     const fs = pickBindFilters(withValueF, fNames, withDefaults);
     const fQuery = pipe(...fs)(fSelect);
