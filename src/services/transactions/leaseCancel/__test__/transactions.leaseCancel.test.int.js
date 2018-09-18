@@ -18,7 +18,7 @@ const service = createService({
   emitEvent: () => () => null,
 });
 
-describe('leaseCancel transaction resolver for one', () => {
+describe('Lease cancel transaction service get', () => {
   it('fetches real tx', async done => {
     service
       .get(TX_ID)
@@ -39,7 +39,7 @@ describe('leaseCancel transaction resolver for one', () => {
     expect(tx).toBe(null);
   });
 });
-describe('leaseCancel transaction resolver for many', () => {
+describe('Lease cancel transaction service search', () => {
   it('fetches real tx', async () => {
     const tx = await service
       .search({

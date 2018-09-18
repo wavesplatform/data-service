@@ -1,4 +1,4 @@
-const { where, limit } = require('../../../../../..//utils/db/knex');
+const { where, limit } = require('../../../../utils/db/knex');
 
 const id = where('id');
 const sender = where('sender');

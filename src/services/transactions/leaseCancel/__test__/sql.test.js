@@ -8,16 +8,13 @@ const filters = {
   limit: 1,
 };
 describe('Sql builder', () => {
-  describe(' many', () => {
-    it('covers recipient filter case (looking in txs_8)', () => {
-      expect(sql.many({ recipient: 'recipient' })).toMatchSnapshot();
-    });
+  describe('search', () => {
     it('covers case with all filters (without after)', () => {
-      expect(sql.many(filters)).toMatchSnapshot();
+      expect(sql.search(filters)).toMatchSnapshot();
     });
     it('covers case with all filters with after', () => {
       expect(
-        sql.many({
+        sql.search({
           ...filters,
           after: {
             timestamp: 'timestamp',
@@ -28,9 +25,9 @@ describe('Sql builder', () => {
       ).toMatchSnapshot();
     });
   });
-  describe(' one', () => {
+  describe(' get', () => {
     it('works', () => {
-      expect(sql.one('id')).toMatchSnapshot();
+      expect(sql.get('id')).toMatchSnapshot();
     });
   });
 });
