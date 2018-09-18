@@ -4,7 +4,7 @@ const { parseDate } = require('../../../../utils/parseDate');
 const Cursor = require('../../../../resolvers/pagination/cursor');
 
 const YESTERDAY = new Date(Date.now() - 60 * 60 * 24 * 1000);
-const TX_ID = 'FU5mCVTaa83TPMx4fj1F7bL6ZAfpMKcPpDDvhvxCD557';
+const TX_ID = 'AkM4bQ5dVkqWezSgMPdW5iieX98xDsiFjVDbEddntGNv';
 
 const loadConfig = require('../../../../loadConfig');
 const options = loadConfig();
@@ -18,7 +18,7 @@ const service = createService({
   emitEvent: () => () => null,
 });
 
-describe('Exchange transaction service get', () => {
+describe('Data transaction service get', () => {
   it('fetches real tx', async done => {
     service
       .get(TX_ID)
@@ -39,7 +39,8 @@ describe('Exchange transaction service get', () => {
     expect(tx).toBe(null);
   });
 });
-describe('Exchange transaction service search', () => {
+
+describe('Data transaction service search', () => {
   it('fetches real tx', async () => {
     const tx = await service
       .search({
@@ -51,10 +52,9 @@ describe('Exchange transaction service search', () => {
     expect(tx).toBeDefined();
     expect(tx.data).toHaveLength(20);
   });
-  
   describe('Pagination ', async () => {
-    const START = '2018-06-02T10:59:43.000Z';
-    const END = '2018-06-03T23:59:48.000Z';
+    const START = '2018-06-28T05:12:41.449Z';
+    const END = '2018-07-20T19:48:06.665Z';
     const LIMIT = 21;
     const createCursor = sort => ({ data }) => Cursor.encode(sort, data);
     it(' doesnt get 2 identical entries for limit 1 asc with next page fetching', async () => {

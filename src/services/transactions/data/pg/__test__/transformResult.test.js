@@ -1,4 +1,4 @@
-const transformResult = require('./transformResult');
+const transformResult = require('../transformResult');
 
 const before = [
   {

@@ -16,7 +16,7 @@ module.exports = ({
   createResolver.search({
     transformInput,
     transformResult: transformResultFn(transformResult),
-    validateInput: validateInput(inputSchema),
-    validateResult: validateResult(resultSchema),
+    validateInput: validateInput(inputSchema, name),
+    validateResult: validateResult(resultSchema, name),
     dbQuery: getData({ name, sql }),
   })({ db: pg, emitEvent });

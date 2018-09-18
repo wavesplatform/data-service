@@ -1,19 +1,19 @@
 const { compose, merge, pick, pipe, assoc } = require('ramda');
 
 const { select, fSelect, composeQuery } = require('./query');
-const { pickBindFilters } = require('../../utils');
+const { pickBindFilters } = require('../../../../../utils/db');
 
 // one — get by id
 // many — apply filters
 module.exports = ({ filters: F }) => ({
-  one: id =>
+  get: id =>
     pipe(
       F.id(id),
       F.sortByDataPosition,
       String
     )(select),
 
-  many: (fValues = {}) => {
+  search: (fValues = {}) => {
     const defaultValues = { limit: 100, sort: 'desc' };
 
     // no `limit` here, will apply it separately

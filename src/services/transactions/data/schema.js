@@ -1,6 +1,8 @@
 const { BigNumber } = require('@waves/data-entities');
 const Joi = require('joi');
 
+const commonFilters = require('../../presets/pg/searchWithPagination/commonFilterSchemas');
+
 const BIGNUMBER = Joi.object()
   .type(BigNumber)
   .required();
@@ -12,7 +14,7 @@ const CORRECT_TYPE = Joi.string().valid([
   'binary',
 ]);
 
-const output = Joi.object().keys({
+const result = Joi.object().keys({
   tx_type: Joi.number().required(),
   tx_version: Joi.number(),
   height: Joi.number().required(),
@@ -38,4 +40,15 @@ const output = Joi.object().keys({
   ),
 });
 
-module.exports = { output, CORRECT_TYPE, BIGNUMBER };
+const inputSearch = Joi.object()
+  .keys({
+    ...commonFilters,
+    sender: Joi.string(),
+    key: Joi.string(),
+    type: CORRECT_TYPE,
+    value: [BIGNUMBER, Joi.string().allow(''), Joi.boolean(), Joi.number()],
+  })
+  .with('value', 'type')
+  .required();
+
+module.exports = { result, inputSearch };

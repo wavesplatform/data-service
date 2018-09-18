@@ -14,7 +14,7 @@ module.exports = ({ name, sql, resultSchema, transformResult }) => ({
   createResolver.get({
     transformInput: identity,
     transformResult: transformResultFn(transformResult),
-    validateInput: validateInput(input),
-    validateResult: validateResult(resultSchema),
+    validateInput: validateInput(input, name),
+    validateResult: validateResult(resultSchema, name),
     dbQuery: getData({ name, sql }),
   })({ db: pg, emitEvent });
