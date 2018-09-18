@@ -1,4 +1,4 @@
-const parseBool = require('./parseBool');
+const { parseBool } = require('./parseBool');
 
 describe('parseBool should correctly parse', () => {
   it('boolean values', () => {
@@ -7,6 +7,7 @@ describe('parseBool should correctly parse', () => {
   });
 
   it('falsy string values', () => {
+    expect(parseBool('')).toEqual(false);
     expect(parseBool('false')).toEqual(false);
     expect(parseBool('FALSE')).toEqual(false);
     expect(parseBool('False')).toEqual(false);
