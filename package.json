@@ -7,7 +7,7 @@
   "author": "Dmitry Shuranov <dvshur@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "export $(cat variables.env | xargs) && nodemon index.js",
+    "start": "export $(cat variables.env | xargs) && NODE_ENV=production node src/index.js",
     "lint": "eslint src",
     "dev": "export $(cat variables.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect",
     "dev:t": "export $(cat variables.testnet.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect",
