@@ -1,4 +1,4 @@
-const Joi = require('joi');
+const Joi = require('../../../utils/validation/joi');
 const { BigNumber } = require('@waves/data-entities');
 
 const commonFilters = require('../../presets/pg/searchWithPagination/commonFilterSchemas');
@@ -10,13 +10,13 @@ const orderTypes = prefix => ({
   [`${prefix}_sender_public_key`]: Joi.string().required(),
   [`${prefix}_signature`]: Joi.string().required(),
   [`${prefix}_matcher_fee`]: Joi.object()
-    .type(BigNumber)
+    .bignumber()
     .required(),
   [`${prefix}_price`]: Joi.object()
-    .type(BigNumber)
+    .bignumber()
     .required(),
   [`${prefix}_amount`]: Joi.object()
-    .type(BigNumber)
+    .bignumber()
     .required(),
   [`${prefix}_time_stamp`]: Joi.object()
     .type(Date)
@@ -37,23 +37,23 @@ const result = Joi.object().keys({
     .required(),
 
   tx_price: Joi.object()
-    .type(BigNumber)
+    .bignumber()
     .required(),
   tx_fee: Joi.object()
-    .type(BigNumber)
+    .bignumber()
     .required(),
   tx_amount: Joi.object()
-    .type(BigNumber)
+    .bignumber()
     .required(),
   tx_height: Joi.number(),
 
   tx_sender: Joi.string().required(),
   tx_sender_public_key: Joi.string().required(),
   tx_buy_matcher_fee: Joi.object()
-    .type(BigNumber)
+    .bignumber()
     .required(),
   tx_sell_matcher_fee: Joi.object()
-    .type(BigNumber)
+    .bignumber()
     .required(),
 
   ...orderTypes('o1'),
@@ -65,8 +65,8 @@ const inputSearch = Joi.object()
     ...commonFilters,
     matcher: Joi.string(),
     sender: Joi.string(),
-    amountAsset: Joi.string(),
-    priceAsset: Joi.string(),
+    amountAsset: Joi.string().base58(),
+    priceAsset: Joi.string().base58(),
   })
   .required();
 

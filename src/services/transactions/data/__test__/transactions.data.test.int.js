@@ -3,7 +3,6 @@ const { createPgDriver } = require('../../../../db');
 const { parseDate } = require('../../../../utils/parseDate');
 const Cursor = require('../../../../resolvers/pagination/cursor');
 
-const YESTERDAY = new Date(Date.now() - 60 * 60 * 24 * 1000);
 const TX_ID = 'AkM4bQ5dVkqWezSgMPdW5iieX98xDsiFjVDbEddntGNv';
 
 const loadConfig = require('../../../../loadConfig');
@@ -41,11 +40,10 @@ describe('Data transaction service get', () => {
 });
 
 describe('Data transaction service search', () => {
-  it('fetches real tx', async () => {
+  it('fetches real txs', async () => {
     const tx = await service
       .search({
         limit: 20,
-        timeStart: YESTERDAY,
       })
       .run()
       .promise();

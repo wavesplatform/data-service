@@ -40,17 +40,18 @@ describe('Transfer transaction service get', () => {
   });
 });
 describe('Transfer transaction service search', () => {
-  it('fetches real tx', async () => {
-    const tx = await service
-      .search({
-        limit: 20,
-        timeStart: YESTERDAY,
-      })
-      .run()
-      .promise();
-    expect(tx).toBeDefined();
-    expect(tx.data).toHaveLength(20);
-  }, 10000);
+  it(
+    'fetches real tx',
+    async () => {
+      const tx = await service
+        .search({ limit: 20 })
+        .run()
+        .promise();
+      expect(tx).toBeDefined();
+      expect(tx.data).toHaveLength(20);
+    },
+    10000
+  );
   describe('Pagination ', async () => {
     const START = '2018-06-02T10:59:43.000Z';
     const END = '2018-06-03T23:59:48.000Z';

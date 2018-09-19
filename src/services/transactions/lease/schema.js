@@ -1,7 +1,4 @@
-const Joi = require('joi');
-const { BigNumber } = require('@waves/data-entities');
-
-const { base58 } = require('../../../utils/regex');
+const Joi = require('../../../utils/validation/joi');
 
 const commonFilters = require('../../presets/pg/searchWithPagination/commonFilterSchemas');
 
@@ -12,13 +9,12 @@ const result = Joi.object().keys({
     .required()
     .allow(null),
   fee: Joi.object()
-    .type(BigNumber)
+    .bignumber()
     .required(),
   amount: Joi.object()
-    .type(BigNumber)
+    .bignumber()
     .required(),
   time_stamp: Joi.date().required(),
-
   signature: Joi.string()
     .required()
     .allow(''),
@@ -28,7 +24,7 @@ const result = Joi.object().keys({
     otherwise: Joi.array().length(0),
   }).required(),
   id: Joi.string()
-    .regex(base58)
+    .base58()
     .required(),
   sender: Joi.string().required(),
   sender_public_key: Joi.string().required(),

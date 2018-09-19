@@ -1,11 +1,6 @@
-const { BigNumber } = require('@waves/data-entities');
-const Joi = require('joi');
+const Joi = require('../../../utils/validation/joi');
 
 const commonFilters = require('../../presets/pg/searchWithPagination/commonFilterSchemas');
-
-const BIGNUMBER = Joi.object()
-  .type(BigNumber)
-  .required();
 
 const CORRECT_TYPE = Joi.string().valid([
   'integer',
@@ -24,20 +19,30 @@ const result = Joi.object().keys({
   proofs: Joi.array(),
   time_stamp: Joi.date().required(),
 
-  fee: BIGNUMBER,
+  fee: Joi.object()
+    .bignumber()
+    .required(),
 
   sender: Joi.string().required(),
   sender_public_key: Joi.string().required(),
 
-  data: Joi.array().items(
-    Joi.object().keys({
-      key: Joi.string()
-        .required()
-        .allow(''),
-      type: CORRECT_TYPE.required(),
-      value: [BIGNUMBER, Joi.string().allow(''), Joi.boolean().required()],
-    })
-  ),
+  data: Joi.array()
+    .items(
+      Joi.object().keys({
+        key: Joi.string()
+          .allow('')
+          .required(),
+        type: CORRECT_TYPE.required(),
+        value: [
+          Joi.object()
+            .bignumber()
+            .int64(),
+          Joi.string().allow(''),
+          Joi.boolean(),
+        ],
+      })
+    )
+    .required(),
 });
 
 const inputSearch = Joi.object()
@@ -46,7 +51,43 @@ const inputSearch = Joi.object()
     sender: Joi.string(),
     key: Joi.string(),
     type: CORRECT_TYPE,
-    value: [BIGNUMBER, Joi.string().allow(''), Joi.boolean()],
+    // value: [BIGNUMBER, Joi.string().allow(''), Joi.boolean()],
+    // value: Joi.alternatives().try([
+    // Joi.when('type', {
+    //   is: Joi.valid('integer').required(),
+    //   then: Joi.object()
+    //     .bignumber()
+    //     .int64(),
+    // }),
+    //   Joi.when('type', {
+    //     is: Joi.valid('boolean').required(),
+    //     then: Joi.boolean(),
+    //   }),
+    //   Joi.when('type', {
+    //     is: Joi.valid('string').required(),
+    //     then: Joi.string().allow(''),
+    //   }),
+    //   Joi.when('type', {
+    //     is: Joi.valid('binary').required(),
+    //     then: Joi.string()
+    //       .base64()
+    //       .allow(''),
+    //   }),
+    // ]),
+    value: Joi.when('type', {
+      is: 'integer',
+      then: Joi.object()
+        .bignumber()
+        .int64(),
+    })
+      .when('type', {
+        is: 'boolean',
+        then: Joi.boolean(),
+      })
+      .when('type', {
+        is: ['string', 'binary'],
+        then: Joi.string().allow(''),
+      }),
   })
   .with('value', 'type')
   .required();

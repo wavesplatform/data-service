@@ -1,5 +1,5 @@
 const { AppError } = require('../../errorHandling');
-const validate = require('../../utils/validate');
+const { validate } = require('../../utils/validation');
 
 // validateInput :: Options -> Boolean
 const validateInput = (schema, name) =>

@@ -1,5 +1,7 @@
 const { curry } = require('ramda');
 
+const { BigNumber } = require('@waves/data-entities');
+
 const { where, limit, orderBy } = require('../../../../../utils/db/knex');
 
 const after = ({ timestamp, id, sortDirection }) => q => {
@@ -16,6 +18,11 @@ const sort = curry((s, q) =>
     .orderBy('id', s)
 );
 
+const value = type => val => {
+  const v = val instanceof BigNumber ? val.toString() : val;
+  return where(`data_value_${type}`, v);
+};
+
 module.exports = {
   id: where('id'),
   after,
@@ -24,7 +31,7 @@ module.exports = {
   sender: where('sender'),
   key: where('data_key'),
   type: where('data_type'),
-  value: type => where(`data_value_${type}`),
+  value,
   timeStart: where('time_stamp', '>='),
   timeEnd: where('time_stamp', '<'),
   limit,

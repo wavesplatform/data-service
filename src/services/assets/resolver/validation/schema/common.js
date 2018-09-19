@@ -1,5 +1,4 @@
-const { BigNumber } = require('@waves/data-entities');
-const Joi = require('joi');
+const Joi = require('../../../../../utils/validation/joi');
 
 const output = Joi.object().keys({
   asset_id: Joi.string().required(),
@@ -9,7 +8,7 @@ const output = Joi.object().keys({
     .allow('')
     .required(),
   issue_height: Joi.number().required(),
-  total_quantity: Joi.object().type(BigNumber),
+  total_quantity: Joi.object().bignumber(),
   decimals: Joi.number().required(),
   reissuable: Joi.boolean().required(),
   ticker: Joi.string()
