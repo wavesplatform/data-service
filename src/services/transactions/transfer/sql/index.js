@@ -1,17 +1,17 @@
 const { pipe, compose, map, pick, filter, has, __ } = require('ramda');
 
 const F = require('./filters');
-const commonQuery = require('./query');
+const { select, withDecimals } = require('./query');
 
 // one — get by id
 // many — apply filters
 module.exports = {
   get: id =>
     pipe(
-      q => q.clone(),
       F.id(id),
+      withDecimals,
       String
-    )(commonQuery),
+    )(select),
 
   search: fValues => {
     const order = [
@@ -35,7 +35,8 @@ module.exports = {
     return pipe(
       q => q.clone(),
       ...appliedFs,
+      withDecimals,
       String
-    )(commonQuery);
+    )(select);
   },
 };

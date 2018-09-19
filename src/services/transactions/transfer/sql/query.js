@@ -1,4 +1,5 @@
 const pg = require('knex')({ client: 'pg' });
+
 const columns = {
   height: 't.height',
   tx_type: 't.tx_type',
@@ -41,4 +42,7 @@ const withDecimals = q =>
 
 const select = pg({ t: 'txs_4' }).select('*');
 
-module.exports = withDecimals(select);
+module.exports = {
+  select,
+  withDecimals,
+};
