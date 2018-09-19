@@ -35,7 +35,7 @@ const result = Joi.object().keys({
     .allow(''),
   sender: Joi.string().required(),
   sender_public_key: Joi.string().required(),
-  recipients: Joi.array().items(Joi.string().base58()),
+  recipients: Joi.array().items(Joi.string()),
   amounts: Joi.array().items(
     Joi.object()
       .bignumber()
