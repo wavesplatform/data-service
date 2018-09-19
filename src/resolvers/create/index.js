@@ -19,12 +19,7 @@ const chainRT = f =>
 /** createResolver :: Boolean ->
  *    Dependencies -> RuntimeOptions ->
  *    Request -> Task AppError Result */
-const createResolver = oneOrMany => {
-  const toValidateM = validateResult =>
-    oneOrMany === 'one'
-      ? liftInnerMaybe(Result.of, validateResult)
-      : traverse(Result.of, liftInnerMaybe(Result.of, validateResult));
-
+const createResolver = applyToResult => {
   return ({
     validateInput,
     validateResult,
@@ -36,7 +31,7 @@ const createResolver = oneOrMany => {
       map(tap(emitEvent('TRANSFORM_RESULT_OK'))),
       map(result => transformResult(result, request)), // Task AppError Result
       map(tap(emitEvent('RESULT_VALIDATION_OK'))),
-      chainRT(toValidateM(validateResult)), // Task AppError Maybe DbResult
+      chainRT(applyToResult(validateResult)), // Task AppError Maybe DbResult
       map(tap(emitEvent('DB_QUERY_OK'))),
       chain(dbQuery(db)), // Task AppError Maybe DbResult
       map(tap(emitEvent('TRANSFORM_INPUT_OK'))),
@@ -47,7 +42,19 @@ const createResolver = oneOrMany => {
     )(request);
 };
 
+// fn :: x -> Result err y
+const applyToGetResult = fn => liftInnerMaybe(Result.of, fn);
+const applyToMgetResult = fn =>
+  traverse(Result.of, liftInnerMaybe(Result.of, fn));
+const applyToSearchResult = fn => traverse(Result.of, fn);
+
 module.exports = {
-  one: createResolver('one'),
-  many: createResolver('many'),
+  // @todo remove
+  one: createResolver(applyToGetResult),
+  many: createResolver(applyToMgetResult),
+
+  // proper resolver creators
+  get: createResolver(applyToGetResult),
+  mget: createResolver(applyToMgetResult),
+  search: createResolver(applyToSearchResult),
 };

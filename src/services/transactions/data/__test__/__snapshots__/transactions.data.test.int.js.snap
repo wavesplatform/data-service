@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Data transaction service get fetches real tx 1`] = `
+Object {
+  "__type": "transaction",
+  "data": Object {
+    "data": Array [
+      Object {
+        "key": "company",
+        "type": "string",
+        "value": "Resonova",
+      },
+    ],
+    "fee": "0.001",
+    "height": 1060009,
+    "id": "AkM4bQ5dVkqWezSgMPdW5iieX98xDsiFjVDbEddntGNv",
+    "proofs": Array [
+      "2BFgwFEUwDYmCPdUbrX3W4QdPrcDX4ai6tmrY2ab4NgEg9aikUo7RzqHUsgBd5kBpFScxsLQWpE29k9cLPdF5YEt",
+    ],
+    "sender": "3PLZcCJyYQnfWfzhKXRA4rteCQC9J1ewf5K",
+    "senderPublicKey": "BQMVwAHwf2WEEwRsCxtMVcSLrXUhJ3XtCLmSptLx2e6L",
+    "timestamp": 2018-06-28T02:12:41.449Z,
+    "type": 12,
+    "version": 1,
+  },
+}
+`;

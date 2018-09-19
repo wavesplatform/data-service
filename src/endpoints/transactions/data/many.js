@@ -1,6 +1,4 @@
-const {
-  many: createResolver,
-} = require('../../../resolvers/transactions/data');
+const createService = require('../../../services/transactions/data');
 const { captureErrors } = require('../../../utils/captureErrors');
 const { select } = require('../../utils/selectors');
 const { selectFilters } = require('./utils');
@@ -15,12 +13,13 @@ const dataTxsEndpointMany = async ctx => {
     filters,
   });
 
-  const resolver = createResolver({
-    db: ctx.state.db,
+  const service = createService({
+    drivers: ctx.state.drivers,
     emitEvent: ctx.eventBus.emit,
   });
 
-  const txs = await resolver(filters)
+  const txs = await service
+    .search(filters)
     .run()
     .promise();
 

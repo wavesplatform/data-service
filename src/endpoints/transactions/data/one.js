@@ -1,4 +1,4 @@
-const { one: createResolver } = require('../../../resolvers/transactions/data');
+const createService = require('../../../services/transactions/data');
 const { captureErrors } = require('../../../utils/captureErrors');
 const { select } = require('../../utils/selectors');
 
@@ -11,15 +11,16 @@ const dataTxsEndpointOne = async ctx => {
     id,
   });
 
-  const resolver = createResolver({
-    db: ctx.state.db,
+  const service = createService({
+    drivers: ctx.state.drivers,
     emitEvent: ctx.eventBus.emit,
   });
 
-  // Run resolver with params
-  const tx = await resolver(id)
+  const tx = await service
+    .get(id)
     .run()
     .promise();
+
   ctx.eventBus.emit('ENDPOINT_RESOLVED', {
     value: tx,
   });

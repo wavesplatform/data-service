@@ -7,7 +7,7 @@ const selectFilters = ({
   after,
   timeStart,
   timeEnd,
-  sort,
+  sort = 'desc',
   limit = 100,
   assetId,
 }) =>

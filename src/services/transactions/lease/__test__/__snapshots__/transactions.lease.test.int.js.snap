@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Lease transaction resolver for one fetches real tx 1`] = `
+exports[`Lease transaction service get fetches real tx 1`] = `
 Object {
   "__type": "transaction",
   "data": Object {
