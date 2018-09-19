@@ -36,6 +36,7 @@ module.exports = {
       q => q.clone(),
       ...appliedFs,
       withDecimals,
+      F.sort(fValues.sort),
       String
     )(select);
   },
