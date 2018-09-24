@@ -2,6 +2,9 @@ const { reject, isNil } = require('ramda');
 const { parseDate } = require('../../../utils/parseDate');
 
 const selectFilters = ({
+  // mget
+  ids,
+  // search
   sender,
   recipient,
   after,
@@ -12,6 +15,7 @@ const selectFilters = ({
   assetId,
 }) =>
   reject(isNil, {
+    ids,
     timeStart: timeStart && parseDate(timeStart),
     timeEnd: timeEnd && parseDate(timeEnd),
     limit: parseInt(limit),
