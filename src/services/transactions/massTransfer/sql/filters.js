@@ -1,9 +1,10 @@
-const { where, limit } = require('../../../../utils/db/knex');
+const { where, whereIn, limit } = require('../../../../utils/db/knex');
 const { selectIdsWhereRecipient } = require('./query');
 
 const recipient = rec => q =>
   q.clone().whereIn('txs_11.id', selectIdsWhereRecipient(rec));
 const id = where('txs_11.id');
+const ids = whereIn('txs_11.id');
 const assetId = where('asset_id');
 const sender = where('sender');
 
@@ -23,6 +24,7 @@ const sort = s => q =>
 
 module.exports = {
   id,
+  ids,
   sender,
   after,
   assetId,
