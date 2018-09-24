@@ -3,12 +3,17 @@ const { pipe, compose, map, pick, filter, has, __ } = require('ramda');
 const F = require('./filters');
 const { select, withDecimals } = require('./query');
 
-// one — get by id
-// many — apply filters
 module.exports = {
   get: id =>
     pipe(
       F.id(id),
+      withDecimals,
+      String
+    )(select),
+
+  mget: ids =>
+    pipe(
+      F.ids(ids),
       withDecimals,
       String
     )(select),
