@@ -1,4 +1,4 @@
-const { where, limit } = require('../../../../utils/db/knex');
+const { where, whereIn, limit } = require('../../../../utils/db/knex');
 
 const { curryN } = require('ramda');
 
@@ -20,6 +20,7 @@ const after = ({ timestamp, id, sortDirection }) => q => {
 
 module.exports = {
   id: where('t.id'),
+  ids: whereIn('t.id'),
   after,
   sortOuter: s => q =>
     q

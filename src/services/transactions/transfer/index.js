@@ -15,14 +15,14 @@ const { result, inputSearch } = require('./schema');
 module.exports = ({ drivers: { pg }, emitEvent }) => {
   return {
     get: getByIdPreset({
-      name: 'transactions.massTransfer.get',
+      name: 'transactions.transfer.get',
       sql: sql.get,
       resultSchema: result,
       transformResult: transformTxInfo,
     })({ pg, emitEvent }),
 
     mget: mgetByIdsPreset({
-      name: 'transactions.massTransfer.mget',
+      name: 'transactions.transfer.mget',
       matchRequestResult: propEq('id'),
       sql: sql.mget,
       resultTypeFactory: Transaction,
@@ -31,7 +31,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
     })({ pg, emitEvent }),
 
     search: searchWithPaginationPreset({
-      name: 'transactions.massTransfer.search',
+      name: 'transactions.transfer.search',
       sql: sql.search,
       inputSchema: inputSearch,
       resultSchema: result,
