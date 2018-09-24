@@ -17,3 +17,42 @@ Object {
   },
 }
 `;
+
+exports[`Lease cancel transaction service mget fetches real txs with nulls for unreal 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "fee": "0.001",
+        "height": 648185,
+        "id": "9oQDeqq23NuaXmGu3o635QKrZbXizZsiTbagmDzkdUaa",
+        "leaseId": "6id3Ym9VqVFkddAUWUbUNDb6mmTtDRPf78tp9p1g51Ah",
+        "sender": "3PPEjbcq1gAhRR5MtGU9GJAB2L1LGdUmhu8",
+        "senderPublicKey": "9EV9ExXLmsTsh1DkaXFBS9WccinLDdktdFrjYNZVsPtP",
+        "signature": "GEjwG5SyTghLDZhLusPToAQhva1ci5UrCRNam9Sin6QH8v4dM1YAUJ18C3sJoBAkwjbAeNBaPvkB5N654Rod4wR",
+        "timestamp": 2017-09-01T00:57:11.682Z,
+        "type": 9,
+        "version": 1,
+      },
+    },
+    null,
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "fee": "0.001",
+        "height": 436147,
+        "id": "4g5vqYxyczBhuyzKydHZiAG6mLcNCmXvvVyAVJwNUtqm",
+        "leaseId": "9rK7fadKpDEkaBNmWyt2sCsEs29rFzW9zJMZEYnVqZm2",
+        "sender": "3PQpqmG6UKJHRTtQ2s8Pz2Wasr9yGy8gowh",
+        "senderPublicKey": "GkNdDyrkPhCGLq5KkC3aLTqymt4NNGoC77C3q4GVfZcQ",
+        "signature": "5bMUfJc55wyDg18dAmehMFCYPMuNvhLGQK8vvm6AZygY6VN168zCSfS2zUovKLfEydE5gK3a4bMzk8dk2TTkrEW6",
+        "timestamp": 2017-04-03T17:35:01.288Z,
+        "type": 9,
+        "version": 1,
+      },
+    },
+  ],
+}
+`;
