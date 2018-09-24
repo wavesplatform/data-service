@@ -28,6 +28,14 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       dbQuery: pgData.get,
     })({ db: pg, emitEvent }),
 
+    // mget: createResolver.mget({
+    //   transformInput: identity,
+    //   transformResult: transformResultGet(transformTxInfo),
+    //   validateInput: validateInput(inputGet, createServiceName('get')),
+    //   validateResult: validateResult(result, createServiceName('get')),
+    //   dbQuery: pgData.get,
+    // })({ db: pg, emitEvent }),
+
     search: createResolver.search({
       transformInput: transformInputSearch,
       transformResult: transformResultSearch(transformTxInfo),

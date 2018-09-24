@@ -9,6 +9,7 @@ const before = [
     data_value_boolean: null,
     data_value_string: null,
     data_value_binary: null,
+    position_in_tx: 0,
   },
   {
     id: 'qwe',
@@ -18,15 +19,7 @@ const before = [
     data_value_boolean: false,
     data_value_string: null,
     data_value_binary: null,
-  },
-  {
-    id: 'asd',
-    data_key: 'teststring',
-    data_type: 'string',
-    data_value_integer: 11,
-    data_value_boolean: null,
-    data_value_string: 'some string',
-    data_value_binary: null,
+    position_in_tx: 1,
   },
   {
     id: 'asd',
@@ -36,11 +29,23 @@ const before = [
     data_value_boolean: null,
     data_value_string: null,
     data_value_binary: 'base64:qwerqwer',
+    position_in_tx: 1,
+  },
+  {
+    id: 'asd',
+    data_key: 'teststring',
+    data_type: 'string',
+    data_value_integer: 11,
+    data_value_boolean: null,
+    data_value_string: 'some string',
+    data_value_binary: null,
+    position_in_tx: 0,
   },
 ];
 
 describe('Data transactions db result transform', () => {
-  it('should group raw results by transaction and put nested `data` inside', () => {
+  it('should group raw results by transaction and put nested `data` inside \
+    preserving order in position_in_tx field', () => {
     expect(transformResult(before)).toMatchSnapshot();
   });
 

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Data transactions db result transform should group raw results by transaction and put nested \`data\` inside 1`] = `
+exports[`Data transactions db result transform should group raw results by transaction and put nested \`data\` inside     preserving order in position_in_tx field 1`] = `
 Array [
   Object {
     "data": Array [

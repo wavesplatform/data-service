@@ -43,12 +43,13 @@ describe('Data transaction service search', () => {
   it('fetches real txs', async () => {
     const tx = await service
       .search({
-        limit: 20,
+        limit: 5,
+        sort: 'asc',
       })
       .run()
       .promise();
-    expect(tx).toBeDefined();
-    expect(tx.data).toHaveLength(20);
+    expect(tx).toMatchSnapshot();
+    expect(tx.data).toHaveLength(5);
   });
   describe('Pagination ', async () => {
     const START = '2018-06-28T05:12:41.449Z';
