@@ -17,6 +17,7 @@ const createCursorMeta = (request, xs) =>
     .map(objOf('lastCursor'))
     .getOrElse({});
 
+// @todo parameterize output type
 /** transformResults :: RawTxsInfo[] -> List Transaction */
 const transformResults = transformTxInfo => (result, request) =>
   compose(
