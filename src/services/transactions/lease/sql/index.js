@@ -3,15 +3,19 @@ const { pipe, compose, map, pick, filter, has, __ } = require('ramda');
 const F = require('./filters');
 const commonQuery = require('./query');
 
-// one — get by id
-// many — apply filters
 module.exports = {
   get: id =>
     pipe(
-      q => q.clone(),
       F.id(id),
       String
     )(commonQuery),
+
+  mget: ids =>
+    pipe(
+      F.ids(ids),
+      String
+    )(commonQuery),
+
   search: fValues => {
     const order = [
       'id',
