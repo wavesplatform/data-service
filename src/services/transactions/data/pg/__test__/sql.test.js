@@ -1,19 +1,25 @@
 const sql = require('../sql');
 
 describe('transactions.data api method', () => {
-  it('`one` matches snapshot', () => {
+  it('get matches snapshot', () => {
     expect(
       sql.get('2jnH9e2KvEEAiWKHgwocD9arjK3AvBz6DbqwK8GUHdXA')
     ).toMatchSnapshot();
   });
 
-  describe('many matches snapshot with', () => {
+  it('mget matches snapshot', () => {
+    expect(sql.mget(['id1', 'id2'])).toMatchSnapshot();
+  });
+
+  describe('search matches snapshots with', () => {
     it('no params', () => {
       expect(sql.search()).toMatchSnapshot();
     });
 
     it('timeStart filter', () => {
-      expect(sql.search({ timeStart: new Date('2018-01-01') })).toMatchSnapshot();
+      expect(
+        sql.search({ timeStart: new Date('2018-01-01') })
+      ).toMatchSnapshot();
     });
 
     it('timeEnd filter', () => {

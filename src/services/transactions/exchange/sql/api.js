@@ -15,6 +15,14 @@ module.exports = ({ filters: F }) => ({
       commonQuery,
       String
     )(select),
+
+  mget: ids =>
+    pipe(
+      F.ids(ids),
+      commonQuery,
+      String
+    )(select),
+
   search: fValues => {
     const order = [
       'limit',

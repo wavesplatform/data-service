@@ -9,7 +9,12 @@ module.exports = ({ filters: F }) => ({
   get: id =>
     pipe(
       F.id(id),
-      F.sortByDataPosition,
+      String
+    )(select),
+
+  mget: ids =>
+    pipe(
+      F.ids(ids),
       String
     )(select),
 
@@ -49,7 +54,6 @@ module.exports = ({ filters: F }) => ({
     return pipe(
       composeQuery,
       F.sort(withDefaults.sort),
-      F.sortByDataPosition,
       String
     )(fQuery);
   },

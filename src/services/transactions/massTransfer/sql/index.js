@@ -13,6 +13,13 @@ module.exports = {
       String
     )(baseQuery),
 
+  mget: ids =>
+    pipe(
+      F.ids(ids),
+      withTransfersDecimalsAndGrouping,
+      String
+    )(baseQuery),
+
   search: fValues => {
     const defaultValues = { limit: 100, sort: 'desc' };
     // { [fName]: fValue }

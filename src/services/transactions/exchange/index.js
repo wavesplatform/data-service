@@ -1,4 +1,9 @@
+const { propEq } = require('ramda');
+
+const { Transaction } = require('../../../types');
+
 const getByIdPreset = require('../../presets/pg/getById');
+const mgetByIdsPreset = require('../../presets/pg/mgetByIds');
 const searchWithPaginationPreset = require('../../presets/pg/searchWithPagination');
 
 const transformTxInfo = require('./transformTxInfo');
@@ -16,8 +21,17 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       transformResult: transformTxInfo,
     })({ pg, emitEvent }),
 
+    mget: mgetByIdsPreset({
+      name: 'transactions.exchange.mget',
+      matchRequestResult: propEq('tx_id'),
+      sql: sql.mget,
+      resultTypeFactory: Transaction,
+      resultSchema: result,
+      transformResult: transformTxInfo,
+    })({ pg, emitEvent }),
+
     search: searchWithPaginationPreset({
-      name: 'transactions.lease.search',
+      name: 'transactions.exchange.search',
       sql: sql.search,
       inputSchema: inputSearch,
       resultSchema: result,

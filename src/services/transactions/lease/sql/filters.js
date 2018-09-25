@@ -1,6 +1,7 @@
-const { where, limit } = require('../../../../utils/db/knex');
+const { where, whereIn, limit } = require('../../../../utils/db/knex');
 
 const id = where('id');
+const ids = whereIn('id');
 const sender = where('sender');
 const recipient = where('recipient');
 
@@ -20,6 +21,7 @@ const sort = s => q =>
 
 module.exports = {
   id,
+  ids,
   sender,
   recipient,
   after,
