@@ -2,6 +2,7 @@ const { Transaction } = require('../../../../types');
 
 const { compose, map } = require('ramda');
 
+// @todo parameterize output type
 const txOrNull = maybeTx =>
   maybeTx.matchWith({
     Just: ({ value }) => Transaction(value),
