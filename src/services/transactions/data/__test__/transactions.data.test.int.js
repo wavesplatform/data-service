@@ -54,7 +54,7 @@ describe('Data transaction service', () => {
     });
   });
 
-  describe('Data transaction service search', () => {
+  describe('search', () => {
     it('fetches real txs', async () => {
       const tx = await service
         .search({
@@ -66,12 +66,13 @@ describe('Data transaction service', () => {
       expect(tx).toMatchSnapshot();
       expect(tx.data).toHaveLength(5);
     });
-    describe('Pagination ', async () => {
+
+    describe('pagination ', async () => {
       const START = '2018-06-28T05:12:41.449Z';
       const END = '2018-07-20T19:48:06.665Z';
       const LIMIT = 21;
       const createCursor = sort => ({ data }) => Cursor.encode(sort, data);
-      it(' doesnt get 2 identical entries for limit 1 asc with next page fetching', async () => {
+      it('doesnt get 2 identical entries for limit 1 asc with next page fetching', async () => {
         const baseParams = {
           limit: 1,
           timeStart: parseDate('Mon Jun 11 2018 12:34:52 GMT+0300 (MSK)'),
@@ -93,7 +94,7 @@ describe('Data transaction service', () => {
 
         expect(firstTx.data).not.toEqual(secondTx.data);
       });
-      it(' works asc', async () => {
+      it('works asc', async () => {
         const SORT = 'asc';
 
         const baseParams = {
@@ -140,7 +141,7 @@ describe('Data transaction service', () => {
 
         expect(cursors).toEqual(expectedCursors);
       });
-      it(' works desc', async () => {
+      it('works desc', async () => {
         const SORT = 'desc';
 
         const baseParams = {
