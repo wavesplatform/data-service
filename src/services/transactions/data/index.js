@@ -3,8 +3,8 @@ const { identity } = require('ramda');
 const createResolver = require('../../../resolvers/create');
 
 // validation
-const { input: inputGet } = require('../../presets/pg/getById/inputSchema');
-const { input: inputMget } = require('../../presets/pg/mgetByIds/inputSchema');
+const { input: inputGetSchema } = require('../../presets/pg/getById/inputSchema');
+const { input: inputMgetSchema } = require('../../presets/pg/mgetByIds/inputSchema');
 const { validateInput, validateResult } = require('../../presets/validation');
 const {
   result: resultSchema,
@@ -30,7 +30,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
     get: createResolver.get({
       transformInput: identity,
       transformResult: transformResultGet(transformTxInfo),
-      validateInput: validateInput(inputGet, createServiceName('get')),
+      validateInput: validateInput(inputGetSchema, createServiceName('get')),
       validateResult: validateResult(resultSchema, createServiceName('get')),
       dbQuery: pgData.get,
     })({ db: pg, emitEvent }),
@@ -38,7 +38,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
     mget: createResolver.mget({
       transformInput: identity,
       transformResult: transformResultMget(Transaction)(transformTxInfo),
-      validateInput: validateInput(inputMget, createServiceName('mget')),
+      validateInput: validateInput(inputMgetSchema, createServiceName('mget')),
       validateResult: validateResult(resultSchema, createServiceName('mget')),
       dbQuery: pgData.mget,
     })({ db: pg, emitEvent }),
