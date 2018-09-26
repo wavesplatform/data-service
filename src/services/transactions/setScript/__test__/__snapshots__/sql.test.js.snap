@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Sql builder get works 1`] = `"select \\"height\\", \\"tx_type\\", \\"id\\", \\"time_stamp\\", \\"signature\\", \\"proofs\\", \\"tx_version\\", \\"sender\\", \\"sender_public_key\\", \\"script\\", fee * 10^(-8) as \\"fee\\" from \\"txs_13\\" as \\"t\\" where \\"id\\" = 'id'"`;
+
+exports[`Sql builder mget works 1`] = `"select \\"height\\", \\"tx_type\\", \\"id\\", \\"time_stamp\\", \\"signature\\", \\"proofs\\", \\"tx_version\\", \\"sender\\", \\"sender_public_key\\", \\"script\\", fee * 10^(-8) as \\"fee\\" from \\"txs_13\\" as \\"t\\" where \\"id\\" in ('id1', 'id2')"`;
