@@ -7,6 +7,9 @@ const selectFields = [
   't.time_stamp',
   't.height',
   't.signature',
+  't.proofs',
+  't.tx_type',
+  't.tx_version',
 
   't.sender',
   't.sender_public_key',
@@ -64,23 +67,27 @@ const withOrders = q => {
 };
 
 const renameMap = {
-  tx_id: 't.id',
-  tx_time_stamp: 't.time_stamp',
-  tx_height: 't.height',
-  tx_signature: 't.signature',
+  id: 't.id',
+  time_stamp: 't.time_stamp',
+  height: 't.height',
+  signature: 't.signature',
+  proofs: 't.proofs',
 
-  tx_sender: 't.sender',
-  tx_sender_public_key: 't.sender_public_key',
+  tx_type: 't.tx_type',
+  tx_version: 't.tx_version',
 
-  tx_amount_asset: 't.amount_asset',
-  tx_price_asset: 't.price_asset',
+  sender: 't.sender',
+  sender_public_key: 't.sender_public_key',
 
-  tx_price: 't.price',
-  tx_amount: 't.amount',
+  amount_asset: 't.amount_asset',
+  price_asset: 't.price_asset',
 
-  tx_fee: pg.raw('t.fee * 10^(-8)'),
-  tx_sell_matcher_fee: pg.raw('t.sell_matcher_fee * 10^(-8)'),
-  tx_buy_matcher_fee: pg.raw('t.buy_matcher_fee * 10^(-8)'),
+  price: 't.price',
+  amount: 't.amount',
+
+  fee: pg.raw('t.fee * 10^(-8)'),
+  sell_matcher_fee: pg.raw('t.sell_matcher_fee * 10^(-8)'),
+  buy_matcher_fee: pg.raw('t.buy_matcher_fee * 10^(-8)'),
 
   // o1
   o1_id: 'o1_id',
@@ -122,24 +129,15 @@ const renameFields = q => pg({ t: q }).select(renameMap);
 const withDecimals = q => {
   const fieldsExceptSatoshi = compose(
     keys,
-    omit([
-      'tx_price',
-      'tx_amount',
-      'o1_price',
-      'o1_amount',
-      'o2_price',
-      'o2_amount',
-    ])
+    omit(['price', 'amount', 'o1_price', 'o1_amount', 'o2_price', 'o2_amount'])
   )(renameMap);
 
   return (
     pg({ t: q })
       .columns(fieldsExceptSatoshi)
       .columns({
-        tx_price: pg.raw(
-          't.tx_price * 10^(-8 - p_dec.decimals + a_dec.decimals)'
-        ),
-        tx_amount: pg.raw('t.tx_amount * 10^(-a_dec.decimals)'),
+        price: pg.raw('t.price * 10^(-8 - p_dec.decimals + a_dec.decimals)'),
+        amount: pg.raw('t.amount * 10^(-a_dec.decimals)'),
         o1_price: pg.raw(
           't.o1_price * 10^(-8 - p_dec.decimals + a_dec.decimals)'
         ),
@@ -153,14 +151,10 @@ const withDecimals = q => {
       // to get decimals
       .innerJoin(
         { a_dec: 'asset_decimals' },
-        't.tx_amount_asset',
+        't.amount_asset',
         'a_dec.asset_id'
       )
-      .innerJoin(
-        { p_dec: 'asset_decimals' },
-        't.tx_price_asset',
-        'p_dec.asset_id'
-      )
+      .innerJoin({ p_dec: 'asset_decimals' }, 't.price_asset', 'p_dec.asset_id')
   );
 };
 

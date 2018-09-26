@@ -1,36 +1,7 @@
-/** transformTx:: RawTxInfo -> TxInfo */
-const transformTxInfo = tx => {
-  const {
-    tx_id,
-    tx_sender,
-    tx_sender_public_key,
-    tx_buy_matcher_fee,
-    tx_time_stamp,
-    tx_signature,
-    tx_price,
-    tx_amount,
-    tx_height,
-    tx_fee,
-    tx_sell_matcher_fee,
-  } = tx;
+const { pick, compose } = require('ramda');
+const { renameKeys } = require('ramda-adjunct');
 
-  return {
-    type: 7,
-    id: tx_id,
-    sender: tx_sender,
-    senderPublicKey: tx_sender_public_key,
-    fee: tx_fee,
-    timestamp: tx_time_stamp,
-    signature: tx_signature,
-    order1: createOrder('o1')(tx),
-    order2: createOrder('o2')(tx),
-    price: tx_price,
-    amount: tx_amount,
-    buyMatcherFee: tx_buy_matcher_fee,
-    sellMatcherFee: tx_sell_matcher_fee,
-    height: tx_height,
-  };
-};
+const transformTxInfo = require('../common/transformTxInfo');
 
 const createOrder = prefix => ({
   [`${prefix}_id`]: id,
@@ -43,9 +14,9 @@ const createOrder = prefix => ({
   [`${prefix}_expiration`]: expiration,
   [`${prefix}_signature`]: signature,
   [`${prefix}_matcher_fee`]: matcherFee,
-  tx_price_asset: priceAsset,
-  tx_amount_asset: amountAsset,
-  tx_sender_public_key: matcherPublicKey,
+  price_asset: priceAsset,
+  amount_asset: amountAsset,
+  sender_public_key: matcherPublicKey,
 }) => ({
   id,
   senderPublicKey,
@@ -64,4 +35,36 @@ const createOrder = prefix => ({
   signature,
 });
 
-module.exports = transformTxInfo;
+/** transformTx:: RawTxInfo -> TxInfo */
+module.exports = tx => {
+  const commonFields = compose(
+    transformTxInfo,
+    pick([
+      'id',
+      'time_stamp',
+      'height',
+      'tx_type',
+      'tx_version',
+      'signature',
+      'proofs',
+      'fee',
+      'sender',
+      'sender_public_key',
+    ])
+  )(tx);
+
+  const exchangeTxFields = compose(
+    renameKeys({
+      buy_matcher_fee: 'buyMatcherFee',
+      sell_matcher_fee: 'sellMatcherFee',
+    }),
+    pick(['buy_matcher_fee', 'sell_matcher_fee', 'price', 'amount'])
+  )(tx);
+
+  return {
+    ...commonFields,
+    ...exchangeTxFields,
+    order1: createOrder('o1')(tx),
+    order2: createOrder('o2')(tx),
+  };
+};

@@ -1,6 +1,122 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Data transaction service Data transaction service search fetches real txs 1`] = `
+exports[`Data transaction service get fetches real tx 1`] = `
+Object {
+  "__type": "transaction",
+  "data": Object {
+    "data": Array [
+      Object {
+        "key": "company",
+        "type": "string",
+        "value": "Resonova",
+      },
+    ],
+    "fee": "0.001",
+    "height": 1060009,
+    "id": "AkM4bQ5dVkqWezSgMPdW5iieX98xDsiFjVDbEddntGNv",
+    "proofs": Array [
+      "2BFgwFEUwDYmCPdUbrX3W4QdPrcDX4ai6tmrY2ab4NgEg9aikUo7RzqHUsgBd5kBpFScxsLQWpE29k9cLPdF5YEt",
+    ],
+    "sender": "3PLZcCJyYQnfWfzhKXRA4rteCQC9J1ewf5K",
+    "senderPublicKey": "BQMVwAHwf2WEEwRsCxtMVcSLrXUhJ3XtCLmSptLx2e6L",
+    "timestamp": 2018-06-28T02:12:41.449Z,
+    "type": 12,
+    "version": 1,
+  },
+}
+`;
+
+exports[`Data transaction service mget fetches real txs with nulls for unreal 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "data": Array [
+          Object {
+            "key": "company",
+            "type": "string",
+            "value": "Resonova",
+          },
+        ],
+        "fee": "0.001",
+        "height": 1060009,
+        "id": "AkM4bQ5dVkqWezSgMPdW5iieX98xDsiFjVDbEddntGNv",
+        "proofs": Array [
+          "2BFgwFEUwDYmCPdUbrX3W4QdPrcDX4ai6tmrY2ab4NgEg9aikUo7RzqHUsgBd5kBpFScxsLQWpE29k9cLPdF5YEt",
+        ],
+        "sender": "3PLZcCJyYQnfWfzhKXRA4rteCQC9J1ewf5K",
+        "senderPublicKey": "BQMVwAHwf2WEEwRsCxtMVcSLrXUhJ3XtCLmSptLx2e6L",
+        "timestamp": 2018-06-28T02:12:41.449Z,
+        "type": 12,
+        "version": 1,
+      },
+    },
+    null,
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "data": Array [
+          Object {
+            "key": "test",
+            "type": "integer",
+            "value": "11",
+          },
+          Object {
+            "key": "neg",
+            "type": "integer",
+            "value": "-9223372036854775808",
+          },
+          Object {
+            "key": "max",
+            "type": "integer",
+            "value": "9223372036854775807",
+          },
+          Object {
+            "key": "somestring",
+            "type": "string",
+            "value": "Some silly string",
+          },
+          Object {
+            "key": "longstring",
+            "type": "string",
+            "value": "ver long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long string",
+          },
+          Object {
+            "key": "testboolF",
+            "type": "boolean",
+            "value": false,
+          },
+          Object {
+            "key": "testboolT",
+            "type": "boolean",
+            "value": true,
+          },
+          Object {
+            "key": "testbytes",
+            "type": "binary",
+            "value": "base64:VGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdA==",
+          },
+        ],
+        "fee": "0.001",
+        "height": 1088100,
+        "id": "42HFStNghPMnXQLtYeGwFTzxXQRjc2rReubGHjwM5Fea",
+        "proofs": Array [
+          "YEaTGuRYdemeeo9jKx5swWs7x1zwnNmmtnPU8GVHDf6i8agNxzeHYUEtjD1VoB1quF4cVjqYGPkCLwgUexZLTFb",
+        ],
+        "sender": "3PCAB4sHXgvtu5NPoen6EXR5yaNbvsEA8Fj",
+        "senderPublicKey": "2M25DqL2W4rGFLCFadgATboS8EPqyWAN3DjH12AH5Kdr",
+        "timestamp": 2018-07-18T09:46:27.479Z,
+        "type": 12,
+        "version": 1,
+      },
+    },
+  ],
+}
+`;
+
+exports[`Data transaction service search fetches real txs 1`] = `
 Object {
   "__type": "list",
   "data": Array [
@@ -1151,121 +1267,5 @@ Object {
     },
   ],
   "lastCursor": "MjAxOC0wNy0yMFQxNjo0ODowNS45MThaOjpHWEt3VEFIb05WYWo0ZFpVZlJLZE1xYndneFhzQ0R1NmhzUEs0UkppejF3Tjo6YXNj",
-}
-`;
-
-exports[`Data transaction service get fetches real tx 1`] = `
-Object {
-  "__type": "transaction",
-  "data": Object {
-    "data": Array [
-      Object {
-        "key": "company",
-        "type": "string",
-        "value": "Resonova",
-      },
-    ],
-    "fee": "0.001",
-    "height": 1060009,
-    "id": "AkM4bQ5dVkqWezSgMPdW5iieX98xDsiFjVDbEddntGNv",
-    "proofs": Array [
-      "2BFgwFEUwDYmCPdUbrX3W4QdPrcDX4ai6tmrY2ab4NgEg9aikUo7RzqHUsgBd5kBpFScxsLQWpE29k9cLPdF5YEt",
-    ],
-    "sender": "3PLZcCJyYQnfWfzhKXRA4rteCQC9J1ewf5K",
-    "senderPublicKey": "BQMVwAHwf2WEEwRsCxtMVcSLrXUhJ3XtCLmSptLx2e6L",
-    "timestamp": 2018-06-28T02:12:41.449Z,
-    "type": 12,
-    "version": 1,
-  },
-}
-`;
-
-exports[`Data transaction service mget fetches real txs with nulls for unreal 1`] = `
-Object {
-  "__type": "list",
-  "data": Array [
-    Object {
-      "__type": "transaction",
-      "data": Object {
-        "data": Array [
-          Object {
-            "key": "company",
-            "type": "string",
-            "value": "Resonova",
-          },
-        ],
-        "fee": "0.001",
-        "height": 1060009,
-        "id": "AkM4bQ5dVkqWezSgMPdW5iieX98xDsiFjVDbEddntGNv",
-        "proofs": Array [
-          "2BFgwFEUwDYmCPdUbrX3W4QdPrcDX4ai6tmrY2ab4NgEg9aikUo7RzqHUsgBd5kBpFScxsLQWpE29k9cLPdF5YEt",
-        ],
-        "sender": "3PLZcCJyYQnfWfzhKXRA4rteCQC9J1ewf5K",
-        "senderPublicKey": "BQMVwAHwf2WEEwRsCxtMVcSLrXUhJ3XtCLmSptLx2e6L",
-        "timestamp": 2018-06-28T02:12:41.449Z,
-        "type": 12,
-        "version": 1,
-      },
-    },
-    null,
-    Object {
-      "__type": "transaction",
-      "data": Object {
-        "data": Array [
-          Object {
-            "key": "test",
-            "type": "integer",
-            "value": "11",
-          },
-          Object {
-            "key": "neg",
-            "type": "integer",
-            "value": "-9223372036854775808",
-          },
-          Object {
-            "key": "max",
-            "type": "integer",
-            "value": "9223372036854775807",
-          },
-          Object {
-            "key": "somestring",
-            "type": "string",
-            "value": "Some silly string",
-          },
-          Object {
-            "key": "longstring",
-            "type": "string",
-            "value": "ver long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long string",
-          },
-          Object {
-            "key": "testboolF",
-            "type": "boolean",
-            "value": false,
-          },
-          Object {
-            "key": "testboolT",
-            "type": "boolean",
-            "value": true,
-          },
-          Object {
-            "key": "testbytes",
-            "type": "binary",
-            "value": "base64:VGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdAVGVzdA==",
-          },
-        ],
-        "fee": "0.001",
-        "height": 1088100,
-        "id": "42HFStNghPMnXQLtYeGwFTzxXQRjc2rReubGHjwM5Fea",
-        "proofs": Array [
-          "YEaTGuRYdemeeo9jKx5swWs7x1zwnNmmtnPU8GVHDf6i8agNxzeHYUEtjD1VoB1quF4cVjqYGPkCLwgUexZLTFb",
-        ],
-        "sender": "3PCAB4sHXgvtu5NPoen6EXR5yaNbvsEA8Fj",
-        "senderPublicKey": "2M25DqL2W4rGFLCFadgATboS8EPqyWAN3DjH12AH5Kdr",
-        "timestamp": 2018-07-18T09:46:27.479Z,
-        "type": 12,
-        "version": 1,
-      },
-    },
-  ],
 }
 `;

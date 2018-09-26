@@ -4,6 +4,7 @@ const { parseDate } = require('../../../../utils/parseDate');
 const Cursor = require('../../../../resolvers/pagination/cursor');
 
 const TX_ID = 'GN5SSawWUwodvAcHV2d96pe7HgFqvxoEAU9FCW9MUphE';
+const TX_ID_2 = 'Co8JB3md1hsnFKYS2xonipBFyQcB7qskyosoJf6YhBi1';
 
 const loadConfig = require('../../../../loadConfig');
 const options = loadConfig();
@@ -43,7 +44,7 @@ describe('Transfer transaction service', () => {
   describe('mget', () => {
     it('fetches real txs with nulls for unreal', async done => {
       service
-        .mget([TX_ID, 'UNREAL', 'Co8JB3md1hsnFKYS2xonipBFyQcB7qskyosoJf6YhBi1'])
+        .mget([TX_ID, 'UNREAL', TX_ID_2])
         .run()
         .promise()
         .then(xs => {
