@@ -18,10 +18,10 @@ const result = Joi.object().keys({
 
   signature: Joi.string()
     .required()
-    .allow(''),
+    .allow(null),
   proofs: Joi.when('signature', {
-    is: '',
-    then: Joi.array().min(1),
+    is: null,
+    then: Joi.array(),
     otherwise: Joi.array().length(0),
   }).required(),
 
