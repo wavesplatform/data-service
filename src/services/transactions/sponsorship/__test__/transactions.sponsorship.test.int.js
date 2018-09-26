@@ -16,7 +16,7 @@ const service = createService({
   emitEvent: () => () => null,
 });
 
-describe('Issue transaction service', () => {
+describe('Sponsorship transaction service', () => {
   describe('get', () => {
     it('fetches real tx', async done => {
       service

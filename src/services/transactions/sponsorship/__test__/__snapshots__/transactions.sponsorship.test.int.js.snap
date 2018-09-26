@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Issue transaction service get fetches real tx 1`] = `
+exports[`Sponsorship transaction service get fetches real tx 1`] = `
 Object {
   "__type": "transaction",
   "data": Object {
@@ -21,7 +21,7 @@ Object {
 }
 `;
 
-exports[`Issue transaction service mget fetches real txs with nulls for unreal 1`] = `
+exports[`Sponsorship transaction service mget fetches real txs with nulls for unreal 1`] = `
 Object {
   "__type": "list",
   "data": Array [
