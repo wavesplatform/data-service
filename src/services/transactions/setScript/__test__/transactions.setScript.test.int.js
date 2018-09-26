@@ -1,9 +1,8 @@
 const createService = require('..');
 const { createPgDriver } = require('../../../../db');
 
-// @todo add real txs once activated on mainnet
-const TX_ID = 'notactivated1';
-const TX_ID_2 = 'notactivated2';
+const TX_ID = '8Nwjd2tcQWff3S9WAhBa7vLRNpNnigWqrTbahvyfMVrU';
+const TX_ID_2 = 'Dt7L51pQbmMcc971byGeBHDgoi7AMfHgCtmoWYMRyWhL';
 
 const loadConfig = require('../../../../loadConfig');
 const options = loadConfig();
