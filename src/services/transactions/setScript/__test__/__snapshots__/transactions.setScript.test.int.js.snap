@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SetScript transaction service get fetches real tx 1`] = `null`;
+
+exports[`SetScript transaction service mget fetches real txs with nulls for unreal 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    null,
+    null,
+    null,
+  ],
+}
+`;
