@@ -1,0 +1,67 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Issue transaction service get fetches real tx 1`] = `
+Object {
+  "__type": "transaction",
+  "data": Object {
+    "assetId": "J8shEVBrQ4BLqsuYw5j6vQGCFJGMLBxr5nu2XvUWFEAR",
+    "fee": "1",
+    "height": 1189856,
+    "id": "A56FrxqFp6Pw9tyqgyDsUugfZMydmzRCqeTwpMnRijCJ",
+    "minSponsoredAssetFee": null,
+    "proofs": Array [
+      "VZPHjQ2ZNmn1zDhMEb4V7noS5qACusF9azzCJ23mQHPkUFtPGDWED9XTWLR54p6ZQYJrosZgXyskjScRD8qBZon",
+    ],
+    "sender": "3PEGsQ1QSj1P7bX7RuGcouc8p9LHkD7wyPy",
+    "senderPublicKey": "9hdJNctMBwRf4aWS7GMwZrZAi4PndLqG8GRjL8tZiwTm",
+    "timestamp": 2018-09-26T10:36:42.466Z,
+    "type": 14,
+    "version": 1,
+  },
+}
+`;
+
+exports[`Issue transaction service mget fetches real txs with nulls for unreal 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "assetId": "J8shEVBrQ4BLqsuYw5j6vQGCFJGMLBxr5nu2XvUWFEAR",
+        "fee": "1",
+        "height": 1189856,
+        "id": "A56FrxqFp6Pw9tyqgyDsUugfZMydmzRCqeTwpMnRijCJ",
+        "minSponsoredAssetFee": null,
+        "proofs": Array [
+          "VZPHjQ2ZNmn1zDhMEb4V7noS5qACusF9azzCJ23mQHPkUFtPGDWED9XTWLR54p6ZQYJrosZgXyskjScRD8qBZon",
+        ],
+        "sender": "3PEGsQ1QSj1P7bX7RuGcouc8p9LHkD7wyPy",
+        "senderPublicKey": "9hdJNctMBwRf4aWS7GMwZrZAi4PndLqG8GRjL8tZiwTm",
+        "timestamp": 2018-09-26T10:36:42.466Z,
+        "type": 14,
+        "version": 1,
+      },
+    },
+    null,
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "assetId": "ErNBkwEfcBAVKKPbQzdfZzmTSFvw2tg6WgUFFZVRwP9g",
+        "fee": "1",
+        "height": 1189863,
+        "id": "GGFdKLjvMnjCdmZRjuc6z9QjD8PCHZywNFBSwf62xTpS",
+        "minSponsoredAssetFee": "0.001",
+        "proofs": Array [
+          "5staf6NkUcHYLQQ3EU39i4HoPz4Mx7GeNuqtjwnQXF1LLsQvHiQfMJJtHtAUCkQKct37oXZQsZijnnRGNWpRyb9N",
+        ],
+        "sender": "3PCHcfG8AFREXsJBWm7cBmd5Yu4kphXwQYk",
+        "senderPublicKey": "5LqikT6VL7caeAEN9Ddnu1SkkuVPaFSEKnxvoTq2iZg5",
+        "timestamp": 2018-09-26T10:44:14.768Z,
+        "type": 14,
+        "version": 1,
+      },
+    },
+  ],
+}
+`;
