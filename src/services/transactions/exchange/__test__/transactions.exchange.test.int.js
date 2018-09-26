@@ -5,6 +5,7 @@ const Cursor = require('../../../../resolvers/pagination/cursor');
 
 const YESTERDAY = new Date(Date.now() - 60 * 60 * 24 * 1000);
 const TX_ID = 'FU5mCVTaa83TPMx4fj1F7bL6ZAfpMKcPpDDvhvxCD557';
+const TX_ID_2 = '4ZXpBjWJRFWaJhq9P2WUgW7N7F5h1poeJyQSfBpJuwfb';
 
 const loadConfig = require('../../../../loadConfig');
 const options = loadConfig();
@@ -44,7 +45,7 @@ describe('Exchange transaction service', () => {
   describe('mget', () => {
     it('fetches real txs with nulls for unreal', async done => {
       service
-        .mget([TX_ID, 'UNREAL', 'FU5mCVTaa83TPMx4fj1F7bL6ZAfpMKcPpDDvhvxCD557'])
+        .mget([TX_ID, 'UNREAL', TX_ID_2])
         .run()
         .promise()
         .then(xs => {

@@ -25,8 +25,8 @@ module.exports = {
   sortOuter: s => q =>
     q
       .clone()
-      .orderBy('tx_time_stamp', s)
-      .orderBy('tx_id', s),
+      .orderBy('time_stamp', s)
+      .orderBy('id', s),
   sort: s => q =>
     q
       .clone()

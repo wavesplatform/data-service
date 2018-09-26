@@ -1,6 +1,6 @@
 const Joi = require('../../../utils/validation/joi');
-const { BigNumber } = require('@waves/data-entities');
 
+const commonFields = require('../common/commonFieldsSchemas');
 const commonFilters = require('../../presets/pg/searchWithPagination/commonFilterSchemas');
 
 const orderTypes = prefix => ({
@@ -27,32 +27,20 @@ const orderTypes = prefix => ({
 });
 
 const result = Joi.object().keys({
-  tx_id: Joi.string().required(),
-  tx_signature: Joi.string().required(),
-  tx_price_asset: Joi.string().required(),
-  tx_amount_asset: Joi.string().required(),
+  ...commonFields,
 
-  tx_time_stamp: Joi.object()
-    .type(Date)
-    .required(),
-
-  tx_price: Joi.object()
+  price_asset: Joi.string().required(),
+  amount_asset: Joi.string().required(),
+  price: Joi.object()
     .bignumber()
     .required(),
-  tx_fee: Joi.object()
+  amount: Joi.object()
     .bignumber()
     .required(),
-  tx_amount: Joi.object()
+  buy_matcher_fee: Joi.object()
     .bignumber()
     .required(),
-  tx_height: Joi.number(),
-
-  tx_sender: Joi.string().required(),
-  tx_sender_public_key: Joi.string().required(),
-  tx_buy_matcher_fee: Joi.object()
-    .bignumber()
-    .required(),
-  tx_sell_matcher_fee: Joi.object()
+  sell_matcher_fee: Joi.object()
     .bignumber()
     .required(),
 
@@ -63,6 +51,7 @@ const result = Joi.object().keys({
 const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
+
     matcher: Joi.string(),
     sender: Joi.string(),
     amountAsset: Joi.string().base58(),

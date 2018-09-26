@@ -23,7 +23,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
 
     mget: mgetByIdsPreset({
       name: 'transactions.exchange.mget',
-      matchRequestResult: propEq('tx_id'),
+      matchRequestResult: propEq('id'),
       sql: sql.mget,
       resultTypeFactory: Transaction,
       resultSchema: result,
