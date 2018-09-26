@@ -1,0 +1,61 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Burn transaction service get fetches real tx 1`] = `
+Object {
+  "__type": "transaction",
+  "data": Object {
+    "amount": "1e-8",
+    "assetId": "AJ3agSmwrBdnqREqFUXkP8fbG687BbHwJnfUdNum2KLM",
+    "fee": "0.01",
+    "height": 442917,
+    "id": "41wEWfP9wMQLJViYTfmE7797fWeZJwTXsk43oUgqZ1WZ",
+    "sender": "3P5c9q348YEZv1fVwHo8476Z1MHDyH2gB3G",
+    "senderPublicKey": "XiHyJgKoAXcEz41QsHwXyDmWVzsUSb2gem3Q4EN8z2m",
+    "signature": "3aAxBwPumxSDXauncWK1dPcbgBAoPiVcXQP3nP9S96Y3QBdm3udDKrimU8rgUB8wKsYSQ2ZY3vbryRt9uu8EioVW",
+    "timestamp": 2017-04-08T08:51:40.476Z,
+    "type": 6,
+    "version": 1,
+  },
+}
+`;
+
+exports[`Burn transaction service mget fetches real txs with nulls for unreal 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "amount": "1e-8",
+        "assetId": "AJ3agSmwrBdnqREqFUXkP8fbG687BbHwJnfUdNum2KLM",
+        "fee": "0.01",
+        "height": 442917,
+        "id": "41wEWfP9wMQLJViYTfmE7797fWeZJwTXsk43oUgqZ1WZ",
+        "sender": "3P5c9q348YEZv1fVwHo8476Z1MHDyH2gB3G",
+        "senderPublicKey": "XiHyJgKoAXcEz41QsHwXyDmWVzsUSb2gem3Q4EN8z2m",
+        "signature": "3aAxBwPumxSDXauncWK1dPcbgBAoPiVcXQP3nP9S96Y3QBdm3udDKrimU8rgUB8wKsYSQ2ZY3vbryRt9uu8EioVW",
+        "timestamp": 2017-04-08T08:51:40.476Z,
+        "type": 6,
+        "version": 1,
+      },
+    },
+    null,
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "amount": "1e-8",
+        "assetId": "AJ3agSmwrBdnqREqFUXkP8fbG687BbHwJnfUdNum2KLM",
+        "fee": "0.001",
+        "height": 442917,
+        "id": "CTgfKGmiu12FPgyuhmqaKvXWrDGYqWwtHemqn8par82Y",
+        "sender": "3P5c9q348YEZv1fVwHo8476Z1MHDyH2gB3G",
+        "senderPublicKey": "XiHyJgKoAXcEz41QsHwXyDmWVzsUSb2gem3Q4EN8z2m",
+        "signature": "2vTAseut4nXWrqujjk1GJ6MdPyKrbc2xDjcDdYtarAYhXvX4FsfmFq6rYDfdV2guPwaE7Se4Yz3vPJP2yQJXzeYZ",
+        "timestamp": 2017-04-08T08:51:56.831Z,
+        "type": 6,
+        "version": 1,
+      },
+    },
+  ],
+}
+`;
