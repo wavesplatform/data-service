@@ -1,5 +1,6 @@
 const Joi = require('../../../utils/validation/joi');
 
+const commonFields = require('../common/commonFieldsSchemas');
 const commonFilters = require('../../presets/pg/searchWithPagination/commonFilterSchemas');
 
 const CORRECT_TYPE = Joi.string().valid([
@@ -10,22 +11,7 @@ const CORRECT_TYPE = Joi.string().valid([
 ]);
 
 const result = Joi.object().keys({
-  tx_type: Joi.number().required(),
-  tx_version: Joi.number(),
-  height: Joi.number().required(),
-
-  id: Joi.string().required(),
-  signature: Joi.string().allow(null),
-  proofs: Joi.array(),
-  time_stamp: Joi.date().required(),
-
-  fee: Joi.object()
-    .bignumber()
-    .required(),
-
-  sender: Joi.string().required(),
-  sender_public_key: Joi.string().required(),
-
+  ...commonFields,
   data: Joi.array()
     .items(
       Joi.object().keys({
