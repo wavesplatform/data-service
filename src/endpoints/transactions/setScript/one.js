@@ -1,17 +1,17 @@
-const createService = require('../../../services/transactions/transfer');
+const createService = require('../../../services/transactions/setScript');
 const { select } = require('../../utils/selectors');
 const { captureErrors } = require('../../../utils/captureErrors');
 
 /**
  * Endpoint
- * @name /transactions/transfer/:id
+ * @name /transactions/set-script/:id
  */
-const transferTxsOneEndpoint = async ctx => {
+const setScriptTxsOneEndpoint = async ctx => {
   const { id } = select(ctx);
 
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
-    resolver: 'transactions.transfer.one',
+    resolver: 'transactions.setScript.one',
   });
 
   const service = createService({
@@ -32,7 +32,7 @@ const transferTxsOneEndpoint = async ctx => {
     ctx.state.returnValue = tx;
   } else {
     ctx.status = 404;
-    ctx.body = `Transfer tx with id=${id} not found`;
+    ctx.body = `SetScript tx with id=${id} not found`;
   }
 };
 
@@ -45,7 +45,7 @@ const handleError = ({ ctx, error }) => {
     },
     Resolver: () => {
       ctx.status = 500;
-      ctx.body = 'Error resolving /transactions/transfer';
+      ctx.body = 'Error resolving /transactions/set-script';
     },
     Validation: () => {
       ctx.status = 400;
@@ -53,4 +53,4 @@ const handleError = ({ ctx, error }) => {
     },
   });
 };
-module.exports = captureErrors(handleError)(transferTxsOneEndpoint);
+module.exports = captureErrors(handleError)(setScriptTxsOneEndpoint);
