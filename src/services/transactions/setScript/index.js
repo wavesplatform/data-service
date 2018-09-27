@@ -4,12 +4,13 @@ const { Transaction } = require('../../../types');
 
 const getByIdPreset = require('../../presets/pg/getById');
 const mgetByIdsPreset = require('../../presets/pg/mgetByIds');
+const searchWithPaginationPreset = require('../../presets/pg/searchWithPagination');
 
 const transformTxInfo = require('../common/transformTxInfo');
 
 const sql = require('./sql');
 
-const { result } = require('./schema');
+const { result, inputSearch } = require('./schema');
 
 module.exports = ({ drivers: { pg }, emitEvent }) => {
   return {
@@ -25,6 +26,14 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       matchRequestResult: propEq('id'),
       sql: sql.mget,
       resultTypeFactory: Transaction,
+      resultSchema: result,
+      transformResult: transformTxInfo,
+    })({ pg, emitEvent }),
+
+    search: searchWithPaginationPreset({
+      name: 'transactions.setScript.search',
+      sql: sql.search,
+      inputSchema: inputSearch,
       resultSchema: result,
       transformResult: transformTxInfo,
     })({ pg, emitEvent }),
