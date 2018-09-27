@@ -1,4 +1,4 @@
-const Maybe = require('folktale/Maybe');
+const Maybe = require('folktale/maybe');
 const { compose, map, filter, has, __, curryN, find } = require('ramda');
 
 /**

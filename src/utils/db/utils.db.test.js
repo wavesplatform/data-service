@@ -1,4 +1,4 @@
-const Maybe = require('folktale/Maybe');
+const Maybe = require('folktale/maybe');
 const { matchRequestsResults } = require('.');
 
 const matchFn = (req, res) => res === req * 10;
