@@ -4,8 +4,6 @@ const { createPgDriver } = require('../../../../db');
 const { parseDate } = require('../../../../utils/parseDate');
 const Cursor = require('../../../../resolvers/pagination/cursor');
 
-// const YESTERDAY = new Date(Date.now() - 60 * 60 * 24 * 1000);
-
 const TX_ID = '8Nwjd2tcQWff3S9WAhBa7vLRNpNnigWqrTbahvyfMVrU';
 const TX_ID_2 = 'Dt7L51pQbmMcc971byGeBHDgoi7AMfHgCtmoWYMRyWhL';
 
