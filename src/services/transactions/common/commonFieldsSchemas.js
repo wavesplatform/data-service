@@ -5,7 +5,10 @@ module.exports = {
     .base58()
     .required(),
   height: Joi.number().required(),
-  tx_type: Joi.number().required(),
+  tx_type: Joi.number()
+    .min(1)
+    .max(14)
+    .required(),
   tx_version: Joi.number()
     .required()
     .allow(null),

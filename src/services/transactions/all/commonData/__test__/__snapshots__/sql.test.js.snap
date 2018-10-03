@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Sql builder get works 1`] = `"select \\"t\\".\\"tx_type\\" as \\"tx_type\\", \\"t\\".\\"id\\" as \\"id\\" from \\"txs\\" as \\"t\\" where \\"id\\" = 'id'"`;
+
+exports[`Sql builder mget works 1`] = `"select \\"t\\".\\"tx_type\\" as \\"tx_type\\", \\"t\\".\\"id\\" as \\"id\\" from \\"txs\\" as \\"t\\" where \\"id\\" in ('id1', 'id2')"`;
+
+exports[`Sql builder search covers case with all filters (without after) 1`] = `"select \\"t\\".\\"tx_type\\" as \\"tx_type\\", \\"t\\".\\"id\\" as \\"id\\" from \\"txs\\" as \\"t\\" where \\"sender\\" = 'sender' and \\"t\\".\\"time_stamp\\" >= 'timeStart' and \\"t\\".\\"time_stamp\\" <= 'timeEnd' order by \\"t\\".\\"time_stamp\\" asc, \\"t\\".\\"id\\" asc limit 1"`;
+
+exports[`Sql builder search covers case with all filters with after 1`] = `"select \\"t\\".\\"tx_type\\" as \\"tx_type\\", \\"t\\".\\"id\\" as \\"id\\" from \\"txs\\" as \\"t\\" where \\"sender\\" = 'sender' and (t.time_stamp, t.id) > ('timestamp', 'id') and \\"t\\".\\"time_stamp\\" >= 'timeStart' and \\"t\\".\\"time_stamp\\" <= 'timeEnd' order by \\"t\\".\\"time_stamp\\" asc, \\"t\\".\\"id\\" asc limit 1"`;

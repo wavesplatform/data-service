@@ -21,7 +21,7 @@ const createPgAdapter = ({ pg, sql }) => {
         .any(sql.many(filters))
         .map(map(Maybe.fromNullable))
         .mapRejected(
-          toDbError({ request: 'transactions.all.mget', params: filters })
+          toDbError({ request: 'transactions.all.search', params: filters })
         );
     },
   };

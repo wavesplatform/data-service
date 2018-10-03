@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`All txs common data transaction service get fetches real tx 1`] = `
+Object {
+  "__type": "transaction",
+  "data": Object {
+    "id": "8W9BkioPSWmPfDjcTFGaCy8vLEmcwkzJeSWno1s3Wra7",
+    "timestamp": 2017-01-27T12:00:37.072Z,
+    "type": 4,
+  },
+}
+`;
+
+exports[`All txs common data transaction service mget fetches real txs with nulls for unreal 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "id": "8W9BkioPSWmPfDjcTFGaCy8vLEmcwkzJeSWno1s3Wra7",
+        "timestamp": 2017-01-27T12:00:37.072Z,
+        "type": 4,
+      },
+    },
+    null,
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "id": "CPf7EWE4hPrBNKJpzBtBm9os4UsyZ8Eebhzwq4EqLWqG",
+        "timestamp": 2017-03-17T15:11:28.591Z,
+        "type": 7,
+      },
+    },
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "id": "23sjEq5zNctBTGqrsapLrPxDkHFM8rJCKF1ti55NRpbF",
+        "timestamp": 2018-04-07T08:36:52.149Z,
+        "type": 12,
+      },
+    },
+  ],
+}
+`;
