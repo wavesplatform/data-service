@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Sql builder get works 1`] = `"select \\"t\\".\\"height\\" as \\"height\\", \\"t\\".\\"tx_type\\" as \\"tx_type\\", \\"t\\".\\"id\\" as \\"id\\", \\"t\\".\\"time_stamp\\" as \\"time_stamp\\", \\"t\\".\\"signature\\" as \\"signature\\", \\"t\\".\\"proofs\\" as \\"proofs\\", \\"t\\".\\"tx_version\\" as \\"tx_version\\", \\"t\\".\\"fee\\" as \\"fee\\", \\"t\\".\\"recipient\\" as \\"recipient\\", t.amount * 10^(-8) as \\"amount\\" from \\"txs_1\\" as \\"t\\" where \\"id\\" = 'id'"`;
+
+exports[`Sql builder mget works 1`] = `"select \\"t\\".\\"height\\" as \\"height\\", \\"t\\".\\"tx_type\\" as \\"tx_type\\", \\"t\\".\\"id\\" as \\"id\\", \\"t\\".\\"time_stamp\\" as \\"time_stamp\\", \\"t\\".\\"signature\\" as \\"signature\\", \\"t\\".\\"proofs\\" as \\"proofs\\", \\"t\\".\\"tx_version\\" as \\"tx_version\\", \\"t\\".\\"fee\\" as \\"fee\\", \\"t\\".\\"recipient\\" as \\"recipient\\", t.amount * 10^(-8) as \\"amount\\" from \\"txs_1\\" as \\"t\\" where \\"id\\" in ('id1', 'id2')"`;
