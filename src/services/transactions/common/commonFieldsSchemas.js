@@ -19,11 +19,7 @@ module.exports = {
   signature: Joi.string()
     .required()
     .allow(null),
-  proofs: Joi.when('signature', {
-    is: null,
-    then: Joi.array(),
-    otherwise: Joi.array().length(0),
-  }).required(),
+  proofs: Joi.array().required(),
 
   sender: Joi.string().required(),
   sender_public_key: Joi.string().required(),

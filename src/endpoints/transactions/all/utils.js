@@ -3,21 +3,17 @@ const { parseDate } = require('../../../utils/parseDate');
 
 const selectFilters = ({
   sender,
-  recipient,
   after,
-  type,
   timeStart,
   timeEnd,
-  sort,
+  sort = 'desc',
   limit = 100,
 }) =>
   reject(isNil, {
     timeStart: timeStart && parseDate(timeStart),
     timeEnd: timeEnd && parseDate(timeEnd),
-    limit,
-    type,
+    limit: parseInt(limit),
     sort,
-    recipient,
     sender,
     after,
   });

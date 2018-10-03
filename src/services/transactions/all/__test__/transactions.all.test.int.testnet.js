@@ -1,10 +1,11 @@
-const createService = require('../');
-const { createPgDriver } = require('../../../../db/');
+const createService = require('..');
+const { createPgDriver } = require('../../../../db');
 const { parseDate } = require('../../../../utils/parseDate');
 const Cursor = require('../../../../resolvers/pagination/cursor');
 
-const YESTERDAY = new Date(Date.now() - 60 * 60 * 24 * 1000);
-const TX_ID = 'GN5SSawWUwodvAcHV2d96pe7HgFqvxoEAU9FCW9MUphE';
+const TX_ID = '8W9BkioPSWmPfDjcTFGaCy8vLEmcwkzJeSWno1s3Wra7'; // tx 4
+const TX_ID_2 = 'CPf7EWE4hPrBNKJpzBtBm9os4UsyZ8Eebhzwq4EqLWqG'; // tx 7
+const TX_ID_3 = '23sjEq5zNctBTGqrsapLrPxDkHFM8rJCKF1ti55NRpbF'; // tx 12
 
 const loadConfig = require('../../../../loadConfig');
 const options = loadConfig();
@@ -18,10 +19,26 @@ const service = createService({
   emitEvent: () => () => null,
 });
 
-describe('Transfer transaction resolver for one', () => {
-  it('fetches real tx', async done => {
+describe('All transactions resolver for one', () => {
+  it('fetches real transfer tx', async done => {
     service
       .get(TX_ID)
+      .run()
+      .promise()
+      .then(() => done())
+      .catch(e => done(JSON.stringify(e)));
+  });
+  it('fetches real exchange tx', async done => {
+    service
+      .get(TX_ID_2)
+      .run()
+      .promise()
+      .then(() => done())
+      .catch(e => done(JSON.stringify(e)));
+  });
+  it('fetches real data tx', async done => {
+    service
+      .get(TX_ID_3)
       .run()
       .promise()
       .then(() => done())
@@ -36,27 +53,28 @@ describe('Transfer transaction resolver for one', () => {
     expect(tx).toBe(null);
   });
 });
-describe('Transfer transaction resolver for many', () => {
+
+describe('All transactions resolver for many', () => {
   it('fetches real tx', async () => {
-    const tx = await service
-      .search({
-        limit: 20,
-        timeStart: YESTERDAY,
-      })
+    const txs = await service
+      .search({ limit: 20, sort: 'asc' })
       .run()
       .promise();
-    expect(tx).toBeDefined();
-    expect(tx.data).toHaveLength(20);
+
+    expect(txs).toBeDefined();
+    expect(txs.data).toHaveLength(20);
+    expect(txs).toMatchSnapshot();
   });
+
   describe('Pagination ', async () => {
-    const START = '2018-06-02T10:59:43.000Z';
-    const END = '2018-06-03T23:59:48.000Z';
+    const START = '2018-07-01T00:00:00.000Z';
+    const END = '2018-10-01T00:00:00.000Z';
     const LIMIT = 21;
     const createCursor = sort => ({ data }) => Cursor.encode(sort, data);
-    it(' doesnt get 2 identical entries for limit 1 asc with next page fetching', async () => {
+    it('doesnt get 2 identical entries for limit 1 asc with next page fetching', async () => {
       const baseParams = {
         limit: 1,
-        timeStart: parseDate('Mon Jun 11 2018 12:34:52 GMT+0300 (MSK)'),
+        timeStart: parseDate(START),
         sort: 'asc',
       };
 
