@@ -2,6 +2,7 @@ const createService = require('../../../services/transactions/transfer');
 
 const { captureErrors } = require('../../../utils/captureErrors');
 const { select } = require('../../utils/selectors');
+const { hasOnlyIds } = require('../../utils/hasOnlyIds');
 const { selectFilters } = require('./utils');
 
 /**
@@ -23,10 +24,23 @@ const transferTxsManyEndpoint = async ctx => {
     emitEvent: ctx.eventBus.emit,
   });
 
-  const txs = await service
-    .search(filters)
-    .run()
-    .promise();
+  let txs;
+  if (filters.ids) {
+    if (!hasOnlyIds(filters)) {
+      ctx.status = 400;
+      ctx.body = 'Invalid query: either request by ids, or by other filters.';
+    }
+    // mget request
+    txs = await service
+      .mget(filters.ids)
+      .run()
+      .promise();
+  } else {
+    txs = await service
+      .search(filters)
+      .run()
+      .promise();
+  }
 
   ctx.eventBus.emit('ENDPOINT_RESOLVED', {
     value: txs,

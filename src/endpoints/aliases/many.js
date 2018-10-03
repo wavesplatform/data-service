@@ -1,9 +1,11 @@
 const { many: createResolver } = require('../../resolvers/aliases');
 const { select } = require('../utils/selectors');
+const { parseBool } = require('../utils/parseBool');
 const { captureErrors } = require('../../utils/captureErrors');
 
 const resolver = async ctx => {
-  const { address, showBroken } = select(ctx).query;
+  const { address, showBroken: showBrokenString } = select(ctx).query;
+  const showBroken = parseBool(showBrokenString);
 
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,

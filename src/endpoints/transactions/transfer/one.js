@@ -45,7 +45,7 @@ const handleError = ({ ctx, error }) => {
     },
     Resolver: () => {
       ctx.status = 500;
-      ctx.body = 'Error resolving /transactions/';
+      ctx.body = 'Error resolving /transactions/transfer';
     },
     Validation: () => {
       ctx.status = 400;

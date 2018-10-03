@@ -1,0 +1,52 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Genesis transaction service get fetches real tx 1`] = `
+Object {
+  "__type": "transaction",
+  "data": Object {
+    "amount": "99999995",
+    "fee": "0",
+    "height": 1,
+    "id": "2DVtfgXjpMeFf2PQCqvwxAiaGbiDsxDjSdNQkc5JQ74eWxjWFYgwvqzC4dn7iB1AhuM32WxEiVi1SGijsBtYQwn8",
+    "recipient": "3PAWwWa6GbwcJaFzwqXQN5KQm7H96Y7SHTQ",
+    "signature": "2DVtfgXjpMeFf2PQCqvwxAiaGbiDsxDjSdNQkc5JQ74eWxjWFYgwvqzC4dn7iB1AhuM32WxEiVi1SGijsBtYQwn8",
+    "timestamp": 2016-06-12T11:42:57.614Z,
+    "type": 1,
+  },
+}
+`;
+
+exports[`Genesis transaction service mget fetches real txs with nulls for unreal 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "amount": "99999995",
+        "fee": "0",
+        "height": 1,
+        "id": "2DVtfgXjpMeFf2PQCqvwxAiaGbiDsxDjSdNQkc5JQ74eWxjWFYgwvqzC4dn7iB1AhuM32WxEiVi1SGijsBtYQwn8",
+        "recipient": "3PAWwWa6GbwcJaFzwqXQN5KQm7H96Y7SHTQ",
+        "signature": "2DVtfgXjpMeFf2PQCqvwxAiaGbiDsxDjSdNQkc5JQ74eWxjWFYgwvqzC4dn7iB1AhuM32WxEiVi1SGijsBtYQwn8",
+        "timestamp": 2016-06-12T11:42:57.614Z,
+        "type": 1,
+      },
+    },
+    null,
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "amount": "1",
+        "fee": "0",
+        "height": 1,
+        "id": "2TsxPS216SsZJAiep7HrjZ3stHERVkeZWjMPFcvMotrdGpFa6UCCmoFiBGNizx83Ks8DnP3qdwtJ8WFcN9J4exa3",
+        "recipient": "3P8JdJGYc7vaLu4UXUZc1iRLdzrkGtdCyJM",
+        "signature": "2TsxPS216SsZJAiep7HrjZ3stHERVkeZWjMPFcvMotrdGpFa6UCCmoFiBGNizx83Ks8DnP3qdwtJ8WFcN9J4exa3",
+        "timestamp": 2016-06-12T11:42:57.614Z,
+        "type": 1,
+      },
+    },
+  ],
+}
+`;

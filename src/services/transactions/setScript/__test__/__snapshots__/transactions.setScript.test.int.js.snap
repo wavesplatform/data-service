@@ -1,0 +1,64 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SetScript transaction service get fetches real tx 1`] = `
+Object {
+  "__type": "transaction",
+  "data": Object {
+    "fee": "0.02082496",
+    "height": 1190001,
+    "id": "8Nwjd2tcQWff3S9WAhBa7vLRNpNnigWqrTbahvyfMVrU",
+    "proofs": Array [
+      "V45jPG1nuEnwaYb9jTKQCJpRskJQvtkBcnZ45WjZUbVdNTi1KijVikJkDfMNcEdSBF8oGDYZiWpVTdLSn76mV57",
+    ],
+    "script": "base64:AQQAAAAEaW5hbAIAAAAESW5hbAQAAAAFZWxlbmECAAAAB0xlbnVza2EEAAAABGxvdmUCAAAAC0luYWxMZW51c2thCQAAAAAAAAIJAAEsAAAAAgUAAAAEaW5hbAUAAAAFZWxlbmEFAAAABGxvdmV4ZFt5",
+    "sender": "3PBSduYkK7GQxVFWkKWMq8GQkVdAGX71hTx",
+    "senderPublicKey": "3LZmDK7vuSBsDmFLxJ4qihZynUz8JF9e88dNu5fsus5p",
+    "timestamp": 2018-09-26T11:51:52.182Z,
+    "type": 13,
+    "version": 1,
+  },
+}
+`;
+
+exports[`SetScript transaction service mget fetches real txs with nulls for unreal 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "fee": "0.02082496",
+        "height": 1190001,
+        "id": "8Nwjd2tcQWff3S9WAhBa7vLRNpNnigWqrTbahvyfMVrU",
+        "proofs": Array [
+          "V45jPG1nuEnwaYb9jTKQCJpRskJQvtkBcnZ45WjZUbVdNTi1KijVikJkDfMNcEdSBF8oGDYZiWpVTdLSn76mV57",
+        ],
+        "script": "base64:AQQAAAAEaW5hbAIAAAAESW5hbAQAAAAFZWxlbmECAAAAB0xlbnVza2EEAAAABGxvdmUCAAAAC0luYWxMZW51c2thCQAAAAAAAAIJAAEsAAAAAgUAAAAEaW5hbAUAAAAFZWxlbmEFAAAABGxvdmV4ZFt5",
+        "sender": "3PBSduYkK7GQxVFWkKWMq8GQkVdAGX71hTx",
+        "senderPublicKey": "3LZmDK7vuSBsDmFLxJ4qihZynUz8JF9e88dNu5fsus5p",
+        "timestamp": 2018-09-26T11:51:52.182Z,
+        "type": 13,
+        "version": 1,
+      },
+    },
+    null,
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "fee": "0.01",
+        "height": 1190002,
+        "id": "Dt7L51pQbmMcc971byGeBHDgoi7AMfHgCtmoWYMRyWhL",
+        "proofs": Array [
+          "3wPYieN6CriPVzRDCGCqDnPLR5xDDC1RaQVPT85RiftARZobeAEQ1bMp4rwMSHhSPgKyAGDAfFDGkjvBvKVuqqJg",
+        ],
+        "script": "base64:AQkAAfQAAAADCAUAAAACdHgAAAAJYm9keUJ5dGVzCQABkQAAAAIIBQAAAAJ0eAAAAAZwcm9vZnMAAAAAAAAAAAABAAAAIJCWiNsyagiZio80TlMvhx+LNSWy+s3wvE/jALCRCi1e2ccqiA==",
+        "sender": "3P6WfA4qYtkgwVAsWiiB6yaea2X8zyXncJh",
+        "senderPublicKey": "EYNuSmW4Adtcc6AMCZyxkiHMPmF2BZ2XxvjpBip3UFZL",
+        "timestamp": 2018-09-26T12:55:09.003Z,
+        "type": 13,
+        "version": 1,
+      },
+    },
+  ],
+}
+`;

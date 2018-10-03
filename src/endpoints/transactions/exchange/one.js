@@ -1,8 +1,7 @@
-const {
-  one: createResolver,
-} = require('../../../resolvers/transactions/exchange');
+const createService = require('../../../services/transactions/exchange');
 const { captureErrors } = require('../../../utils/captureErrors');
 const { select } = require('../../utils/selectors');
+
 const exchangeTxsEndpointOne = async ctx => {
   const { id } = select(ctx);
 
@@ -12,15 +11,16 @@ const exchangeTxsEndpointOne = async ctx => {
     id,
   });
 
-  const resolver = createResolver({
-    db: ctx.state.db,
+  const service = createService({
+    drivers: ctx.state.drivers,
     emitEvent: ctx.eventBus.emit,
   });
 
-  // Run resolver with params
-  const tx = await resolver(id)
+  const tx = await service
+    .get(id)
     .run()
     .promise();
+
   ctx.eventBus.emit('ENDPOINT_RESOLVED', {
     value: tx,
   });

@@ -7,14 +7,14 @@ const selectFilters = ({
   assetId,
   timeStart,
   timeEnd,
-  sort,
+  sort = 'desc',
   limit = 100,
   recipient,
 }) =>
   reject(isNil, {
     timeStart: timeStart && parseDate(timeStart),
     timeEnd: timeEnd && parseDate(timeEnd),
-    limit,
+    limit: parseInt(limit),
     sort,
     sender,
     after,

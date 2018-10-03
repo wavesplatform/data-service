@@ -1,0 +1,70 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Transfer transaction service get fetches real tx 1`] = `
+Object {
+  "__type": "transaction",
+  "data": Object {
+    "amount": "0.00093605",
+    "assetId": "AnERqFRffNVrCbviXbDEdzrU6ipXCP5Y1PKpFdRnyQAy",
+    "attachment": "",
+    "fee": "0.001",
+    "feeAsset": "WAVES",
+    "height": 554167,
+    "id": "GN5SSawWUwodvAcHV2d96pe7HgFqvxoEAU9FCW9MUphE",
+    "recipient": "3PMYPcrwE844vTzqDxxeJMTQZYiP5GQSmvh",
+    "sender": "3P23fi1qfVw6RVDn4CH2a5nNouEtWNQ4THs",
+    "senderPublicKey": "9pfdqs3WwYv3d4zN2ekHSqxcPnE7zKceMJXq1zZxAyd4",
+    "signature": "3hXbwJ1gBu5JeqQqBZkwegMZzn1GSTa6jj31eJ8GGpbjRxgFRjdvvLgHUayRccgTKBhi8uNLDrSmrgVr9nfT21DC",
+    "timestamp": 2017-06-25T14:11:59.285Z,
+    "type": 4,
+    "version": 1,
+  },
+}
+`;
+
+exports[`Transfer transaction service mget fetches real txs with nulls for unreal 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "amount": "0.00093605",
+        "assetId": "AnERqFRffNVrCbviXbDEdzrU6ipXCP5Y1PKpFdRnyQAy",
+        "attachment": "",
+        "fee": "0.001",
+        "feeAsset": "WAVES",
+        "height": 554167,
+        "id": "GN5SSawWUwodvAcHV2d96pe7HgFqvxoEAU9FCW9MUphE",
+        "recipient": "3PMYPcrwE844vTzqDxxeJMTQZYiP5GQSmvh",
+        "sender": "3P23fi1qfVw6RVDn4CH2a5nNouEtWNQ4THs",
+        "senderPublicKey": "9pfdqs3WwYv3d4zN2ekHSqxcPnE7zKceMJXq1zZxAyd4",
+        "signature": "3hXbwJ1gBu5JeqQqBZkwegMZzn1GSTa6jj31eJ8GGpbjRxgFRjdvvLgHUayRccgTKBhi8uNLDrSmrgVr9nfT21DC",
+        "timestamp": 2017-06-25T14:11:59.285Z,
+        "type": 4,
+        "version": 1,
+      },
+    },
+    null,
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "amount": "0.007",
+        "assetId": "WAVES",
+        "attachment": "",
+        "fee": "0.001",
+        "feeAsset": "WAVES",
+        "height": 240868,
+        "id": "Co8JB3md1hsnFKYS2xonipBFyQcB7qskyosoJf6YhBi1",
+        "recipient": "3PJkWhTJXrYWiSj6sxv9aoUrzoBbGZmzvQf",
+        "sender": "3P2b1YqpGNb57ftMQN5be25iKowq65GmkZ7",
+        "senderPublicKey": "J9LBb9ZixtDiLFxXocGXt69JU5vConrGYh7yM1mnAPWQ",
+        "signature": "4QgAFzCvEhMEEWuYvuPU8tw4bhSKzrfFW2RrhkEYFc82EVdmUV7HqRehpTxsvQ9V2dYd4yp4Ezez9RqVwDSKr2uz",
+        "timestamp": 2016-11-21T07:01:42.156Z,
+        "type": 4,
+        "version": 1,
+      },
+    },
+  ],
+}
+`;

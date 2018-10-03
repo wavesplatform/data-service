@@ -14,11 +14,17 @@ const transferMany = require('./transfer/many');
 const leaseOne = require('./lease/one');
 const leaseMany = require('./lease/many');
 
+const leaseCancelOne = require('./leaseCancel/one');
+const leaseCancelMany = require('./leaseCancel/many');
+
 const massTransferOne = require('./massTransfer/one');
 const massTransferSearch = require('./massTransfer/search');
 
-const allTransfersOne = require('./all/one');
-const allTransfersMany = require('./all/many');
+const setScriptOne = require('./setScript/one');
+const setScriptMany = require('./setScript/many');
+
+const allTransactionsOne = require('./all/one');
+const allTransactionsMany = require('./all/many');
 
 const postToGet = require('../utils/postToGet');
 
@@ -38,12 +44,20 @@ subrouter.get('/transactions/lease/:id', leaseOne);
 subrouter.get('/transactions/lease', leaseMany);
 subrouter.post('/transactions/lease', postToGet(leaseMany));
 
+subrouter.get('/transactions/lease-cancel/:id', leaseCancelOne);
+subrouter.get('/transactions/lease-cancel', leaseCancelMany);
+subrouter.post('/transactions/lease-cancel', postToGet(leaseCancelMany));
+
 subrouter.get('/transactions/mass-transfer/:id', massTransferOne);
 subrouter.get('/transactions/mass-transfer', massTransferSearch);
 subrouter.post('/transactions/mass-transfer', postToGet(massTransferSearch));
 
-subrouter.get('/transactions/all/:id', allTransfersOne);
-subrouter.get('/transactions/all', allTransfersMany);
-subrouter.post('/transactions/all', postToGet(allTransfersMany));
+subrouter.get('/transactions/set-script/:id', setScriptOne);
+subrouter.get('/transactions/set-script', setScriptMany);
+subrouter.post('/transactions/set-script', postToGet(setScriptMany));
+
+subrouter.get('/transactions/all/:id', allTransactionsOne);
+subrouter.get('/transactions/all', allTransactionsMany);
+subrouter.post('/transactions/all', postToGet(allTransactionsMany));
 
 module.exports = subrouter;
