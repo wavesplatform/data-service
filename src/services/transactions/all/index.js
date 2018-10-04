@@ -7,12 +7,13 @@ const {
   toPairs,
   pick,
   isNil,
+  reject,
   ifElse,
   flatten,
   indexBy,
+  identity,
+  evolve,
 } = require('ramda');
-
-const { Transaction } = require('../../../types');
 
 const commonData = require('./commonData');
 
@@ -43,6 +44,39 @@ module.exports = deps => {
   const commonTxData = commonData(deps);
   const txsServices = map(f => f(deps), createServices);
 
+  /**
+   * idTypeFromCommonData
+   * List CommonData -> { id, type }[]
+   */
+  const idTypeFromCommonData = pipe(
+    getData,
+    map(
+      pipe(
+        getData,
+        pick(['id', 'type'])
+      )
+    )
+  );
+
+  /**
+   * resultsFromIdType
+   * returns unordered response data from types and ids
+   * { id, type }[] -> Task TxData[]
+   */
+  const resultsFromIdType = pipe(
+    groupBy(prop('type')),
+    toPairs,
+    map(([type, txs]) => txsServices[type].mget(txs.map(prop('id')))),
+    Task.waitAll,
+    map(
+      pipe(
+        map(getData),
+        flatten,
+        map(getData)
+      )
+    )
+  );
+
   return {
     get: id =>
       commonTxData
@@ -58,36 +92,50 @@ module.exports = deps => {
           )
         ),
 
+    mget: ids =>
+      commonTxData
+        .mget(ids) // Task (tx | null)[]
+        .chain(txsList =>
+          pipe(
+            evolve({ data: reject(isNil) }),
+            idTypeFromCommonData,
+            resultsFromIdType, // Task TxData[]
+            // format output
+            map(
+              pipe(
+                indexBy(prop('id')),
+                resultsMap => ({
+                  ...txsList,
+                  data: txsList.data.map(
+                    ifElse(isNil, identity, t => ({
+                      ...t,
+                      data: resultsMap[t.data.id],
+                    }))
+                  ),
+                })
+              )
+            )
+          )(txsList)
+        ),
+
     search: filters =>
       commonTxData.search(filters).chain(txsList =>
         pipe(
-          getData,
+          idTypeFromCommonData,
+          resultsFromIdType,
+          // format output
           map(
             pipe(
-              getData,
-              pick(['id', 'type'])
+              indexBy(prop('id')),
+              resultsMap => ({
+                ...txsList,
+                data: txsList.data.map(t => ({
+                  ...t,
+                  data: resultsMap[t.data.id],
+                })),
+              })
             )
-          ),
-          txs => {
-            const requestsT = pipe(
-              groupBy(prop('type')),
-              toPairs,
-              map(([type, txs]) => txsServices[type].mget(txs.map(prop('id')))),
-              Task.waitAll
-            )(txs);
-
-            return requestsT.map(
-              pipe(
-                map(getData),
-                flatten,
-                map(getData),
-                indexBy(prop('id')),
-                resultsMap => txs.map(prop('id')).map(id => resultsMap[id]),
-                // to preserve cursor from commonData service
-                txs => ({ ...txsList, data: txs.map(Transaction) })
-              )
-            );
-          }
+          )
         )(txsList)
       ),
   };
