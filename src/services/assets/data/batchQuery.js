@@ -1,6 +1,10 @@
 const { matchRequestsResults } = require('../../../utils/db/index');
-const { curryN } = require('ramda');
+const { curryN, uncurryN, compose, map } = require('ramda');
 
-module.exports = curryN(3, (matchFn, requests, results) =>
-  matchRequestsResults(matchFn, requests, results).map(mx => mx.getOrElse(null))
+module.exports = curryN(
+  3,
+  compose(
+    map(mx => mx.getOrElse(null)),
+    uncurryN(3, matchRequestsResults)
+  )
 );
