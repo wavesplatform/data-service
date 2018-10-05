@@ -1,14 +1,7 @@
 const Router = require('koa-router');
 
-const subrouter = new Router();
+const createEndpoint = require('../_common');
 
-const assetsMany = require('./many');
-const assetsOne = require('./one');
-const postToGet = require('../utils/postToGet');
+const createService = require('../../services/assets');
 
-subrouter.get('/assets', assetsMany);
-subrouter.post('/assets', postToGet(assetsMany));
-
-subrouter.get('/assets/:id', assetsOne);
-
-module.exports = subrouter;
+module.exports = createEndpoint('/assets', createService)(new Router());

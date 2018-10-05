@@ -1,7 +1,7 @@
 const { has } = require('ramda');
 
-const { captureErrors } = require('../../../utils/captureErrors');
-const { select } = require('../../utils/selectors');
+const { captureErrors } = require('../../utils/captureErrors');
+const { select } = require('../utils/selectors');
 
 const { parseFilterValues } = require('./filters');
 

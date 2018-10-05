@@ -3,10 +3,13 @@ const createManyMiddleware = require('./many');
 
 const postToGet = require('../utils/postToGet');
 
-const create = ({
-  filterParsers,
-  mgetFilterName = 'ids',
-}) => url => service => router => {
+const { ids } = require('./filters');
+
+const create = (
+  url,
+  service,
+  { filterParsers = { ids }, mgetFilterName = 'ids' } = {}
+) => router => {
   const manyMiddleware = createManyMiddleware(
     {
       filterParsers,

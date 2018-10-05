@@ -1,4 +1,4 @@
-const { compose, reject, isNil, mapObjIndexed, tap } = require('ramda');
+const { compose, reject, isNil, mapObjIndexed } = require('ramda');
 
 const parseFilterValues = parsers => values =>
   compose(

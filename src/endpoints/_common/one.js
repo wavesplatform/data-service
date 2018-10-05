@@ -1,5 +1,5 @@
-const { captureErrors } = require('../../../utils/captureErrors');
-const { select } = require('../../utils/selectors');
+const { captureErrors } = require('../../utils/captureErrors');
+const { select } = require('../utils/selectors');
 
 const createGetMiddleware = (url, service) => {
   const handleError = ({ ctx, error }) => {
