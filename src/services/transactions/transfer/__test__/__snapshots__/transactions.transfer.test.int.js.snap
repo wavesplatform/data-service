@@ -45,7 +45,6 @@ Object {
         "version": 1,
       },
     },
-    null,
     Object {
       "__type": "transaction",
       "data": Object {
@@ -65,6 +64,7 @@ Object {
         "version": 1,
       },
     },
+    null,
   ],
 }
 `;
