@@ -21,6 +21,11 @@ describe('Filter values parsing', () => {
     after: 'AFTER',
   };
 
+  const defaults = {
+    limit: 100,
+    sort: 'desc',
+  };
+
   describe('all common filter', () => {
     it('values are parsed correctly provided correct values are given', () => {
       expect(parseQuery(query)).toEqual({
@@ -31,21 +36,28 @@ describe('Filter values parsing', () => {
       });
     });
     it('correct default values are given ', () => {
-      expect(
-        expect(parseQuery({})).toEqual({
-          limit: 100,
-          sort: 'desc',
-        })
-      );
+      expect(parseQuery({})).toEqual(defaults);
+    });
+
+    it('ids are parsed correctly in any form', () => {
+      expect(parseQuery({ ids: 'someValue' })).toEqual({
+        ...defaults,
+        ids: ['someValue'],
+      });
+
+      expect(parseQuery({ ids: '' })).toEqual({
+        ...defaults,
+        ids: [],
+      });
+
+      expect(parseQuery({ ids: 'qwe,asd' })).toEqual({
+        ...defaults,
+        ids: ['qwe', 'asd'],
+      });
     });
   });
 
   it('extra input values are ignored', () => {
-    expect(
-      expect(parseQuery({ badKey: 'badValue' })).toEqual({
-        limit: 100,
-        sort: 'desc',
-      })
-    );
+    expect(parseQuery({ badKey: 'badValue' })).toEqual(defaults);
   });
 });

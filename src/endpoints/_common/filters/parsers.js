@@ -8,6 +8,7 @@ const {
 } = require('ramda');
 
 const { parseDate } = require('../../../utils/parseDate');
+const { parseArrayQuery } = require('../../utils/parseArrayQuery');
 
 const dateOrNull = ifElse(isNil, always(null), parseDate);
 
@@ -20,5 +21,5 @@ module.exports = {
   ),
   sort: defaultTo('desc'),
   after: identity,
-  ids: identity,
+  ids: parseArrayQuery,
 };

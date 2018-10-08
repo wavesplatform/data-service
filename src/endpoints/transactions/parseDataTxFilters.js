@@ -1,10 +1,9 @@
 const { reject, isNil } = require('ramda');
-const { parseDate } = require('../../../utils/parseDate');
-const { parseBool } = require('../../utils/parseBool');
+const { parseDate } = require('../../utils/parseDate');
+const { parseBool } = require('../utils/parseBool');
+const { parseArrayQuery } = require('../utils/parseArrayQuery');
 
 const { BigNumber } = require('@waves/data-entities');
-
-// integer, boolean, string, binary
 
 const parseValue = (type, value) => {
   if (type === 'boolean') return parseBool(value);
@@ -12,7 +11,8 @@ const parseValue = (type, value) => {
   else return value;
 };
 
-const selectFilters = ({
+const parseFilters = ({
+  ids,
   timeStart, // No default value for timestart, other way - bad for desc pagination
   timeEnd,
   sender,
@@ -24,6 +24,7 @@ const selectFilters = ({
   after,
 }) =>
   reject(isNil, {
+    ids: ids && parseArrayQuery(ids),
     timeStart: timeStart && parseDate(timeStart),
     timeEnd: timeEnd && parseDate(timeEnd),
     limit: parseInt(limit),
@@ -35,4 +36,4 @@ const selectFilters = ({
     after,
   });
 
-module.exports = { selectFilters };
+module.exports = parseFilters;

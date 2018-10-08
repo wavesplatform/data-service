@@ -6,7 +6,7 @@ const { select } = require('../utils/selectors');
 const { parseFilterValues } = require('./filters');
 
 const createManyMiddleware = (
-  { filterParsers, mgetFilterName },
+  { parseFiltersFn, filterParsers, mgetFilterName },
   url,
   service
 ) => {
@@ -40,9 +40,9 @@ const createManyMiddleware = (
     }
 
     const { query } = select(ctx);
-    const fValues = parseFilterValues(filterParsers)(query);
-
-    console.log(fValues);
+    const fValues = parseFiltersFn
+      ? parseFiltersFn(query)
+      : parseFilterValues(filterParsers)(query);
 
     ctx.eventBus.emit('ENDPOINT_HIT', {
       url: ctx.originalUrl,
