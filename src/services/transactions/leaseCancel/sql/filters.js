@@ -1,8 +1,5 @@
-const { where, whereIn, limit } = require('../../../../utils/db/knex');
-
-const id = where('id');
-const ids = whereIn('id');
-const sender = where('sender');
+const commonFilters = require('../../_common/sql/filters');
+const commonFiltersOrder = require('../../_common/sql/filtersOrder');
 
 // txs_9 do not contain recipient info directly
 // only txs_8 do
@@ -13,28 +10,10 @@ const recipient = r => q =>
       .where('recipient', r);
   });
 
-const after = ({ timestamp, id, sortDirection }) => q => {
-  const comparator = sortDirection === 'desc' ? '<' : '>';
-  return q
-    .clone()
-    .whereRaw(`(t.time_stamp, t.id) ${comparator} (?, ?)`, [timestamp, id]);
-};
-const timeStart = where('t.time_stamp', '>=');
-const timeEnd = where('t.time_stamp', '<=');
-const sort = s => q =>
-  q
-    .clone()
-    .orderBy('t.time_stamp', s)
-    .orderBy('t.id', s);
-
 module.exports = {
-  id,
-  ids,
-  sender,
-  recipient,
-  after,
-  timeStart,
-  timeEnd,
-  sort,
-  limit,
+  filters: {
+    ...commonFilters,
+    recipient,
+  },
+  filtersOrder: [...commonFiltersOrder, 'recipient'],
 };
