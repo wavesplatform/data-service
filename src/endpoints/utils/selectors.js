@@ -1,22 +1,12 @@
-const {
-  pipe,
-  pickAll,
-  ifElse,
-  values,
-  always,
-  split,
-  pathOr,
-  equals,
-} = require('ramda');
+const { pipe, pickAll, ifElse, values, pathOr } = require('ramda');
 
-const isEmptyString = equals('');
+const { parseArrayQuery } = require('./parseArrayQuery');
 
 const selectArrayFromQuery = what =>
   pipe(
     selectQuery,
     pathOr('', [what]),
-    String,
-    ifElse(isEmptyString, always([]), split(','))
+    parseArrayQuery
   );
 
 const selectParams = pathOr({}, ['params']);

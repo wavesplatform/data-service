@@ -1,63 +1,120 @@
+const { compose, identity, toPairs, reduce } = require('ramda');
+
 const Router = require('koa-router');
 
-const subrouter = new Router();
+const createEndpoint = require('../_common');
+const { timeStart, timeEnd, after, limit, ids } = require('../_common/filters');
 
-const exchangeOne = require('./exchange/one');
-const exchangeMany = require('./exchange/many');
+// services
+const genesis = require('../../services/transactions/genesis');
+const send = require('../../services/transactions/send');
+const issue = require('../../services/transactions/issue');
+const transfer = require('../../services/transactions/transfer');
+const reissue = require('../../services/transactions/reissue');
+const burn = require('../../services/transactions/burn');
+const exchange = require('../../services/transactions/exchange');
+const lease = require('../../services/transactions/lease');
+const leaseCancel = require('../../services/transactions/leaseCancel');
+const alias = require('../../services/transactions/alias');
+const massTransfer = require('../../services/transactions/massTransfer');
+const data = require('../../services/transactions/data');
+const setScript = require('../../services/transactions/setScript');
+const sponsorship = require('../../services/transactions/sponsorship');
+const all = require('../../services/transactions/all');
 
-const dataOne = require('./data/one');
-const dataMany = require('./data/many');
+// filters
+const commonTxFilters = {
+  ids,
+  timeStart,
+  timeEnd,
+  limit,
+  after,
+  sender: identity,
+};
 
-const transferOne = require('./transfer/one');
-const transferMany = require('./transfer/many');
+// common options
+const createOptions = specificFilters => ({
+  filterParsers: { ...commonTxFilters, ...specificFilters },
+});
 
-const leaseOne = require('./lease/one');
-const leaseMany = require('./lease/many');
+const transactionsEndpointsConfig = {
+  '/transactions/all': {
+    service: all,
+    options: createOptions(),
+  },
+  '/transactions/genesis': {
+    service: genesis,
+    options: undefined,
+  },
+  '/transactions/send': {
+    service: send,
+    options: createOptions(),
+  },
+  '/transactions/issue': {
+    service: issue,
+    options: createOptions(),
+  },
+  '/transactions/transfer': {
+    service: transfer,
+    options: createOptions({
+      assetId: identity,
+      recipient: identity,
+    }),
+  },
+  '/transactions/reissue': {
+    service: reissue,
+    options: createOptions(),
+  },
+  '/transactions/burn': {
+    service: burn,
+    options: createOptions(),
+  },
+  '/transactions/exchange': {
+    service: exchange,
+    options: createOptions({
+      matcher: identity,
+      amountAsset: identity,
+      priceAsset: identity,
+    }),
+  },
+  '/transactions/lease': {
+    service: lease,
+    options: createOptions({ recipient: identity }),
+  },
+  '/transactions/lease-cancel': {
+    service: leaseCancel,
+    options: createOptions({ recipient: identity }),
+  },
+  '/transactions/alias': {
+    service: alias,
+    options: createOptions(),
+  },
+  '/transactions/mass-transfer': {
+    service: massTransfer,
+    options: createOptions({
+      assetId: identity,
+      recipient: identity,
+    }),
+  },
+  '/transactions/data': {
+    service: data,
+    options: { parseFiltersFn: require('./parseDataTxFilters') },
+  },
+  '/transactions/set-script': {
+    service: setScript,
+    options: createOptions({ script: identity }),
+  },
+  '/transactions/sponsorship': {
+    service: sponsorship,
+    options: createOptions(),
+  },
+};
 
-const leaseCancelOne = require('./leaseCancel/one');
-const leaseCancelMany = require('./leaseCancel/many');
-
-const massTransferOne = require('./massTransfer/one');
-const massTransferSearch = require('./massTransfer/search');
-
-const setScriptOne = require('./setScript/one');
-const setScriptMany = require('./setScript/many');
-
-const allTransactionsOne = require('./all/one');
-const allTransactionsMany = require('./all/many');
-
-const postToGet = require('../utils/postToGet');
-
-subrouter.get('/transactions/exchange/:id', exchangeOne);
-subrouter.get('/transactions/exchange', exchangeMany);
-subrouter.post('/transactions/exchange', postToGet(exchangeMany));
-
-subrouter.get('/transactions/data/:id', dataOne);
-subrouter.get('/transactions/data', dataMany);
-subrouter.post('/transactions/data', postToGet(dataMany));
-
-subrouter.get('/transactions/transfer/:id', transferOne);
-subrouter.get('/transactions/transfer', transferMany);
-subrouter.post('/transactions/transfer', postToGet(transferMany));
-
-subrouter.get('/transactions/lease/:id', leaseOne);
-subrouter.get('/transactions/lease', leaseMany);
-subrouter.post('/transactions/lease', postToGet(leaseMany));
-
-subrouter.get('/transactions/lease-cancel/:id', leaseCancelOne);
-subrouter.get('/transactions/lease-cancel', leaseCancelMany);
-subrouter.post('/transactions/lease-cancel', postToGet(leaseCancelMany));
-
-subrouter.get('/transactions/mass-transfer/:id', massTransferOne);
-subrouter.get('/transactions/mass-transfer', massTransferSearch);
-subrouter.post('/transactions/mass-transfer', postToGet(massTransferSearch));
-
-subrouter.get('/transactions/set-script/:id', setScriptOne);
-subrouter.get('/transactions/set-script', setScriptMany);
-subrouter.post('/transactions/set-script', postToGet(setScriptMany));
-
-subrouter.get('/transactions/all/:id', allTransactionsOne);
-subrouter.get('/transactions/all', allTransactionsMany);
-subrouter.post('/transactions/all', postToGet(allTransactionsMany));
-
-module.exports = subrouter;
+module.exports = compose(
+  reduce(
+    (acc, [url, { service, options }]) =>
+      createEndpoint(url, service, options)(acc),
+    new Router()
+  ),
+  toPairs
+)(transactionsEndpointsConfig);
