@@ -2,7 +2,7 @@ const { omit } = require('ramda');
 
 const Joi = require('../../../utils/validation/joi');
 
-const commonFields = require('../common/commonFieldsSchemas');
+const commonFields = require('../_common/commonFieldsSchemas');
 
 const result = Joi.object().keys({
   // genesis txs do not have a sender

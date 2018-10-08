@@ -6,7 +6,7 @@ const getByIdPreset = require('../../presets/pg/getById');
 const mgetByIdsPreset = require('../../presets/pg/mgetByIds');
 const searchWithPaginationPreset = require('../../presets/pg/searchWithPagination');
 
-const transformTxInfo = require('../common/transformTxInfo');
+const transformTxInfo = require('../_common/transformTxInfo');
 
 const sql = require('./sql');
 

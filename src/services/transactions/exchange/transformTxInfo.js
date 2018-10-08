@@ -1,7 +1,7 @@
 const { pick, compose } = require('ramda');
 const { renameKeys } = require('ramda-adjunct');
 
-const transformTxInfo = require('../common/transformTxInfo');
+const transformTxInfo = require('../_common/transformTxInfo');
 
 const createOrder = prefix => ({
   [`${prefix}_id`]: id,
