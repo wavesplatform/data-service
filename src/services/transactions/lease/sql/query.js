@@ -15,4 +15,4 @@ const select = pg({ t: 'txs_8' }).select({
   recipient: 't.recipient',
 });
 
-module.exports = select;
+module.exports = { select };

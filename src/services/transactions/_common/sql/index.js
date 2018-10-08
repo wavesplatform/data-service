@@ -1,5 +1,4 @@
 const {
-  pipe,
   compose,
   map,
   pick,
