@@ -1,11 +1,13 @@
 const { renameKeys } = require('ramda-adjunct');
-const { compose, ifElse, propEq, omit, identity } = require('ramda');
+const { compose, ifElse, propEq, omit, identity, pathEq } = require('ramda');
 
 const hasNullSig = propEq('signature', null);
+const hasZeroProofs = pathEq(['proofs', 'length'], 0);
+
 const processProofsAndSignature = ifElse(
   hasNullSig,
   omit(['signature']),
-  omit(['proofs'])
+  ifElse(hasZeroProofs, omit(['proofs']), identity)
 );
 
 /** transformTxInfo:: RawTxInfo -> TxInfo */

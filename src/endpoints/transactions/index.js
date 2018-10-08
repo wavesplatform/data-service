@@ -20,6 +20,7 @@ const massTransfer = require('../../services/transactions/massTransfer');
 const data = require('../../services/transactions/data');
 const setScript = require('../../services/transactions/setScript');
 const sponsorship = require('../../services/transactions/sponsorship');
+const all = require('../../services/transactions/all');
 
 // filters
 const commonTxFilters = {
@@ -37,6 +38,10 @@ const createOptions = specificFilters => ({
 });
 
 const transactionsEndpointsConfig = {
+  '/transactions/all': {
+    service: all,
+    options: createOptions(),
+  },
   '/transactions/genesis': {
     service: genesis,
     options: undefined,
