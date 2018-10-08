@@ -12,7 +12,7 @@ const pairsOneEndpoint = async ctx => {
 
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
-    resolver: 'pairsOne',
+    resolver: '/pairs/:id1/:id2',
   });
 
   const service = createService({
@@ -36,7 +36,7 @@ const pairsOneEndpoint = async ctx => {
     ctx.state.returnValue = pairs;
   } else {
     ctx.status = 404;
-    ctx.body = `pairs for ${id1}/${id2} not found`;
+    ctx.body = `Pair for ${id1}/${id2} not found`;
   }
 };
 
@@ -49,7 +49,7 @@ const handleError = ({ ctx, error }) => {
     },
     Resolver: () => {
       ctx.status = 500;
-      ctx.body = 'Error resolving /pairs/';
+      ctx.body = 'Error resolving /pairs/:id1/:id2';
     },
     Validation: () => {
       ctx.status = 400;
