@@ -1,28 +1,11 @@
-const createService = require('..');
-const { createPgDriver } = require('../../../../db');
 const { parseDate } = require('../../../../utils/parseDate');
 const Cursor = require('../../../../resolvers/pagination/cursor');
 
-const YESTERDAY = new Date(Date.now() - 60 * 60 * 24 * 1000);
-const TX_ID = '2rdiawoYXnwVieRgTkESYKAKwcRrnLZQ4abmC9JQSj7n';
-
-const loadConfig = require('../../../../loadConfig');
-const options = loadConfig();
-
-const drivers = {
-  pg: createPgDriver(options),
-};
-
-const service = createService({
-  drivers,
-  emitEvent: () => () => null,
-});
-
-describe('Lease transaction service', () => {
+const get = (service, txId) =>
   describe('get', () => {
     it('fetches real tx', async done => {
       service
-        .get(TX_ID)
+        .get(txId)
         .run()
         .promise()
         .then(x => {
@@ -41,10 +24,11 @@ describe('Lease transaction service', () => {
     });
   });
 
+const mget = (service, txIds) =>
   describe('mget', () => {
     it('fetches real txs with nulls for unreal', async done => {
       service
-        .mget([TX_ID, 'UNREAL', 'CQ1AAooHc3kK81Gk3NY7Y9ewsDhQqRpiito4pm64NkS9'])
+        .mget([...txIds, 'UNREAL'])
         .run()
         .promise()
         .then(xs => {
@@ -55,27 +39,27 @@ describe('Lease transaction service', () => {
     });
   });
 
+const search = service =>
   describe('search', () => {
-    it('fetches real tx', async () => {
-      const tx = await service
-        .search({
-          limit: 20,
-          timeStart: YESTERDAY,
-        })
-        .run()
-        .promise();
-      expect(tx).toBeDefined();
-      expect(tx.data).toHaveLength(20);
-    });
+    it(
+      'fetches real txs',
+      async () => {
+        const tx = await service
+          .search({ limit: 20 })
+          .run()
+          .promise();
+        expect(tx).toBeDefined();
+        expect(tx.data).toHaveLength(20);
+      },
+      10000
+    );
+
     describe('Pagination ', async () => {
-      const START = '2018-06-02T10:59:43.000Z';
-      const END = '2018-06-03T23:59:48.000Z';
       const LIMIT = 21;
       const createCursor = sort => ({ data }) => Cursor.encode(sort, data);
-      it(' doesnt get 2 identical entries for limit 1 asc with next page fetching', async () => {
+      it('doesnt get 2 identical entries for limit 1 asc with next page fetching', async () => {
         const baseParams = {
           limit: 1,
-          timeStart: parseDate('Mon Jun 11 2018 12:34:52 GMT+0300 (MSK)'),
           sort: 'asc',
         };
 
@@ -94,13 +78,12 @@ describe('Lease transaction service', () => {
 
         expect(firstTx.data).not.toEqual(secondTx.data);
       });
-      it(' works asc', async () => {
+
+      it('works asc', async () => {
         const SORT = 'asc';
 
         const baseParams = {
           limit: LIMIT,
-          timeEnd: parseDate(END),
-          timeStart: parseDate(START),
           sort: SORT,
         };
 
@@ -141,13 +124,12 @@ describe('Lease transaction service', () => {
 
         expect(cursors).toEqual(expectedCursors);
       });
-      it(' works desc', async () => {
+
+      it('works desc', async () => {
         const SORT = 'desc';
 
         const baseParams = {
           limit: LIMIT,
-          timeEnd: parseDate(END),
-          timeStart: parseDate(START),
           sort: SORT,
         };
 
@@ -204,4 +186,9 @@ describe('Lease transaction service', () => {
         })
         .catch(e => done(JSON.stringify(e, null, 2))));
   });
-});
+
+module.exports = {
+  get,
+  mget,
+  search,
+};
