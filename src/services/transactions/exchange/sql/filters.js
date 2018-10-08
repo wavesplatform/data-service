@@ -1,6 +1,9 @@
-const { where, whereIn, limit } = require('../../../../utils/db/knex');
-
 const { curryN } = require('ramda');
+
+const { where } = require('../../../../utils/db/knex');
+
+const commonFilters = require('../../_common/sql/filters');
+const commonFiltersOrder = require('../../_common/sql/filtersOrder');
 
 const bySender = curryN(2, (sender, q) =>
   q
@@ -11,32 +14,18 @@ const bySender = curryN(2, (sender, q) =>
     .where('o.sender', sender)
 );
 
-const after = ({ timestamp, id, sortDirection }) => q => {
-  const comparator = sortDirection === 'desc' ? '<' : '>';
-  return q
-    .clone()
-    .whereRaw(`(t.time_stamp, t.id) ${comparator} (?, ?)`, [timestamp, id]);
-};
-
 module.exports = {
-  id: where('t.id'),
-  ids: whereIn('t.id'),
-  after,
-  sortOuter: s => q =>
-    q
-      .clone()
-      .orderBy('time_stamp', s)
-      .orderBy('id', s),
-  sort: s => q =>
-    q
-      .clone()
-      .orderBy('t.time_stamp', s)
-      .orderBy('t.id', s),
-  matcher: where('t.sender'),
-  amountAsset: where('t.amount_asset'),
-  priceAsset: where('t.price_asset'),
-  timeStart: where('t.time_stamp', '>='),
-  timeEnd: where('t.time_stamp', '<='),
-  limit,
-  sender: bySender,
+  filters: {
+    ...commonFilters,
+    matcher: where('t.sender'),
+    amountAsset: where('t.amount_asset'),
+    priceAsset: where('t.price_asset'),
+    sender: bySender,
+    sortOuter: s => q =>
+      q
+        .clone()
+        .orderBy('time_stamp', s)
+        .orderBy('id', s),
+  },
+  filtersOrder: [...commonFiltersOrder, 'matcher', 'amountAsset', 'priceAsset'],
 };

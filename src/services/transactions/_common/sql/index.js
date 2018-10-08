@@ -7,6 +7,7 @@ const {
   __,
   identity,
   reverse,
+  merge,
 } = require('ramda');
 
 const commonFiltersOrder = require('./filtersOrder');
@@ -16,38 +17,49 @@ const createSql = ({
   query,
   filters = commonFilters,
   filtersOrder = commonFiltersOrder,
-  queryAfterFilters = identity,
-}) => ({
-  get: id =>
-    compose(
-      String,
-      queryAfterFilters,
-      filters.id(id)
-    )(query),
+  queryAfterFilters = {},
+}) => {
+  const queryAfterFiltersWithDefaults = merge(
+    {
+      get: identity,
+      mget: identity,
+      search: identity,
+    },
+    queryAfterFilters
+  );
 
-  mget: ids =>
-    compose(
-      String,
-      queryAfterFilters,
-      filters.ids(ids)
-    )(query),
+  return {
+    get: id =>
+      compose(
+        String,
+        q => queryAfterFiltersWithDefaults.get(q, id),
+        filters.id(id)
+      )(query),
 
-  search: fValues => {
-    const fValuesPicked = pick(filtersOrder, fValues);
+    mget: ids =>
+      compose(
+        String,
+        q => queryAfterFiltersWithDefaults.mget(q, ids),
+        filters.ids(ids)
+      )(query),
 
-    const appliedFs = compose(
-      map(x => filters[x](fValuesPicked[x])),
-      filter(has(__, fValuesPicked)),
-      reverse
-    )(filtersOrder);
+    search: fValues => {
+      const fValuesPicked = pick(filtersOrder, fValues);
 
-    return compose(
-      String,
-      queryAfterFilters,
-      ...appliedFs,
-      q => q.clone()
-    )(query);
-  },
-});
+      const appliedFs = compose(
+        map(x => filters[x](fValuesPicked[x])),
+        filter(has(__, fValuesPicked)),
+        reverse
+      )(filtersOrder);
+
+      return compose(
+        String,
+        q => queryAfterFiltersWithDefaults.search(q, fValuesPicked),
+        ...appliedFs,
+        q => q.clone()
+      )(query);
+    },
+  };
+};
 
 module.exports = createSql;
