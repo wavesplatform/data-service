@@ -14,4 +14,7 @@ const result = Joi.object().keys({
     .allow(null),
 });
 
-module.exports = { result };
+module.exports = {
+  result,
+  inputSearch: require('../../presets/pg/searchWithPagination/commonFilterSchemas'),
+};

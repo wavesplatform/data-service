@@ -126,7 +126,6 @@ const services = [
       'A56FrxqFp6Pw9tyqgyDsUugfZMydmzRCqeTwpMnRijCJ',
       'GGFdKLjvMnjCdmZRjuc6z9QjD8PCHZywNFBSwf62xTpS',
     ],
-    tests: ['get', 'mget'],
   },
   {
     name: 'all.commonData',
@@ -148,7 +147,7 @@ const services = [
 
 // for disabling some tests for debug purpose
 // const pred = () => true;
-const pred = s => s.name === 'reissue';
+const pred = s => s.name === 'sponsorship';
 
 // test run
 services.filter(pred).forEach(s => {
