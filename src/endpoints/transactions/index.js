@@ -23,6 +23,9 @@ const massTransferSearch = require('./massTransfer/search');
 const setScriptOne = require('./setScript/one');
 const setScriptMany = require('./setScript/many');
 
+const allTransactionsOne = require('./all/one');
+const allTransactionsMany = require('./all/many');
+
 const postToGet = require('../utils/postToGet');
 
 subrouter.get('/transactions/exchange/:id', exchangeOne);
@@ -52,5 +55,9 @@ subrouter.post('/transactions/mass-transfer', postToGet(massTransferSearch));
 subrouter.get('/transactions/set-script/:id', setScriptOne);
 subrouter.get('/transactions/set-script', setScriptMany);
 subrouter.post('/transactions/set-script', postToGet(setScriptMany));
+
+subrouter.get('/transactions/all/:id', allTransactionsOne);
+subrouter.get('/transactions/all', allTransactionsMany);
+subrouter.post('/transactions/all', postToGet(allTransactionsMany));
 
 module.exports = subrouter;
