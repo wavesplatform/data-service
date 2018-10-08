@@ -3,7 +3,14 @@ const { compose, identity, toPairs, reduce } = require('ramda');
 const Router = require('koa-router');
 
 const createEndpoint = require('../_common');
-const { timeStart, timeEnd, after, limit, ids } = require('../_common/filters');
+const {
+  timeStart,
+  timeEnd,
+  after,
+  limit,
+  ids,
+  sort,
+} = require('../_common/filters');
 
 // services
 const genesis = require('../../services/transactions/genesis');
@@ -29,6 +36,7 @@ const commonTxFilters = {
   timeEnd,
   limit,
   after,
+  sort,
   sender: identity,
 };
 
