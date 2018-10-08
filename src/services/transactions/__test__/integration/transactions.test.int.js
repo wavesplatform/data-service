@@ -37,7 +37,6 @@ const services = [
       'CeFjjLBxhpj1vsF832KC6SXEHicc1a2gUJMzaAZGHUJ7',
       '5ZUsD93EbK1SZZa2GXYZx3SjhcXWDvMKqzWoJZjNGkW8',
     ],
-    tests: ['get', 'mget'],
   },
   {
     name: 'transfer',
@@ -149,7 +148,8 @@ const services = [
 ];
 
 // for disabling some tests for debug purpose
-const pred = s => true; // || s.name === 'alias';
+// const pred = () => true;
+const pred = s => s.name === 'issue';
 
 // test run
 services.filter(pred).forEach(s => {
