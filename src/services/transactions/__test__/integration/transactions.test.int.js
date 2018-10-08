@@ -145,8 +145,8 @@ const services = [
 ];
 
 // for disabling some tests for debug purpose
-// const pred = () => true;
-const pred = s => s.name === 'send';
+// const pred = s => s.name === 'send';
+const pred = () => true;
 
 // test run
 services.filter(pred).forEach(s => {

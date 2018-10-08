@@ -45,7 +45,7 @@ const search = service =>
       'fetches real txs',
       async () => {
         const tx = await service
-          .search({ limit: 20 })
+          .search({ limit: 20, sort: 'asc' })
           .run()
           .promise();
         expect(tx).toBeDefined();

@@ -1,0 +1,171 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Genesis transaction service search Pagination  works asc 1`] = `
+Array [
+  Object {
+    "__type": "transaction",
+    "data": Object {
+      "amount": "1",
+      "fee": "0",
+      "height": 1,
+      "id": "29gnRjk8urzqc9kvqaxAfr6niQTuTZnq7LXDAbd77nydHkvrTA4oepoMLsiPkJ8wj2SeFB5KXASSPmbScvBbfLiV",
+      "recipient": "3PBWXDFUc86N2EQxKJmW8eFco65xTyMZx6J",
+      "signature": "29gnRjk8urzqc9kvqaxAfr6niQTuTZnq7LXDAbd77nydHkvrTA4oepoMLsiPkJ8wj2SeFB5KXASSPmbScvBbfLiV",
+      "timestamp": 2016-06-12T11:42:57.614Z,
+      "type": 1,
+    },
+  },
+  Object {
+    "__type": "transaction",
+    "data": Object {
+      "amount": "99999995",
+      "fee": "0",
+      "height": 1,
+      "id": "2DVtfgXjpMeFf2PQCqvwxAiaGbiDsxDjSdNQkc5JQ74eWxjWFYgwvqzC4dn7iB1AhuM32WxEiVi1SGijsBtYQwn8",
+      "recipient": "3PAWwWa6GbwcJaFzwqXQN5KQm7H96Y7SHTQ",
+      "signature": "2DVtfgXjpMeFf2PQCqvwxAiaGbiDsxDjSdNQkc5JQ74eWxjWFYgwvqzC4dn7iB1AhuM32WxEiVi1SGijsBtYQwn8",
+      "timestamp": 2016-06-12T11:42:57.614Z,
+      "type": 1,
+    },
+  },
+  Object {
+    "__type": "transaction",
+    "data": Object {
+      "amount": "1",
+      "fee": "0",
+      "height": 1,
+      "id": "2TsxPS216SsZJAiep7HrjZ3stHERVkeZWjMPFcvMotrdGpFa6UCCmoFiBGNizx83Ks8DnP3qdwtJ8WFcN9J4exa3",
+      "recipient": "3P8JdJGYc7vaLu4UXUZc1iRLdzrkGtdCyJM",
+      "signature": "2TsxPS216SsZJAiep7HrjZ3stHERVkeZWjMPFcvMotrdGpFa6UCCmoFiBGNizx83Ks8DnP3qdwtJ8WFcN9J4exa3",
+      "timestamp": 2016-06-12T11:42:57.614Z,
+      "type": 1,
+    },
+  },
+  Array [
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "amount": "1",
+        "fee": "0",
+        "height": 1,
+        "id": "3gF8LFjhnZdgEVjP7P6o1rvwapqdgxn7GCykCo8boEQRwxCufhrgqXwdYKEg29jyPWthLF5cFyYcKbAeFvhtRNTc",
+        "recipient": "3PAGPDPqnGkyhcihyjMHe9v36Y4hkAh9yDy",
+        "signature": "3gF8LFjhnZdgEVjP7P6o1rvwapqdgxn7GCykCo8boEQRwxCufhrgqXwdYKEg29jyPWthLF5cFyYcKbAeFvhtRNTc",
+        "timestamp": 2016-06-12T11:42:57.614Z,
+        "type": 1,
+      },
+    },
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "amount": "1",
+        "fee": "0",
+        "height": 1,
+        "id": "5hjSPLDyqic7otvtTJgVv73H3o6GxgTBqFMTY2PqAFzw2GHAnoQddC4EgWWFrAiYrtPadMBUkoepnwFHV1yR6u6g",
+        "recipient": "3P9o3ZYwtHkaU1KxsKkFjJqJKS3dLHLC9oF",
+        "signature": "5hjSPLDyqic7otvtTJgVv73H3o6GxgTBqFMTY2PqAFzw2GHAnoQddC4EgWWFrAiYrtPadMBUkoepnwFHV1yR6u6g",
+        "timestamp": 2016-06-12T11:42:57.614Z,
+        "type": 1,
+      },
+    },
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "amount": "1",
+        "fee": "0",
+        "height": 1,
+        "id": "ivP1MzTd28yuhJPkJsiurn2rH2hovXqxr7ybHZWoRGUYKazkfaL9MYoTUym4sFgwW7WB5V252QfeFTsM6Uiz3DM",
+        "recipient": "3PJaDyprvekvPXPuAtxrapacuDJopgJRaU3",
+        "signature": "ivP1MzTd28yuhJPkJsiurn2rH2hovXqxr7ybHZWoRGUYKazkfaL9MYoTUym4sFgwW7WB5V252QfeFTsM6Uiz3DM",
+        "timestamp": 2016-06-12T11:42:57.614Z,
+        "type": 1,
+      },
+    },
+  ],
+]
+`;
+
+exports[`Genesis transaction service search Pagination  works desc 1`] = `
+Array [
+  Object {
+    "__type": "transaction",
+    "data": Object {
+      "amount": "1",
+      "fee": "0",
+      "height": 1,
+      "id": "ivP1MzTd28yuhJPkJsiurn2rH2hovXqxr7ybHZWoRGUYKazkfaL9MYoTUym4sFgwW7WB5V252QfeFTsM6Uiz3DM",
+      "recipient": "3PJaDyprvekvPXPuAtxrapacuDJopgJRaU3",
+      "signature": "ivP1MzTd28yuhJPkJsiurn2rH2hovXqxr7ybHZWoRGUYKazkfaL9MYoTUym4sFgwW7WB5V252QfeFTsM6Uiz3DM",
+      "timestamp": 2016-06-12T11:42:57.614Z,
+      "type": 1,
+    },
+  },
+  Object {
+    "__type": "transaction",
+    "data": Object {
+      "amount": "1",
+      "fee": "0",
+      "height": 1,
+      "id": "5hjSPLDyqic7otvtTJgVv73H3o6GxgTBqFMTY2PqAFzw2GHAnoQddC4EgWWFrAiYrtPadMBUkoepnwFHV1yR6u6g",
+      "recipient": "3P9o3ZYwtHkaU1KxsKkFjJqJKS3dLHLC9oF",
+      "signature": "5hjSPLDyqic7otvtTJgVv73H3o6GxgTBqFMTY2PqAFzw2GHAnoQddC4EgWWFrAiYrtPadMBUkoepnwFHV1yR6u6g",
+      "timestamp": 2016-06-12T11:42:57.614Z,
+      "type": 1,
+    },
+  },
+  Object {
+    "__type": "transaction",
+    "data": Object {
+      "amount": "1",
+      "fee": "0",
+      "height": 1,
+      "id": "3gF8LFjhnZdgEVjP7P6o1rvwapqdgxn7GCykCo8boEQRwxCufhrgqXwdYKEg29jyPWthLF5cFyYcKbAeFvhtRNTc",
+      "recipient": "3PAGPDPqnGkyhcihyjMHe9v36Y4hkAh9yDy",
+      "signature": "3gF8LFjhnZdgEVjP7P6o1rvwapqdgxn7GCykCo8boEQRwxCufhrgqXwdYKEg29jyPWthLF5cFyYcKbAeFvhtRNTc",
+      "timestamp": 2016-06-12T11:42:57.614Z,
+      "type": 1,
+    },
+  },
+  Array [
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "amount": "1",
+        "fee": "0",
+        "height": 1,
+        "id": "2TsxPS216SsZJAiep7HrjZ3stHERVkeZWjMPFcvMotrdGpFa6UCCmoFiBGNizx83Ks8DnP3qdwtJ8WFcN9J4exa3",
+        "recipient": "3P8JdJGYc7vaLu4UXUZc1iRLdzrkGtdCyJM",
+        "signature": "2TsxPS216SsZJAiep7HrjZ3stHERVkeZWjMPFcvMotrdGpFa6UCCmoFiBGNizx83Ks8DnP3qdwtJ8WFcN9J4exa3",
+        "timestamp": 2016-06-12T11:42:57.614Z,
+        "type": 1,
+      },
+    },
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "amount": "99999995",
+        "fee": "0",
+        "height": 1,
+        "id": "2DVtfgXjpMeFf2PQCqvwxAiaGbiDsxDjSdNQkc5JQ74eWxjWFYgwvqzC4dn7iB1AhuM32WxEiVi1SGijsBtYQwn8",
+        "recipient": "3PAWwWa6GbwcJaFzwqXQN5KQm7H96Y7SHTQ",
+        "signature": "2DVtfgXjpMeFf2PQCqvwxAiaGbiDsxDjSdNQkc5JQ74eWxjWFYgwvqzC4dn7iB1AhuM32WxEiVi1SGijsBtYQwn8",
+        "timestamp": 2016-06-12T11:42:57.614Z,
+        "type": 1,
+      },
+    },
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "amount": "1",
+        "fee": "0",
+        "height": 1,
+        "id": "29gnRjk8urzqc9kvqaxAfr6niQTuTZnq7LXDAbd77nydHkvrTA4oepoMLsiPkJ8wj2SeFB5KXASSPmbScvBbfLiV",
+        "recipient": "3PBWXDFUc86N2EQxKJmW8eFco65xTyMZx6J",
+        "signature": "29gnRjk8urzqc9kvqaxAfr6niQTuTZnq7LXDAbd77nydHkvrTA4oepoMLsiPkJ8wj2SeFB5KXASSPmbScvBbfLiV",
+        "timestamp": 2016-06-12T11:42:57.614Z,
+        "type": 1,
+      },
+    },
+  ],
+]
+`;

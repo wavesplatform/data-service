@@ -1,4 +1,4 @@
-const { compose, identity, toPairs, reduce } = require('ramda');
+const { compose, identity, toPairs, reduce, omit } = require('ramda');
 
 const Router = require('koa-router');
 
@@ -52,7 +52,7 @@ const transactionsEndpointsConfig = {
   },
   '/transactions/genesis': {
     service: genesis,
-    options: undefined,
+    options: { filterParsers: omit(['sender'], commonTxFilters) },
   },
   '/transactions/send': {
     service: send,
