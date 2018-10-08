@@ -20,7 +20,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
     get: getByIdPreset({
       name: 'transactions.issue.get',
       sql: sql.get,
-      resultSchema: resultSchema,
+      resultSchema,
       transformResult: transformTxInfo,
     })({ pg, emitEvent }),
 
@@ -29,7 +29,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       matchRequestResult: propEq('id'),
       sql: sql.mget,
       resultTypeFactory: Transaction,
-      resultSchema: resultSchema,
+      resultSchema,
       transformResult: transformTxInfo,
     })({ pg, emitEvent }),
 

@@ -53,7 +53,6 @@ const services = [
       '2JksHUA6E4ZQd351i3oxJq2Ts7tvMN7NNVfoduR1fFsk',
       '2TyaLLCzjvC3tVTWebq5hAvEakXeACRrf3Bgu4e8fSos',
     ],
-    tests: ['get', 'mget'],
   },
   {
     name: 'burn',
@@ -149,7 +148,7 @@ const services = [
 
 // for disabling some tests for debug purpose
 // const pred = () => true;
-const pred = s => s.name === 'issue';
+const pred = s => s.name === 'reissue';
 
 // test run
 services.filter(pred).forEach(s => {
