@@ -8,10 +8,7 @@ const commonFiltersOrder = require('../../_common/sql/filtersOrder');
 const bySender = curryN(2, (sender, q) =>
   q
     .clone()
-    .innerJoin({ o: 'orders' }, function() {
-      this.on('t.order1', '=', 'o.id').orOn('t.order2', '=', 'o.id');
-    })
-    .where('o.sender', sender)
+    .whereRaw("array[order1->>'sender', order1->>'sender'] <@ ?", `{${sender}}`)
 );
 
 module.exports = {
