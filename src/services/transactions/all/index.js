@@ -66,7 +66,11 @@ module.exports = deps => {
   const resultsFromIdType = pipe(
     groupBy(prop('type')),
     toPairs,
-    map(([type, txs]) => txsServices[type].mget(txs.map(prop('id')))),
+    map(([type, txs]) =>
+      Task.of(console.time(type))
+        .chain(() => txsServices[type].mget(txs.map(prop('id'))))
+        .map(x => console.timeEnd(type) || x)
+    ),
     Task.waitAll,
     map(
       pipe(
@@ -119,24 +123,30 @@ module.exports = deps => {
         ),
 
     search: filters =>
-      commonTxData.search(filters).chain(txsList =>
-        pipe(
-          idTypeFromCommonData,
-          resultsFromIdType,
-          // format output
-          map(
+      Task.of((console.time('dbQuery'), console.time('commonData'))).chain(() =>
+        commonTxData
+          .search(filters)
+          .map(x => console.timeEnd('commonData') || x)
+          .chain(txsList =>
             pipe(
-              indexBy(prop('id')),
-              resultsMap => ({
-                ...txsList,
-                data: txsList.data.map(t => ({
-                  ...t,
-                  data: resultsMap[t.data.id],
-                })),
-              })
-            )
+              idTypeFromCommonData,
+              resultsFromIdType,
+              // format output
+              map(
+                pipe(
+                  indexBy(prop('id')),
+                  resultsMap => ({
+                    ...txsList,
+                    data: txsList.data.map(t => ({
+                      ...t,
+                      data: resultsMap[t.data.id],
+                    })),
+                  })
+                )
+              )
+            )(txsList)
           )
-        )(txsList)
+          .map(x => console.timeEnd('dbQuery') || x)
       ),
   };
 };
