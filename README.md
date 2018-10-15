@@ -8,7 +8,7 @@ This is an API aimed at retrieving data from blockchain quickly and conveniently
 - Testnet
   - [https://api.testnet.wavesplatform.com/v0/](https://api.testnet.wavesplatform.com/v0/)
 
-The provided links should redirect to Swagger API documentation automatically. If not, visit `/docs` for reference.
+Visit `/docs` for Swagger documentation.
 
 
 ## Data service on-premise
