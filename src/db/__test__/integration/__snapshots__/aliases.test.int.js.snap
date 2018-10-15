@@ -1092,3 +1092,16 @@ Array [
   },
 ]
 `;
+
+exports[`Aliases should return Maybe(alias) for one correctly 1`] = `
+Object {
+  "@@tag": "Just",
+  "@@type": "folktale:Maybe",
+  "@@value": Object {
+    "value": Object {
+      "address": "3PQqCXNPoTRsHRK2nZyXWENaZwLmxrUZPBi",
+      "alias": "sexy-boys",
+    },
+  },
+}
+`;

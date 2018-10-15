@@ -103,6 +103,7 @@ const search = service =>
           .run()
           .promise()
           .then(x => x.data.map(createCursor(SORT))[0]);
+
         var i = 0;
         var cursors = [firstCursor];
         var curCursor = firstCursor;
@@ -149,6 +150,7 @@ const search = service =>
           .run()
           .promise()
           .then(x => x.data.map(createCursor(SORT))[0]);
+
         var i = 0;
         var cursors = [firstCursor];
         var curCursor = firstCursor;

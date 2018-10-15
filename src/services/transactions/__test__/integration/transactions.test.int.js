@@ -145,7 +145,7 @@ const services = [
 ];
 
 // for disabling some tests for debug purpose
-// const pred = s => s.name === 'send';
+// const pred = s => s.name === 'all';
 const pred = () => true;
 
 // test run
