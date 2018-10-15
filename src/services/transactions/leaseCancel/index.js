@@ -10,14 +10,17 @@ const transformTxInfo = require('./transformTxInfo');
 
 const sql = require('./sql');
 
-const { result, inputSearch } = require('./schema');
+const {
+  result: resultSchema,
+  inputSearch: inputSearchSchema,
+} = require('./schema');
 
 module.exports = ({ drivers: { pg }, emitEvent }) => {
   return {
     get: getByIdPreset({
       name: 'transactions.leaseCancel.get',
       sql: sql.get,
-      resultSchema: result,
+      resultSchema,
       transformResult: transformTxInfo,
     })({ pg, emitEvent }),
 
@@ -26,15 +29,15 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       matchRequestResult: propEq('id'),
       sql: sql.mget,
       resultTypeFactory: Transaction,
-      resultSchema: result,
+      resultSchema,
       transformResult: transformTxInfo,
     })({ pg, emitEvent }),
 
     search: searchWithPaginationPreset({
       name: 'transactions.leaseCancel.search',
       sql: sql.search,
-      inputSchema: inputSearch,
-      resultSchema: result,
+      inputSchema: inputSearchSchema,
+      resultSchema,
       transformResult: transformTxInfo,
     })({ pg, emitEvent }),
   };

@@ -1,18 +1,6 @@
-const { pipe } = require('ramda');
+const createSql = require('../../_common/sql/index');
 
-const F = require('./filters');
 const { select } = require('./query');
+const { filters, filtersOrder } = require('./filters');
 
-module.exports = {
-  get: id =>
-    pipe(
-      F.id(id),
-      String
-    )(select),
-
-  mget: ids =>
-    pipe(
-      F.ids(ids),
-      String
-    )(select),
-};
+module.exports = createSql({ query: select, filters, filtersOrder });

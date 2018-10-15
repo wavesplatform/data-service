@@ -32,4 +32,5 @@ module.exports = {
     .required(),
   sort: Joi.string().valid('asc', 'desc'),
   after: Joi.cursor().valid(),
+  sender: Joi.string(),
 };

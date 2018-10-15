@@ -8,7 +8,7 @@ const txExchange = {
   height: 809923,
   signature:
     'N6p6eqNP8875kd8m3KxwH6MD7RUFA9epdShxSjPJt7YqKa8qF2K9UD2SGNERY9GdfMABRX2KBn1bCdHJym9wBHP',
-  proofs: null,
+  proofs: [],
   fee: new BigNumber('1'),
   sender: '3PJaDyprvekvPXPuAtxrapacuDJopgJRaU3',
   sender_public_key: '7kPFrHDiGw1rCm7LPszuECwWYL3dMf6iMifLRDJQZMzy',

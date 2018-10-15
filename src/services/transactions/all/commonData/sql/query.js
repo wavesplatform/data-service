@@ -6,4 +6,4 @@ const select = pg({ t: 'txs' }).select({
   time_stamp: 't.time_stamp',
 });
 
-module.exports = select;
+module.exports = { select };

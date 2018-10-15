@@ -6,7 +6,7 @@ const selectIdsWhereRecipient = recipient =>
     .where('recipient', '=', recipient)
     .select('tx_id');
 
-const baseQuery = pg('txs_11');
+const select = pg('txs_11');
 const renameToTxs = q => pg({ txs: q.clone() });
 const transfers = pg('txs_11_transfers').select([
   'recipient',
@@ -63,7 +63,7 @@ const withTransfersDecimalsAndGrouping = pipe(
   q => q.select(columns)
 );
 module.exports = {
-  baseQuery,
+  select,
   withTransfersDecimalsAndGrouping,
   selectIdsWhereRecipient,
 };

@@ -14,4 +14,4 @@ const select = pg({ t: 'txs_9' }).select({
   lease_id: 't.lease_id',
 });
 
-module.exports = select;
+module.exports = { select };

@@ -4,28 +4,40 @@ const { Transaction } = require('../../../types');
 
 const getByIdPreset = require('../../presets/pg/getById');
 const mgetByIdsPreset = require('../../presets/pg/mgetByIds');
+const searchWithPaginationPreset = require('../../presets/pg/searchWithPagination');
 
-const transformTxInfo = require('../common/transformTxInfo');
+const transformTxInfo = require('../_common/transformTxInfo');
 
 const sql = require('./sql');
 
-const { result } = require('./schema');
+const {
+  result: resultSchema,
+  inputSearch: inputSearchSchema,
+} = require('./schema');
 
 module.exports = ({ drivers: { pg }, emitEvent }) => {
   return {
     get: getByIdPreset({
-      name: 'transactions.issue.get',
+      name: 'transactions.genesis.get',
       sql: sql.get,
-      resultSchema: result,
+      resultSchema,
       transformResult: transformTxInfo,
     })({ pg, emitEvent }),
 
     mget: mgetByIdsPreset({
-      name: 'transactions.issue.mget',
+      name: 'transactions.genesis.mget',
       matchRequestResult: propEq('id'),
       sql: sql.mget,
       resultTypeFactory: Transaction,
-      resultSchema: result,
+      resultSchema,
+      transformResult: transformTxInfo,
+    })({ pg, emitEvent }),
+
+    search: searchWithPaginationPreset({
+      name: 'transactions.genesis.search',
+      sql: sql.search,
+      inputSchema: inputSearchSchema,
+      resultSchema,
       transformResult: transformTxInfo,
     })({ pg, emitEvent }),
   };

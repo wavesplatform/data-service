@@ -1,8 +1,7 @@
 const createService = require('..');
 const { createPgDriver } = require('../../../../db');
-
-const TX_ID = '2DVtfgXjpMeFf2PQCqvwxAiaGbiDsxDjSdNQkc5JQ74eWxjWFYgwvqzC4dn7iB1AhuM32WxEiVi1SGijsBtYQwn8';
-const TX_ID_2 = '2TsxPS216SsZJAiep7HrjZ3stHERVkeZWjMPFcvMotrdGpFa6UCCmoFiBGNizx83Ks8DnP3qdwtJ8WFcN9J4exa3';
+const { parseDate } = require('../../../../utils/parseDate');
+const Cursor = require('../../../../resolvers/pagination/cursor');
 
 const loadConfig = require('../../../../loadConfig');
 const options = loadConfig();
@@ -17,39 +16,85 @@ const service = createService({
 });
 
 describe('Genesis transaction service', () => {
-  describe('get', () => {
-    it('fetches real tx', async done => {
-      service
-        .get(TX_ID)
-        .run()
-        .promise()
-        .then(x => {
-          expect(x).toMatchSnapshot();
-          done();
-        })
-        .catch(e => done(JSON.stringify(e)));
-    });
-    it('returns null for unreal tx', async () => {
-      const tx = await service
-        .get('UNREAL')
-        .run()
-        .promise();
+  describe('search', () => {
+    it(
+      'fetches all 6 genesis txs',
+      async () => {
+        const tx = await service
+          .search({ limit: 20, sort: 'asc' })
+          .run()
+          .promise();
 
-      expect(tx).toBe(null);
-    });
-  });
+        expect(tx).toBeDefined();
+        expect(tx.data).toHaveLength(6);
+      },
+      10000
+    );
 
-  describe('mget', () => {
-    it('fetches real txs with nulls for unreal', async done => {
-      service
-        .mget([TX_ID, 'UNREAL', TX_ID_2])
-        .run()
-        .promise()
-        .then(xs => {
-          expect(xs).toMatchSnapshot();
-          done();
-        })
-        .catch(e => done(JSON.stringify(e)));
+    describe('Pagination ', async () => {
+      const createCursor = sort => ({ data }) => Cursor.encode(sort, data);
+
+      it('doesnt get 2 identical entries for limit 1 asc with next page fetching', async () => {
+        const baseParams = {
+          limit: 1,
+          sort: 'asc',
+        };
+
+        const firstTx = await service
+          .search(baseParams)
+          .run()
+          .promise();
+
+        const secondTx = await service
+          .search({
+            after: firstTx.lastCursor,
+            limit: 1,
+          })
+          .run()
+          .promise();
+
+        expect(firstTx.data).not.toEqual(secondTx.data);
+      });
+
+      const assertPagination = async sort => {
+        const LIMIT = 3;
+
+        const firstThree = await service
+          .search({
+            limit: LIMIT,
+            sort,
+          })
+          .run()
+          .promise();
+
+        const secondThree = await service
+          .search({
+            limit: LIMIT,
+            sort,
+            after: createCursor(sort)(firstThree.data[2]),
+          })
+          .run()
+          .promise();
+
+        expect([...firstThree.data, secondThree.data]).toMatchSnapshot();
+      };
+
+      it('works asc', () => assertPagination('asc'));
+      it('works desc', () => assertPagination('desc'));
+
+      it('doesnt try to create a cursor for empty response', done =>
+        service
+          .search({
+            limit: 1,
+            timeEnd: parseDate('1'),
+          })
+          .run()
+          .promise()
+          .then(d => {
+            expect(d).not.toHaveProperty('lastCursor');
+            done();
+          })
+          .catch(e => done(JSON.stringify(e, null, 2))));
     });
   });
 });

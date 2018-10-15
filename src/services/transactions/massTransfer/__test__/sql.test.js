@@ -1,38 +1,10 @@
 const sql = require('../sql');
-const filters = {
-  sender: 'sender',
+
+const filterValues = {
   recipient: 'recipient',
-  timeStart: 'timeStart',
-  timeEnd: 'timeEnd',
-  sort: 'sort',
-  limit: 1,
+  assetId: 'assetId',
 };
-describe('Sql builder', () => {
-  describe('search', () => {
-    it('covers case with all filters (without after)', () => {
-      expect(sql.search(filters)).toMatchSnapshot();
-    });
-    it('covers case with all filters with after', () => {
-      expect(
-        sql.search({
-          ...filters,
-          after: {
-            timestamp: 'timestamp',
-            id: 'id',
-            sortDirection: 'sortDirection',
-          },
-        })
-      ).toMatchSnapshot();
-    });
-  });
-  describe('get', () => {
-    it('works', () => {
-      expect(sql.get('id')).toMatchSnapshot();
-    });
-  });
-  describe('mget', () => {
-    it('works', () => {
-      expect(sql.mget(['id1', 'id2'])).toMatchSnapshot();
-    });
-  });
+
+test('Sql search supports type-specific filters', () => {
+  expect(sql.search(filterValues)).toMatchSnapshot();
 });

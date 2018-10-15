@@ -1,48 +1,23 @@
-const { pipe, compose, map, pick, filter, has, __ } = require('ramda');
+const { compose } = require('ramda');
 
-const F = require('./filters');
+const createSql = require('../../_common/sql/index');
+
 const { select, withDecimals } = require('./query');
+const { filters, filtersOrder } = require('./filters');
 
-module.exports = {
-  get: id =>
-    pipe(
-      F.id(id),
-      withDecimals,
-      String
-    )(select),
-
-  mget: ids =>
-    pipe(
-      F.ids(ids),
-      withDecimals,
-      String
-    )(select),
-
-  search: fValues => {
-    const order = [
-      'id',
-      'assetId',
-      'sender',
-      'recipient',
-      'after',
-      'timeStart',
-      'timeEnd',
-      'sort',
-      'limit',
-    ];
-
-    const fValuesPicked = pick(order, fValues);
-
-    const appliedFs = compose(
-      map(x => F[x](fValuesPicked[x])),
-      filter(has(__, fValuesPicked))
-    )(order);
-    return pipe(
-      q => q.clone(),
-      ...appliedFs,
-      withDecimals,
-      F.sort(fValues.sort),
-      String
-    )(select);
-  },
+const queryAfterFilters = {
+  get: withDecimals,
+  mget: withDecimals,
+  search: (q, fValues) =>
+    compose(
+      filters.sort(fValues.sort),
+      withDecimals
+    )(q),
 };
+
+module.exports = createSql({
+  query: select,
+  filters,
+  filtersOrder,
+  queryAfterFilters,
+});
