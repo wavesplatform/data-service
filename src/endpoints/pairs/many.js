@@ -1,6 +1,8 @@
 const createService = require('../../services/pairs');
-const { select } = require('../utils/selectors');
-const { captureErrors } = require('../../utils/captureErrors');
+
+const createManyMiddleware = require('../_common/many');
+
+const { parseArrayQuery } = require('../utils/parseArrayQuery');
 
 const { map, split, zipObj, compose } = require('ramda');
 
@@ -26,46 +28,18 @@ const parsePairs = map(
  * Endpoint
  * @name /pairs?pairs[]‌="{asset_id_1}/{asset_id_2}"&pairs[]="{asset_id_1}/{asset_id_2}" ...other params
  */
-const pairsManyEndpoint = async ctx => {
-  const { pairs } = select(ctx);
-
-  ctx.eventBus.emit('ENDPOINT_HIT', {
-    url: ctx.originalUrl,
-    resolver: 'pairsMany',
-  });
-
-  const service = createService({
-    drivers: ctx.state.drivers,
-    emitEvent: ctx.eventBus.emit,
-  });
-
-  const result = await service
-    .mget(parsePairs(pairs))
-    .run()
-    .promise();
-
-  ctx.eventBus.emit('ENDPOINT_RESOLVED', {
-    value: result,
-  });
-
-  ctx.state.returnValue = result;
-};
-
-const handleError = ({ ctx, error }) => {
-  ctx.eventBus.emit('ERROR', error);
-  error.matchWith({
-    Db: () => {
-      ctx.status = 500;
-      ctx.body = 'Database Error';
+const pairsMany = createManyMiddleware(
+  {
+    filterParsers: {
+      pairs: compose(
+        parsePairs,
+        parseArrayQuery
+      ),
     },
-    Resolver: () => {
-      ctx.status = 500;
-      ctx.body = 'Error resolving /pairs';
-    },
-    Validation: () => {
-      ctx.status = 400;
-      ctx.body = `Invalid query, check params, got: ${ctx.querystring}`;
-    },
-  });
-};
-module.exports = captureErrors(handleError)(pairsManyEndpoint);
+    mgetFilterName: 'pairs',
+  },
+  '/pairs',
+  createService
+);
+
+module.exports = pairsMany;

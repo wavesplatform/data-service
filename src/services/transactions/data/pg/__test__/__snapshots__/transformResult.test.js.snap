@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Data transactions db result transform should group raw results by transaction and put nested \`data\` inside     preserving order in position_in_tx field 1`] = `
+Array [
+  Object {
+    "data": Array [
+      Object {
+        "key": "testint",
+        "type": "integer",
+        "value": 11,
+      },
+      Object {
+        "key": "testbool",
+        "type": "boolean",
+        "value": false,
+      },
+    ],
+    "id": "qwe",
+  },
+  Object {
+    "data": Array [
+      Object {
+        "key": "teststring",
+        "type": "string",
+        "value": "some string",
+      },
+      Object {
+        "key": "testbinary",
+        "type": "binary",
+        "value": "base64:qwerqwer",
+      },
+    ],
+    "id": "asd",
+  },
+]
+`;
+
+exports[`Data transactions db result transform should handle case when there is no data in tx (all nulls in a row) 1`] = `
+Array [
+  Object {
+    "data": Array [],
+    "id": "asd",
+  },
+]
+`;

@@ -1,9 +1,10 @@
-const { curry, find, map } = require('ramda');
+const { matchRequestsResults } = require('../../../utils/db/index');
+const { curryN, uncurryN, compose, map } = require('ramda');
 
-const batchQuery = (matchFn, requests, results) => {
-  const mf = curry(matchFn);
-  const findRes = req => find(mf(req), results) || null;
-  return map(findRes, requests);
-};
-
-module.exports = curry(batchQuery);
+module.exports = curryN(
+  3,
+  compose(
+    map(mx => mx.getOrElse(null)),
+    uncurryN(3, matchRequestsResults)
+  )
+);

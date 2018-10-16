@@ -1,29 +1,26 @@
-const Joi = require('joi');
-const { BigNumber } = require('@waves/data-entities');
-
-const { base58 } = require('../../../../../utils/regex');
+const Joi = require('../../../../../utils/validation/joi');
 
 const pairInput = Joi.object().keys({
   amountAsset: Joi.string()
-    .regex(base58)
+    .base58()
     .required(),
   priceAsset: Joi.string()
-    .regex(base58)
+    .base58()
     .required(),
 });
 
 const output = Joi.object().keys({
   first_price: Joi.object()
-    .type(BigNumber)
+    .bignumber()
     .required(),
   last_price: Joi.object()
-    .type(BigNumber)
+    .bignumber()
     .required(),
   volume: Joi.object()
-    .type(BigNumber)
+    .bignumber()
     .required(),
   volume_waves: Joi.object()
-    .type(BigNumber)
+    .bignumber()
     .required()
     .allow(null),
 });
