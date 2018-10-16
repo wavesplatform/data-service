@@ -18,7 +18,7 @@ module.exports = ({ pgAdapter, redisAdapter, emitEvent }) => {
           maybeCached.matchWith({
             Nothing: () =>
               Task.rejected(pair).mapRejected(
-                tap(emitEvent('CACHE_MISS', { level: 'info', meta: pair }))
+                tap(() => emitEvent('CACHE_MISS', { level: 'info', meta: pair }))
               ), // log cache miss,
             Just: () => Task.of(maybeCached), // Task Maybe r
           })
