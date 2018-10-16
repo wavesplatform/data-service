@@ -6,9 +6,10 @@ const selectTxs7 = ({ priceAsset, amountAsset }, selectStatement = '*') =>
     .whereRaw(
       "t.time_stamp BETWEEN timezone('utc', now() - INTERVAL '1 day') AND timezone('utc', now())"
     )
-    .whereRaw("amount_asset || '/' || price_asset = ?", [
-      `${amountAsset}/${priceAsset}`,
-    ])
+    .where({
+      amount_asset: amountAsset,
+      price_asset: priceAsset,
+    })
     .clone();
 
 const volume = pair =>
@@ -54,9 +55,18 @@ const averagePriceWithWaves = asset =>
     .whereRaw(
       "t.time_stamp BETWEEN timezone('utc', now() - INTERVAL '1 day') AND timezone('utc', now())"
     )
-    .whereRaw(
-      "(amount_asset || '/' || price_asset = ? OR amount_asset || '/' || price_asset = ?)",
-      [`${asset}/WAVES`, `WAVES/${asset}`]
+    .where(b =>
+      b
+        .where(b =>
+          b.where({
+            amount_asset: 'WAVES',
+            price_asset: asset,
+          })
+        )
+        .orWhere({
+          amount_asset: asset,
+          price_asset: 'WAVES',
+        })
     )
     .clone();
 
