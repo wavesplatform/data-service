@@ -17,7 +17,9 @@ module.exports = ({ pgAdapter, redisAdapter, emitEvent }) => {
         .chain(maybeCached =>
           maybeCached.matchWith({
             Nothing: () =>
-              Task.rejected(pair).mapRejected(tap(emitEvent('CACHE_MISS'))), // log cache miss,
+              Task.rejected(pair).mapRejected(
+                tap(emitEvent('CACHE_MISS', { level: 'info', meta: pair }))
+              ), // log cache miss,
             Just: () => Task.of(maybeCached), // Task Maybe r
           })
         )
@@ -31,7 +33,11 @@ module.exports = ({ pgAdapter, redisAdapter, emitEvent }) => {
                 // only if db responded with actual data
                 redisAdapter
                   .cache([[pair, resp]])
-                  .map(tap(() => emitEvent('CACHE_CACHED', { level: 'info' })))
+                  .map(
+                    tap(() =>
+                      emitEvent('CACHE_CACHED', { level: 'info', meta: pair })
+                    )
+                  )
                   .run();
                 return resp;
               })
@@ -51,7 +57,10 @@ module.exports = ({ pgAdapter, redisAdapter, emitEvent }) => {
               .mapRejected(logRedisError(emitEvent)) // log cache error
               .orElse(always(Task.of(s))) // but continue chain as if cache returned nothing
         )
-        .map(s => (emitEvent('CACHE_RETURNED', s.cacheResp), s))
+        .map(s => {
+          emitEvent('CACHE_RETURNED', { level: 'info', meta: s.cacheResp });
+          return s;
+        })
         .chain(s => {
           const cacheMisses = s.request.filter(
             (_, i) => !s.cacheResp[i].getOrElse(false)
@@ -61,7 +70,9 @@ module.exports = ({ pgAdapter, redisAdapter, emitEvent }) => {
             ? Task.of(s)
             : pgAdapter
               .mget(cacheMisses)
-              .map(tap(emitEvent('DB_RETURNED'))) // log db response
+              .map(
+                tap(meta => emitEvent('DB_RETURNED', { level: 'info', meta }))
+              ) // log db response
               .map(dbResp => assoc('dbResp', dbResp, s));
         })
         // @impure
