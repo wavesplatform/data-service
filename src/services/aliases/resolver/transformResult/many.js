@@ -1,4 +1,4 @@
-const { Alias, List, fromMaybe } = require('../../../types');
+const { Alias, List, fromMaybe } = require('../../../../types');
 
 const { map, compose } = require('ramda');
 

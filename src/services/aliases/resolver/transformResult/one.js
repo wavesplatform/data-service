@@ -1,4 +1,4 @@
-const { Alias } = require('../../../types');
+const { Alias } = require('../../../../types');
 
 const aliasOrNull = maybeAlias =>
   maybeAlias.matchWith({

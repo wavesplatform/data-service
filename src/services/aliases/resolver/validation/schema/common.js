@@ -5,6 +5,7 @@ const output = Joi.object().keys({
     .required()
     .allow(null),
   alias: Joi.string().required(),
+  duplicates: Joi.string(),
 });
 
 module.exports = { output };
