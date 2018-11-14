@@ -1,6 +1,6 @@
 const Maybe = require('folktale/maybe');
 
-const { Alias } = require('../../../../types');
+const { Alias } = require('../../../../../types');
 const transformResult = require('../one');
 
 const a = {

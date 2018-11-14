@@ -18,8 +18,9 @@
  * @returns AliasInfoRaw
  */
 const transformResults = result => ({
-  alias: result.alias,
-  address: result.duplicates > 1 ? null : result.address,
+    alias: result.alias,
+    address: result.duplicates > 1 ? null : result.address,
 });
 
 module.exports = transformResults;
+  

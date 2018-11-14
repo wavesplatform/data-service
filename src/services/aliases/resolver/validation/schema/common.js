@@ -4,8 +4,7 @@ const output = Joi.object().keys({
   address: Joi.string()
     .required()
     .allow(null),
-  alias: Joi.string().required(),
-  duplicates: Joi.string(),
+  alias: Joi.string().required()
 });
 
 module.exports = { output };

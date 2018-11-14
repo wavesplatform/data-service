@@ -4,11 +4,11 @@ const Task = require('folktale/concurrency/task');
 const Maybe = require('folktale/maybe');
 
 const resolverOne = createResolver.one({
-  db: { aliases: { one: a => Task.of(Maybe.of(a)) } },
+  getData: a => Task.of(Maybe.of(a)),
   emitEvent: () => () => null,
 });
 const resolverMany = createResolver.many({
-  db: { aliases: { many: a => Task.of([Maybe.of(a), Maybe.Nothing()]) } },
+  getData: a => Task.of([Maybe.of(a), Maybe.Nothing()]),
   emitEvent: () => () => null,
 });
 
@@ -32,7 +32,7 @@ describe('Alias resolver validation', () => {
         done();
       });
 
-  describe('one', () => {
+  describe('get', () => {
     it('fails if /alias/{alias} param is not provided', done =>
       assertValidationError(done, resolverOne));
     it('fails if /alias/{alias} param is not a string', done => {
@@ -45,7 +45,7 @@ describe('Alias resolver validation', () => {
       assertValidationPass(done, resolverOne, 'alias'));
   });
 
-  describe('many', () => {
+  describe('mget', () => {
     it('fails if /alias?address={address} param is not provided', done =>
       assertValidationError(done, resolverMany));
     it('fails if /alias?address={address} param is of a wrong type', done => {

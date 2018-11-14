@@ -1,8 +1,4 @@
-const createAliasesAdapter = require('./aliases');
-
 // db adapter factory
-const createDbAdapter = options => ({
-  aliases: createAliasesAdapter(options),
-});
+const createDbAdapter = options => ({});
 
 module.exports = createDbAdapter;

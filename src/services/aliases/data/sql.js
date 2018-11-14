@@ -14,12 +14,12 @@ const selectFromSet = aliasSet =>
   });
 
 module.exports = {
-  one: alias =>
+  get: alias =>
     selectFromSet([alias])
       .clone()
       .toString(),
 
-  many: ({ address, showBroken }) => {
+  mget: ({ address, showBroken }) => {
     const q = selectFromSet(
       pg('txs_10')
         .select('alias')
