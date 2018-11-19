@@ -1,14 +1,14 @@
-const { where } = require("../../../../utils/db/knex");
+const { where } = require('../../../../utils/db/knex');
 
-const commonFilters = require("../../_common/sql/filters");
-const commonFiltersOrder = require("../../_common/sql/filtersOrder");
+const commonFilters = require('../../_common/sql/filters');
+const commonFiltersOrder = require('../../_common/sql/filtersOrder');
 
-const assetId = where("asset_id");
+const assetId = where('asset_id');
 
 module.exports = {
   filters: {
     ...commonFilters,
-    assetId
+    assetId,
   },
-  filtersOrder: [...commonFiltersOrder, "assetId"]
+  filtersOrder: [...commonFiltersOrder, 'assetId'],
 };

@@ -1,6 +1,6 @@
-const Joi = require("../../../utils/validation/joi");
+const Joi = require('../../../utils/validation/joi');
 
-const commonFields = require("../_common/commonFieldsSchemas");
+const commonFields = require('../_common/commonFieldsSchemas');
 const commonFilters = require('../../presets/pg/searchWithPagination/commonFilterSchemas');
 
 const result = Joi.object().keys({
@@ -12,23 +12,23 @@ const result = Joi.object().keys({
   asset_name: Joi.string().required(),
   description: Joi.string()
     .required()
-    .allow(""),
+    .allow(''),
   quantity: Joi.object()
     .bignumber()
     .required(),
   decimals: Joi.number().required(),
-  reissuable: Joi.boolean().required()
+  reissuable: Joi.boolean().required(),
 });
 
 const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
 
-    assetId: Joi.string().base58()
+    assetId: Joi.string().base58(),
   })
   .required();
 
 module.exports = {
   result,
-  inputSearch
+  inputSearch,
 };

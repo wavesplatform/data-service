@@ -1,7 +1,7 @@
-const createSql = require("../../../_common/sql");
+const createSql = require('../../../_common/sql');
 
-const { select } = require("./query");
+const { select } = require('./query');
 
 module.exports = createSql({
-  query: select
+  query: select,
 });
