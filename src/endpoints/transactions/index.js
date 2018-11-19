@@ -60,7 +60,9 @@ const transactionsEndpointsConfig = {
   },
   '/transactions/issue': {
     service: issue,
-    options: createOptions(),
+    options: createOptions({
+      assetId: identity,
+    }),
   },
   '/transactions/transfer': {
     service: transfer,
@@ -71,11 +73,15 @@ const transactionsEndpointsConfig = {
   },
   '/transactions/reissue': {
     service: reissue,
-    options: createOptions(),
+    options: createOptions({
+      assetId: identity,
+    }),
   },
   '/transactions/burn': {
     service: burn,
-    options: createOptions(),
+    options: createOptions({
+      assetId: identity,
+    }),
   },
   '/transactions/exchange': {
     service: exchange,
