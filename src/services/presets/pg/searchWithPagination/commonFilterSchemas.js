@@ -1,5 +1,5 @@
 const rawJoi = require('joi');
-const Cursor = require('../../../../resolvers/pagination/cursor');
+const Cursor = require('../../../_common/pagination/cursor');
 const DATE0 = new Date(0);
 const Joi = rawJoi.extend(joi => ({
   base: joi.string().base64({ paddingRequired: false }),

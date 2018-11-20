@@ -1,5 +1,5 @@
 const { identity } = require('ramda');
-const createResolver = require('../../../../resolvers/create');
+const createResolver = require('../../../_common/create');
 
 const { validateInput, validateResult } = require('../../validation');
 const transformResultFn = require('./transformResult');
