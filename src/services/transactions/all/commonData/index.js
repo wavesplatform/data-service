@@ -10,6 +10,8 @@ const transformTxInfo = require('./transformTxInfo');
 
 const sql = require('./sql');
 
+const { inputOne } = require('../../../presets/pg/getById/inputSchema');
+const { inputMany } = require('../../../presets/pg/mgetByIds/inputSchema');
 const { result, inputSearch } = require('./schema');
 
 module.exports = ({ drivers: { pg }, emitEvent }) => {
@@ -17,7 +19,9 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
     get: getByIdPreset({
       name: 'transactions.all.commonData.get',
       sql: sql.get,
+      inputSchema: inputOne,
       resultSchema: result,
+      resultTypeFactory: Transaction,
       transformResult: transformTxInfo,
     })({ pg, emitEvent }),
 
@@ -26,6 +30,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       matchRequestResult: propEq('id'),
       sql: sql.mget,
       resultTypeFactory: Transaction,
+      inputSchema: inputMany,
       resultSchema: result,
       transformResult: transformTxInfo,
     })({ pg, emitEvent }),
