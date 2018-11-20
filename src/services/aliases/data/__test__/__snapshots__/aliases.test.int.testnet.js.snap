@@ -86,6 +86,19 @@ Array [
 `;
 
 exports[`Aliases request by address should return correct data if requested without showBroken 1`] = `
+Object {
+  "@@tag": "Just",
+  "@@type": "folktale:Maybe",
+  "@@value": Object {
+    "value": Object {
+      "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
+      "alias": "test-alias",
+    },
+  },
+}
+`;
+
+exports[`Aliases request by address should return correct data if requested without showBroken 2`] = `
 Array [
   Object {
     "@@tag": "Just",
@@ -168,12 +181,4 @@ Array [
     },
   },
 ]
-`;
-
-exports[`Aliases should return Maybe(alias) for one correctly 1`] = `
-Object {
-  "@@tag": "Nothing",
-  "@@type": "folktale:Maybe",
-  "@@value": Object {},
-}
 `;
