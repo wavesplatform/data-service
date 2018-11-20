@@ -17,7 +17,7 @@ const resolver = async ctx => {
   });
 
   const aliases = await service
-    .mget({ address, showBroken })
+    .search({ address, showBroken })
     .run()
     .promise();
 

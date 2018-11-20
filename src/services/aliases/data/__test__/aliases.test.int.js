@@ -1,13 +1,24 @@
 const { Nothing } = require('folktale/maybe');
 
-const db = require('./createDb')();
+const { createPgDriver } = require('../../../../db');
+const loadConfig = require('../../../../loadConfig');
+const options = loadConfig();
+const drivers = {
+  pg: createPgDriver(options),
+};
+const create = require('../index');
 
 const ADDRESS = '3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy';
 
 describe('Aliases', () => {
+  const service = create({
+    drivers,
+    emitEvent: () => () => null,
+  });
+
   it('should return Maybe(alias) for one correctly', done => {
-    db.aliases
-      .one('sexy-boys')
+    service
+      .get('sexy-boys')
       .run()
       .listen({
         onResolved: maybeX => {
@@ -16,8 +27,8 @@ describe('Aliases', () => {
         },
       });
 
-    db.aliases
-      .one('NON_EXISTING_ALIAS')
+    service
+      .get('NON_EXISTING_ALIAS')
       .run()
       .listen({
         onResolved: maybeX => {
@@ -29,8 +40,8 @@ describe('Aliases', () => {
 
   describe('request by address', () => {
     it('should return correct data if requested without showBroken', done => {
-      db.aliases
-        .many({ address: ADDRESS })
+      service
+        .mget({ address: ADDRESS })
         .run()
         .listen({
           onResolved: mxs => {
@@ -41,8 +52,8 @@ describe('Aliases', () => {
     });
 
     it('should return correct data if requested with showBroken', done => {
-      db.aliases
-        .many({
+      service
+        .mget({
           address: ADDRESS,
           showBroken: true,
         })

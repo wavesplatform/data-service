@@ -1,4 +1,5 @@
 const { identity } = require('ramda');
+
 const createResolver = require('../../../../resolvers/create');
 
 const { validateInput, validateResult } = require('../../validation');
@@ -12,9 +13,9 @@ module.exports = ({
   inputSchema,
   resultSchema,
   resultTypeFactory,
-  transformResult
+  transformResult,
 }) => ({ pg, emitEvent }) =>
-  createResolver.get({
+  createResolver.search({
     transformInput: identity,
     transformResult: transformResultFn(resultTypeFactory)(transformResult),
     validateInput: validateInput(inputSchema, name),
