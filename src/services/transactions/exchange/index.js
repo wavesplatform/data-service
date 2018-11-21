@@ -4,6 +4,8 @@ const { Transaction } = require('../../../types');
 
 const getByIdPreset = require('../../presets/pg/getById');
 const mgetByIdsPreset = require('../../presets/pg/mgetByIds');
+const { inputGet } = require('../../presets/pg/getById/inputSchema');
+const { inputMget } = require('../../presets/pg/mgetByIds/inputSchema');
 const searchWithPaginationPreset = require('../../presets/pg/searchWithPagination');
 
 const transformTxInfo = require('./transformTxInfo');
@@ -17,7 +19,9 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
     get: getByIdPreset({
       name: 'transactions.exchange.get',
       sql: sql.get,
+      inputSchema: inputGet,
       resultSchema: result,
+      resultTypeFactory: Transaction,
       transformResult: transformTxInfo,
     })({ pg, emitEvent }),
 
@@ -25,6 +29,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       name: 'transactions.exchange.mget',
       matchRequestResult: propEq('id'),
       sql: sql.mget,
+      inputSchema: inputMget,
       resultTypeFactory: Transaction,
       resultSchema: result,
       transformResult: transformTxInfo,

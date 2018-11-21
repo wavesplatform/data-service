@@ -4,4 +4,4 @@ const input = Joi.array()
   .items(Joi.string().base58())
   .required();
 
-module.exports = { input };
+module.exports = { inputMget: input };

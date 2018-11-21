@@ -13,9 +13,9 @@ module.exports = ({
   inputSchema,
   resultSchema,
   resultTypeFactory,
-  transformResult
+  transformResult,
 }) => ({ pg, emitEvent }) =>
-  createResolver.get({
+  createResolver.search({
     transformInput: identity,
     transformResult: transformResultFn(resultTypeFactory)(transformResult),
     validateInput: validateInput(inputSchema, name),

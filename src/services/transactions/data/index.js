@@ -1,6 +1,6 @@
 const { identity } = require('ramda');
 
-const createResolver = require('../../../resolvers/create');
+const createResolver = require('../../_common/createResolver');
 
 // validation
 const { input: inputGetSchema } = require('../../presets/pg/getById/inputSchema');
