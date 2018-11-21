@@ -5,9 +5,9 @@ const { compose, chain, map, always, identity, traverse } = require('ramda');
 // @hack because of ramda 'tap' not working with null values
 // https://github.com/ramda/ramda/issues/2421
 // @todo refactor after ramda fix
-const tap = require('../../utils/tap');
+const tap = require('../../../utils/tap');
 
-const { resultToTask, liftInnerMaybe } = require('../../utils/fp');
+const { resultToTask, liftInnerMaybe } = require('../../../utils/fp');
 
 /** chainRT :: (a -> Result b c) -> Task a d -> Task b c */
 const chainRT = f =>
