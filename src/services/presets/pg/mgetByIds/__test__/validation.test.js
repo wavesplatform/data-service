@@ -4,7 +4,7 @@ const { always, identity, equals } = require('ramda');
 const Joi = require('joi');
 
 const mgetByIdsPreset = require('..');
-const { input } = require('../inputSchema');
+const { inputMget: input } = require('../inputSchema');
 
 const createService = resultSchema =>
   mgetByIdsPreset({

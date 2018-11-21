@@ -7,7 +7,7 @@ const Joi = require('joi');
 const { Transaction } = require('../../../../../types');
 
 const getByIdPreset = require('..');
-const { input } = require('../inputSchema');
+const { inputGet: input } = require('../inputSchema');
 
 const createService = resultSchema =>
   getByIdPreset({

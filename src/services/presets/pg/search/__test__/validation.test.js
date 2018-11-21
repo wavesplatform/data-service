@@ -5,7 +5,6 @@ const Joi = require('joi');
 
 const { Transaction } = require('../../../../../types');
 const search = require('..');
-const commonFilterSchemas = require('../commonFilterSchemas');
 
 const mockTxs = [
   { id: 'q', timestamp: new Date() },
@@ -14,7 +13,7 @@ const mockTxs = [
 const service = search({
   name: 'some_name',
   sql: identity,
-  inputSchema: Joi.object().keys(commonFilterSchemas),
+  inputSchema: Joi.any(),
   resultSchema: Joi.any(),
   resultTypeFactory: Transaction,
   transformResult: identity(Transaction),
