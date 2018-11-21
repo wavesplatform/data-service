@@ -1,4 +1,4 @@
-const createResolver = require('../../../../resolvers/create');
+const createResolver = require('../../../_common/createResolver');
 
 const { validateInput, validateResult } = require('../../validation');
 const transformInput = require('./transformInput');

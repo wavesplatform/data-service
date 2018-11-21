@@ -1,19 +1,18 @@
-const { Transaction } = require('../../../../types');
-
 const { compose, map } = require('ramda');
 
 // @todo parameterize output type
-const txOrNull = maybeTx =>
-  maybeTx.matchWith({
-    Just: ({ value }) => Transaction(value),
+/** dataOrNull :: t -> Maybe DbResponse -> Maybe */
+const dataOrNull = typeFactory => maybe =>
+  maybe.matchWith({
+    Just: ({ value }) => typeFactory(value),
     Nothing: () => null,
   });
 
-/** transformResults :: Maybe RawTxInfo -> Transaction | null */
-const transformResults = transformTxInfo =>
+/** transformResults :: t -> transformDbResponse -> (Maybe DbResponse) -> t | null */
+const transformResults = typeFactory => transformDbResponse =>
   compose(
-    txOrNull,
-    map(transformTxInfo)
+    dataOrNull(typeFactory),
+    map(transformDbResponse)
   );
 
 module.exports = transformResults;

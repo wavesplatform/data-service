@@ -1,5 +1,5 @@
 const { parseDate } = require('../../../../utils/parseDate');
-const Cursor = require('../../../../resolvers/pagination/cursor');
+const Cursor = require('../../../_common/pagination/cursor');
 
 const get = (service, txId) =>
   describe('get', () => {

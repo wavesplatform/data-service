@@ -1,5 +1,6 @@
 const { identity } = require('ramda');
-const create = require('../../../resolvers/create');
+
+const create = require('../../_common/createResolver');
 
 const oneConfig = {
   ...require('./validation/one'),

@@ -1,7 +1,7 @@
 const rawJoi = require('joi');
 
 const { BigNumber } = require('@waves/data-entities');
-const Cursor = require('../../resolvers/pagination/cursor');
+const Cursor = require('../../services/_common/pagination/cursor');
 const { base58: base58Regex } = require('../regex');
 
 module.exports = rawJoi

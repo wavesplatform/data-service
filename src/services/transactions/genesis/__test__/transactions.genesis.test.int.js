@@ -1,7 +1,7 @@
 const createService = require('..');
 const { createPgDriver } = require('../../../../db');
 const { parseDate } = require('../../../../utils/parseDate');
-const Cursor = require('../../../../resolvers/pagination/cursor');
+const Cursor = require('../../../_common/pagination/cursor');
 
 const loadConfig = require('../../../../loadConfig');
 const options = loadConfig();

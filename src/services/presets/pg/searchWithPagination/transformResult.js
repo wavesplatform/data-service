@@ -3,7 +3,7 @@ const Maybe = require('folktale/maybe');
 const { Transaction, List } = require('../../../../types');
 
 const { map, compose, pipe, last, prop, objOf } = require('ramda');
-const Cursor = require('../../../../resolvers/pagination/cursor');
+const Cursor = require('../../../_common/pagination/cursor');
 
 const lastItem = pipe(
   last,
