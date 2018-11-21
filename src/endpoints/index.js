@@ -7,13 +7,13 @@ const assets = require('./assets');
 const pairs = require('./pairs');
 const transactions = require('./transactions');
 const aliases = require('./aliases');
-// const candles = require('./candles');
+const candles = require('./candles');
 
 router.use(assets.routes());
 router.use(pairs.routes());
 router.use(transactions.routes());
 router.use(aliases.routes());
-// router.use(candles.routes());
+router.use(candles.routes());
 
 router.get('/version', version);
 router.get('/', root);
