@@ -12,19 +12,19 @@ const calculateIntervaledCandles = сandlesInInterval => {
     open: сandlesInInterval[0].open,
     close: сandlesInInterval[сandlesInInterval.length - 1].close,
     low: null,
-    high: 0,
+    high: BigNumber(0),
     volume: BigNumber(0),
     price_volume: BigNumber(0),
+    weighted_average_price: BigNumber(0),
     max_height: 0,
-    weighted_average_price: 0,
     txs_count: 0,
   };
 
   forEach(candle => {
-    if (candle.low < resultCandle.low || resultCandle.low === null) {
+    if (candle.low.comparedTo(resultCandle.low) < 1 || resultCandle.low === null) {
       resultCandle.low = candle.low;
     }
-    if (candle.high > resultCandle.high) {
+    if (candle.high.comparedTo(resultCandle.high) == 1) {
       resultCandle.high = candle.high;
     }
     resultCandle.volume = resultCandle.volume.plus(candle.volume);
@@ -55,15 +55,15 @@ const addMissingCandles = curryN(
 
     const emptyCandle = {
       time_start: null,
-      open: BigNumber(0),
-      close: BigNumber(0),
-      low: BigNumber(0),
-      high: BigNumber(0),
-      volume: BigNumber(0),
-      price_volume: BigNumber(0),
-      max_height: BigNumber(0),
-      weighted_average_price: BigNumber(0),
-      txs_count: 0,
+      open: null,
+      close: null,
+      low: null,
+      high: null,
+      volume: null,
+      price_volume: null,
+      max_height: null,
+      weighted_average_price: null,
+      txs_count: null,
     };
 
     const fullFilled = [];
