@@ -1,20 +1,20 @@
-const searchWithPagination = require('../presets/pg/searchWithPagination');
+const search = require('../presets/pg/search');
 
-const getData = require('./data');
-const { inputSearch } = require('./inputSchema');
-const { outputSearch } = require('./resultSchema');
-const transformResult = require('./transformResult');
+const { Candle } = require('../../types');
+
+const sql = require('./sql');
+const { inputSearch, output } = require('./schema');
+const transformResults = require('./transformResults');
 
 module.exports = ({ drivers, emitEvent }) => {
-  const data = getData({ pg: drivers.pg });
-
   return {
-    search: searchWithPagination({
+    search: search({
       name: 'candles.search',
-      sql: data.search,
+      sql,
       inputSchema: inputSearch,
-      resultSchema: outputSearch,
-      transformResult,
+      resultSchema: output,
+      transformResult: transformResults,
+      resultTypeFactory: Candle,
     })({ pg: drivers.pg, emitEvent: emitEvent }),
   };
 };

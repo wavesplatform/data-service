@@ -4,7 +4,8 @@ const search = require('../presets/pg/search');
 const { Alias } = require('../../types');
 
 const sql = require('./data/sql');
-const transformResult = require('./data/transformResults');
+const transformResult = require('./data/transformResult');
+const transformResults = require('./data/transformResults');
 
 const { inputGet, inputSearch, output } = require('./schema');
 
@@ -15,7 +16,7 @@ module.exports = ({ drivers, emitEvent }) => {
       sql: sql.get,
       inputSchema: inputGet,
       resultSchema: output,
-      transformResult: transformResult,
+      transformResult,
       resultTypeFactory: Alias,
     })({ pg: drivers.pg, emitEvent: emitEvent }),
 
@@ -24,7 +25,7 @@ module.exports = ({ drivers, emitEvent }) => {
       sql: sql.mget,
       inputSchema: inputSearch,
       resultSchema: output,
-      transformResult: transformResult,
+      transformResult: transformResults(Alias),
       resultTypeFactory: Alias
     })({ pg: drivers.pg, emitEvent: emitEvent }),
   };

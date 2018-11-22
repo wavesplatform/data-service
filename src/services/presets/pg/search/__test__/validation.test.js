@@ -3,7 +3,7 @@ const { always, identity } = require('ramda');
 
 const Joi = require('joi');
 
-const { Transaction } = require('../../../../../types');
+const { Transaction, List } = require('../../../../../types');
 const search = require('..');
 
 const mockTxs = [
@@ -16,7 +16,7 @@ const service = search({
   inputSchema: Joi.any(),
   resultSchema: Joi.any(),
   resultTypeFactory: Transaction,
-  transformResult: identity(Transaction),
+  transformResult: identity(List),
 })({
   pg: { any: () => Task.of(mockTxs) },
   emitEvent: always(identity),

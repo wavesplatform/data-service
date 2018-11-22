@@ -2,7 +2,7 @@ const { identity } = require('ramda');
 
 const { captureErrors } = require('../../utils/captureErrors');
 const { select } = require('../utils/selectors');
-const { parseFilterValues } = require('../_common/filters');
+const { parseFilterValues, timeStart, timeEnd } = require('../_common/filters');
 const service = require('../../services/candles');
 
 const url = '/candles/:amountAsset/:priceAsset';
@@ -19,8 +19,8 @@ const candlesSearch = async ctx => {
   const { query } = select(ctx);
 
   const fValues = parseFilterValues({
-    timeStart: parseInt,
-    timeEnd: parseInt,
+    timeStart,
+    timeEnd,
     interval: identity,
   })(query);
 

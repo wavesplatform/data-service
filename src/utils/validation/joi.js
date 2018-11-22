@@ -3,6 +3,7 @@ const rawJoi = require('joi');
 const { BigNumber } = require('@waves/data-entities');
 const Cursor = require('../../services/_common/pagination/cursor');
 const { base58: base58Regex } = require('../regex');
+const { parseInterval, intervalValue } = require('../interval');
 
 module.exports = rawJoi
   .extend(joi => ({
@@ -10,6 +11,7 @@ module.exports = rawJoi
     name: 'string',
     language: {
       base58: 'must be a valid base58 string',
+      period: 'must be a valid period of time',
     },
     rules: [
       {
@@ -46,6 +48,87 @@ module.exports = rawJoi
             return this.createError('string.cursor', { value }, state, options);
           }
           return value; // Everything is OK
+        },
+      },
+      {
+        name: 'period',
+        validate(_, value, state, options) {
+          if (
+            joi
+              .string()
+              .regex(/^\d+\w{1}/)
+              .validate().error
+          ) {
+            return this.createError('string.period', { value }, state, options);
+          }
+
+          return value;
+        },
+      },
+      {
+        name: 'accepted',
+        params: {
+          accepted: joi.array(),
+        },
+        validate(params, value, state, options) {
+          const parsedValue = parseInterval(value);
+
+          if (params.accepted.indexOf(parsedValue[1]) === -1) {
+            return this.createError(
+              'string.period.accepted',
+              { value },
+              state,
+              options
+            );
+          }
+
+          return value;
+        },
+      },
+      {
+        name: 'min',
+        params: {
+          min: joi.string().regex(/^\d+\w{1}/),
+        },
+        validate(params, value, state, options) {
+          const parsedValue = parseInterval(value);
+
+          const min = parseInterval(params.min);
+          const minValue = intervalValue(min);
+
+          if (minValue > intervalValue(parsedValue)) {
+            return this.createError(
+              'string.period.min',
+              { value },
+              state,
+              options
+            );
+          }
+
+          return value;
+        },
+      },
+      {
+        name: 'max',
+        params: {
+          max: joi.string().regex(/^\d+\w{1}/),
+        },
+        validate(params, value, state, options) {
+          const parsedValue = parseInterval(value);
+
+          const max = parseInterval(params.max);
+          const maxValue = intervalValue(max);
+
+          if (maxValue < intervalValue(parsedValue)) {
+            return this.createError(
+              'string.period.max',
+              { value },
+              state,
+              options
+            );
+          }
+
+          return value;
         },
       },
     ],

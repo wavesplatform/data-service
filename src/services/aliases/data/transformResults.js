@@ -1,25 +1,22 @@
-/**
- * @typedef {object} AliasDbResponse
- * @property {string} alias
- * @property {string} address
- * @property {number} duplicates
- */
+const Maybe = require('folktale/maybe');
+const { map, compose } = require('ramda');
 
-/**
- * @typedef {object} AliasInfoRaw
- * @property {string} alias
- * @property {string | null} address
- */
+const { List } = require('../../../types');
 
-/**
- * DB task returns array of values:
- * @typedef {function} transformResults
- * @param {AliasDbResponse} result
- * @returns AliasInfoRaw
- */
-const transformResults = result => ({
-  alias: result.alias,
-  address: result.duplicates > 1 ? null : result.address,
-});
+const transformResult = require('./transformResult');
+
+/** transformResults :: t -> -> transformDbResponse -> DbResponse[] -> List Maybe t */
+const transformResults = typeFactory => result =>
+  compose(
+    List,
+    map(m => m.getOrElse(null)),
+    map(Maybe.fromNullable),
+    map(
+      compose(
+        typeFactory,
+        transformResult
+      )
+    )
+  )(result);
 
 module.exports = transformResults;
