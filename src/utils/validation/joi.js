@@ -2,7 +2,7 @@ const rawJoi = require('joi');
 
 const { BigNumber } = require('@waves/data-entities');
 const Cursor = require('../../services/_common/pagination/cursor');
-const { base58: base58Regex } = require('../regex');
+const { base58: base58Regex, interval: intervalRegex } = require('../regex');
 const { parseInterval, intervalValue } = require('../interval');
 
 module.exports = rawJoi
@@ -56,7 +56,7 @@ module.exports = rawJoi
           if (
             joi
               .string()
-              .regex(/^\d+\w{1}/)
+              .regex(intervalRegex)
               .validate().error
           ) {
             return this.createError('string.period', { value }, state, options);
