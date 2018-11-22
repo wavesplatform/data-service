@@ -30,22 +30,14 @@ const candlesSearch = async ctx => {
     query,
   });
 
-  let results;
-
-  // search hit
-  if (candles.search) {
-    results = await candles
-      .search({
-        amountAsset,
-        priceAsset,
-        params: fValues,
-      })
-      .run()
-      .promise();
-  } else {
-    ctx.status = 404;
-    return;
-  }
+  let results = await candles
+    .search({
+      amountAsset,
+      priceAsset,
+      params: fValues,
+    })
+    .run()
+    .promise();
 
   ctx.eventBus.emit('ENDPOINT_RESOLVED', {
     value: results,
