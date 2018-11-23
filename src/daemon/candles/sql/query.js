@@ -34,10 +34,12 @@ const candleSelectColumns = [
 ];
 
 const selectExchangesBetweenTick = (startTick, endTick) =>
-  selectExchanges().whereBetween('t.time_stamp', [
-    startTick.toGMTString(),
-    endTick.toISOString(),
-  ]);
+  selectExchanges()
+    .clone()
+    .whereBetween('t.time_stamp', [
+      startTick.toGMTString(),
+      endTick.toISOString(),
+    ]);
 
 const selectExchanges = () =>
   pg({ t: 'txs_7' })
@@ -49,14 +51,23 @@ const selectCandlesByMinute = (startTick, endTick) =>
   pg({ t: 'txs_7' })
     .columns(candleSelectColumns)
     .select()
-    .from(selectExchangesBetweenTick(startTick, endTick).as('e'))
+    .from(
+      selectExchangesBetweenTick(startTick, endTick)
+        .clone()
+        .as('e')
+    )
     .groupByRaw('e.amount_asset, e.price_asset, e.candle_time');
 
-const selectAllCandlesByMinute = () =>
-  pg({ t: 'txs_7' })
+const selectAllCandlesByMinute = instance =>
+  instance
+    .from({ t: 'txs_7' })
     .columns(candleSelectColumns)
     .select()
-    .from(selectExchanges().as('e'))
+    .from(
+      selectExchanges()
+        .clone()
+        .as('e')
+    )
     .groupByRaw('e.amount_asset, e.price_asset, e.candle_time');
 
 const candleToQuery = candle => ({
@@ -111,33 +122,27 @@ const createCandlesTable = pg.schema
     table.timestamp('time_start').notNullable();
     table.string('amount_asset_id').notNullable();
     table.string('price_asset_id').notNullable();
-    table.integer('max_height').notNullable();
-    table.integer('txs_count').notNullable();
     table.decimal('low', null, null).notNullable();
     table.decimal('high', null, null).notNullable();
-    table.decimal('open', null, null).notNullable();
-    table.decimal('close', null, null).notNullable();
     table.decimal('volume', null, null).notNullable();
     table.decimal('price_volume', null, null).notNullable();
+    table.integer('max_height').notNullable();
+    table.integer('txs_count').notNullable();
     table.decimal('weighted_average_price', null, null).notNullable();
+    table.decimal('open', null, null).notNullable();
+    table.decimal('close', null, null).notNullable();
     table.primary(['time_start', 'amount_asset_id', 'price_asset_id']);
   })
   .raw('alter table "candles" owner to dba;');
 
-const createCandlesTableAndFillAll = pg.and(createCandlesTable).selectAllCandlesByMinute;
-// compose(
-//   m => m.getOrElse(';'),
-//   tap(console.log),
-//   map(flip(concat)(selectAllCandlesByMinute().toString())),
-//   map(flip(concat)('create table "candles" as ')),
-//   Maybe.of,
-//   () => dropTable('candles')
-// );
+const updateCandlesAll = pg({}).into('candles').insert(function() {
+  selectAllCandlesByMinute(this);
+});
 
 module.exports = {
   selectCandlesByMinute,
   insertOrUpdateCandles,
   candleToQuery,
   createCandlesTable,
-  createCandlesTableAndFillAll,
+  updateCandlesAll,
 };

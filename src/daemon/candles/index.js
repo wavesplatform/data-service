@@ -8,7 +8,7 @@ const {
   insertOrUpdateCandles,
   candleToQuery,
   createCandlesTable,
-  createCandlesTableAndFillAll,
+  updateCandlesAll,
 } = require('./sql/query');
 const { truncSeconds, fillSeconds } = require('../../utils/dateTime');
 const { createPgDriver } = require('../../db');
@@ -27,7 +27,7 @@ const printError = value => console.log(chalk.red(value));
 const printSuccess = value => console.log(chalk.green(value));
 
 const getCandles = (startTime, endTime) =>
-  pgDriver.any(selectEmptyPairsByMinute(startTime, endTime).toString());
+  pgDriver.any(selectCandlesByMinute(startTime, endTime).toString());
 
 const updateCandles = compose(
   chain(candles =>
@@ -75,20 +75,19 @@ const updateCandlesLoop = compose(
 );
 
 const updateDBAll = compose(
-  () => printDelemiter(),
-  () =>
-    pgDriver
-      .any(createCandlesTableAndFillAll.toString())
-      .run()
-      .listen({
-        onResolved: () => {
-          printValueWithLabel('Handle time', `${new Date() - startTime} ms`);
-          printSuccess('Success update DB!');
-        },
-        onRejected: printError,
-        onCancelled: () => printError('Fail start is fail'),
-      }),
-  () => printSuccess('Start updating...'),
+  task =>
+    task.run().listen({
+      onResolved: () => {
+        printValueWithLabel('Handle time', `${new Date() - startTime} ms`);
+        printSuccess('Success update DB!');
+        printDelemiter();
+      },
+      onRejected: printError,
+      onCancelled: () => printError('Fail start is fail'),
+    }),
+  chain(() => pgDriver.none(updateCandlesAll.toString())),
+  () => pgDriver.none(createCandlesTable.toString()),
+  () => printSuccess('Start updating all candles ...'),
   () => printDelemiter(),
   () => (startTime = new Date())
 );
@@ -96,9 +95,7 @@ const updateDBAll = compose(
 const main = compose(
   task =>
     task.run().listen({
-      onResolved: () => {
-        printSuccess('Daemon is end started!');
-      },
+      onResolved: () => {},
       onRejected: printError,
       onCancelled: () => printError('Fail start is fail'),
     }),
