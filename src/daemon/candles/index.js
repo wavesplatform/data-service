@@ -85,6 +85,10 @@ const updateDBAll = compose(
       onRejected: printError,
       onCancelled: () => printError('Fail start is fail'),
     }),
+  chain(() => updateCandles(startTime, new Date())),
+  chain(() =>
+    Task.of(setInterval(updateCandlesLoop, options.candlesUpdateInterval))
+  ),
   chain(() => pgDriver.none(updateCandlesAll.toString())),
   () => pgDriver.none(createCandlesTable.toString()),
   () => printSuccess('Start updating all candles ...'),
