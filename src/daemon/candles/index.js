@@ -1,4 +1,22 @@
-const { curryN, compose, chain, map, prop, join } = require('ramda');
+const {
+  curryN,
+  compose,
+  chain,
+  map,
+  prop,
+  join,
+  propOr,
+  eqProps,
+  equals,
+  ifElse,
+  cond,
+  always,
+  allPass,
+  has,
+  and,
+  or,
+  gt
+} = require('ramda');
 const chalk = require('chalk');
 const Task = require('folktale/concurrency/task');
 const Maybe = require('folktale/maybe');
@@ -9,8 +27,10 @@ const {
   candleToQuery,
   createCandlesTable,
   updateCandlesAll,
+  selectLastCandle,
+  selectLastExchange,
 } = require('./sql/query');
-const { truncSeconds, fillSeconds } = require('../../utils/dateTime');
+
 const { createPgDriver } = require('../../db');
 const loadConfig = require('../../loadConfig');
 const tap = require('../../utils/tap');
@@ -51,27 +71,35 @@ const checkCreateDB = compose(
   prop('candlesCreateTable')
 );
 
+const getUpdateTime = (exchange, candle) => [
+  console.log(
+    or(has('height', exchange), has('max_height', candle))
+      ? and(has('height', exchange), has('max_height', candle))
+        ? gt(prop('max_height', candle), prop('height', exchange)) ? prop('time_stamp', exchange) : prop('time_start', candle)
+        : propOr(prop('time_start', candle), 'time_stamp', exchange)
+      : new Date(0)
+  ) || new Date(),
+  new Date(),
+];
+
 const updateCandlesLoop = compose(
   task =>
     task.run().listen({
       onResolved: () => {
         printValueWithLabel('Handle time', `${new Date() - startTime} ms`);
         printSuccess('Success update');
+        setTimeout(updateCandlesLoop, options.candlesUpdateInterval);
       },
       onRejected: printError,
       onCancelled: () => printError('Fail update'),
     }),
-  now => updateCandles(truncSeconds(now), fillSeconds(now)),
-  tap(now =>
-    printValueWithLabel('Candle time range')(
-      `${truncSeconds(now).toLocaleTimeString()} - ${fillSeconds(
-        now
-      ).toLocaleTimeString()}`
-    )
+  chain(candle =>
+    pgDriver
+      .one(selectLastExchange().toString())
+      .chain(exchange => updateCandles(...getUpdateTime(exchange, candle)))
   ),
-  tap(now => (startTime = now)),
-  () => new Date(),
-  printDelemiter
+  () => pgDriver.one(selectLastCandle().toString()),
+  () => (startTime = new Date())
 );
 
 const updateDBAll = compose(
@@ -81,18 +109,15 @@ const updateDBAll = compose(
         printValueWithLabel('Handle time', `${new Date() - startTime} ms`);
         printSuccess('Success update DB!');
         printDelemiter();
+        setTimeout(updateCandlesLoop, options.candlesUpdateInterval);
       },
       onRejected: printError,
       onCancelled: () => printError('Fail start is fail'),
     }),
-  chain(() => updateCandles(startTime, new Date())),
-  chain(() =>
-    Task.of(setInterval(updateCandlesLoop, options.candlesUpdateInterval))
-  ),
+  chain(() => Task.of(updateCandlesLoop)),
   chain(() => pgDriver.none(updateCandlesAll.toString())),
   () => pgDriver.none(createCandlesTable.toString()),
   () => printSuccess('Start updating all candles ...'),
-  () => printDelemiter(),
   () => (startTime = new Date())
 );
 
@@ -101,17 +126,13 @@ const main = compose(
     task.run().listen({
       onResolved: () => {},
       onRejected: printError,
-      onCancelled: () => printError('Fail start is fail'),
+      onCancelled: () => printError('Daemon start is fail'),
     }),
-  args =>
-    ((task, options) =>
-      task.chain(() =>
-        Task.of(
-          options.downloadAllCandles
-            ? updateDBAll()
-            : setInterval(updateCandlesLoop, options.candlesUpdateInterval)
-        )
-      ))(...args),
+  tap(() => printDelemiter()),
+  ([task, options]) =>
+    task.chain(() =>
+      Task.of(options.downloadAllCandles ? updateDBAll() : updateCandlesLoop())
+    ),
   options => [checkCreateDB(options), options]
 );
 

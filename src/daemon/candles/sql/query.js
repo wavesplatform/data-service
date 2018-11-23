@@ -41,6 +41,18 @@ const selectExchangesBetweenTick = (startTick, endTick) =>
       endTick.toISOString(),
     ]);
 
+const selectLastCandle = () =>
+  pg({ t: 'candles' })
+    .select('*')
+    .limit(1)
+    .orderByRaw('time_start desc');
+
+const selectLastExchange = () =>
+  pg({ t: 'txs_7' })
+    .select('*')
+    .limit(1)
+    .orderByRaw('height desc');
+
 const selectExchanges = () =>
   pg({ t: 'txs_7' })
     .columns(exchangeColumns)
@@ -135,9 +147,11 @@ const createCandlesTable = pg.schema
   })
   .raw('alter table "candles" owner to dba;');
 
-const updateCandlesAll = pg({}).into('candles').insert(function() {
-  selectAllCandlesByMinute(this);
-});
+const updateCandlesAll = pg({})
+  .into('candles')
+  .insert(function() {
+    selectAllCandlesByMinute(this);
+  });
 
 module.exports = {
   selectCandlesByMinute,
@@ -145,4 +159,6 @@ module.exports = {
   candleToQuery,
   createCandlesTable,
   updateCandlesAll,
+  selectLastCandle,
+  selectLastExchange,
 };
