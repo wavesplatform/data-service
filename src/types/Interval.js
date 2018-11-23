@@ -22,6 +22,7 @@ const getLengthMilliseconds = s => {
   return n * units[u] * 1000;
 };
 
+// @todo maybe take numbers, not strings? parse to string value if possible
 const Interval = s => {
   // validate
   if (typeof s !== 'string') throw new Error('String argument expected');
