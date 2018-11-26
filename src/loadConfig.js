@@ -22,8 +22,8 @@ const loadConfig = () => {
     logLevel: process.env.LOG_LEVEL || 'info',
 
     candlesUpdateInterval: process.env.CANDLES_UPDATE_INTERVAL_MS || 2500,
-    candlesCreateTable: process.env.CANDLES_CREATE_TABLE,
-    downloadAllCandles: process.env.CANDLES_DOWNLOAD_ALL,
+    candlesCreateTable: process.env.CANDLES_CREATE_TABLE || false,
+    downloadAllCandles: process.env.CANDLES_DOWNLOAD_ALL || false,
   };
 };
 

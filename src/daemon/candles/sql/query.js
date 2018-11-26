@@ -3,8 +3,6 @@ const pg = knex({ client: 'pg' });
 const { compose, map, concat, flip } = require('ramda');
 const Maybe = require('folktale/maybe');
 
-const tap = require('../../../utils/tap');
-
 const exchangeColumns = [
   'amount_asset',
   'price_asset',
@@ -33,19 +31,16 @@ const candleSelectColumns = [
   ),
 ];
 
-const selectExchangesBetweenTick = (startTick, endTick) =>
+const selectExchangesAfterBlock = (startBlock) =>
   selectExchanges()
     .clone()
-    .whereBetween('t.time_stamp', [
-      startTick.toGMTString(),
-      endTick.toISOString(),
-    ]);
+    .whereRaw(`t.height >= ${startBlock}`);
 
 const selectLastCandle = () =>
   pg({ t: 'candles' })
     .select('*')
     .limit(1)
-    .orderByRaw('time_start desc');
+    .orderByRaw('max_height desc');
 
 const selectLastExchange = () =>
   pg({ t: 'txs_7' })
@@ -59,12 +54,12 @@ const selectExchanges = () =>
     .innerJoin({ a_dec: 'asset_decimals' }, 't.amount_asset', 'a_dec.asset_id')
     .innerJoin({ p_dec: 'asset_decimals' }, 't.price_asset', 'p_dec.asset_id');
 
-const selectCandlesByMinute = (startTick, endTick) =>
+const selectCandlesByMinute = (startBlock) =>
   pg({ t: 'txs_7' })
     .columns(candleSelectColumns)
     .select()
     .from(
-      selectExchangesBetweenTick(startTick, endTick)
+      selectExchangesAfterBlock(startBlock)
         .clone()
         .as('e')
     )
@@ -144,6 +139,7 @@ const createCandlesTable = pg.schema
     table.decimal('open', null, null).notNullable();
     table.decimal('close', null, null).notNullable();
     table.primary(['time_start', 'amount_asset_id', 'price_asset_id']);
+    table.index(['max_height']);
   })
   .raw('alter table "candles" owner to dba;');
 
