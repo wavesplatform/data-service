@@ -29,8 +29,10 @@ const Interval = s => {
     throw new Error('String argument does not match interval pattern');
 
   const length = getLengthMilliseconds(s);
+  const unit = s.substr(-1);
   return {
     length,
+    unit,
     div: i => length / i.length,
     toString: () => s,
     toJSON: () => s,
