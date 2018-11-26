@@ -31,7 +31,7 @@ const candleSelectColumns = [
   ),
 ];
 
-const selectExchangesAfterBlock = (startBlock) =>
+const selectExchangesAfterBlock = startBlock =>
   selectExchanges()
     .clone()
     .whereRaw(`t.height >= ${startBlock}`);
@@ -54,7 +54,7 @@ const selectExchanges = () =>
     .innerJoin({ a_dec: 'asset_decimals' }, 't.amount_asset', 'a_dec.asset_id')
     .innerJoin({ p_dec: 'asset_decimals' }, 't.price_asset', 'p_dec.asset_id');
 
-const selectCandlesByMinute = (startBlock) =>
+const selectCandlesByMinute = startBlock =>
   pg({ t: 'txs_7' })
     .columns(candleSelectColumns)
     .select()
@@ -106,22 +106,21 @@ const updatedFields = [
 
 const insertCandle = candles => pg({ t: 'candles' }).insert(candles);
 
-const insertOrUpdateCandles = candles =>
-  compose(
-    m => m.getOrElse(';'),
-    map(
-      flip(concat)(
-        updatedFields.map(field => field + '=EXCLUDED.' + field).join(', ')
-      )
-    ),
-    map(
-      flip(concat)(
-        ' on conflict (time_start,amount_asset_id, price_asset_id) do update set '
-      )
-    ),
-    map(() => insertCandle(candles).toString()),
-    () => (candles.length ? Maybe.of(candles) : Maybe.Nothing())
-  )();
+const insertOrUpdateCandles = compose(
+  m => m.getOrElse(';'),
+  map(
+    flip(concat)(
+      updatedFields.map(field => field + '=EXCLUDED.' + field).join(', ')
+    )
+  ),
+  map(
+    flip(concat)(
+      ' on conflict (time_start,amount_asset_id, price_asset_id) do update set '
+    )
+  ),
+  map(candles => insertCandle(candles).toString()),
+  candles => (candles.length ? Maybe.of(candles) : Maybe.Nothing())
+);
 
 const createCandlesTable = pg.schema
   .dropTableIfExists('candles')
