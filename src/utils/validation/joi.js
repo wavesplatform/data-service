@@ -3,7 +3,7 @@ const rawJoi = require('joi');
 const { BigNumber } = require('@waves/data-entities');
 const Cursor = require('../../services/_common/pagination/cursor');
 const { base58: base58Regex, interval: intervalRegex } = require('../regex');
-const { parseInterval, intervalValue } = require('../interval');
+const Interval = require('../../types/Interval');
 
 module.exports = rawJoi
   .extend(joi => ({
@@ -11,7 +11,13 @@ module.exports = rawJoi
     name: 'string',
     language: {
       base58: 'must be a valid base58 string',
-      period: 'must be a valid period of time',
+      period: {
+        value: 'must be a valid interval value',
+        accept: 'must be in accepted',
+        dividing: 'must be dividing by divider',
+        min: 'must be more then min',
+        max: 'must be less then max',
+      },
     },
     rules: [
       {
@@ -57,25 +63,51 @@ module.exports = rawJoi
             joi
               .string()
               .regex(intervalRegex)
-              .validate().error
+              .validate(value).error
           ) {
-            return this.createError('string.period', { value }, state, options);
+            return this.createError(
+              'string.period.value',
+              { value },
+              state,
+              options
+            );
           }
 
           return value;
         },
       },
       {
-        name: 'accepted',
+        name: 'accept',
         params: {
-          accepted: joi.array(),
+          accept: joi.array(),
         },
         validate(params, value, state, options) {
-          const parsedValue = parseInterval(value);
+          const interval = Interval(value);
 
-          if (params.accepted.indexOf(parsedValue[1]) === -1) {
+          if (params.accept.indexOf(interval.unit) === -1) {
             return this.createError(
-              'string.period.accepted',
+              'string.period.accept',
+              { value },
+              state,
+              options
+            );
+          }
+
+          return value;
+        },
+      },
+      {
+        name: 'dividing',
+        params: {
+          dividing: joi.string().regex(intervalRegex),
+        },
+        validate(params, value, state, options) {
+          const interval = Interval(value);
+          const dividingInterval = Interval(params.dividing);
+
+          if (interval.div(dividingInterval) % 1 !== 0) {
+            return this.createError(
+              'string.period.dividing',
               { value },
               state,
               options
@@ -88,15 +120,13 @@ module.exports = rawJoi
       {
         name: 'min',
         params: {
-          min: joi.string().regex(/^\d+\w{1}/),
+          min: joi.string().regex(intervalRegex),
         },
         validate(params, value, state, options) {
-          const parsedValue = parseInterval(value);
+          const interval = Interval(value);
+          const minInterval = Interval(params.min);
 
-          const min = parseInterval(params.min);
-          const minValue = intervalValue(min);
-
-          if (minValue > intervalValue(parsedValue)) {
+          if (minInterval.length > interval.length) {
             return this.createError(
               'string.period.min',
               { value },
@@ -111,15 +141,13 @@ module.exports = rawJoi
       {
         name: 'max',
         params: {
-          max: joi.string().regex(/^\d+\w{1}/),
+          max: joi.string().regex(intervalRegex),
         },
         validate(params, value, state, options) {
-          const parsedValue = parseInterval(value);
+          const interval = Interval(value);
+          const maxInterval = Interval(params.max);
 
-          const max = parseInterval(params.max);
-          const maxValue = intervalValue(max);
-
-          if (maxValue < intervalValue(parsedValue)) {
+          if (maxInterval.length < interval.length) {
             return this.createError(
               'string.period.max',
               { value },

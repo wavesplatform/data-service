@@ -17,5 +17,6 @@ module.exports = {
   Pair: createNamedType('pair'),
   Transaction: createNamedType('transaction'),
   List: require('./List'),
+  Interval: require('./Interval'),
   fromMaybe,
 };

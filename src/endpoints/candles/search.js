@@ -24,6 +24,11 @@ const candlesSearch = async ctx => {
     interval: identity,
   })(query);
 
+  // default
+  if (!fValues.timeEnd) {
+    fValues.timeEnd = new Date();
+  }
+
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
     resolver: `${url}`,

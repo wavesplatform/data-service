@@ -4,7 +4,7 @@ const { Candle } = require('../../types');
 
 const sql = require('./sql');
 const { inputSearch, output } = require('./schema');
-const transformResults = require('./transformResults');
+const { transformResults } = require('./transformResults');
 
 module.exports = ({ drivers, emitEvent }) => {
   return {
