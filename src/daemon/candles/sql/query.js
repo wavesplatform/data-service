@@ -8,26 +8,26 @@ const exchangeColumns = [
   'price_asset',
   'height',
   pg.raw(`date_trunc('minute', t.time_stamp) as candle_time`),
-  pg.raw(`t.amount * 10 ^(-a_dec.decimals) as real_amount`),
-  pg.raw(`t.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals) as real_price`),
+  pg.raw(`amount`),
+  pg.raw(`price`),
 ];
 
 const candleSelectColumns = [
   pg.raw('e.candle_time as time_start'),
   'amount_asset as amount_asset_id',
   'price_asset as price_asset_id',
-  pg.raw('min(e.real_price) as low'),
-  pg.raw('max(e.real_price) as high'),
-  pg.raw('sum(e.real_amount) as volume'),
-  pg.raw('sum(e.real_amount * e.real_price) as price_volume'),
+  pg.raw('min(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals)) as low'),
+  pg.raw('max(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals)) as high'),
+  pg.raw('sum(e.amount * 10 ^(-a_dec.decimals)) as volume'),
+  pg.raw('sum(e.amount * 10 ^(-a_dec.decimals) * e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals)) as price_volume'),
   pg.raw('max(height) as max_height'),
-  pg.raw('count(e.real_price) as txs_count'),
+  pg.raw('count(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals)) as txs_count'),
   pg.raw(
-    'sum(e.real_amount * e.real_price)/sum(e.real_amount) as weighted_average_price'
+    'sum(e.amount * 10 ^(-a_dec.decimals) * e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))/sum(e.amount * 10 ^(-a_dec.decimals)) as weighted_average_price'
   ),
-  pg.raw('(array_agg(e.real_price)::numeric[])[1] as open'),
+  pg.raw('(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))::numeric[])[1] as open'),
   pg.raw(
-    '(array_agg(e.real_price)::numeric[])[array_length(array_agg(e.real_price)::numeric[], 1)] as close'
+    '(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))::numeric[])[array_length(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))::numeric[], 1)] as close'
   ),
 ];
 
@@ -50,9 +50,7 @@ const selectLastExchange = () =>
 
 const selectExchanges = () =>
   pg({ t: 'txs_7' })
-    .columns(exchangeColumns)
-    .innerJoin({ a_dec: 'asset_decimals' }, 't.amount_asset', 'a_dec.asset_id')
-    .innerJoin({ p_dec: 'asset_decimals' }, 't.price_asset', 'p_dec.asset_id');
+    .columns(exchangeColumns);
 
 const selectCandlesByMinute = startBlock =>
   pg({ t: 'txs_7' })
@@ -63,6 +61,8 @@ const selectCandlesByMinute = startBlock =>
         .clone()
         .as('e')
     )
+    .innerJoin({ a_dec: 'asset_decimals' }, 'e.amount_asset', 'a_dec.asset_id')
+    .innerJoin({ p_dec: 'asset_decimals' }, 'e.price_asset', 'p_dec.asset_id')
     .groupByRaw('e.amount_asset, e.price_asset, e.candle_time');
 
 const selectAllCandlesByMinute = instance =>
@@ -75,6 +75,8 @@ const selectAllCandlesByMinute = instance =>
         .clone()
         .as('e')
     )
+    .innerJoin({ a_dec: 'asset_decimals' }, 'e.amount_asset', 'a_dec.asset_id')
+    .innerJoin({ p_dec: 'asset_decimals' }, 'e.price_asset', 'p_dec.asset_id')
     .groupByRaw('e.amount_asset, e.price_asset, e.candle_time');
 
 const candleToQuery = candle => ({
