@@ -30,14 +30,3 @@ module.exports = {
   add,
   subtract,
 };
-
-// const roundToMinuteUp = d => {
-//   const coeff = 1000 * 60;
-//   return new Date(Math.ceil(d.getTime() / coeff) * coeff);
-// };
-
-// const getIntervalStart = timeStart => minutesInInterval => {
-//   const offset = timeStart.getTime();
-//   const coeff = 1000 * 60 * minutesInInterval;
-//   return new Date(Math.ceil(d.getTime() / coeff) * coeff);
-// };
