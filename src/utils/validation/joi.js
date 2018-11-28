@@ -14,7 +14,7 @@ module.exports = rawJoi
       period: {
         value: 'must be a valid interval value',
         accept: 'must be in accepted',
-        dividing: 'must be dividing by divider',
+        divisibleBy: 'must be divisible by divider',
         min: 'must be more then min',
         max: 'must be less then max',
       },
@@ -97,17 +97,17 @@ module.exports = rawJoi
         },
       },
       {
-        name: 'dividing',
+        name: 'divisibleBy',
         params: {
-          dividing: joi.string().regex(intervalRegex),
+          divisibleBy: joi.string().regex(intervalRegex),
         },
         validate(params, value, state, options) {
           const interval = Interval(value);
-          const dividingInterval = Interval(params.dividing);
+          const divisibleByInterval = Interval(params.divisibleBy);
 
-          if (interval.div(dividingInterval) % 1 !== 0) {
+          if (interval.div(divisibleByInterval) % 1 !== 0) {
             return this.createError(
-              'string.period.dividing',
+              'string.period.divisibleBy',
               { value },
               state,
               options

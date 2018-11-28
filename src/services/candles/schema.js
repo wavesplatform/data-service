@@ -57,8 +57,8 @@ const customJoi = Joi.extend(joi => ({
           joi
             .string()
             .period()
-            .accept(['m', 'h', 'd', 'M'])
-            .dividing('1m')
+            .accept(['m', 'h', 'd', 'M', 'Y'])
+            .divisibleBy('1m')
             .min('1m')
             .max('1M')
             .validate(value.interval).error
@@ -163,9 +163,10 @@ const output = Joi.object().keys({
     .bignumber()
     .required(),
   txs_count: Joi.number().required(),
-  fold: Joi.number()
+  interval_in_secs: Joi.number()
     .integer()
-    .valid([60, 300, 900, 1800, 3600, 86400]), // 1min, 5min, 15min, 30min, 1hour, 1day
+    .valid([60, 300, 900, 1800, 3600, 86400]) // 1min, 5min, 15min, 30min, 1hour, 1day
+    .required(),
 });
 
 module.exports = { inputSearch, output };

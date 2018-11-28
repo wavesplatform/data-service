@@ -114,11 +114,11 @@ describe('Joi extended with custom types', () => {
       assertError(validatePeriod('25h'));
     });
 
-    it('should validates dividing intervals correclty', () => {
+    it('should validates divisible by intervals correclty', () => {
       const validatePeriod = validate(
         Joi.string()
           .period()
-          .dividing('2m')
+          .divisibleBy('2m')
       );
 
       assertPass(validatePeriod('2m'));

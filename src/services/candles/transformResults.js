@@ -14,8 +14,10 @@ const {
 const { renameKeys } = require('ramda-adjunct');
 const { Interval, List } = require('../../types');
 const concatAll = require('../../utils/fp/concatAll');
-const { floor, ceil, add } = require('../../utils/date');
+const { floor, ceil, add, trunc } = require('../../utils/date');
 const { candleMonoid } = require('./candleMonoid');
+
+const truncToMinutes = trunc('minutes');
 
 /** transformCandle :: [Date, CandleDbResponse] -> Candle */
 const transformCandle = ([time, candle]) => {
@@ -54,7 +56,7 @@ const addMissingCandles = curryN(
       it <= end;
       it = add(interval, it)
     ) {
-      const cur = it.toISOString().substr(0, 16);
+      const cur = truncToMinutes(it);
 
       if (!res[cur]) {
         res[cur] = [];
@@ -78,11 +80,11 @@ const transformResults = (result, request) =>
       request.params.timeStart,
       request.params.timeEnd
     ),
-    groupBy(candle => {
-      return floor(Interval(request.params.interval), candle.time_start)
-        .toISOString()
-        .substr(0, 16);
-    })
+    groupBy(candle =>
+      truncToMinutes(
+        floor(Interval(request.params.interval), candle.time_start)
+      )
+    )
   )(result);
 
 module.exports = {
