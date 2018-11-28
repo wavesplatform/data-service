@@ -21,7 +21,6 @@ const customJoi = Joi.extend(joi => ({
       name: 'period',
       params: {
         options: joi.object().keys({
-          accept: joi.array().items(joi.string()),
           divisibleByLeftBound: joi.array().items(joi.string()),
           limit: joi.number().integer(),
         }),
@@ -62,21 +61,6 @@ const customJoi = Joi.extend(joi => ({
             .dividing('1m')
             .min('1m')
             .max('1M')
-            .validate(value.interval).error
-        ) {
-          return this.createError(
-            'object.period.interval.valid',
-            { value },
-            state,
-            options
-          );
-        }
-
-        if (
-          params.options.accept &&
-          joi
-            .string()
-            .valid(params.options.accept)
             .validate(value.interval).error
         ) {
           return this.createError(
@@ -140,7 +124,6 @@ const inputSearch = Joi.object()
       .base58()
       .required(),
     params: customJoi.object().period({
-      // accept: ['1m', '5m', '15m', '30m', '60m', '1h', '1d', '1M'],
       divisibleByLeftBound: ['1d', '1h', '1m'],
       limit: 1440,
     }),
