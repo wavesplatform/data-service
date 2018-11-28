@@ -1,59 +1,43 @@
-const {
-  compose,
-  curryN,
-  groupBy,
-  map,
-  mapObjIndexed,
-  sort,
-  values,
-} = require('ramda');
+const { compose, curryN, groupBy, map, sort, toPairs } = require('ramda');
 const { renameKeys } = require('ramda-adjunct');
 const { Interval, List } = require('../../types');
 const concatAll = require('../../utils/fp/concatAll');
 const { floor, ceil, add } = require('../../utils/date');
 const { candleMonoid } = require('./candleMonoid');
 
-const transformCandle = ([candle, time]) => {
-  let result = {
-    time: new Date(time).valueOf(),
-    open: null,
-    low: null,
-    high: null,
-    close: null,
-    volume: null,
-    priceVolume: null,
-    weightedAveragePrice: null,
-    maxHeight: null,
-    txsCount: null,
+const transformCandle = ([time, candle]) => {
+  return {
+    ...renameKeys(
+      {
+        price_volume: 'priceVolume',
+        weighted_average_price: 'weightedAveragePrice',
+        max_height: 'maxHeight',
+        txs_count: 'txsCount',
+        time_start: 'time',
+      },
+      {
+        ...candle,
+        high: candle.high == -Infinity ? null : candle.high,
+        low: candle.low == +Infinity ? null : candle.low,
+        volume: candle.volume.comparedTo(0) === 0 ? null : candle.volume,
+        price_volume: candle.price_volume.comparedTo(0) === 0 ? null : candle.price_volume,
+        weighted_average_price: candle.weighted_average_price.comparedTo(0) === 0 ? null : candle.weighted_average_price,
+        txs_count: candle.txs_count || null,
+        max_height: candle.max_height || null
+      }
+    ),
+    time: new Date(candle.time_start || time),
   };
-
-  if (candle.txs_count) {
-    result = {
-      ...renameKeys(
-        {
-          price_volume: 'priceVolume',
-          weighted_average_price: 'weightedAveragePrice',
-          max_height: 'maxHeight',
-          txs_count: 'txsCount',
-          time_start: 'time',
-        },
-        candle
-      ),
-      time: new Date(candle.time_start).valueOf(),
-    };
-  }
-
-  return result;
 };
 
-// addMissingCandles :: Interval -> String -> String -> {String: [Candle]} -> {String: [Candle]}
+// addMissingCandles :: Interval -> Date -> Date -> {String: [Candle]} -> {String: [Candle]}
 const addMissingCandles = curryN(
   4,
   (interval, timeStart, timeEnd, candlesGroupedByTime) => {
-    const end = new Date(timeEnd);
+    const end = timeEnd;
 
     for (
-      let it = ceil(interval, new Date(timeStart));
+      let it = ceil(interval, timeStart);
       it <= end;
       it = add(interval, it)
     ) {
@@ -73,13 +57,8 @@ const transformResults = (result, request) =>
   compose(
     List,
     map(transformCandle),
-    sort((a, b) => {
-      const aDate = new Date(a[1]),
-        bDate = new Date(b[1]);
-      return aDate > bDate ? 1 : aDate < bDate ? -1 : 0;
-    }),
-    values,
-    mapObjIndexed((candle, time) => [candle, time]),
+    sort((a, b) => new Date(a[0]) - new Date(b[0])),
+    toPairs,
     map(concatAll(candleMonoid)),
     addMissingCandles(
       Interval(request.params.interval),

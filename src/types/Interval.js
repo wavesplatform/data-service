@@ -1,4 +1,5 @@
 const Result = require('folktale/result');
+const { findLast, pipe, prop, sortBy } = require('ramda');
 const { toValidationError } = require('../errorHandling/factories');
 
 const { interval: intervalRegex } = require('../utils/regex');
@@ -35,6 +36,16 @@ const Interval = s => {
     length,
     unit,
     div: i => length / i.length,
+    closest: pipe(
+      sortBy(
+        pipe(
+          Interval,
+          prop('length')
+        )
+      ),
+      findLast(i => length / Interval(i).length > 1),
+      Interval
+    ),
     toString: () => s,
     toJSON: () => s,
   };

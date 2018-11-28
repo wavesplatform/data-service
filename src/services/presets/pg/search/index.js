@@ -15,7 +15,7 @@ module.exports = ({
 }) => ({ pg, emitEvent }) =>
   createResolver.search({
     transformInput: identity,
-    transformResult: transformResult,
+    transformResult,
     validateInput: validateInput(inputSchema, name),
     validateResult: validateResult(resultSchema, name),
     dbQuery: getData({ name, sql }),

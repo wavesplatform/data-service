@@ -1,4 +1,4 @@
-const { groupBy, map, mapObjIndexed, pipe, values } = require('ramda');
+const { groupBy, map, pipe, toPairs } = require('ramda');
 const { addMissingCandles, transformCandle } = require('../transformResults');
 const { candleMonoid } = require('../candleMonoid');
 const { Interval } = require('../../../types');
@@ -7,10 +7,13 @@ const concatAll = require('../../../utils/fp/concatAll');
 
 const data1Candles = require('./mocks/data-1-candles');
 const dataMonthCandles = require('./mocks/data-month-candles');
-const date1 = new Date(1541019600000), // 1st nov 2018 00:00:00.000 +03:00
-  date2 = new Date(1543611600000); // 1st dec 2018 00:00:00.000 +03:00
+
+const date1 = new Date('2018-11-01T00:00:00+03:00'),
+  date2 = new Date('2018-12-01T00:00:00+03:00');
+
 const intervalD = Interval('1d'),
   intervalM = Interval('1m');
+
 const addMissing1mCandles = addMissingCandles(intervalM),
   addMissing1dCandles = addMissingCandles(intervalD);
 
@@ -24,12 +27,8 @@ describe('add missing candles', () => {
               .toISOString()
               .substr(0, 16);
           }),
-          addMissing1mCandles(
-            date1.valueOf(),
-            date2.valueOf(),
-          ),
-          mapObjIndexed((candle, time) => [candle, time]),
-          values,
+          addMissing1mCandles(date1, date2),
+          toPairs
         )(data1Candles).length
       ).toBe(43201);
     });
@@ -41,12 +40,8 @@ describe('add missing candles', () => {
               .toISOString()
               .substr(0, 16);
           }),
-          addMissing1mCandles(
-            date1.valueOf(),
-            date2.valueOf(),
-          ),
-          mapObjIndexed((candle, time) => [candle, time]),
-          values,
+          addMissing1mCandles(date1, date2),
+          toPairs
         )(dataMonthCandles).length
       ).toBe(43201);
     });
@@ -61,9 +56,8 @@ describe('add missing candles', () => {
               .toISOString()
               .substr(0, 16);
           }),
-          addMissing1dCandles(date1.valueOf(), date2.valueOf()),
-          mapObjIndexed((candle, time) => [candle, time]),
-          values,
+          addMissing1dCandles(date1, date2),
+          toPairs
         )(data1Candles).length
       ).toBe(30);
     });
@@ -76,9 +70,8 @@ describe('add missing candles', () => {
               .toISOString()
               .substr(0, 16);
           }),
-          addMissing1dCandles(date1.valueOf(), date2.valueOf()),
-          mapObjIndexed((candle, time) => [candle, time]),
-          values,
+          addMissing1dCandles(date1, date2),
+          toPairs
         )(dataMonthCandles).length
       ).toBe(30);
     });
@@ -98,7 +91,7 @@ describe('candle monoid', () => {
             .toISOString()
             .substr(0, 16);
         }),
-        map(concatAll(candleMonoid)),
+        map(concatAll(candleMonoid))
       )(dataMonthCandles)
     ).toMatchSnapshot();
   });
@@ -106,10 +99,10 @@ describe('candle monoid', () => {
 
 describe('transform candle fn', () => {
   it('take empty candle and returns correctly transformed for result candle', () => {
-    expect(transformCandle([{txs_count: null}, date1])).toMatchSnapshot();
+    expect(transformCandle([date1, candleMonoid.empty])).toMatchSnapshot();
   });
 
   it('take valid candle and returns correctly transformed for result candle', () => {
-    expect(transformCandle([data1Candles[0], date1])).toMatchSnapshot();
+    expect(transformCandle([date1, data1Candles[0]])).toMatchSnapshot();
   });
 });
