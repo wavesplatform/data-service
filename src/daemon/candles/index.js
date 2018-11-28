@@ -1,6 +1,5 @@
 const {
   compose,
-  chain,
   map,
   prop,
   has,
@@ -30,13 +29,12 @@ const {
   printSuccess,
   printSuccessValueWithLabel,
   printErrorValueWithLabel,
-} = require('../presets/logger');
+} = require('../../utils/logger');
 const { daemon } = require('../presets/daemon');
-const { timeStart, timeEnd } = require('../presets/time');
+const { timeStart, timeEnd } = require('../../utils/time');
 
 const { createPgDriver } = require('../../db');
 const loadConfig = require('../../loadConfig');
-const tap = require('../../utils/tap');
 
 const options = loadConfig();
 const pgDriver = createPgDriver(options);
@@ -59,21 +57,34 @@ const getStartBlock = (exchange, candle) =>
         : Maybe.Nothing()
   )();
 
-const updateCandles = compose(
-  chain(candles =>
-    pgDriver.any(insertOrUpdateCandles(candles.map(candleToQuery)))
-  ),
-  map(
-    tap(candles =>
-      printSuccessValueWithLabel('[CANDLES] length')(candles.length)
-    )
-  ),
-  startBlock => pgDriver.any(selectCandlesByMinute(startBlock).toString())
-);
+const updateCandles = startBlock =>
+  pgDriver
+    .any(selectCandlesByMinute(startBlock).toString())
+    .chain(
+      candles =>
+        printSuccessValueWithLabel('[CANDLES] length')(candles.length) ||
+        pgDriver.any(insertOrUpdateCandles(candles.map(candleToQuery)))
+    );
 
-const updateCandlesLoop = compose(
-  task =>
-    task.run().listen({
+const updateCandlesLoop = () => {
+  printSuccessValueWithLabel('[CANDLES] date', new Date().toLocaleTimeString());
+  timeStart('candle-update');
+  pgDriver
+    .one(selectLastCandle().toString())
+    .chain(candle =>
+      pgDriver.one(selectLastExchange().toString()).chain(exchange =>
+        Task.of(getStartBlock(exchange, candle)).chain(height =>
+          updateCandles(height)
+            .chain(() => pgDriver.any(updateCandlesBy(1, 300, height)))
+            .chain(() => pgDriver.any(updateCandlesBy(300, 900, height)))
+            .chain(() => pgDriver.any(updateCandlesBy(900, 1800, height)))
+            .chain(() => pgDriver.any(updateCandlesBy(1800, 3600, height)))
+            .chain(() => pgDriver.any(updateCandlesBy(3600, 86400, height)))
+        )
+      )
+    )
+    .run()
+    .listen({
       onResolved: () => {
         printSuccessValueWithLabel(
           `[CANDLES] handle time`,
@@ -86,26 +97,8 @@ const updateCandlesLoop = compose(
           JSON.stringify(error)
         ),
       onCancelled: () => printError(`[CANDLES] update canceled`),
-    }),
-  chain(candle =>
-    pgDriver.one(selectLastExchange().toString()).chain(exchange =>
-      Task.of(getStartBlock(exchange, candle)).chain(height =>
-        updateCandles(height)
-          .chain(() => pgDriver.any(updateCandlesBy(1, 300, height)))
-          .chain(() => pgDriver.any(updateCandlesBy(300, 900, height)))
-          .chain(() => pgDriver.any(updateCandlesBy(900, 1800, height)))
-          .chain(() => pgDriver.any(updateCandlesBy(1800, 3600, height)))
-          .chain(() => pgDriver.any(updateCandlesBy(3600, 86400, height)))
-      )
-    )
-  ),
-  () => pgDriver.one(selectLastCandle().toString()),
-  () =>
-    printSuccessValueWithLabel(
-      '[CANDLES] date',
-      new Date().toLocaleTimeString()
-    ) || timeStart('candle-update')
-);
+    });
+};
 
 const initAllFoldFrom = (fromFold, fold) =>
   Task.task(
