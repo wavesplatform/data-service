@@ -1,4 +1,16 @@
-const { compose, curryN, groupBy, map, sort, toPairs } = require('ramda');
+const {
+  compose,
+  curryN,
+  groupBy,
+  map,
+  sort,
+  toPairs,
+  assoc,
+  always,
+  ifElse,
+  identity,
+  evolve,
+} = require('ramda');
 const { renameKeys } = require('ramda-adjunct');
 const { Interval, List } = require('../../types');
 const concatAll = require('../../utils/fp/concatAll');
@@ -6,28 +18,26 @@ const { floor, ceil, add } = require('../../utils/date');
 const { candleMonoid } = require('./candleMonoid');
 
 const transformCandle = ([time, candle]) => {
-  return {
-    ...renameKeys(
-      {
-        price_volume: 'priceVolume',
-        weighted_average_price: 'weightedAveragePrice',
-        max_height: 'maxHeight',
-        txs_count: 'txsCount',
-        time_start: 'time',
-      },
-      {
-        ...candle,
-        high: candle.high == -Infinity ? null : candle.high,
-        low: candle.low == +Infinity ? null : candle.low,
-        volume: candle.volume.comparedTo(0) === 0 ? null : candle.volume,
-        price_volume: candle.price_volume.comparedTo(0) === 0 ? null : candle.price_volume,
-        weighted_average_price: candle.weighted_average_price.comparedTo(0) === 0 ? null : candle.weighted_average_price,
-        txs_count: candle.txs_count || null,
-        max_height: candle.max_height || null
-      }
-    ),
-    time: new Date(candle.time_start || time),
-  };
+  const isEmpty = c => c.txs_count === 0;
+
+  const transformEmpty = c =>
+    compose(
+      assoc('time_start', new Date(time)),
+      map(always(null))
+    )(c);
+
+  const renameFields = renameKeys({
+    price_volume: 'priceVolume',
+    weighted_average_price: 'weightedAveragePrice',
+    max_height: 'maxHeight',
+    txs_count: 'txsCount',
+    time_start: 'time',
+  });
+
+  return compose(
+    renameFields,
+    ifElse(isEmpty, transformEmpty, evolve({ time_start: t => new Date(t) }))
+  )(candle);
 };
 
 // addMissingCandles :: Interval -> Date -> Date -> {String: [Candle]} -> {String: [Candle]}
