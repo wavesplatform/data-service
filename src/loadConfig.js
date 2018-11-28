@@ -23,7 +23,6 @@ const loadConfig = () => {
 
     candlesUpdateInterval: process.env.CANDLES_UPDATE_INTERVAL_MS || 2500,
     candlesCreateTable: process.env.CANDLES_CREATE_TABLE || false,
-    downloadAllCandles: process.env.CANDLES_DOWNLOAD_ALL || false,
   };
 };
 
