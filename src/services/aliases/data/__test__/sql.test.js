@@ -7,13 +7,13 @@ describe('Alias sql query build', () => {
 
   it('`many` should build select by address with order by time and hide blocked by default', () => {
     expect(
-      sql.mget({ address: '3PELiu6JuVMLJojenRkTPTzCRjAocrxXWJy' })
+      sql.search({ address: '3PELiu6JuVMLJojenRkTPTzCRjAocrxXWJy' })
     ).toMatchSnapshot();
   });
 
   it('`many` should build select by address with order by time and show blocked if flag is set', () => {
     expect(
-      sql.mget({
+      sql.search({
         address: '3PELiu6JuVMLJojenRkTPTzCRjAocrxXWJy',
         showBroken: true,
       })

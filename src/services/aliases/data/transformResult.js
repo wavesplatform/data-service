@@ -17,9 +17,7 @@
  * @param {AliasDbResponse} result
  * @returns AliasInfoRaw
  */
-const transformResults = result => ({
+module.exports = result => ({
   alias: result.alias,
   address: result.duplicates > 1 ? null : result.address,
 });
-
-module.exports = transformResults;
