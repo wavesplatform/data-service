@@ -1,13 +1,4 @@
-const {
-  compose,
-  map,
-  prop,
-  has,
-  and,
-  gt,
-  lt,
-  propEq,
-} = require('ramda');
+const { compose, map, prop, has, and, gt, lt, propEq } = require('ramda');
 const Task = require('folktale/concurrency/task');
 const Maybe = require('folktale/maybe');
 
@@ -23,14 +14,8 @@ const {
   updateCandlesBy,
 } = require('./sql/query');
 
-const {
-  printDelemiter,
-  printError,
-  printSuccess,
-  printSuccessValueWithLabel,
-  printErrorValueWithLabel,
-} = require('../../utils/logger');
-const { daemon } = require('../presets/daemon');
+const logger = require('../presets/chulkLogger');
+const { daemon, logging } = require('../presets/daemon');
 const { timeStart, timeEnd } = require('../../utils/time');
 
 const { createPgDriver } = require('../../db');
@@ -62,7 +47,7 @@ const updateCandles = startBlock =>
     .any(selectCandlesByMinute(startBlock).toString())
     .chain(
       candles =>
-        printSuccessValueWithLabel('[CANDLES] length')(candles.length) ||
+        logging('log', logger, `[CANDLES] length: ${candles.length}`) ||
         pgDriver.any(insertOrUpdateCandles(candles.map(candleToQuery)))
     );
 
@@ -154,29 +139,32 @@ const createDB = Task.task(
       .none(createCandlesTable.toString())
       .run()
       .listen({
-        onResolved: () =>
-          printSuccessValueWithLabel(
-            '[DB] creating success',
-            timeEnd('db-create')
+        onResolved: data =>
+          logging(
+            'log',
+            logger,
+            `[DB] creating success: ${data ? data : ''}`
           ) || resolver.resolve(),
         onRejected: error =>
-          printErrorValueWithLabel(
-            '[DB] creating error',
-            JSON.stringify(error)
+          logging(
+            'error',
+            logger,
+            `[DB] creating error: ${JSON.stringify(error)}`
           ) || resolver.reject(),
         onCancelled: () =>
-          printError('[DB] creating cancel') || resolver.reject(),
+          logging('warn', logger, '[DB] creating cancel') || resolver.reject(),
       })
-).chain(() => printSuccess('[DB] init ...') || initDBAll);
+).chain(() => logging('log', logger, '[DB] init ...') || initDBAll);
 
 daemon(
   {
     init: configuration =>
       propEq('candlesCreateTable', 'true', configuration)
-        ? printSuccess('[DB] creating ...') || createDB
+        ? logging('log', logger, '[DB] creating ...') || createDB
         : Task.of(),
     loop: updateCandlesLoop,
   },
   options,
-  options.candlesUpdateInterval
+  options.candlesUpdateInterval,
+  logger
 );

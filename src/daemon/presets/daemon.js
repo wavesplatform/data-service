@@ -1,11 +1,5 @@
-const { prop, propIs } = require('ramda');
+const { prop, propIs, curryN } = require('ramda');
 const Task = require('folktale/concurrency/task');
-
-const {
-  printWarning,
-  printSuccess,
-  printErrorValueWithLabel,
-} = require('../../utils/logger');
 
 const loop = (func, cfg, interval) =>
   setTimeout(() => {
@@ -13,24 +7,35 @@ const loop = (func, cfg, interval) =>
     loop(func, cfg, interval);
   }, interval);
 
-const main = (functions, cfg, interval) =>
-  (propIs(Function, 'init', functions)
-    ? printSuccess(`[DAEMON] init()`) || prop('init', functions)(cfg)
-    : printWarning(`[DAEMON] init !== Function => loop()`) || Task.of(cfg)
+/** logging :: String -> Object -> Any */
+const logging = curryN(3, (level, logger, data) => {
+  if (propIs(Function, level, logger)) prop(level, logger)(data);
+});
+
+/** main :: Object -> Object -> Number -> TaskExecution */
+const main = (funcObject, config, interval, logger = console) =>
+  (propIs(Function, 'init', funcObject)
+    ? logging('log', logger, '[DAEMON] init ...') ||
+      prop('init', funcObject)(config)
+    : logging('warn', logger, '[DAEMON] init != Function') || Task.of(config)
   )
     .chain(() =>
-      propIs(Function, 'loop', functions)
-        ? Task.task(() => loop(prop('loop', functions), cfg, interval))
-        : printWarning(`[DAEMON] loop !== Function`) || Task.of(cfg)
+      propIs(Function, 'loop', funcObject)
+        ? logging('log', logger, '[DAEMON] start loop ...') ||
+          Task.task(() => loop(prop('loop', funcObject), config, interval))
+        : logging('warn', logger, '[DAEMON] loop != Function') ||
+          Task.of(config)
     )
     .run()
     .listen({
-      onResolved: () => printSuccess('[DAEMON] success start end'),
+      onResolved: data =>
+        logging('log', logger, `[DAEMON] stop: ${data ? data : ''}`),
       onRejected: error =>
-        printErrorValueWithLabel('[DAEMON] error', JSON.stringify(error)),
-      onCancelled: () => printWarning('[DAEMON] task is canceled!'),
+        logging('error', logger, `[DAEMON] error: ${JSON.stringify(error)}`),
+      onCancelled: () => logging('warn', logger, '[DAEMON] task is canceled!'),
     });
 
 module.exports = {
   daemon: main,
+  logging
 };
