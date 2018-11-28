@@ -8,7 +8,7 @@ const {
   assoc,
   always,
   ifElse,
-  identity,
+  clone,
   evolve,
 } = require('ramda');
 const { renameKeys } = require('ramda-adjunct');
@@ -17,6 +17,7 @@ const concatAll = require('../../utils/fp/concatAll');
 const { floor, ceil, add } = require('../../utils/date');
 const { candleMonoid } = require('./candleMonoid');
 
+/** transformCandle :: [Date, CandleDbResponse] -> Candle */
 const transformCandle = ([time, candle]) => {
   const isEmpty = c => c.txs_count === 0;
 
@@ -40,11 +41,13 @@ const transformCandle = ([time, candle]) => {
   )(candle);
 };
 
-// addMissingCandles :: Interval -> Date -> Date -> {String: [Candle]} -> {String: [Candle]}
+/** addMissingCandles :: Interval -> Date -> Date
+ * -> Map String CandleDbResponse[]-> Map String CandleDbResponse[] */
 const addMissingCandles = curryN(
   4,
   (interval, timeStart, timeEnd, candlesGroupedByTime) => {
     const end = timeEnd;
+    const res = clone(candlesGroupedByTime);
 
     for (
       let it = ceil(interval, timeStart);
@@ -53,16 +56,16 @@ const addMissingCandles = curryN(
     ) {
       const cur = it.toISOString().substr(0, 16);
 
-      if (!candlesGroupedByTime[cur]) {
-        candlesGroupedByTime[cur] = [];
+      if (!res[cur]) {
+        res[cur] = [];
       }
     }
 
-    return candlesGroupedByTime;
+    return res;
   }
 );
 
-/** transformResults :: (DbResponse[], request) -> List Maybe t */
+/** transformResults :: (CandleDbResponse[], request) -> List Maybe t */
 const transformResults = (result, request) =>
   compose(
     List,
