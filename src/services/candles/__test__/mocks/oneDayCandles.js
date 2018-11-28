@@ -9,7 +9,7 @@ module.exports = [
     high: BigNumber(0.01),
     volume: BigNumber(2842),
     price_volume: BigNumber(3.3000442),
-    weighted_average_price: BigNumber(0.00116116966924700914),
+    weighted_average_price: BigNumber(0.0011),
     max_height: 377979,
     txs_count: 20,
   },

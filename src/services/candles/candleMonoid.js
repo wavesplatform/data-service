@@ -6,6 +6,7 @@ const leftNotNullMonoid = new Monoid({
   concat: (a, b) => a || b,
   empty: null,
 });
+
 const rightNotNullMonoid = new Monoid({
   concat: (a, b) => b || a,
   empty: null,
@@ -26,24 +27,23 @@ const maxMonoid = new Monoid({
   empty: 0,
 });
 
-// individual
-const lowMonoid = new Monoid({
+const bigNumberLowestMonoid = new Monoid({
   concat: (a, b) => (a.comparedTo(b) === 1 ? b : a),
   empty: BigNumber(+Infinity),
 });
 
-const highMonoid = new Monoid({
+const bigNumberHighestMonoid = new Monoid({
   concat: (a, b) => (a.comparedTo(b) === 1 ? a : b),
   empty: BigNumber(-Infinity),
 });
 
+// individual
 const weightedAveragePriceMonoid = new Monoid({
-  concat: (a, b) => {
-    return a.weighted_average_price
+  concat: (a, b) =>
+    a.weighted_average_price
       .multipliedBy(a.volume)
       .plus(b.weighted_average_price.multipliedBy(b.volume))
-      .dividedBy(a.volume.plus(b.volume));
-  },
+      .dividedBy(a.volume.plus(b.volume)),
   empty: BigNumber(0),
 });
 
@@ -52,8 +52,8 @@ const candleMonoid = new Monoid({
     time_start: leftNotNullMonoid.concat(a.time_start, b.time_start),
     open: leftNotNullMonoid.concat(a.open, b.open),
     close: rightNotNullMonoid.concat(a.close, b.close),
-    high: highMonoid.concat(a.high, b.high),
-    low: lowMonoid.concat(a.low, b.low),
+    high: bigNumberHighestMonoid.concat(a.high, b.high),
+    low: bigNumberLowestMonoid.concat(a.low, b.low),
     volume: bigNumberPlusMonoid.concat(a.volume, b.volume),
     price_volume: bigNumberPlusMonoid.concat(a.price_volume, b.price_volume),
     weighted_average_price: weightedAveragePriceMonoid.concat(a, b),
@@ -64,8 +64,8 @@ const candleMonoid = new Monoid({
     time_start: leftNotNullMonoid.empty,
     open: leftNotNullMonoid.empty,
     close: rightNotNullMonoid.empty,
-    high: highMonoid.empty,
-    low: lowMonoid.empty,
+    high: bigNumberHighestMonoid.empty,
+    low: bigNumberLowestMonoid.empty,
     volume: bigNumberPlusMonoid.empty,
     price_volume: bigNumberPlusMonoid.empty,
     weighted_average_price: weightedAveragePriceMonoid.empty,
@@ -74,4 +74,14 @@ const candleMonoid = new Monoid({
   },
 });
 
-module.exports = { candleMonoid };
+module.exports = {
+  leftNotNullMonoid,
+  rightNotNullMonoid,
+  sumMonoid,
+  bigNumberPlusMonoid,
+  maxMonoid,
+  bigNumberHighestMonoid,
+  bigNumberLowestMonoid,
+  weightedAveragePriceMonoid,
+  candleMonoid,
+};
