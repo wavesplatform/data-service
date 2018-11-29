@@ -51,8 +51,8 @@ const updateCandles = startBlock =>
         pgDriver.any(insertOrUpdateCandles(candles.map(candleToQuery)))
     );
 
-const updateCandlesLoop = () => {
-  printSuccessValueWithLabel('[CANDLES] date', new Date().toLocaleTimeString());
+const updateCandlesLoop = resolver => {
+  logging('log', logger, `[CANDLES] date: ${new Date().toLocaleTimeString()}`);
   timeStart('candle-update');
   pgDriver
     .one(selectLastCandle().toString())
@@ -70,43 +70,50 @@ const updateCandlesLoop = () => {
     )
     .run()
     .listen({
-      onResolved: () => {
-        printSuccessValueWithLabel(
-          `[CANDLES] handle time`,
-          timeEnd(`candle-update`)
-        ) || printDelemiter();
-      },
+      onResolved: () =>
+        logging(
+          'log',
+          logger,
+          `[CANDLES] handle time: ${timeEnd(`candle-update`)}\n${'-'.repeat(
+            50
+          )}`
+        ) || resolver.resolve(),
       onRejected: error =>
-        printErrorValueWithLabel(
-          `[CANDLES] update fail`,
-          JSON.stringify(error)
-        ),
-      onCancelled: () => printError(`[CANDLES] update canceled`),
+        logging(
+          'error',
+          logger,
+          `[CANDLES] update fai: ${JSON.stringify(error)}`
+        ) || resolver.reject(),
+      onCancelled: () => logging('warn', logger, `[CANDLES] update canceled`) || resolver.reject(),
     });
 };
 
 const initAllFoldFrom = (fromFold, fold) =>
   Task.task(
     resolver =>
-      printSuccess(`[DB] init fold ${fromFold}-${fold}...`) ||
+      logging('log', logger, `[DB] init fold ${fromFold}-${fold}...`) ||
       timeStart(`db-init-fold-${fromFold}-${fold}`) ||
       pgDriver
         .none(insertAllCandlesBy(fromFold, fold).toString())
         .run()
         .listen({
           onResolved: () =>
-            printSuccessValueWithLabel(
-              `[DB] init fold ${fromFold}->${fold}`,
-              timeEnd(`db-init-fold-${fromFold}-${fold}`)
-            ) || resolver.resolve(),
+            logging('log', logger, `[DB] init fold ${fromFold}->${fold}`) ||
+            resolver.resolve(),
           onRejected: error =>
-            printErrorValueWithLabel(
-              `[DB] init fold ${fromFold}->${fold}`,
-              JSON.stringify(error)
+            logging(
+              'error',
+              logger,
+              `[DB] init fold ${fromFold}->${fold} error: ${JSON.stringify(
+                error
+              )}`
             ) || resolver.reject(),
           onCancelled: () =>
-            printError(`[DB] init fold ${fromFold}->${fold}`) ||
-            resolver.reject(),
+            logging(
+              'warn',
+              logger,
+              `[DB] init fold ${fromFold}->${fold} canceled`
+            ) || resolver.reject(),
         })
   );
 
@@ -118,12 +125,16 @@ const initDBAll = Task.task(
       .run()
       .listen({
         onResolved: () =>
-          printSuccessValueWithLabel('[DB] init success', timeEnd('db-init')) ||
+          logging('log', logger, `[DB] init success: ${timeEnd('db-init')}`) ||
           resolver.resolve(),
         onRejected: error =>
-          printErrorValueWithLabel('[DB] init error', JSON.stringify(error)) ||
-          resolver.reject(),
-        onCancelled: () => printError('[DB] init cancel') || resolver.reject(),
+          logging(
+            'error',
+            logger,
+            `[DB] init error: ${JSON.stringify(error)}`
+          ) || resolver.reject(),
+        onCancelled: () =>
+          logging('warn', logger, `[DB] init cancel`) || resolver.reject(),
       })
 )
   .chain(() => initAllFoldFrom(60, 300))
@@ -162,9 +173,10 @@ daemon(
       propEq('candlesCreateTable', 'true', configuration)
         ? logging('log', logger, '[DB] creating ...') || createDB
         : Task.of(),
-    loop: updateCandlesLoop,
+    loop: () => Task.task(updateCandlesLoop),
   },
   options,
   options.candlesUpdateInterval,
+  options.candlesUpdateTimeout,
   logger
 );
