@@ -1,180 +1,23 @@
+const createDaemon = require('./create');
+
 const { compose, map, prop, has, and, gt, lt, propEq } = require('ramda');
 const Task = require('folktale/concurrency/task');
 const Maybe = require('folktale/maybe');
+const tap = require('../../utils/tap');
 
-const {
-  selectCandlesByMinute,
-  insertOrUpdateCandles,
-  candleToQuery,
-  createCandlesTable,
-  updateMinutesCandlesAll,
-  selectLastCandle,
-  selectLastExchange,
-  insertAllCandlesBy,
-  updateCandlesBy,
-} = require('./sql/query');
-
+// logger
 const logger = require('../presets/chulkLogger');
-const { daemon, logging } = require('../presets/daemon');
-const { timeStart, timeEnd } = require('../../utils/time');
+// const { timeStart, timeEnd } = require('../../utils/time');
 
+// pg
 const { createPgDriver } = require('../../db');
 const loadConfig = require('../../loadConfig');
-
 const options = loadConfig();
 const pgDriver = createPgDriver(options);
 
-const getStartBlock = (exchange, candle) =>
-  compose(
-    m => m.getOrElse(1),
-    map(([exchangeHeight, candleHeight]) => {
-      if (gt(candleHeight, exchangeHeight)) {
-        return exchangeHeight - 2000; // Rollback
-      } else {
-        return lt(candleHeight, exchangeHeight)
-          ? candleHeight - 2
-          : exchangeHeight - 2;
-      }
-    }),
-    () =>
-      and(has('height', exchange), has('max_height', candle))
-        ? Maybe.of([prop('height', exchange), prop('max_height', candle)])
-        : Maybe.Nothing()
-  )();
+const { daemon: runDaemon } = require('../presets/daemon');
 
-const updateCandles = startBlock =>
-  pgDriver
-    .any(selectCandlesByMinute(startBlock).toString())
-    .chain(
-      candles =>
-        logging('log', logger, `[CANDLES] length: ${candles.length}`) ||
-        pgDriver.any(insertOrUpdateCandles(candles.map(candleToQuery)))
-    );
-
-const updateCandlesLoop = resolver => {
-  logging('log', logger, `[CANDLES] date: ${new Date().toLocaleTimeString()}`);
-  timeStart('candle-update');
-  pgDriver
-    .one(selectLastCandle().toString())
-    .chain(candle =>
-      pgDriver.one(selectLastExchange().toString()).chain(exchange =>
-        Task.of(getStartBlock(exchange, candle)).chain(height =>
-          updateCandles(height)
-            .chain(() => pgDriver.any(updateCandlesBy(1, 300, height)))
-            .chain(() => pgDriver.any(updateCandlesBy(300, 900, height)))
-            .chain(() => pgDriver.any(updateCandlesBy(900, 1800, height)))
-            .chain(() => pgDriver.any(updateCandlesBy(1800, 3600, height)))
-            .chain(() => pgDriver.any(updateCandlesBy(3600, 86400, height)))
-        )
-      )
-    )
-    .run()
-    .listen({
-      onResolved: () =>
-        logging(
-          'log',
-          logger,
-          `[CANDLES] handle time: ${timeEnd(`candle-update`)}\n${'-'.repeat(
-            50
-          )}`
-        ) || resolver.resolve(),
-      onRejected: error =>
-        logging(
-          'error',
-          logger,
-          `[CANDLES] update fai: ${JSON.stringify(error)}`
-        ) || resolver.reject(),
-      onCancelled: () => logging('warn', logger, `[CANDLES] update canceled`) || resolver.reject(),
-    });
-};
-
-const initAllFoldFrom = (fromFold, fold) =>
-  Task.task(
-    resolver =>
-      logging('log', logger, `[DB] init fold ${fromFold}-${fold}...`) ||
-      timeStart(`db-init-fold-${fromFold}-${fold}`) ||
-      pgDriver
-        .none(insertAllCandlesBy(fromFold, fold).toString())
-        .run()
-        .listen({
-          onResolved: () =>
-            logging('log', logger, `[DB] init fold ${fromFold}->${fold}`) ||
-            resolver.resolve(),
-          onRejected: error =>
-            logging(
-              'error',
-              logger,
-              `[DB] init fold ${fromFold}->${fold} error: ${JSON.stringify(
-                error
-              )}`
-            ) || resolver.reject(),
-          onCancelled: () =>
-            logging(
-              'warn',
-              logger,
-              `[DB] init fold ${fromFold}->${fold} canceled`
-            ) || resolver.reject(),
-        })
-  );
-
-const initDBAll = Task.task(
-  resolver =>
-    timeStart('db-init') ||
-    pgDriver
-      .none(updateMinutesCandlesAll.toString())
-      .run()
-      .listen({
-        onResolved: () =>
-          logging('log', logger, `[DB] init success: ${timeEnd('db-init')}`) ||
-          resolver.resolve(),
-        onRejected: error =>
-          logging(
-            'error',
-            logger,
-            `[DB] init error: ${JSON.stringify(error)}`
-          ) || resolver.reject(),
-        onCancelled: () =>
-          logging('warn', logger, `[DB] init cancel`) || resolver.reject(),
-      })
-)
-  .chain(() => initAllFoldFrom(60, 300))
-  .chain(() => initAllFoldFrom(300, 900))
-  .chain(() => initAllFoldFrom(900, 1800))
-  .chain(() => initAllFoldFrom(1800, 3600))
-  .chain(() => initAllFoldFrom(3600, 86400));
-
-const createDB = Task.task(
-  resolver =>
-    timeStart('db-create') ||
-    pgDriver
-      .none(createCandlesTable.toString())
-      .run()
-      .listen({
-        onResolved: data =>
-          logging(
-            'log',
-            logger,
-            `[DB] creating success: ${data ? data : ''}`
-          ) || resolver.resolve(),
-        onRejected: error =>
-          logging(
-            'error',
-            logger,
-            `[DB] creating error: ${JSON.stringify(error)}`
-          ) || resolver.reject(),
-        onCancelled: () =>
-          logging('warn', logger, '[DB] creating cancel') || resolver.reject(),
-      })
-).chain(() => logging('log', logger, '[DB] init ...') || initDBAll);
-
-daemon(
-  {
-    init: configuration =>
-      propEq('candlesCreateTable', 'true', configuration)
-        ? logging('log', logger, '[DB] creating ...') || createDB
-        : Task.of(),
-    loop: () => Task.task(updateCandlesLoop),
-  },
+runDaemon(createDaemon({ logger, pg: pgDriver }, options)
   options,
   options.candlesUpdateInterval,
   options.candlesUpdateTimeout,
