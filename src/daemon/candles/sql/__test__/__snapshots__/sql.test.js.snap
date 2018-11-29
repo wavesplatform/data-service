@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`candles daemon sql test create candles table with indexes 1`] = `
+"drop table if exists \\"candles\\";
+create table \\"candles\\" (\\"time_start\\" timestamptz not null, \\"amount_asset_id\\" varchar(255) not null, \\"price_asset_id\\" varchar(255) not null, \\"low\\" decimal not null, \\"high\\" decimal not null, \\"volume\\" decimal not null, \\"price_volume\\" decimal not null, \\"max_height\\" integer not null, \\"txs_count\\" integer not null, \\"weighted_average_price\\" decimal not null, \\"open\\" decimal not null, \\"close\\" decimal not null);
+alter table \\"candles\\" add constraint \\"candles_pkey\\" primary key (\\"time_start\\", \\"amount_asset_id\\", \\"price_asset_id\\");
+create index \\"candles_max_height_index\\" on \\"candles\\" (\\"max_height\\");
+alter table \\"candles\\" owner to dba;"
+`;
+
+exports[`candles daemon sql test get last candle order by max_height 1`] = `"select * from \\"candles\\" as \\"t\\" order by max_height desc limit 1"`;
+
+exports[`candles daemon sql test get last exchange order by height 1`] = `"select * from \\"txs_7\\" as \\"t\\" order by height desc limit 1"`;
+
+exports[`candles daemon sql test insert or update candles 1`] = `"insert into \\"candles\\" as \\"t\\" (\\"amount_asset_id\\", \\"close\\", \\"hight\\", \\"low\\", \\"open\\", \\"price\\", \\"price_asset_id\\", \\"price_volume\\", \\"time_start\\", \\"txs_count\\", \\"weighted_average_price\\") values ('1', 80, 100, 1, 20, 1.2, '2', 100.2, '1970-01-01 03:00:00.000', 22, 2.1) on conflict (time_start,amount_asset_id, price_asset_id) do update set open=EXCLUDED.open, close=EXCLUDED.close, low=EXCLUDED.low, high=EXCLUDED.high, max_height=EXCLUDED.max_height, price_volume=EXCLUDED.price_volume, txs_count=EXCLUDED.txs_count, volume=EXCLUDED.volume, weighted_average_price=EXCLUDED.weighted_average_price"`;
+
+exports[`candles daemon sql test insert or update candles empty 1`] = `";"`;
+
+exports[`candles daemon sql test select candles by 1 minute 1`] = `"select e.candle_time as time_start, \\"amount_asset\\" as \\"amount_asset_id\\", \\"price_asset\\" as \\"price_asset_id\\", min(e.real_price) as low, max(e.real_price) as high, sum(e.real_amount) as volume, sum(e.real_amount * e.real_price) as price_volume, max(height) as max_height, count(e.real_price) as txs_count, sum(e.real_amount * e.real_price)/sum(e.real_amount) as weighted_average_price, (array_agg(e.real_price)::numeric[])[1] as open, (array_agg(e.real_price)::numeric[])[array_length(array_agg(e.real_price)::numeric[], 1)] as close from (select \\"amount_asset\\", \\"price_asset\\", \\"height\\", date_trunc('minute', t.time_stamp) as candle_time, t.amount * 10 ^(-a_dec.decimals) as real_amount, t.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals) as real_price from \\"txs_7\\" as \\"t\\" inner join \\"asset_decimals\\" as \\"a_dec\\" on \\"t\\".\\"amount_asset\\" = \\"a_dec\\".\\"asset_id\\" inner join \\"asset_decimals\\" as \\"p_dec\\" on \\"t\\".\\"price_asset\\" = \\"p_dec\\".\\"asset_id\\" where t.height >= 777) as \\"e\\" group by e.amount_asset, e.price_asset, e.candle_time"`;
+
+exports[`candles daemon sql test update candles all 1`] = `"insert into \\"candles\\" select e.candle_time as time_start, \\"amount_asset\\" as \\"amount_asset_id\\", \\"price_asset\\" as \\"price_asset_id\\", min(e.real_price) as low, max(e.real_price) as high, sum(e.real_amount) as volume, sum(e.real_amount * e.real_price) as price_volume, max(height) as max_height, count(e.real_price) as txs_count, sum(e.real_amount * e.real_price)/sum(e.real_amount) as weighted_average_price, (array_agg(e.real_price)::numeric[])[1] as open, (array_agg(e.real_price)::numeric[])[array_length(array_agg(e.real_price)::numeric[], 1)] as close from (select \\"amount_asset\\", \\"price_asset\\", \\"height\\", date_trunc('minute', t.time_stamp) as candle_time, t.amount * 10 ^(-a_dec.decimals) as real_amount, t.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals) as real_price from \\"txs_7\\" as \\"t\\" inner join \\"asset_decimals\\" as \\"a_dec\\" on \\"t\\".\\"amount_asset\\" = \\"a_dec\\".\\"asset_id\\" inner join \\"asset_decimals\\" as \\"p_dec\\" on \\"t\\".\\"price_asset\\" = \\"p_dec\\".\\"asset_id\\") as \\"e\\" group by e.amount_asset, e.price_asset, e.candle_time"`;
