@@ -1,6 +1,10 @@
 const knex = require('knex');
 const pg = knex({ client: 'pg' });
 
+const { map, compose } = require('ramda');
+
+const { serializeCandle } = require('./utils');
+
 const insertManyIntoCandles = selectFunction =>
   pg({})
     .into('candles')
@@ -42,23 +46,29 @@ const selectExchanges = pg({ t: 'txs_7' })
     `amount`,
     `price`,
   ])
-  .select();
+  .select()
+  .toString();
 
 // selectExchangesAfterBlock:: Number -> QueryBuilder
 const selectExchangesAfterBlock = startBlock =>
-  selectExchanges.clone().whereRaw(`t.height >= ${startBlock}`);
+  selectExchanges
+    .clone()
+    .whereRaw(`t.height >= ${startBlock}`)
+    .toString();
 
 const selectLastCandle = () =>
   pg({ t: 'candles' })
     .select('*')
     .limit(1)
-    .orderByRaw('max_height desc');
+    .orderByRaw('max_height desc')
+    .toString();
 
 const selectLastExchange = () =>
   pg({ t: 'txs_7' })
     .select('*')
     .limit(1)
-    .orderByRaw('height desc');
+    .orderByRaw('height desc')
+    .toString();
 
 const selectCandlesByMinute = startBlock =>
   pg({ t: 'txs_7' })
@@ -71,7 +81,8 @@ const selectCandlesByMinute = startBlock =>
     )
     .innerJoin({ a_dec: 'asset_decimals' }, 'e.amount_asset', 'a_dec.asset_id')
     .innerJoin({ p_dec: 'asset_decimals' }, 'e.price_asset', 'p_dec.asset_id')
-    .groupByRaw('e.amount_asset, e.price_asset, e.candle_time');
+    .groupByRaw('e.amount_asset, e.price_asset, e.candle_time')
+    .toString();
 
 const foldCandlesBy = (instance, fromFold, fold) =>
   instance
@@ -99,7 +110,8 @@ const foldCandlesBy = (instance, fromFold, fold) =>
     ])
     .select()
     .whereRaw(`t.fold=${fromFold}`)
-    .groupByRaw('candle_time, amount_asset_id, price_asset_id');
+    .groupByRaw('candle_time, amount_asset_id, price_asset_id')
+    .toString();
 
 const selectAllCandlesByMinute = instance =>
   instance
@@ -109,24 +121,8 @@ const selectAllCandlesByMinute = instance =>
     .from(selectExchanges.clone().as('e'))
     .innerJoin({ a_dec: 'asset_decimals' }, 'e.amount_asset', 'a_dec.asset_id')
     .innerJoin({ p_dec: 'asset_decimals' }, 'e.price_asset', 'p_dec.asset_id')
-    .groupByRaw('e.amount_asset, e.price_asset, e.candle_time');
-
-// candleToQuery:: Object => Object
-const candleToQuery = candle => ({
-  time_start: candle.time_start,
-  amount_asset_id: candle.amount_asset_id,
-  price_asset_id: candle.price_asset_id,
-  low: candle.low.toNumber(),
-  high: candle.high.toNumber(),
-  volume: candle.volume.toNumber(),
-  price_volume: candle.price_volume.toNumber(),
-  max_height: candle.max_height,
-  txs_count: candle.txs_count.toNumber(),
-  weighted_average_price: candle.weighted_average_price.toNumber(),
-  open: candle.open.toNumber(),
-  close: candle.close.toNumber(),
-  fold: 60,
-});
+    .groupByRaw('e.amount_asset, e.price_asset, e.candle_time')
+    .toString();
 
 const updatedFieldsExcluded = [
   'open',
@@ -147,7 +143,7 @@ const insertOrUpdateCandles = candles =>
   pg
     .raw(
       `${pg({ t: 'candles' }).insert(
-        candles
+        candles.map(serializeCandle)
       )} on conflict (time_start,amount_asset_id, price_asset_id, fold) do update set ${updatedFieldsExcluded}`
     )
     .toString();
@@ -181,7 +177,8 @@ const selectFold = (fromFold, fold, startBlock, instance) =>
       ),
       pg.raw(`${fold} as fold`),
     ])
-    .groupByRaw('candle_time, amount_asset_id, price_asset_id');
+    .groupByRaw('candle_time, amount_asset_id, price_asset_id')
+    .toString();
 
 const updateCandlesBy = (fromFold, fold, startBlock) =>
   pg
@@ -193,40 +190,47 @@ const updateCandlesBy = (fromFold, fold, startBlock) =>
     .toString();
 
 // createCandlesTable:: QueryBuilder
-const createCandlesTable = pg.schema
-  .dropTableIfExists('candles')
-  .createTable('candles', table => {
-    table.timestamp('time_start', true).notNullable();
-    table.string('amount_asset_id').notNullable();
-    table.string('price_asset_id').notNullable();
-    table.decimal('low', null, null).notNullable();
-    table.decimal('high', null, null).notNullable();
-    table.decimal('volume', null, null).notNullable();
-    table.decimal('price_volume', null, null).notNullable();
-    table.integer('max_height').notNullable();
-    table.integer('txs_count').notNullable();
-    table.decimal('weighted_average_price', null, null).notNullable();
-    table.decimal('open', null, null).notNullable();
-    table.decimal('close', null, null).notNullable();
-    table.integer('fold').notNullable();
-    table.primary(['fold', 'time_start', 'amount_asset_id', 'price_asset_id']);
-    table.index(['max_height']);
-  })
-  .raw('alter table "candles" owner to dba;');
+const createCandlesTable = () =>
+  pg.schema
+    .dropTableIfExists('candles')
+    .createTable('candles', table => {
+      table.timestamp('time_start', true).notNullable();
+      table.string('amount_asset_id').notNullable();
+      table.string('price_asset_id').notNullable();
+      table.decimal('low', null, null).notNullable();
+      table.decimal('high', null, null).notNullable();
+      table.decimal('volume', null, null).notNullable();
+      table.decimal('price_volume', null, null).notNullable();
+      table.integer('max_height').notNullable();
+      table.integer('txs_count').notNullable();
+      table.decimal('weighted_average_price', null, null).notNullable();
+      table.decimal('open', null, null).notNullable();
+      table.decimal('close', null, null).notNullable();
+      table.integer('fold').notNullable();
+      table.primary([
+        'fold',
+        'time_start',
+        'amount_asset_id',
+        'price_asset_id',
+      ]);
+      table.index(['max_height']);
+    })
+    .raw('alter table "candles" owner to dba;')
+    .toString();
 
-const updateMinutesCandlesAll = insertManyIntoCandles(function() {
-  selectAllCandlesByMinute(this);
-});
+const updateMinutesCandlesAll = () =>
+  insertManyIntoCandles(function() {
+    selectAllCandlesByMinute(this);
+  }).toString();
 
 const insertAllCandlesBy = (fromFold, fold) =>
   insertManyIntoCandles(function() {
     foldCandlesBy(this, fromFold, fold);
-  });
+  }).toString();
 
 module.exports = {
   selectCandlesByMinute,
   insertOrUpdateCandles,
-  candleToQuery,
   createCandlesTable,
   updateMinutesCandlesAll,
   selectLastCandle,
