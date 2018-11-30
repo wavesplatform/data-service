@@ -17,7 +17,10 @@ const loop = (func, cfg, interval, timeout) => {
   return Task.waitAny([
     func(cfg),
     Task.task(resolver => {
-      const timerId = setTimeout(resolver.reject, timeout);
+      const timerId = setTimeout(
+        () => resolver.reject(new Error('[DAEMON] timeout expired')),
+        timeout
+      );
       resolver.cleanup(() => clearTimeout(timerId));
     }),
   ])
@@ -29,12 +32,14 @@ const loop = (func, cfg, interval, timeout) => {
         getSleepTime(startLoop, interval)
       );
     })
-    .catch(() => loop(func, cfg, interval, timeout));
+    .catch(e => {
+      throw e;
+    });
 };
 
 /** main :: Object { init, loop } -> Object -> Number ms -> Number ms -> Object { info, warn, error } -> TaskExecution */
-const main = (funcObject, config, interval, timeout, logger) =>
-  Task.of(Maybe.fromNullable(funcObject.init))
+const main = (daemon, config, interval, timeout, logger) =>
+  Task.of(Maybe.fromNullable(daemon.init))
     .map(
       tap(maybeInit =>
         maybeInit.matchWith({
@@ -66,7 +71,7 @@ const main = (funcObject, config, interval, timeout, logger) =>
         maybeInit.getOrElse(Task.of)(config)
       )
     )
-    .map(() => Maybe.fromNullable(funcObject.loop))
+    .map(() => Maybe.fromNullable(daemon.loop))
     .map(
       tap(maybeLoop =>
         maybeLoop.matchWith({

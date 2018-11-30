@@ -1,5 +1,3 @@
-const { compose, map, prop, has, and, gt, lt, propEq } = require('ramda');
-
 const createDaemon = require('./create');
 
 // logger

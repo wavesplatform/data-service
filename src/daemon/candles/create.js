@@ -1,34 +1,42 @@
 const Task = require('folktale/concurrency/task');
 
 const {
+  dropTable,
+  insertAllMinuteCandles,
+  calculateAllCandles,
   selectCandlesByMinute,
   insertOrUpdateCandles,
-  createCandlesTable,
-  updateMinutesCandlesAll,
+
   selectLastCandle,
   selectLastExchange,
-  insertAllCandlesBy,
-  updateCandlesBy,
+  calculateCandles,
 } = require('./sql/query');
 
 const logTaskProgress = require('../utils/logTaskProgress');
 
-// @todo dependencies clean up, delete files
-const { logging } = require('../presets/daemon');
-const { timeStart, timeEnd } = require('../../utils/time');
+const intervalPairs = [
+  [60, 300],
+  [300, 900],
+  [900, 1800],
+  [1800, 3600],
+  [3600, 86400],
+];
 
-// @todo sig
+/** getStartBlock :: (Object, Object) -> Number */
 const getStartBlock = (exchangeTx, candle) => {
-  if (!candle) return 1;
-
-  if (candle.height > exchangeTx.height) {
-    return exchangeTx.height - 2000; // handle rollback
-  } else {
-    return Math.min(candle.height, exchangeTx.height) - 2;
+  if (candle && exchangeTx) {
+    if (candle.max_height > exchangeTx.height) {
+      return exchangeTx.height - 2000; // handle rollback
+    } else {
+      return Math.min(candle.max_height, exchangeTx.height) - 2;
+    }
   }
+
+  return 1;
 };
 
-const updateCandlesLoop = (logTask, pg) => {
+/** updateCandlesLoop :: (LogTask, Pg, String) -> Task */
+const updateCandlesLoop = (logTask, pg, tableName) => {
   const logMessages = {
     start: timeStart => ({
       message: '[CANDLES] update started',
@@ -45,128 +53,80 @@ const updateCandlesLoop = (logTask, pg) => {
     }),
   };
 
-  // Updates minute candles.
-  // Uses raw pg-promise.
   const pgPromiseUpdateCandles = (t, startBlockHeight) =>
     t
       .any(selectCandlesByMinute(startBlockHeight))
-      .then(candles => t.any(insertOrUpdateCandles(candles)));
+      .then(candles => t.any(insertOrUpdateCandles(tableName, candles)));
 
   return logTask(
     logMessages,
     pg.tx(t =>
       t
-        .batch([t.one(selectLastExchange()), t.any(selectLastCandle())])
+        .batch([t.any(selectLastExchange()), t.any(selectLastCandle(tableName))])
         .then(([lastTx, candle]) => {
-          const startHeight = getStartBlock(lastTx, candle);
-          return pgPromiseUpdateCandles(t, startHeight).then(() => {
-            const longerCandlesUpdates = [
-              [60, 300],
-              [300, 900],
-              [900, 1800],
-              [1800, 3600],
-              [3600, 86400],
-            ];
-            const toSql = ([shorter, longer]) =>
-              t.any(updateCandlesBy(shorter, longer, startHeight));
-
-            return t.batch(longerCandlesUpdates.map(toSql));
-          });
+          const startHeight = getStartBlock(
+            head(lastTx),
+            head(candle)
+          );
+          return pgPromiseUpdateCandles(t, startHeight).then(() =>
+            t.batch(
+              intervalMap.map(([shorter, longer]) =>
+                t.any(calculateCandles(tableName, shorter, longer, startHeight))
+              )
+            )
+          );
         })
     )
   );
 };
 
-// @todo refactor
-const initAllFoldFrom = (fromFold, fold) =>
-  Task.task(
-    resolver =>
-      logging('log', logger, `[DB] init fold ${fromFold}-${fold}...`) ||
-      timeStart(`db-init-fold-${fromFold}-${fold}`) ||
-      pgDriver
-        .none(insertAllCandlesBy(fromFold, fold).toString())
-        .run()
-        .listen({
-          onResolved: () =>
-            logging('log', logger, `[DB] init fold ${fromFold}->${fold}`) ||
-            resolver.resolve(),
-          onRejected: error =>
-            logging(
-              'error',
-              logger,
-              `[DB] init fold ${fromFold}->${fold} error: ${JSON.stringify(
-                error
-              )}`
-            ) || resolver.reject(),
-          onCancelled: () =>
-            logging(
-              'warn',
-              logger,
-              `[DB] init fold ${fromFold}->${fold} canceled`
-            ) || resolver.reject(),
-        })
-  );
-
-// @todo refactor or remove
-const initDBAll = Task.task(
-  resolver =>
-    timeStart('db-init') ||
-    pgDriver
-      .none(updateMinutesCandlesAll.toString())
-      .run()
-      .listen({
-        onResolved: () =>
-          logging('log', logger, `[DB] init success: ${timeEnd('db-init')}`) ||
-          resolver.resolve(),
-        onRejected: error =>
-          logging(
-            'error',
-            logger,
-            `[DB] init error: ${JSON.stringify(error)}`
-          ) || resolver.reject(),
-        onCancelled: () =>
-          logging('warn', logger, `[DB] init cancel`) || resolver.reject(),
-      })
-)
-  .chain(() => initAllFoldFrom(60, 300))
-  .chain(() => initAllFoldFrom(300, 900))
-  .chain(() => initAllFoldFrom(900, 1800))
-  .chain(() => initAllFoldFrom(1800, 3600))
-  .chain(() => initAllFoldFrom(3600, 86400));
-
-// @todo better naming
-// @todo do we need it?
-const createDB = (logTask, pgDriver) =>
+/** fillCandlesDBAll :: (LogTask, Pg, String) -> Task */
+const fillCandlesDBAll = (logTask, pg, tableName) =>
   logTask(
     {
       start: timeStart => ({
-        message: '[DB] creating started',
+        message: '[DB] start fill',
         time: timeStart,
       }),
       error: (e, timeTaken) => ({
-        message: '[DB] creating started',
+        message: '[DB] fill error',
         time: timeTaken,
         error: e,
       }),
       success: (_, timeTaken) => ({
-        message: '[DB] creating started',
+        message: '[DB] fill success',
         time: timeTaken,
       }),
     },
-    pgDriver.none(createCandlesTable.toString())
+    pg.tx(t =>
+      t.batch([
+        t.any(dropTable(tableName)), // @todo truncate
+        t.any(insertAllMinuteCandles(tableName)),
+        ...intervalMap.map(([shorter, longer]) =>
+          t.any(calculateAllCandles(tableName, shorter, longer))
+        ),
+      ])
+    )
   );
 
 module.exports = ({ logger, pg }, configuration) => {
   const unsafeLogTaskProgress = logTaskProgress(logger);
 
   return {
-    // init: () => {
-    //   if (configuration.candlesCreateTable)
-    //     return createDB(unsafeLogTaskProgress, pg);
-    //   else return Task.of();
-    // },
-    init: Task.of,
-    // loop: () => updateCandlesLoop(unsafeLogTaskProgress, pg),
-    loop: Task.of,
+    init: () => {
+      if (configuration.candlesCreateTable)
+        return fillCandlesDBAll(
+          unsafeLogTaskProgress,
+          pg,
+          configuration.candlesTableName
+        );
+      else return Task.of();
+    },
+    loop: () =>
+      updateCandlesLoop(
+        unsafeLogTaskProgress,
+        pg,
+        configuration.candlesTableName
+      ),
   };
 };
