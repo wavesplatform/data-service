@@ -24,6 +24,9 @@ const loadConfig = () => {
     candlesUpdateInterval: process.env.CANDLES_UPDATE_INTERVAL_MS || 2500,
     candlesUpdateTimeout: process.env.CANDLES_UPDATE_TIMEOUT_MS || 20000,
     candlesCreateTable: process.env.CANDLES_CREATE_TABLE || false,
+
+    pairsUpdateInterval: process.env.PAIRS_UPDATE_INTERVAL_MS || 2500,
+    pairsUpdateTimeout: process.env.PAIRS_UPDATE_TIMEOUT_MS || 20000,
   };
 };
 

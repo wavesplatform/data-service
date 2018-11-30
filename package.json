@@ -10,6 +10,8 @@
     "start": "export $(cat variables.env | xargs) && NODE_ENV=production node src/index.js",
     "candles": "export $(cat variables.env | xargs) && NODE_ENV=production node src/daemon/candles/index.js",
     "dev:candles:t": "export $(cat variables.testnet.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect src/daemon/candles/index.js",
+    "pairs": "export $(cat variables.env | xargs) && NODE_ENV=production node src/daemon/pairs/index.js",
+    "dev:pairs:t": "export $(cat variables.testnet.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect src/daemon/pairs/index.js",
     "lint": "eslint src",
     "dev": "export $(cat variables.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect",
     "dev:t": "export $(cat variables.testnet.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect",
