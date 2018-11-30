@@ -11,7 +11,7 @@ const loop = ({ logTask, pg, tableName }) => {
     error: (e, timeTaken) => ({
       message: '[PAIRS] update error',
       time: timeTaken,
-      error: e.message || e,
+      error: e instanceof Error ? e : new Error(e), // Error.toString() -> e.message
     }),
     success: (_, timeTaken) => ({
       message: '[PAIRS] update success',
