@@ -8,24 +8,30 @@ describe('Preset for create daemon', () => {
     let init = jest.fn(() => Task.of());
 
     try {
-      daemon({ init }, { test: 1 }, 1000, 2000, { warn });
+      daemon({ init }, { test: 1 }, 1000, 2000, { warn, info: () => {} });
       throw 'Must be thrown';
     } catch (e) {
       expect(e.toString()).toEqual('[DAEMON] stoped but must never');
-      expect(warn).toBeCalledWith('[DAEMON] loop not provided');
+      expect(warn).toBeCalledWith({ message: '[DAEMON] loop not provided' });
       done();
     }
   });
 
   it('should warning if no init', done => {
     let warn = jest.fn();
+    let error = jest.fn();
     let loop = jest.fn(() => Task.of());
 
     let d = daemon({ loop }, { conf: 'qwerty' }, 1000, 2000, {
       warn,
+      error,
+      info: () => {},
     }).listen({
       onCancelled: () => {
-        expect(warn).toBeCalledWith('[DAEMON] init not provided');
+        expect(warn).toBeCalledWith({ message: '[DAEMON] init not provided' });
+        expect(error).toBeCalledWith({
+          message: `[DAEMON] start loop canceled`,
+        });
         expect(loop).toBeCalledWith({ conf: 'qwerty' });
         done();
       },
@@ -38,27 +44,37 @@ describe('Preset for create daemon', () => {
     let warn = jest.fn();
 
     try {
-      daemon({}, {}, 1000, 2000, { warn }).listen({});
+      daemon({}, {}, 1000, 2000, { warn, info: () => {} }).listen({});
       throw 'Must be thrown';
     } catch (e) {
       expect(e.toString()).toEqual('[DAEMON] stoped but must never');
-      expect(warn).toBeCalledWith('[DAEMON] init not provided');
-      expect(warn).toBeCalledWith('[DAEMON] loop not provided');
+      expect(warn).toBeCalledWith({ message: '[DAEMON] init not provided' });
+      expect(warn).toBeCalledWith({ message: '[DAEMON] loop not provided' });
       done();
     }
   });
 
   it('should run loop 5 time with interval=5ms, timeout=20ms, loop=min, stop=28', done => {
     let loop = jest.fn(() => Task.of());
+    let warn = jest.fn();
+    let error = jest.fn();
 
-    let d = daemon({ loop }, {}, 5, 20, {}).listen({
-      onCancelled: () => {
-        expect(loop).toHaveBeenCalledTimes(6);
-        done();
-      },
-    });
+    let d = daemon({ loop }, {}, 5, 20, { info: () => {}, warn, error }).listen(
+      {
+        onCancelled: () => {
+          expect(warn).toBeCalledWith({
+            message: '[DAEMON] init not provided',
+          });
+          expect(error).toBeCalledWith({
+            message: `[DAEMON] start loop canceled`,
+          });
+          expect(loop).toHaveBeenCalledTimes(6);
+          done();
+        },
+      }
+    );
 
-    setTimeout(() => d.cancel(), 28);
+    setTimeout(() => d.cancel(), 29);
   });
 
   it('should run loop 2 time with interval=5ms, timeout=20ms, loop=10ms, stop=28', done => {
@@ -66,12 +82,23 @@ describe('Preset for create daemon', () => {
       Task.task(resolver => setTimeout(() => resolver.resolve(), 10))
     );
 
-    let d = daemon({ loop }, {}, 5, 20, {}).listen({
-      onCancelled: () => {
-        expect(loop).toHaveBeenCalledTimes(3);
-        done();
-      },
-    });
+    let warn = jest.fn();
+    let error = jest.fn();
+
+    let d = daemon({ loop }, {}, 5, 20, { info: () => {}, warn, error }).listen(
+      {
+        onCancelled: () => {
+          expect(warn).toBeCalledWith({
+            message: '[DAEMON] init not provided',
+          });
+          expect(error).toBeCalledWith({
+            message: `[DAEMON] start loop canceled`,
+          });
+          expect(loop).toHaveBeenCalledTimes(3);
+          done();
+        },
+      }
+    );
 
     setTimeout(() => d.cancel(), 28);
   });
@@ -86,12 +113,23 @@ describe('Preset for create daemon', () => {
       )
     );
 
-    let d = daemon({ loop }, {}, 5, 10, {}).listen({
-      onCancelled: () => {
-        expect(loop).toHaveBeenCalledTimes(3);
-        done();
-      },
-    });
+    let warn = jest.fn();
+    let error = jest.fn();
+
+    let d = daemon({ loop }, {}, 5, 10, { info: () => {}, warn, error }).listen(
+      {
+        onCancelled: () => {
+          expect(warn).toBeCalledWith({
+            message: '[DAEMON] init not provided',
+          });
+          expect(error).toBeCalledWith({
+            message: `[DAEMON] start loop canceled`,
+          });
+          expect(loop).toHaveBeenCalledTimes(3);
+          done();
+        },
+      }
+    );
 
     setTimeout(() => d.cancel(), 28);
   });
