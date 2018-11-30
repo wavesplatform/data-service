@@ -11,10 +11,9 @@ const {
   updateCandlesBy,
 } = require('./sql/query');
 
-const logTaskProgress = require('./utils/logTaskProgress');
+const logTaskProgress = require('../utils/logTaskProgress');
 
 // @todo dependencies clean up, delete files
-const logger = require('../presets/chulkLogger');
 const { logging } = require('../presets/daemon');
 const { timeStart, timeEnd } = require('../../utils/time');
 
@@ -161,11 +160,13 @@ module.exports = ({ logger, pg }, configuration) => {
   const unsafeLogTaskProgress = logTaskProgress(logger);
 
   return {
-    init: () => {
-      if (configuration.candlesCreateTable)
-        return createDB(unsafeLogTaskProgress, pg);
-      else return Task.of();
-    },
-    loop: () => updateCandlesLoop(unsafeLogTaskProgress, pg),
+    // init: () => {
+    //   if (configuration.candlesCreateTable)
+    //     return createDB(unsafeLogTaskProgress, pg);
+    //   else return Task.of();
+    // },
+    init: Task.of,
+    // loop: () => updateCandlesLoop(unsafeLogTaskProgress, pg),
+    loop: Task.of,
   };
 };

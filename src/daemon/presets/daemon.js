@@ -1,6 +1,8 @@
-const { prop, curryN } = require('ramda');
 const Task = require('folktale/concurrency/task');
 const Maybe = require('folktale/maybe');
+
+const tap = require('../../utils/tap');
+const logTaskProgress = require('../utils/logTaskProgress');
 
 /** getSleepTime :: Date -> Number ms -> Number ms */
 const getSleepTime = (start, interval) => {
@@ -30,49 +32,94 @@ const loop = (func, cfg, interval, timeout) => {
     .catch(() => loop(func, cfg, interval, timeout));
 };
 
-/** logging :: String -> Object -> Any -> undefined */
-const logging = curryN(3, (level, logger, data) => {
-  if (typeof prop(level, logger) === 'function') prop(level, logger)(data);
-  return undefined;
-});
-
-/** main :: Object -> Object -> Number -> TaskExecution */
-const main = (funcObject, config, interval, timeout, logger = console) =>
+/** main :: Object { init, loop } -> Object -> Number ms -> Number ms -> Object { info, warn, error } -> TaskExecution */
+const main = (funcObject, config, interval, timeout, logger) =>
   Task.of(Maybe.fromNullable(funcObject.init))
-    // init
-    .chain(maybeInit =>
-      maybeInit.matchWith({
-        Just: ({ value }) => {
-          logging('log', logger, '[DAEMON] init ...');
-          return value(config);
-        },
-        Nothing: () => {
-          logging('warn', logger, '[DAEMON] init not provided');
-          return Task.of();
-        },
-      })
+    .map(
+      tap(maybeInit =>
+        maybeInit.matchWith({
+          Nothing: () =>
+            logger.warn({
+              message: '[DAEMON] init not provided',
+            }),
+          Just: () => {},
+        })
+      )
     )
-    // loop
-    .chain(() => {
-      return funcObject.loop
-        ? logging('log', logger, '[DAEMON] start loop ...') ||
-            Task.task(() => loop(funcObject.loop, config, interval, timeout))
-        : logging('warn', logger, '[DAEMON] loop not provided') || Task.of();
-    })
+    .chain(maybeInit =>
+      logTaskProgress(logger)(
+        {
+          start: timeStart => ({
+            message: '[DAEMON] init started',
+            time: timeStart,
+          }),
+          error: (e, timeTaken) => ({
+            message: '[DAEMON] init error',
+            time: timeTaken,
+            error: e,
+          }),
+          success: (_, timeTaken) => ({
+            message: '[DAEMON] init success',
+            time: timeTaken,
+          }),
+        },
+        maybeInit.getOrElse(Task.of)(config)
+      )
+    )
+    .map(() => Maybe.fromNullable(funcObject.loop))
+    .map(
+      tap(maybeLoop =>
+        maybeLoop.matchWith({
+          Nothing: () =>
+            logger.warn({
+              message: '[DAEMON] loop not provided',
+            }),
+          Just: () => {},
+        })
+      )
+    )
+    .chain(maybeLoop =>
+      logTaskProgress(logger)(
+        {
+          start: timeStart => ({
+            message: '[DAEMON] start loop',
+            time: timeStart,
+          }),
+          error: (e, timeTaken) => ({
+            message: '[DAEMON] loop error',
+            time: timeTaken,
+            error: e,
+          }),
+          success: (_, timeTaken) => ({
+            message: '[DAEMON] start loop ended',
+            time: timeTaken,
+          }),
+        },
+        maybeLoop.matchWith({
+          Just: ({ value }) =>
+            Task.task(() => loop(value, config, interval, timeout)),
+          Nothing: Task.of,
+        })
+      )
+    )
     .run()
     .listen({
       onResolved: () => {
         throw '[DAEMON] stoped but must never';
       },
       onRejected: error => {
-        logging('error', logger, `[DAEMON] error: ${JSON.stringify(error)}`);
+        logger.error({
+          message: `[DAEMON] error: ${JSON.stringify(error)}`,
+          error,
+        });
         throw error;
       },
       onCancelled: () =>
-        logging('error', logger, `[DAEMON] start loop canceled`),
+        logger.error({
+          message: `[DAEMON] start loop canceled`,
+        }),
     });
 
 module.exports = {
   daemon: main,
-  logging,
 };
