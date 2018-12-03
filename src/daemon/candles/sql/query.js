@@ -94,15 +94,15 @@ const selectLastCandle = tableName =>
     .orderBy('max_height', 'desc')
     .toString();
 
-/** selectLastExchange :: String query */
-const selectLastExchange = () =>
+/** selectLastExchangeTx :: String query */
+const selectLastExchangeTx = () =>
   pg({ t: 'txs_7' })
     .select('height')
     .limit(1)
     .orderBy('height', 'desc')
     .toString();
 
-/** for make complex query with "on conflict (...) update ... without set concrete values" See insertOrUpdateCandles or calculateCandles */
+/** for make complex query with "on conflict (...) update ... without set concrete values" See insertOrUpdateCandles or insertOrUpdateCandlesFromHeight */
 const updatedFieldsExcluded = [
   'open',
   'close',
@@ -119,17 +119,22 @@ const updatedFieldsExcluded = [
   .join(', ');
 
 /** insertOrUpdateCandles :: (String, Array[Object]) -> String query */
-const insertOrUpdateCandles = (tableName, candles) =>
-  pg
-    .raw(
-      `${pg({ t: tableName }).insert(
-        candles.map(serializeCandle)
-      )} on conflict (time_start,amount_asset_id, price_asset_id, interval_in_secs) do update set ${updatedFieldsExcluded}`
-    )
-    .toString();
+const insertOrUpdateCandles = (tableName, candles) => {
+  if (candles.length) {
+    return pg
+      .raw(
+        `${pg({ t: tableName }).insert(
+          candles.map(serializeCandle)
+        )} on conflict (time_start,amount_asset_id, price_asset_id, interval_in_secs) do update set ${updatedFieldsExcluded}`
+      )
+      .toString();
+  }
 
-/** calculateCandles :: (String, Number, Number, Number) -> String query */
-const calculateCandles = (
+  return ';';
+};
+
+/** insertOrUpdateCandlesFromHeight :: (String, Number, Number, Number) -> String query */
+const insertOrUpdateCandlesFromHeight = (
   tableName,
   shortInterval,
   longerInterval,
@@ -174,8 +179,8 @@ const insertAllMinuteCandles = tableName =>
       .toString();
   }).toString();
 
-/** calculateAllCandles :: (String, Number, Number, Number) -> String query */
-const calculateAllCandles = (tableName, shortInterval, longerInterval) =>
+/** insertAllCandles :: (String, Number, Number, Number) -> String query */
+const insertAllCandles = (tableName, shortInterval, longerInterval) =>
   insertIntoCandlesFromSelect(tableName, function() {
     this.from({ t: tableName })
       .column(makeCandleCalculateColumns(longerInterval))
@@ -202,10 +207,10 @@ const selectCandlesByMinute = startHeight =>
 module.exports = {
   truncateTable,
   insertAllMinuteCandles,
-  calculateAllCandles,
+  insertAllCandles,
   selectCandlesByMinute,
   insertOrUpdateCandles,
   selectLastCandle,
-  selectLastExchange,
-  calculateCandles,
+  selectLastExchangeTx,
+  insertOrUpdateCandlesFromHeight,
 };

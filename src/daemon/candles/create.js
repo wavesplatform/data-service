@@ -6,12 +6,12 @@ const logTaskProgress = require('../utils/logTaskProgress');
 const {
   truncateTable,
   insertAllMinuteCandles,
-  calculateAllCandles,
+  insertAllCandles,
   selectCandlesByMinute,
   insertOrUpdateCandles,
   selectLastCandle,
-  selectLastExchange,
-  calculateCandles,
+  selectLastExchangeTx,
+  insertOrUpdateCandlesFromHeight,
 } = require('./sql/query');
 
 /** for combining candles */
@@ -64,7 +64,7 @@ const updateCandlesLoop = (logTask, pg, tableName) => {
     pg.tx(t =>
       t
         .batch([
-          t.any(selectLastExchange()),
+          t.any(selectLastExchangeTx()),
           t.any(selectLastCandle(tableName)),
         ])
         .then(([lastTx, candle]) => {
@@ -72,7 +72,7 @@ const updateCandlesLoop = (logTask, pg, tableName) => {
           return pgPromiseUpdateCandles(t, startHeight).then(() =>
             t.batch(
               intervalPairs.map(([shorter, longer]) =>
-                t.any(calculateCandles(tableName, shorter, longer, startHeight))
+                t.any(insertOrUpdateCandlesFromHeight(tableName, shorter, longer, startHeight))
               )
             )
           );
@@ -104,7 +104,7 @@ const fillCandlesDBAll = (logTask, pg, tableName) =>
         t.any(truncateTable(tableName)),
         t.any(insertAllMinuteCandles(tableName)),
         ...intervalPairs.map(([shorter, longer]) =>
-          t.any(calculateAllCandles(tableName, shorter, longer))
+          t.any(insertAllCandles(tableName, shorter, longer))
         ),
       ])
     )
