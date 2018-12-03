@@ -3,11 +3,8 @@ const pg = knex({ client: 'pg' });
 
 const { serializeCandle, candlePresets } = require('./utils');
 
-const insertManyIntoCandles = (tableName, selectFunction) =>
-  pg.into(tableName).insert(selectFunction);
-
-/** candleCalculateColumns :: Number -> Array */
-const candleCalculateColumns = longerInterval => [
+/** makeCandleCalculateColumns :: Number -> Array */
+const makeCandleCalculateColumns = longerInterval => [
   candlePresets.aggregate.candle_time(longerInterval),
   'amount_asset_id',
   'price_asset_id',
@@ -71,6 +68,10 @@ const candleSelectColumns = [
   },
 ];
 
+/** insertIntoCandlesFromSelect :: (String, Function) -> QueryBuilder */
+const insertIntoCandlesFromSelect = (tableName, selectFunction) =>
+  pg.into(tableName).insert(selectFunction);
+
 /** selectExchanges :: QueryBuilder */
 const selectExchanges = pg({ t: 'txs_7' }).column(
   'amount_asset',
@@ -88,7 +89,7 @@ const selectExchangesAfterBlock = startBlock =>
 /** selectLastCandle :: String -> String query */
 const selectLastCandle = tableName =>
   pg({ t: tableName })
-    .select('*') // @todo height only?
+    .select('max_height')
     .limit(1)
     .orderBy('max_height', 'desc')
     .toString();
@@ -96,12 +97,12 @@ const selectLastCandle = tableName =>
 /** selectLastExchange :: String query */
 const selectLastExchange = () =>
   pg({ t: 'txs_7' })
-    .select('*') // @todo height only?
+    .select('height')
     .limit(1)
     .orderBy('height', 'desc')
     .toString();
 
-// @todo add comment explain
+/** for make complex query with "on conflict (...) update ... without set concrete values" See insertOrUpdateCandles or calculateCandles */
 const updatedFieldsExcluded = [
   'open',
   'close',
@@ -136,7 +137,7 @@ const calculateCandles = (
 ) =>
   pg
     .raw(
-      `${insertManyIntoCandles(tableName, function() {
+      `${insertIntoCandlesFromSelect(tableName, function() {
         this.from(
           pg(tableName)
             .select('*')
@@ -144,21 +145,21 @@ const calculateCandles = (
             .where('max_height', '>=', startHeight)
             .as('d')
         )
-          .column(candleCalculateColumns(longerInterval))
+          .column(makeCandleCalculateColumns(longerInterval))
           .groupBy('candle_time', 'amount_asset_id', 'price_asset_id');
       })} on conflict (time_start,amount_asset_id, price_asset_id, interval_in_secs) do update set ${updatedFieldsExcluded}`
     )
     .toString();
 
-/** dropTable :: String -> String query */
-const dropTable = tableName =>
+/** truncateTable :: String -> String query */
+const truncateTable = tableName =>
   pg(tableName)
     .truncate()
     .toString();
 
 /** insertAllMinuteCandles :: String -> String query */
 const insertAllMinuteCandles = tableName =>
-  insertManyIntoCandles(tableName, function() {
+  insertIntoCandlesFromSelect(tableName, function() {
     this.from({ t: 'txs_7' })
       .columns(candleSelectColumns)
       .select()
@@ -175,9 +176,9 @@ const insertAllMinuteCandles = tableName =>
 
 /** calculateAllCandles :: (String, Number, Number, Number) -> String query */
 const calculateAllCandles = (tableName, shortInterval, longerInterval) =>
-  insertManyIntoCandles(tableName, function() {
+  insertIntoCandlesFromSelect(tableName, function() {
     this.from({ t: tableName })
-      .column(candleCalculateColumns(longerInterval))
+      .column(makeCandleCalculateColumns(longerInterval))
       .select()
       .where('t.interval_in_secs', shortInterval)
       .groupBy(['candle_time', 'amount_asset_id', 'price_asset_id']);
@@ -199,7 +200,7 @@ const selectCandlesByMinute = startHeight =>
     .toString();
 
 module.exports = {
-  dropTable,
+  truncateTable,
   insertAllMinuteCandles,
   calculateAllCandles,
   selectCandlesByMinute,

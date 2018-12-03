@@ -31,9 +31,6 @@ const loop = (func, cfg, interval, timeout) => {
         () => loop(func, cfg, interval, timeout),
         getSleepTime(startLoop, interval)
       );
-    })
-    .catch(e => {
-      throw e;
     });
 };
 
@@ -45,7 +42,7 @@ const main = (daemon, config, interval, timeout, logger) =>
         maybeInit.matchWith({
           Nothing: () =>
             logger.warn({
-              message: '[DAEMON] init not provided',
+              message: '[DAEMON] init function not found',
             }),
           Just: () => {},
         })
@@ -55,16 +52,16 @@ const main = (daemon, config, interval, timeout, logger) =>
       logTaskProgress(logger)(
         {
           start: timeStart => ({
-            message: '[DAEMON] init started',
+            message: '[DAEMON] initialization started',
             time: timeStart,
           }),
           error: (e, timeTaken) => ({
-            message: '[DAEMON] init error',
+            message: '[DAEMON] initialization error',
             time: timeTaken,
             error: e,
           }),
           success: (_, timeTaken) => ({
-            message: '[DAEMON] init success',
+            message: '[DAEMON] initialization successful',
             time: timeTaken,
           }),
         },
@@ -77,7 +74,7 @@ const main = (daemon, config, interval, timeout, logger) =>
         maybeLoop.matchWith({
           Nothing: () =>
             logger.warn({
-              message: '[DAEMON] loop not provided',
+              message: '[DAEMON] loop function not found',
             }),
           Just: () => {},
         })
@@ -87,7 +84,7 @@ const main = (daemon, config, interval, timeout, logger) =>
       logTaskProgress(logger)(
         {
           start: timeStart => ({
-            message: '[DAEMON] start loop',
+            message: '[DAEMON] loop started',
             time: timeStart,
           }),
           error: (e, timeTaken) => ({
@@ -96,32 +93,34 @@ const main = (daemon, config, interval, timeout, logger) =>
             error: e,
           }),
           success: (_, timeTaken) => ({
-            message: '[DAEMON] start loop ended',
+            message: '[DAEMON] loop successfully stopped',
             time: timeTaken,
           }),
         },
         maybeLoop.matchWith({
           Just: ({ value }) =>
-            Task.task(() => loop(value, config, interval, timeout)),
-          Nothing: Task.of,
+            Task.task(resolver =>
+              loop(value, config, interval, timeout).catch(e =>
+                resolver.reject(e)
+              )
+            ),
+          Nothing: () => Task.rejected('[DAEMON] loop function not found'),
         })
       )
     )
     .run()
     .listen({
       onResolved: () => {
-        throw '[DAEMON] stoped but must never';
+        throw '[DAEMON] loop is stopped but never should';
       },
-      onRejected: error => {
+      onRejected: error =>
         logger.error({
           message: `[DAEMON] error: ${JSON.stringify(error)}`,
           error,
-        });
-        throw error;
-      },
+        }),
       onCancelled: () =>
         logger.error({
-          message: `[DAEMON] start loop canceled`,
+          message: `[DAEMON] loop canceled`,
         }),
     });
 

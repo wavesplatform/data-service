@@ -1,19 +1,20 @@
+const { head } = require('ramda');
 const Task = require('folktale/concurrency/task');
 
+const logTaskProgress = require('../utils/logTaskProgress');
+
 const {
-  dropTable,
+  truncateTable,
   insertAllMinuteCandles,
   calculateAllCandles,
   selectCandlesByMinute,
   insertOrUpdateCandles,
-
   selectLastCandle,
   selectLastExchange,
   calculateCandles,
 } = require('./sql/query');
 
-const logTaskProgress = require('../utils/logTaskProgress');
-
+/** for combining candles */
 const intervalPairs = [
   [60, 300],
   [300, 900],
@@ -39,7 +40,7 @@ const getStartBlock = (exchangeTx, candle) => {
 const updateCandlesLoop = (logTask, pg, tableName) => {
   const logMessages = {
     start: timeStart => ({
-      message: '[CANDLES] update started',
+      message: '[CANDLES] start updating candles',
       time: timeStart,
     }),
     error: (e, timeTaken) => ({
@@ -48,7 +49,7 @@ const updateCandlesLoop = (logTask, pg, tableName) => {
       error: e,
     }),
     success: (_, timeTaken) => ({
-      message: '[CANDLES] update success',
+      message: '[CANDLES] update successful',
       time: timeTaken,
     }),
   };
@@ -62,15 +63,15 @@ const updateCandlesLoop = (logTask, pg, tableName) => {
     logMessages,
     pg.tx(t =>
       t
-        .batch([t.any(selectLastExchange()), t.any(selectLastCandle(tableName))])
+        .batch([
+          t.any(selectLastExchange()),
+          t.any(selectLastCandle(tableName)),
+        ])
         .then(([lastTx, candle]) => {
-          const startHeight = getStartBlock(
-            head(lastTx),
-            head(candle)
-          );
+          const startHeight = getStartBlock(head(lastTx), head(candle));
           return pgPromiseUpdateCandles(t, startHeight).then(() =>
             t.batch(
-              intervalMap.map(([shorter, longer]) =>
+              intervalPairs.map(([shorter, longer]) =>
                 t.any(calculateCandles(tableName, shorter, longer, startHeight))
               )
             )
@@ -85,7 +86,7 @@ const fillCandlesDBAll = (logTask, pg, tableName) =>
   logTask(
     {
       start: timeStart => ({
-        message: '[DB] start fill',
+        message: '[DB] start filling',
         time: timeStart,
       }),
       error: (e, timeTaken) => ({
@@ -94,15 +95,15 @@ const fillCandlesDBAll = (logTask, pg, tableName) =>
         error: e,
       }),
       success: (_, timeTaken) => ({
-        message: '[DB] fill success',
+        message: '[DB] fill successful',
         time: timeTaken,
       }),
     },
     pg.tx(t =>
       t.batch([
-        t.any(dropTable(tableName)), // @todo truncate
+        t.any(truncateTable(tableName)),
         t.any(insertAllMinuteCandles(tableName)),
-        ...intervalMap.map(([shorter, longer]) =>
+        ...intervalPairs.map(([shorter, longer]) =>
           t.any(calculateAllCandles(tableName, shorter, longer))
         ),
       ])
