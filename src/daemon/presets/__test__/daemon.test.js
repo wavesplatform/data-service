@@ -1,136 +1,126 @@
 const { daemon } = require('../daemon');
-
 const Task = require('folktale/concurrency/task');
 
+const createLogger = () => {
+  return {
+    warn: jest.fn(),
+    info: jest.fn(),
+    error: jest.fn(),
+  };
+};
+
 describe('Preset for create daemon', () => {
-  it('should warning if no loop', done => {
-    let warn = jest.fn();
-    let init = jest.fn(() => Task.of());
+  describe('Should started without any or all function', () => {
+    it('should throw exception if no loop', done => {
+      let logger = createLogger();
+      let init = jest.fn(() => Task.of());
 
-    try {
-      daemon({ init }, { test: 1 }, 1000, 2000, { warn, info: () => {} });
-      throw 'Must be thrown';
-    } catch (e) {
-      expect(e.toString()).toEqual('[DAEMON] stoped but must never');
-      expect(warn).toBeCalledWith({ message: '[DAEMON] loop not provided' });
-      done();
-    }
-  });
-
-  it('should warning if no init', done => {
-    let warn = jest.fn();
-    let error = jest.fn();
-    let loop = jest.fn(() => Task.of());
-
-    let d = daemon({ loop }, { conf: 'qwerty' }, 1000, 2000, {
-      warn,
-      error,
-      info: () => {},
-    }).listen({
-      onCancelled: () => {
-        expect(warn).toBeCalledWith({ message: '[DAEMON] init not provided' });
-        expect(error).toBeCalledWith({
-          message: `[DAEMON] start loop canceled`,
+      daemon({ init }, { test: 1 }, 1000, 2000, logger)
+        .promise()
+        .catch(e => {
+          expect(e.toString()).toEqual('[DAEMON] loop function not found');
+          expect(logger.error.mock.calls[0][0]).toMatchObject({
+            error: '[DAEMON] loop function not found',
+            message: '[DAEMON] loop error',
+          });
+          done();
         });
-        expect(loop).toBeCalledWith({ conf: 'qwerty' });
-        done();
-      },
     });
 
-    setTimeout(() => d.cancel(), 20);
-  });
+    it('should warn if no init', done => {
+      let logger = createLogger();
+      let loop = jest.fn(() => Task.of());
 
-  it('should stop if no init and no loop', done => {
-    let warn = jest.fn();
-
-    try {
-      daemon({}, {}, 1000, 2000, { warn, info: () => {} }).listen({});
-      throw 'Must be thrown';
-    } catch (e) {
-      expect(e.toString()).toEqual('[DAEMON] stoped but must never');
-      expect(warn).toBeCalledWith({ message: '[DAEMON] init not provided' });
-      expect(warn).toBeCalledWith({ message: '[DAEMON] loop not provided' });
-      done();
-    }
-  });
-
-  it('should run loop 5 time with interval=5ms, timeout=20ms, loop=min, stop=28', done => {
-    let loop = jest.fn(() => Task.of());
-    let warn = jest.fn();
-    let error = jest.fn();
-
-    let d = daemon({ loop }, {}, 5, 20, { info: () => {}, warn, error }).listen(
-      {
+      let d = daemon({ loop }, { conf: 'qwerty' }, 1000, 2000, logger).listen({
         onCancelled: () => {
-          expect(warn).toBeCalledWith({
-            message: '[DAEMON] init not provided',
+          expect(logger.warn).toBeCalledWith({
+            message: '[DAEMON] init function not found',
           });
-          expect(error).toBeCalledWith({
-            message: `[DAEMON] start loop canceled`,
+          expect(logger.error).toBeCalledWith({
+            message: `[DAEMON] loop canceled`,
+          });
+          expect(loop).toBeCalledWith({ conf: 'qwerty' });
+          done();
+        },
+      });
+
+      setTimeout(() => d.cancel(), 20);
+    });
+
+    it('should stop if no init and no loop', done => {
+      let logger = createLogger();
+
+      daemon({}, {}, 1000, 2000, logger)
+        .promise()
+        .catch(e => {
+          expect(e.toString()).toEqual('[DAEMON] loop function not found');
+          expect(logger.warn).toBeCalledWith({
+            message: '[DAEMON] init function not found',
+          });
+          expect(logger.warn).toBeCalledWith({
+            message: '[DAEMON] loop function not found',
+          });
+          done();
+        });
+    });
+  });
+
+  describe('Should throw exception when timeout expired, run loop with interval', () => {
+    it('should work with planing next run as interval-(run time loop iteration)', done => {
+      let loop = jest.fn(() => Task.of());
+      let logger = createLogger();
+
+      let d = daemon({ loop }, {}, 5, 20, logger).listen({
+        onCancelled: () => {
+          expect(logger.warn).toBeCalledWith({
+            message: '[DAEMON] init function not found',
+          });
+          expect(logger.error).toBeCalledWith({
+            message: `[DAEMON] loop canceled`,
           });
           expect(loop).toHaveBeenCalledTimes(6);
           done();
         },
-      }
-    );
+      });
 
-    setTimeout(() => d.cancel(), 29);
-  });
+      setTimeout(() => d.cancel(), 29);
+    });
 
-  it('should run loop 2 time with interval=5ms, timeout=20ms, loop=10ms, stop=28', done => {
-    let loop = jest.fn(() =>
-      Task.task(resolver => setTimeout(() => resolver.resolve(), 10))
-    );
+    it('should rerun immedently if interval < loop', done => {
+      let loop = jest.fn(() =>
+        Task.task(resolver => setTimeout(() => resolver.resolve(), 10))
+      );
+      let logger = createLogger();
 
-    let warn = jest.fn();
-    let error = jest.fn();
-
-    let d = daemon({ loop }, {}, 5, 20, { info: () => {}, warn, error }).listen(
-      {
+      let d = daemon({ loop }, {}, 1, 100, logger).listen({
         onCancelled: () => {
-          expect(warn).toBeCalledWith({
-            message: '[DAEMON] init not provided',
+          expect(logger.warn).toBeCalledWith({
+            message: '[DAEMON] init function not found',
           });
-          expect(error).toBeCalledWith({
-            message: `[DAEMON] start loop canceled`,
+          expect(logger.error).toBeCalledWith({
+            message: `[DAEMON] loop canceled`,
           });
           expect(loop).toHaveBeenCalledTimes(3);
           done();
         },
-      }
-    );
+      });
 
-    setTimeout(() => d.cancel(), 28);
-  });
+      setTimeout(() => d.cancel(), 28);
+    });
 
-  it('should run loop 2 time with interval=5ms, timeout=10ms, loop=12ms, stop=28', done => {
-    let loop = jest.fn(() =>
-      Task.task(resolver =>
-        setTimeout(
-          () => (!resolver.isCancelled ? resolver.resolve() : true),
-          12
-        )
-      )
-    );
+    it('should throw exception when timeout expired', done => {
+      let loop = jest.fn(() =>
+        Task.task(resolver => setTimeout(resolver.resolve, 10000))
+      );
+      let logger = createLogger();
 
-    let warn = jest.fn();
-    let error = jest.fn();
-
-    let d = daemon({ loop }, {}, 5, 10, { info: () => {}, warn, error }).listen(
-      {
-        onCancelled: () => {
-          expect(warn).toBeCalledWith({
-            message: '[DAEMON] init not provided',
-          });
-          expect(error).toBeCalledWith({
-            message: `[DAEMON] start loop canceled`,
-          });
-          expect(loop).toHaveBeenCalledTimes(3);
+      daemon({ loop }, {}, 1, 1, logger)
+        .promise()
+        .catch(e => {
+          expect(e.toString()).toEqual('Error: [DAEMON] timeout expired');
+          expect(loop).toHaveBeenCalledTimes(1);
           done();
-        },
-      }
-    );
-
-    setTimeout(() => d.cancel(), 28);
+        });
+    });
   });
 });
