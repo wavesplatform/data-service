@@ -1,6 +1,6 @@
 {
   "name": "data-service",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "Waves data service",
   "main": "src/index.js",
   "repository": "git@github.com:wavesplatform/data-service.git",
@@ -8,6 +8,8 @@
   "license": "MIT",
   "scripts": {
     "start": "export $(cat variables.env | xargs) && NODE_ENV=production node src/index.js",
+    "candles": "export $(cat variables.env | xargs) && NODE_ENV=production node src/daemons/candles/index.js",
+    "dev:candles:t": "export $(cat variables.testnet.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect src/daemons/candles/index.js",
     "lint": "eslint src",
     "dev": "export $(cat variables.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect",
     "dev:t": "export $(cat variables.testnet.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect",
