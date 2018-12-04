@@ -406,6 +406,6 @@ Object {
   "time": 2018-11-15T14:03:00.000Z,
   "txsCount": 20,
   "volume": "2842",
-  "weightedAveragePrice": "0.0011611696692470092",
+  "weightedAveragePrice": "0.0011",
 }
 `;
