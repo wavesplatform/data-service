@@ -20,11 +20,6 @@ const loadConfig = () => {
     redisPassword: process.env.REDIS_PASSWORD,
 
     logLevel: process.env.LOG_LEVEL || 'info',
-
-    candlesUpdateInterval: process.env.CANDLES_UPDATE_INTERVAL_MS || 2500,
-    candlesUpdateTimeout: process.env.CANDLES_UPDATE_TIMEOUT_MS || 20000,
-    candlesTruncateTable: process.env.RECALCULATE_ALL_CANDLES_ON_START || true,
-    candlesTableName: process.env.CANDLES_TABLE_NAME || 'candles',
   };
 };
 
