@@ -1,15 +1,14 @@
-const { findLast, map, pipe, prop, sortBy } = require('ramda');
+const { compose, findLast, map, prop, sortBy } = require('ramda');
 const Interval = require('../../types/Interval');
 
 const pg = require('knex')({ client: 'pg' });
 
 /** highestDividerLessThen :: Interval i => i -> String[] -> i */
 const highestDividerLessThen = (interval, dividers) =>
-  pipe(
-    map(Interval),
-    sortBy(pipe(prop('length'))),
+  compose(
     findLast(i => interval.div(i) > 1),
-    Interval
+    sortBy(prop('length')),
+    map(Interval),
   )(dividers);
 
 /** sql :: { String, String, Object } -> String */
