@@ -1,6 +1,12 @@
-const Joi = require('../../../../../utils/validation/joi');
+const Joi = require('../../utils/validation/joi');
 
-const output = Joi.object().keys({
+const inputSearch = Joi.object()
+  .keys({
+    ticker: Joi.string(),
+  })
+  .required();
+
+const result = Joi.object().keys({
   asset_id: Joi.string().required(),
   asset_name: Joi.string().required(),
   description: Joi.string().allow(''),
@@ -19,4 +25,4 @@ const output = Joi.object().keys({
     .required(),
 });
 
-module.exports = { output };
+module.exports = { inputSearch, result };

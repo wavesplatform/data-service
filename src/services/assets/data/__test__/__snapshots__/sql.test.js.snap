@@ -1,3 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`Assets knex should build the sql query 1`] = `"select * from \\"assets\\" where \\"asset_id\\" in ('q', 'w', 'e')"`;
