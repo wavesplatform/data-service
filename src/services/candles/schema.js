@@ -26,7 +26,7 @@ const customJoi = Joi.extend(joi => ({
         }),
       },
       validate(params, value, state, options) {
-        if (joi.date().validate(value.timeStart).error) {
+        if (joi.date().required().validate(value.timeStart).error) {
           return this.createError(
             'object.period.timeStart',
             { value },
@@ -35,7 +35,7 @@ const customJoi = Joi.extend(joi => ({
           );
         }
 
-        if (joi.date().validate(value.timeEnd).error) {
+        if (joi.date().required().validate(value.timeEnd).error) {
           return this.createError(
             'object.period.timeEnd',
             { value },
@@ -61,6 +61,7 @@ const customJoi = Joi.extend(joi => ({
             .divisibleBy('1m')
             .min('1m')
             .max('1M')
+            .required()
             .validate(value.interval).error
         ) {
           return this.createError(
