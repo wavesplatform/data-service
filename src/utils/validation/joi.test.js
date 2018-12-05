@@ -60,4 +60,75 @@ describe('Joi extended with custom types', () => {
       'The number 9223372036854775808 is outside int64 range'
     );
   });
+
+  describe('period', () => {
+    it('should validates interval correctly', () => {
+      const validatePeriod = validate(Joi.string().period());
+
+      assertPass(validatePeriod('1d'));
+      assertPass(validatePeriod('30m'));
+
+      assertError(validatePeriod('11'));
+      assertError(validatePeriod('hh'));
+    });
+
+    it('should validates accepted intervals correclty', () => {
+      const validatePeriod = validate(
+        Joi.string()
+          .period()
+          .accept(['m', 'h', 'd'])
+      );
+
+      assertPass(validatePeriod('1m'));
+      assertPass(validatePeriod('1d'));
+
+      assertError(validatePeriod('1s'));
+      assertError(validatePeriod('1Y'));
+    });
+
+    it('should validates min intervals correclty', () => {
+      const validatePeriod = validate(
+        Joi.string()
+          .period()
+          .min('1m')
+      );
+
+      assertPass(validatePeriod('1m'));
+      assertPass(validatePeriod('60s'));
+
+      assertError(validatePeriod('0m'));
+      assertError(validatePeriod('0s'));
+    });
+
+    it('should validates max intervals correclty', () => {
+      const validatePeriod = validate(
+        Joi.string()
+          .period()
+          .max('1d')
+      );
+
+      assertPass(validatePeriod('1d'));
+      assertPass(validatePeriod('24h'));
+
+      assertError(validatePeriod('2d'));
+      assertError(validatePeriod('25h'));
+    });
+
+    it('should validates divisible by intervals correclty', () => {
+      const validatePeriod = validate(
+        Joi.string()
+          .period()
+          .divisibleBy('2m')
+      );
+
+      assertPass(validatePeriod('2m'));
+      assertPass(validatePeriod('10m'));
+      assertPass(validatePeriod('120s'));
+      assertPass(validatePeriod('1h'));
+
+      assertError(validatePeriod('1m'));
+      assertError(validatePeriod('3m'));
+      assertError(validatePeriod('180s'));
+    });
+  });
 });

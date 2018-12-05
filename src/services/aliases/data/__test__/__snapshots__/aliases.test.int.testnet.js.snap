@@ -1,197 +1,139 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Aliases request by address should return correct data if requested with showBroken 1`] = `
-Array [
-  Object {
-    "@@tag": "Just",
-    "@@type": "folktale:Maybe",
-    "@@value": Object {
-      "value": Object {
+exports[`Aliases request by address should return List(Alias) if requested with showBroken 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "alias",
+      "data": Object {
         "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
         "alias": "test-alias",
       },
     },
-  },
-  Object {
-    "@@tag": "Just",
-    "@@type": "folktale:Maybe",
-    "@@value": Object {
-      "value": Object {
+    Object {
+      "__type": "alias",
+      "data": Object {
         "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
         "alias": "test-alias-2",
       },
     },
-  },
-  Object {
-    "@@tag": "Just",
-    "@@type": "folktale:Maybe",
-    "@@value": Object {
-      "value": Object {
+    Object {
+      "__type": "alias",
+      "data": Object {
         "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
         "alias": "test-alias-3",
       },
     },
-  },
-  Object {
-    "@@tag": "Just",
-    "@@type": "folktale:Maybe",
-    "@@value": Object {
-      "value": Object {
+    Object {
+      "__type": "alias",
+      "data": Object {
         "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
         "alias": "test-alias-4",
       },
     },
-  },
-  Object {
-    "@@tag": "Just",
-    "@@type": "folktale:Maybe",
-    "@@value": Object {
-      "value": Object {
+    Object {
+      "__type": "alias",
+      "data": Object {
         "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
         "alias": "test-alias-5",
       },
     },
-  },
-  Object {
-    "@@tag": "Just",
-    "@@type": "folktale:Maybe",
-    "@@value": Object {
-      "value": Object {
+    Object {
+      "__type": "alias",
+      "data": Object {
         "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
         "alias": "test-alias-6",
       },
     },
-  },
-  Object {
-    "@@tag": "Just",
-    "@@type": "folktale:Maybe",
-    "@@value": Object {
-      "value": Object {
+    Object {
+      "__type": "alias",
+      "data": Object {
         "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
         "alias": "test-alias-7",
       },
     },
-  },
-  Object {
-    "@@tag": "Just",
-    "@@type": "folktale:Maybe",
-    "@@value": Object {
-      "value": Object {
+    Object {
+      "__type": "alias",
+      "data": Object {
         "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
         "alias": "test@test.test",
       },
     },
-  },
-]
-`;
-
-exports[`Aliases request by address should return correct data if requested without showBroken 1`] = `
-Object {
-  "@@tag": "Just",
-  "@@type": "folktale:Maybe",
-  "@@value": Object {
-    "value": Object {
-      "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
-      "alias": "test-alias",
-    },
-  },
+  ],
 }
 `;
 
-exports[`Aliases request by address should return correct data if requested without showBroken 2`] = `
-Array [
-  Object {
-    "@@tag": "Just",
-    "@@type": "folktale:Maybe",
-    "@@value": Object {
-      "value": Object {
+exports[`Aliases request by address should return List(Alias) if requested without showBroken 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "alias",
+      "data": Object {
         "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
         "alias": "test-alias",
       },
     },
-  },
-  Object {
-    "@@tag": "Just",
-    "@@type": "folktale:Maybe",
-    "@@value": Object {
-      "value": Object {
+    Object {
+      "__type": "alias",
+      "data": Object {
         "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
         "alias": "test-alias-2",
       },
     },
-  },
-  Object {
-    "@@tag": "Just",
-    "@@type": "folktale:Maybe",
-    "@@value": Object {
-      "value": Object {
+    Object {
+      "__type": "alias",
+      "data": Object {
         "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
         "alias": "test-alias-3",
       },
     },
-  },
-  Object {
-    "@@tag": "Just",
-    "@@type": "folktale:Maybe",
-    "@@value": Object {
-      "value": Object {
+    Object {
+      "__type": "alias",
+      "data": Object {
         "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
         "alias": "test-alias-4",
       },
     },
-  },
-  Object {
-    "@@tag": "Just",
-    "@@type": "folktale:Maybe",
-    "@@value": Object {
-      "value": Object {
+    Object {
+      "__type": "alias",
+      "data": Object {
         "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
         "alias": "test-alias-5",
       },
     },
-  },
-  Object {
-    "@@tag": "Just",
-    "@@type": "folktale:Maybe",
-    "@@value": Object {
-      "value": Object {
+    Object {
+      "__type": "alias",
+      "data": Object {
         "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
         "alias": "test-alias-6",
       },
     },
-  },
-  Object {
-    "@@tag": "Just",
-    "@@type": "folktale:Maybe",
-    "@@value": Object {
-      "value": Object {
+    Object {
+      "__type": "alias",
+      "data": Object {
         "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
         "alias": "test-alias-7",
       },
     },
-  },
-  Object {
-    "@@tag": "Just",
-    "@@type": "folktale:Maybe",
-    "@@value": Object {
-      "value": Object {
+    Object {
+      "__type": "alias",
+      "data": Object {
         "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
         "alias": "test@test.test",
       },
     },
-  },
-]
+  ],
+}
 `;
 
-exports[`Aliases should return Maybe(alias) for one correctly 1`] = `
+exports[`Aliases request by alias should return Alias for one correctly 1`] = `
 Object {
-  "@@tag": "Just",
-  "@@type": "folktale:Maybe",
-  "@@value": Object {
-    "value": Object {
-      "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
-      "alias": "test-alias",
-    },
+  "__type": "alias",
+  "data": Object {
+    "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
+    "alias": "test-alias",
   },
 }
 `;

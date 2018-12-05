@@ -115,7 +115,7 @@ const main = (daemon, config, interval, timeout, logger) =>
       },
       onRejected: error =>
         logger.error({
-          message: `[DAEMON] error: ${JSON.stringify(error)}`,
+          message: `[DAEMON] error: ${error}`,
           error,
         }),
       onCancelled: () =>

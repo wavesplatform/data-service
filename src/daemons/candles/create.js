@@ -115,7 +115,7 @@ module.exports = ({ logger, pg }, configuration) => {
 
   return {
     init: () => {
-      if (configuration.candlesCreateTable)
+      if (configuration.candlesTruncateTable)
         return fillCandlesDBAll(
           unsafeLogTaskProgress,
           pg,
