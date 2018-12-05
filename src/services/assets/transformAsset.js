@@ -16,4 +16,4 @@ const transformAsset = compose(
   reject(isNil)
 );
 
-module.exports = { transformAsset };
+module.exports = transformAsset;
