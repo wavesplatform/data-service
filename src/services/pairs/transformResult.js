@@ -1,6 +1,7 @@
 const { compose, pick } = require('ramda');
 const { renameKeys } = require('ramda-adjunct');
 
+/** transformResult :: Object -> Object */
 module.exports = compose(
   pick(['firstPrice', 'lastPrice', 'volume', 'volumeWaves']),
   renameKeys({

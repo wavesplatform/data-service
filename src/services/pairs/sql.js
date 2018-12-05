@@ -1,5 +1,6 @@
 const pg = require('knex')({ client: 'pg' });
 
+/** query :: Array[Object] -> String */
 const query = pairs =>
   pg({ t: 'pairs' })
     .select('*')
@@ -10,6 +11,8 @@ const query = pairs =>
     .toString();
 
 module.exports = {
+  /** get :: Object -> String */
   get: pair => query([pair]),
+  /** mget :: Array[Object] -> String */
   mget: query,
 };
