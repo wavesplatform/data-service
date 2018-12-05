@@ -2,7 +2,7 @@ const search = require('../presets/pg/search');
 
 const { Candle } = require('../../types');
 
-const sql = require('./sql');
+const { sql } = require('./sql');
 const { inputSearch, output } = require('./schema');
 const { transformResults } = require('./transformResults');
 

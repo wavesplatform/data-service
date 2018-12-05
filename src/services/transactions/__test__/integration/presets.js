@@ -41,18 +41,16 @@ const mget = (service, txIds) =>
 
 const search = service =>
   describe('search', () => {
-    it(
-      'fetches real txs',
-      async () => {
+    describe('just', () => {
+      it('fetches real txs', async () => {
         const tx = await service
           .search({ limit: 20, sort: 'asc' })
           .run()
           .promise();
         expect(tx).toBeDefined();
         expect(tx.data).toHaveLength(20);
-      },
-      10000
-    );
+      }, 10000);
+    });
 
     describe('Pagination ', async () => {
       const LIMIT = 21;
@@ -169,24 +167,24 @@ const search = service =>
           .run()
           .promise()
           .then(x => x.data.map(createCursor(SORT)));
-
+          
         expect(cursors).toEqual(expectedCursors);
       });
-    });
 
-    it('doesnt try to create a cursor for empty response', done =>
-      service
-        .search({
-          limit: 1,
-          timeEnd: parseDate('1'),
-        })
-        .run()
-        .promise()
-        .then(d => {
-          expect(d).not.toHaveProperty('lastCursor');
-          done();
-        })
-        .catch(e => done(JSON.stringify(e, null, 2))));
+      it('doesnt try to create a cursor for empty response', done =>
+        service
+          .search({
+            limit: 1,
+            timeEnd: parseDate('1'),
+          })
+          .run()
+          .promise()
+          .then(d => {
+            expect(d).not.toHaveProperty('lastCursor');
+            done();
+          })
+          .catch(e => done(JSON.stringify(e, null, 2))));
+    });
   });
 
 module.exports = {

@@ -37,29 +37,6 @@ const inputSearch = Joi.object()
     sender: Joi.string(),
     key: Joi.string(),
     type: CORRECT_TYPE,
-    // value: [BIGNUMBER, Joi.string().allow(''), Joi.boolean()],
-    // value: Joi.alternatives().try([
-    // Joi.when('type', {
-    //   is: Joi.valid('integer').required(),
-    //   then: Joi.object()
-    //     .bignumber()
-    //     .int64(),
-    // }),
-    //   Joi.when('type', {
-    //     is: Joi.valid('boolean').required(),
-    //     then: Joi.boolean(),
-    //   }),
-    //   Joi.when('type', {
-    //     is: Joi.valid('string').required(),
-    //     then: Joi.string().allow(''),
-    //   }),
-    //   Joi.when('type', {
-    //     is: Joi.valid('binary').required(),
-    //     then: Joi.string()
-    //       .base64()
-    //       .allow(''),
-    //   }),
-    // ]),
     value: Joi.when('type', {
       is: 'integer',
       then: Joi.object()

@@ -1,0 +1,776 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Aliases request by address should return correct data if requested with showBroken 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "carl",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "lmao",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "ubiq",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "payments",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "wings",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "matt",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "jonathan",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "platinum",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "silver",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "cobalt",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "hydrogen",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "zinc",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "swift",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "rnsd",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "happy",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "flux",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "abram",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "fortuna",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "gamb",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "first",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "fortune",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "national",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "haha",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "whenmoon",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "music",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "gaming",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "rubles",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "dollars",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "rail",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "surf",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "homo",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "noah",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "emma",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "emily",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "peace",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "vitamin",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "whalepool",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "eternal",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "tsunami",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "rocket",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "solid",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": null,
+        "alias": "scam",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "hack",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "when",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "nudes",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "email",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "mail",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "messi",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "star",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "allah",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "jesus",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "banker",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "flight",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "bird",
+      },
+    },
+  ],
+}
+`;
+
+exports[`Aliases request by address should return correct data if requested without showBroken 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "carl",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "lmao",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "ubiq",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "payments",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "wings",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "matt",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "jonathan",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "platinum",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "silver",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "cobalt",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "hydrogen",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "zinc",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "swift",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "rnsd",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "happy",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "flux",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "abram",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "fortuna",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "gamb",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "first",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "fortune",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "national",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "haha",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "whenmoon",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "music",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "gaming",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "rubles",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "dollars",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "rail",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "surf",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "homo",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "noah",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "emma",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "emily",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "peace",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "vitamin",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "whalepool",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "eternal",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "tsunami",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "rocket",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "solid",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "hack",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "when",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "nudes",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "email",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "mail",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "messi",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "star",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "allah",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "jesus",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "banker",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "flight",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy",
+        "alias": "bird",
+      },
+    },
+  ],
+}
+`;
+
+exports[`Aliases request by alias should return Maybe(alias) for one correctly 1`] = `
+Object {
+  "__type": "alias",
+  "data": Object {
+    "address": "3PQqCXNPoTRsHRK2nZyXWENaZwLmxrUZPBi",
+    "alias": "sexy-boys",
+  },
+}
+`;
