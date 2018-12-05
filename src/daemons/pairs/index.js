@@ -1,5 +1,5 @@
 // configuration
-const loadConfig = require('../../loadConfig');
+const loadConfig = require('./loadConfig');
 const configuration = loadConfig();
 
 // logger
@@ -18,7 +18,7 @@ const logger = createLogger({
 runDaemon(
   createDaemon({ logger, pg: pgDriver, tableName: 'pairs' }, configuration),
   configuration,
-  configuration.pairsUpdateInterval, 
+  configuration.pairsUpdateInterval,
   configuration.pairsUpdateTimeout,
   logger
 );

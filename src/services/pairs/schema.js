@@ -1,6 +1,6 @@
-const Joi = require('../../../../../utils/validation/joi');
+const Joi = require('../../utils/validation/joi');
 
-const pairInput = Joi.object().keys({
+const inputPair = Joi.object().keys({
   amountAsset: Joi.string()
     .base58()
     .required(),
@@ -9,7 +9,15 @@ const pairInput = Joi.object().keys({
     .required(),
 });
 
+const inputPairs = Joi.array().items(inputPair);
+
 const output = Joi.object().keys({
+  amount_asset_id: Joi.string()
+    .base58()
+    .required(),
+  price_asset_id: Joi.string()
+    .base58()
+    .required(),
   first_price: Joi.object()
     .bignumber()
     .required(),
@@ -25,4 +33,4 @@ const output = Joi.object().keys({
     .allow(null),
 });
 
-module.exports = { output, pairInput };
+module.exports = { inputPair, inputPairs, output };

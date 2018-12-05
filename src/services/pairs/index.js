@@ -1,18 +1,30 @@
-// import refactored resolver
-const createData = require('./data');
-const createResolvers = require('./resolver');
+const getById = require('../presets/pg/getById');
+const mgetByIds = require('../presets/pg/mgetByIds');
+const { Pair } = require('../../types');
+
+const { inputPair, inputPairs, output } = require('./schema');
+const transformResult = require('./transformResult');
+const { get, mget } = require('./sql');
+const { matchPairs } = require('./matcher');
 
 module.exports = ({ drivers, emitEvent }) => {
-  const data = createData({ drivers, emitEvent });
-
   return {
-    get: createResolvers.one({
-      getData: data.get,
-      emitEvent,
-    }),
-    mget: createResolvers.many({
-      getData: data.mget,
-      emitEvent,
-    }),
+    get: getById({
+      nae: 'pairs.get',
+      sql: get,
+      inputSchema: inputPair,
+      resultSchema: output,
+      transformResult: transformResult,
+      resultTypeFactory: Pair,
+    })({ pg: drivers.pg, emitEvent }),
+    mget: mgetByIds({
+      nae: 'pairs.mget',
+      sql: mget,
+      inputSchema: inputPairs,
+      resultSchema: output,
+      transformResult: transformResult,
+      matchRequestResult: matchPairs,
+      resultTypeFactory: Pair,
+    })({ pg: drivers.pg, emitEvent }),
   };
 };

@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Pairs get many pairs should return Pairs for one correctly 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "pair",
+      "data": Object {
+        "firstPrice": "1e-7",
+        "lastPrice": "1e-7",
+        "volume": "0.1",
+        "volumeWaves": "1e-8",
+      },
+    },
+  ],
+}
+`;
+
+exports[`Pairs get one pair should return Pair for one correctly 1`] = `
+Object {
+  "__type": "pair",
+  "data": Object {
+    "firstPrice": "1e-7",
+    "lastPrice": "1e-7",
+    "volume": "0.1",
+    "volumeWaves": "1e-8",
+  },
+}
+`;
