@@ -151,6 +151,8 @@ const pred = () => true;
 // test run
 services.filter(pred).forEach(s => {
   describe(`${s.name} transactions service`, () => {
+    jest.setTimeout(10000);
+
     const service = s.service({
       drivers,
       emitEvent: () => () => null,

@@ -77,7 +77,7 @@ Object {
         "id": "8LQW8f7P5d5PZM7GtZEBgaqRPGSzS3DfPuiXrURJ4AJS",
         "name": "WBTC",
         "precision": 8,
-        "quantity": "2099999999809278",
+        "quantity": "2099999999809224",
         "reissuable": false,
         "sender": "3PC4roN512iugc6xGVTTM2XkoWKEdSiiscd",
         "ticker": "BTC",

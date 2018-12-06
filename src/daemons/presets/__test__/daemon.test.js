@@ -70,29 +70,7 @@ describe('Preset for create daemon', () => {
       let loop = jest.fn(() => Task.of());
       let logger = createLogger();
 
-      let d = daemon({ loop }, {}, 5, 20, logger).listen({
-        onCancelled: () => {
-          expect(logger.warn).toBeCalledWith({
-            message: '[DAEMON] init function not found',
-          });
-          expect(logger.error).toBeCalledWith({
-            message: `[DAEMON] loop canceled`,
-          });
-          expect(loop).toHaveBeenCalledTimes(6);
-          done();
-        },
-      });
-
-      setTimeout(() => d.cancel(), 29);
-    });
-
-    it('should rerun immedently if interval < loop', done => {
-      let loop = jest.fn(() =>
-        Task.task(resolver => setTimeout(() => resolver.resolve(), 10))
-      );
-      let logger = createLogger();
-
-      let d = daemon({ loop }, {}, 1, 100, logger).listen({
+      let d = daemon({ loop }, {}, 50, 100, logger).listen({
         onCancelled: () => {
           expect(logger.warn).toBeCalledWith({
             message: '[DAEMON] init function not found',
@@ -105,7 +83,29 @@ describe('Preset for create daemon', () => {
         },
       });
 
-      setTimeout(() => d.cancel(), 28);
+      setTimeout(() => d.cancel(), 140);
+    });
+
+    it('should rerun immedently if interval < loop', done => {
+      let loop = jest.fn(() =>
+        Task.task(resolver => setTimeout(() => resolver.resolve(), 50))
+      );
+      let logger = createLogger();
+
+      let d = daemon({ loop }, {}, 10, 100, logger).listen({
+        onCancelled: () => {
+          expect(logger.warn).toBeCalledWith({
+            message: '[DAEMON] init function not found',
+          });
+          expect(logger.error).toBeCalledWith({
+            message: `[DAEMON] loop canceled`,
+          });
+          expect(loop).toHaveBeenCalledTimes(3);
+          done();
+        },
+      });
+
+      setTimeout(() => d.cancel(), 140);
     });
 
     it('should throw exception when timeout expired', done => {
