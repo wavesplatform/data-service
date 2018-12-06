@@ -1,7 +1,7 @@
 const knex = require('knex');
 const pg = knex({ client: 'pg' });
 
-const selectVolumeWavesFromTempPairs = pg({ d: 'temp_pairs' })
+const selectVolumeWavesFromPairsCTE = pg({ d: 'pairs_cte' })
   .select({ volume_waves: pg.raw('p.volume * d.weighted_average_price') })
   .whereRaw(`(d.amount_asset_id=p.price_asset_id AND d.price_asset_id='WAVES')`)
   .orWhereRaw(
@@ -13,9 +13,9 @@ const selectExchanges = pg('txs_7')
   .whereRaw(`time_stamp >= now() - interval '1 day'`)
   .orderBy('time_stamp', 'desc');
 
-const selectTempPairs = pg
-  .with('temp_pairs', qp => {
-    qp.columns({
+const selectPairsCTE = pg
+  .with('pairs_cte', qp => {
+    qp.select({
       amount_asset_id: 'amount_asset',
       price_asset_id: 'price_asset',
       last_price: pg.raw(
@@ -35,7 +35,7 @@ const selectTempPairs = pg
         "case when amount_asset = 'WAVES' then sum(e.amount * 10 ^(-a_dec.decimals)) when price_asset = 'WAVES' then sum(e.amount * 10 ^(-a_dec.decimals) * e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals)) end"
       ),
     })
-      .from(selectExchanges.clone().as('e'))
+      .from({ e: selectExchanges.clone() })
       .innerJoin(
         { a_dec: 'asset_decimals' },
         'e.amount_asset',
@@ -44,7 +44,7 @@ const selectTempPairs = pg
       .innerJoin({ p_dec: 'asset_decimals' }, 'e.price_asset', 'p_dec.asset_id')
       .groupBy(['amount_asset', 'price_asset']);
   })
-  .from({ p: 'temp_pairs' })
+  .from({ p: 'pairs_cte' })
   .columns(
     'amount_asset_id',
     'price_asset_id',
@@ -53,18 +53,13 @@ const selectTempPairs = pg
     'volume',
     {
       volume_waves: pg.raw(
-        `coalesce(volume_waves, (${selectVolumeWavesFromTempPairs.toString()}))`
+        `coalesce(volume_waves, (${selectVolumeWavesFromPairsCTE.toString()}))`
       ),
     }
   );
-console.log(
+
+module.exports = tableName =>
   pg
-    .into('pairs')
-    .insert(selectTempPairs)
-    .toString()
-);
-// module.exports = tableName =>
-//   pg
-//     .into(tableName)
-//     .insert(selectTempPairs)
-//     .toString();
+    .into(tableName)
+    .insert(selectPairsCTE)
+    .toString();
