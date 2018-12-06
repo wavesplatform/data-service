@@ -15,6 +15,7 @@ const { renameKeys } = require('ramda-adjunct');
 const { Interval, List } = require('../../types');
 const concatAll = require('../../utils/fp/concatAll');
 const { floor, ceil, add, trunc } = require('../../utils/date');
+const { Candle } = require('../../types/index');
 const { candleMonoid } = require('./candleMonoid');
 
 const truncToMinutes = trunc('minutes');
@@ -38,6 +39,7 @@ const transformCandle = ([time, candle]) => {
   });
 
   return compose(
+    Candle,
     renameFields,
     ifElse(isEmpty, transformEmpty, evolve({ time_start: t => new Date(t) }))
   )(candle);
