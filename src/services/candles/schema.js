@@ -26,7 +26,12 @@ const customJoi = Joi.extend(joi => ({
         }),
       },
       validate(params, value, state, options) {
-        if (joi.date().required().validate(value.timeStart).error) {
+        if (
+          joi
+            .date()
+            .required()
+            .validate(value.timeStart).error
+        ) {
           return this.createError(
             'object.period.timeStart',
             { value },
@@ -35,7 +40,12 @@ const customJoi = Joi.extend(joi => ({
           );
         }
 
-        if (joi.date().required().validate(value.timeEnd).error) {
+        if (
+          joi
+            .date()
+            .required()
+            .validate(value.timeEnd).error
+        ) {
           return this.createError(
             'object.period.timeEnd',
             { value },
@@ -124,10 +134,13 @@ const inputSearch = Joi.object()
     priceAsset: Joi.string()
       .base58()
       .required(),
-    params: customJoi.object().period({
-      divisibleByLeftBound: ['1d', '1h', '1m'],
-      limit: 1440,
-    }),
+    params: customJoi
+      .object()
+      .period({
+        divisibleByLeftBound: ['1d', '1h', '1m'],
+        limit: 1440,
+      })
+      .required(),
   })
   .required();
 
