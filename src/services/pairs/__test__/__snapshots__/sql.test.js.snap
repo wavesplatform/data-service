@@ -2,4 +2,4 @@
 
 exports[`sql query from pairs should get many pairs 1`] = `"select * from \\"pairs\\" as \\"t\\" where (\\"t\\".\\"amount_asset_id\\", \\"t\\".\\"price_asset_id\\") in (('111', '222'), ('333', '444'))"`;
 
-exports[`sql query from pairs should get one pairs 1`] = `"select * from \\"pairs\\" as \\"t\\" where (\\"t\\".\\"amount_asset_id\\", \\"t\\".\\"price_asset_id\\") in (('111', '222'))"`;
+exports[`sql query from pairs should get one pair 1`] = `"select * from \\"pairs\\" as \\"t\\" where (\\"t\\".\\"amount_asset_id\\", \\"t\\".\\"price_asset_id\\") in (('111', '222'))"`;

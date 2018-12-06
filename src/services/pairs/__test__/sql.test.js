@@ -1,7 +1,7 @@
 const sql = require('../sql');
 
 describe('sql query from pairs', () => {
-  it('should get one pairs', () => {
+  it('should get one pair', () => {
     expect(
       sql.get({
         amountAsset: '111',

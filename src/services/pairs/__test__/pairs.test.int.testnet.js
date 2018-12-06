@@ -1,31 +1,43 @@
+const pg = require('knex')({ client: 'pg' });
 const { createPgDriver } = require('../../../db');
 const loadConfig = require('../../../loadConfig');
 const options = loadConfig();
+const pgDriver = createPgDriver(options);
 const create = require('../index');
-
-const amountAsset = 'CVRciuSiK8xiNJSRitAG9dGqcmfFPHvn9bcXtntnpuvp';
-const priceAsset = 'WAVES';
+let pair;
 
 describe('Pairs', () => {
   const service = create({
-    drivers: { pg: createPgDriver(options) },
+    drivers: { pg: pgDriver },
     emitEvent: () => () => null,
   });
 
+  beforeAll(async () => {
+    pair = await pgDriver
+      .one(
+        pg('pairs')
+          .select('*')
+          .limit(1)
+          .toString()
+      )
+      .run()
+      .promise();
+  });
+
   describe('get one pair', () => {
-    it('should return Pair for one correctly', done => {
-      service
+    it('should return Pair for one correctly', async () => {
+      const result = await service
         .get({
-          amountAsset,
-          priceAsset,
+          amountAsset: pair.amount_asset_id,
+          priceAsset: pair.price_asset_id,
         })
         .run()
-        .listen({
-          onResolved: pair => {
-            expect(pair).toMatchSnapshot();
-            done();
-          },
-        });
+        .promise();
+
+      expect(result.data).toHaveProperty('firstPrice', pair.first_price);
+      expect(result.data).toHaveProperty('lastPrice', pair.last_price);
+      expect(result.data).toHaveProperty('volume', pair.volume);
+      expect(result.data).toHaveProperty('volumeWaves', pair.volume_waves);
     });
 
     it('should return null for non existing pair', done => {
@@ -45,21 +57,28 @@ describe('Pairs', () => {
   });
 
   describe('get many pairs', () => {
-    it('should return Pairs for one correctly', done => {
-      service
+    it('should return Pairs for one correctly', async () => {
+      const result = await service
         .mget([
           {
-            amountAsset,
-            priceAsset,
+            amountAsset: pair.amount_asset_id,
+            priceAsset: pair.price_asset_id,
           },
         ])
         .run()
-        .listen({
-          onResolved: pairs => {
-            expect(pairs).toMatchSnapshot();
-            done();
-          },
-        });
+        .promise();
+
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].data).toHaveProperty(
+        'firstPrice',
+        pair.first_price
+      );
+      expect(result.data[0].data).toHaveProperty('lastPrice', pair.last_price);
+      expect(result.data[0].data).toHaveProperty('volume', pair.volume);
+      expect(result.data[0].data).toHaveProperty(
+        'volumeWaves',
+        pair.volume_waves
+      );
     });
 
     it('should return null for non existing pairs', done => {

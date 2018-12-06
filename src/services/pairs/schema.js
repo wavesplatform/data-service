@@ -11,7 +11,7 @@ const inputPair = Joi.object().keys({
 
 const inputPairs = Joi.array().items(inputPair);
 
-const output = Joi.object().keys({
+const result = Joi.object().keys({
   amount_asset_id: Joi.string()
     .base58()
     .required(),
@@ -33,4 +33,4 @@ const output = Joi.object().keys({
     .allow(null),
 });
 
-module.exports = { inputPair, inputPairs, output };
+module.exports = { inputPair, inputPairs, result };
