@@ -128,6 +128,7 @@ const search = service =>
         const SORT = 'desc';
 
         const baseParams = {
+          timeEnd: new Date('2018-12-01'),
           limit: LIMIT,
           sort: SORT,
         };
