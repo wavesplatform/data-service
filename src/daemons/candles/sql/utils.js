@@ -47,7 +47,7 @@ const candlePresets = {
     },
     weighted_average_price: {
       weighted_average_price: pg.raw(
-        'sum(price_volume * volume) / sum(volume)'
+        'sum(price_volume) / sum(volume)'
       ),
     },
     open: {

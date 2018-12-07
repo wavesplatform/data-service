@@ -11,7 +11,7 @@ const makeCandleCalculateColumns = longerInterval => [
   candlePresets.aggregate.low,
   candlePresets.aggregate.high,
   candlePresets.aggregate.volume,
-  candlePresets.aggregate.price_volume,
+  candlePresets.aggregate.quote_volume,
   candlePresets.aggregate.max_height,
   candlePresets.aggregate.txs_count,
   candlePresets.aggregate.weighted_average_price,
@@ -36,7 +36,7 @@ const candleSelectColumns = [
     volume: pg.raw('sum(e.amount * 10 ^(-a_dec.decimals))'),
   },
   {
-    price_volume: pg.raw(
+    quote_volume: pg.raw(
       'sum(e.amount * 10 ^(-a_dec.decimals) * e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'
     ),
   },
@@ -109,7 +109,7 @@ const updatedFieldsExcluded = [
   'low',
   'high',
   'max_height',
-  'price_volume',
+  'quote_volume',
   'txs_count',
   'volume',
   'weighted_average_price',
