@@ -64,26 +64,3 @@ Object {
   ],
 }
 `;
-
-exports[`Assets service search fetches non-WAVES asset by ticker (BTC) 1`] = `
-Object {
-  "__type": "list",
-  "data": Array [
-    Object {
-      "__type": "asset",
-      "data": Object {
-        "description": "Bitcoin Token",
-        "height": 257457,
-        "id": "8LQW8f7P5d5PZM7GtZEBgaqRPGSzS3DfPuiXrURJ4AJS",
-        "name": "WBTC",
-        "precision": 8,
-        "quantity": "2099999999809224",
-        "reissuable": false,
-        "sender": "3PC4roN512iugc6xGVTTM2XkoWKEdSiiscd",
-        "ticker": "BTC",
-        "timestamp": 2016-12-02T12:01:16.160Z,
-      },
-    },
-  ],
-}
-`;
