@@ -1,190 +1,226 @@
 const { parseDate } = require('../../../../utils/parseDate');
 const Cursor = require('../../../_common/pagination/cursor');
 
+const TIMEOUT = 10000;
+
 const get = (service, txId) =>
   describe('get', () => {
-    it('fetches real tx', async done => {
-      service
-        .get(txId)
-        .run()
-        .promise()
-        .then(x => {
-          expect(x).toMatchSnapshot();
-          done();
-        })
-        .catch(e => done(JSON.stringify(e)));
-    });
-    it('returns null for unreal tx', async () => {
-      const tx = await service
-        .get('UNREAL')
-        .run()
-        .promise();
+    it(
+      'fetches real tx',
+      async done => {
+        service
+          .get(txId)
+          .run()
+          .promise()
+          .then(x => {
+            expect(x).toMatchSnapshot();
+            done();
+          })
+          .catch(e => done(JSON.stringify(e)));
+      },
+      TIMEOUT
+    );
+    it(
+      'returns null for unreal tx',
+      async () => {
+        const tx = await service
+          .get('UNREAL')
+          .run()
+          .promise();
 
-      expect(tx).toBe(null);
-    });
+        expect(tx).toBe(null);
+      },
+      TIMEOUT
+    );
   });
 
 const mget = (service, txIds) =>
   describe('mget', () => {
-    it('fetches real txs with nulls for unreal', async done => {
-      service
-        .mget([...txIds, 'UNREAL'])
-        .run()
-        .promise()
-        .then(xs => {
-          expect(xs).toMatchSnapshot();
-          done();
-        })
-        .catch(e => done(JSON.stringify(e)));
-    });
+    it(
+      'fetches real txs with nulls for unreal',
+      async done => {
+        service
+          .mget([...txIds, 'UNREAL'])
+          .run()
+          .promise()
+          .then(xs => {
+            expect(xs).toMatchSnapshot();
+            done();
+          })
+          .catch(e => done(JSON.stringify(e)));
+      },
+      TIMEOUT
+    );
   });
 
 const search = service =>
   describe('search', () => {
     describe('just', () => {
-      it('fetches real txs', async () => {
-        const tx = await service
-          .search({ limit: 20, sort: 'asc' })
-          .run()
-          .promise();
-        expect(tx).toBeDefined();
-        expect(tx.data).toHaveLength(20);
-      }, 10000);
+      it(
+        'fetches real txs',
+        async () => {
+          const tx = await service
+            .search({ limit: 20, sort: 'asc' })
+            .run()
+            .promise();
+          expect(tx).toBeDefined();
+          expect(tx.data).toHaveLength(20);
+        },
+        TIMEOUT
+      );
     });
 
     describe('Pagination ', async () => {
       const LIMIT = 21;
       const createCursor = sort => ({ data }) => Cursor.encode(sort, data);
-      it('doesnt get 2 identical entries for limit 1 asc with next page fetching', async () => {
-        const baseParams = {
-          limit: 1,
-          sort: 'asc',
-        };
-
-        const firstTx = await service
-          .search(baseParams)
-          .run()
-          .promise();
-
-        const secondTx = await service
-          .search({
-            after: firstTx.lastCursor,
+      it(
+        'doesnt get 2 identical entries for limit 1 asc with next page fetching',
+        async () => {
+          const baseParams = {
             limit: 1,
-          })
-          .run()
-          .promise();
+            sort: 'asc',
+          };
 
-        expect(firstTx.data).not.toEqual(secondTx.data);
-      });
+          const firstTx = await service
+            .search(baseParams)
+            .run()
+            .promise();
 
-      it('works asc', async () => {
-        const SORT = 'asc';
+          const secondTx = await service
+            .search({
+              after: firstTx.lastCursor,
+              limit: 1,
+            })
+            .run()
+            .promise();
 
-        const baseParams = {
-          limit: LIMIT,
-          sort: SORT,
-        };
+          expect(firstTx.data).not.toEqual(secondTx.data);
+        },
+        TIMEOUT
+      );
 
-        const fetchAndGetNextCursor = cursor =>
-          service
+      it(
+        'works asc',
+        async () => {
+          const SORT = 'asc';
+
+          const baseParams = {
+            limit: LIMIT,
+            sort: SORT,
+          };
+
+          const fetchAndGetNextCursor = cursor =>
+            service
+              .search({
+                ...baseParams,
+                limit: 5,
+                after: cursor,
+              })
+              .run()
+              .promise()
+              .then(x => [x.lastCursor, x.data.map(createCursor(SORT))]);
+
+          const firstCursor = await service
+            .search({ ...baseParams, limit: 1 })
+            .run()
+            .promise()
+            .then(x => x.data.map(createCursor(SORT))[0]);
+
+          var i = 0;
+          var cursors = [firstCursor];
+          var curCursor = firstCursor;
+
+          while (i++ < (LIMIT - 1) / 5) {
+            var [nextCursor, cs] = await fetchAndGetNextCursor(curCursor);
+            curCursor = nextCursor;
+            cursors = [...cursors, ...cs];
+          }
+
+          const expectedCursors = await service
             .search({
               ...baseParams,
-              limit: 5,
-              after: cursor,
+              limit: LIMIT,
             })
             .run()
             .promise()
-            .then(x => [x.lastCursor, x.data.map(createCursor(SORT))]);
+            .then(x => x.data.map(createCursor(SORT)));
 
-        const firstCursor = await service
-          .search({ ...baseParams, limit: 1 })
-          .run()
-          .promise()
-          .then(x => x.data.map(createCursor(SORT))[0]);
+          expect(cursors).toEqual(expectedCursors);
+        },
+        TIMEOUT
+      );
 
-        var i = 0;
-        var cursors = [firstCursor];
-        var curCursor = firstCursor;
+      it(
+        'works desc',
+        async () => {
+          const SORT = 'desc';
 
-        while (i++ < (LIMIT - 1) / 5) {
-          var [nextCursor, cs] = await fetchAndGetNextCursor(curCursor);
-          curCursor = nextCursor;
-          cursors = [...cursors, ...cs];
-        }
-
-        const expectedCursors = await service
-          .search({
-            ...baseParams,
+          const baseParams = {
+            timeEnd: new Date('2018-12-01'),
             limit: LIMIT,
-          })
-          .run()
-          .promise()
-          .then(x => x.data.map(createCursor(SORT)));
+            sort: SORT,
+          };
 
-        expect(cursors).toEqual(expectedCursors);
-      });
+          const fetchAndGetNextCursor = cursor =>
+            service
+              .search({
+                ...baseParams,
+                limit: 5,
+                after: cursor,
+              })
+              .run()
+              .promise()
+              .then(x => [x.lastCursor, x.data.map(createCursor(SORT))]);
 
-      it('works desc', async () => {
-        const SORT = 'desc';
+          const firstCursor = await service
+            .search({ ...baseParams, limit: 1 })
+            .run()
+            .promise()
+            .then(x => x.data.map(createCursor(SORT))[0]);
 
-        const baseParams = {
-          timeEnd: new Date('2018-12-01'),
-          limit: LIMIT,
-          sort: SORT,
-        };
+          var i = 0;
+          var cursors = [firstCursor];
+          var curCursor = firstCursor;
 
-        const fetchAndGetNextCursor = cursor =>
-          service
+          while (i++ < (LIMIT - 1) / 5) {
+            var [nextCursor, curCursors] = await fetchAndGetNextCursor(
+              curCursor
+            );
+            curCursor = nextCursor;
+            cursors = [...cursors, ...curCursors];
+          }
+
+          const expectedCursors = await service
             .search({
               ...baseParams,
-              limit: 5,
-              after: cursor,
+              limit: LIMIT,
             })
             .run()
             .promise()
-            .then(x => [x.lastCursor, x.data.map(createCursor(SORT))]);
+            .then(x => x.data.map(createCursor(SORT)));
 
-        const firstCursor = await service
-          .search({ ...baseParams, limit: 1 })
-          .run()
-          .promise()
-          .then(x => x.data.map(createCursor(SORT))[0]);
+          expect(cursors).toEqual(expectedCursors);
+        },
+        TIMEOUT
+      );
 
-        var i = 0;
-        var cursors = [firstCursor];
-        var curCursor = firstCursor;
-
-        while (i++ < (LIMIT - 1) / 5) {
-          var [nextCursor, curCursors] = await fetchAndGetNextCursor(curCursor);
-          curCursor = nextCursor;
-          cursors = [...cursors, ...curCursors];
-        }
-
-        const expectedCursors = await service
-          .search({
-            ...baseParams,
-            limit: LIMIT,
-          })
-          .run()
-          .promise()
-          .then(x => x.data.map(createCursor(SORT)));
-          
-        expect(cursors).toEqual(expectedCursors);
-      });
-
-      it('doesnt try to create a cursor for empty response', done =>
-        service
-          .search({
-            limit: 1,
-            timeEnd: parseDate('1'),
-          })
-          .run()
-          .promise()
-          .then(d => {
-            expect(d).not.toHaveProperty('lastCursor');
-            done();
-          })
-          .catch(e => done(JSON.stringify(e, null, 2))));
+      it(
+        'doesnt try to create a cursor for empty response',
+        done =>
+          service
+            .search({
+              limit: 1,
+              timeEnd: parseDate('1'),
+            })
+            .run()
+            .promise()
+            .then(d => {
+              expect(d).not.toHaveProperty('lastCursor');
+              done();
+            })
+            .catch(e => done(JSON.stringify(e, null, 2))),
+        TIMEOUT
+      );
     });
   });
 
