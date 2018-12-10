@@ -82,14 +82,14 @@ describe('monoid', () => {
 
   describe('candle', () => {
     it('should return two concated candle monoids', () => {
-      expect(candleMonoid.concat(oneDayCandles[0], oneDayCandles[0])).toEqual({
+      expect(candleMonoid.concat(oneDayCandles[0], oneDayCandles[0])).toMatchObject({
         time_start: '2018-11-15T14:03:00.000Z',
         open: BigNumber(0.01),
         close: BigNumber(0.0001),
         low: BigNumber(1e-8),
         high: BigNumber(0.01),
         volume: BigNumber(5684),
-        price_volume: BigNumber(6.6000884),
+        quote_volume: BigNumber(6.6000884),
         weighted_average_price: BigNumber(0.0011),
         max_height: 377979,
         txs_count: 40,
