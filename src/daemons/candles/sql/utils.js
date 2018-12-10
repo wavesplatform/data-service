@@ -31,7 +31,7 @@ const candlePresets = {
     max_height: pg.max('max_height'),
     txs_count: pg.sum('txs_count'),
     weighted_average_price: pg.raw(
-      '(sum(quote_volume)::numeric / sum(volume)::numeric)'
+      '(sum((weighted_average_price * volume)::numeric)::numeric / sum(volume)::numeric)::numeric'
     ),
     open: pg.raw('(array_agg(open)::numeric[])[1]'),
     close: pg.raw(
