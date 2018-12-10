@@ -170,7 +170,7 @@ const output = Joi.object().keys({
   volume: Joi.object()
     .bignumber()
     .required(),
-  price_volume: Joi.object()
+  quote_volume: Joi.object()
     .bignumber()
     .required(),
   weighted_average_price: Joi.object()
@@ -181,6 +181,8 @@ const output = Joi.object().keys({
     .integer()
     .valid([60, 300, 900, 1800, 3600, 86400]) // 1min, 5min, 15min, 30min, 1hour, 1day
     .required(),
+  a_dec: Joi.number().required(),
+  p_dec: Joi.number().required(),
 });
 
 module.exports = { inputSearch, output };

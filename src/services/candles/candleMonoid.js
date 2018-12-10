@@ -55,10 +55,12 @@ const candleMonoid = new Monoid({
     high: bigNumberHighestMonoid.concat(a.high, b.high),
     low: bigNumberLowestMonoid.concat(a.low, b.low),
     volume: bigNumberPlusMonoid.concat(a.volume, b.volume),
-    price_volume: bigNumberPlusMonoid.concat(a.price_volume, b.price_volume),
+    quote_volume: bigNumberPlusMonoid.concat(a.quote_volume, b.quote_volume),
     weighted_average_price: weightedAveragePriceMonoid.concat(a, b),
     max_height: maxMonoid.concat(a.max_height, b.max_height),
     txs_count: sumMonoid.concat(a.txs_count, b.txs_count),
+    a_dec: maxMonoid.concat(a.a_dec, b.a_dec),
+    p_dec: maxMonoid.concat(a.p_dec, b.p_dec)
   }),
   empty: {
     time_start: leftNotNullMonoid.empty,
@@ -67,10 +69,12 @@ const candleMonoid = new Monoid({
     high: bigNumberHighestMonoid.empty,
     low: bigNumberLowestMonoid.empty,
     volume: bigNumberPlusMonoid.empty,
-    price_volume: bigNumberPlusMonoid.empty,
+    quote_volume: bigNumberPlusMonoid.empty,
     weighted_average_price: weightedAveragePriceMonoid.empty,
     max_height: maxMonoid.empty,
     txs_count: sumMonoid.empty,
+    a_dec: rightNotNullMonoid.empty,
+    p_dec: rightNotNullMonoid.empty
   },
 });
 

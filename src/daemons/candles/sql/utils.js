@@ -9,7 +9,7 @@ const serializeCandle = candle => ({
   low: candle.low.toString(),
   high: candle.high.toString(),
   volume: candle.volume.toString(),
-  price_volume: candle.price_volume.toString(),
+  quote_volume: candle.quote_volume.toString(),
   max_height: candle.max_height,
   txs_count: candle.txs_count.toString(),
   weighted_average_price: candle.weighted_average_price.toString(),
@@ -36,8 +36,8 @@ const candlePresets = {
     volume: {
       volume: pg.sum('volume'),
     },
-    price_volume: {
-      price_volume: pg.sum('price_volume'),
+    quote_volume: {
+      quote_volume: pg.sum('quote_volume'),
     },
     max_height: {
       max_height: pg.max('max_height'),
@@ -47,7 +47,7 @@ const candlePresets = {
     },
     weighted_average_price: {
       weighted_average_price: pg.raw(
-        'sum(price_volume) / sum(volume)'
+        '(sum((volume * weighted_average_price)::numeric)::numeric / sum(volume)::numeric)::numeric'
       ),
     },
     open: {

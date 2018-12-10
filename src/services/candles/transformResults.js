@@ -10,6 +10,7 @@ const {
   ifElse,
   clone,
   evolve,
+  omit,
 } = require('ramda');
 const { renameKeys } = require('ramda-adjunct');
 const { Interval, List } = require('../../types');
@@ -31,7 +32,7 @@ const transformCandle = ([time, candle]) => {
     )(c);
 
   const renameFields = renameKeys({
-    price_volume: 'priceVolume',
+    quote_volume: 'quoteVolume',
     weighted_average_price: 'weightedAveragePrice',
     max_height: 'maxHeight',
     txs_count: 'txsCount',
@@ -40,8 +41,18 @@ const transformCandle = ([time, candle]) => {
 
   return compose(
     Candle,
+    omit([
+      'a_dec',
+      'p_dec'
+    ]),
     renameFields,
-    ifElse(isEmpty, transformEmpty, evolve({ time_start: t => new Date(t) }))
+    ifElse(
+      isEmpty,
+      transformEmpty,
+      evolve({
+        time_start: t => new Date(t),
+      })
+    )
   )(candle);
 };
 
@@ -69,6 +80,20 @@ const addMissingCandles = curryN(
   }
 );
 
+const candleFixedDecimals = (candle, aDecimals, pDecimals) =>
+  evolve(
+    {
+      open: t => t.decimalPlaces(8 + pDecimals - aDecimals),
+      close: t => t.decimalPlaces(8 + pDecimals - aDecimals),
+      high: t => t.decimalPlaces(8 + pDecimals - aDecimals),
+      low: t => t.decimalPlaces(8 + pDecimals - aDecimals),
+      volume: t => t.decimalPlaces(aDecimals),
+      quote_volume: t => t.decimalPlaces(pDecimals),
+      weighted_average_price: t => t.decimalPlaces(8 + pDecimals - aDecimals),
+    },
+    candle
+  );
+
 /** transformResults :: (CandleDbResponse[], request) -> List Maybe t */
 const transformResults = (result, request) =>
   compose(
@@ -76,6 +101,11 @@ const transformResults = (result, request) =>
     map(transformCandle),
     sort((a, b) => new Date(a[0]) - new Date(b[0])),
     toPairs,
+    map(candle =>
+      candle.a_dec && candle.p_dec
+        ? candleFixedDecimals(candle, candle.a_dec, candle.p_dec)
+        : candle
+    ),
     map(concatAll(candleMonoid)),
     addMissingCandles(
       Interval(request.params.interval),

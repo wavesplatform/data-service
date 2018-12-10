@@ -32,7 +32,7 @@ describe('candles daemon sql test', () => {
             price_asset_id: '2',
             price: new BigNumber(1.2),
             volume: new BigNumber(200.2),
-            price_volume: new BigNumber(100.2),
+            quote_volume: new BigNumber(100.2),
             txs_count: new BigNumber(22),
             weighted_average_price: new BigNumber(2.1),
           },
