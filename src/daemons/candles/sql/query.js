@@ -4,21 +4,23 @@ const pg = knex({ client: 'pg' });
 const { serializeCandle, candlePresets } = require('./utils');
 
 /** makeCandleCalculateColumns :: Number -> Array */
-const makeCandleCalculateColumns = longerInterval => [
-  candlePresets.aggregate.candle_time(longerInterval),
-  'amount_asset_id',
-  'price_asset_id',
-  candlePresets.aggregate.low,
-  candlePresets.aggregate.high,
-  candlePresets.aggregate.volume,
-  candlePresets.aggregate.quote_volume,
-  candlePresets.aggregate.max_height,
-  candlePresets.aggregate.txs_count,
-  candlePresets.aggregate.weighted_average_price,
-  candlePresets.aggregate.open,
-  candlePresets.aggregate.close,
-  candlePresets.aggregate.interval_in_secs(longerInterval),
-];
+const makeCandleCalculateColumns = longerInterval => {
+  return {
+    candle_time: candlePresets.aggregate.candle_time(longerInterval),
+    amount_asset_id: 'amount_asset_id',
+    price_asset_id: 'price_asset_id',
+    low: candlePresets.aggregate.low,
+    high: candlePresets.aggregate.high,
+    volume: candlePresets.aggregate.volume,
+    quote_volume: candlePresets.aggregate.quote_volume,
+    max_height: candlePresets.aggregate.max_height,
+    txs_count: candlePresets.aggregate.txs_count,
+    weighted_average_price: candlePresets.aggregate.weighted_average_price,
+    open: candlePresets.aggregate.open,
+    close: candlePresets.aggregate.close,
+    interval_in_secs: longerInterval,
+  };
+};
 
 const candleSelectColumns = [
   {

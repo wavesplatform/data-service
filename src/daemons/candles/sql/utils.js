@@ -20,49 +20,23 @@ const serializeCandle = candle => ({
 
 const candlePresets = {
   aggregate: {
-    candle_time: interval => {
-      return {
-        candle_time: pg.raw(
-          `to_timestamp(floor((extract('epoch' from time_start) / ${interval} )) * ${interval})`
-        ),
-      };
-    },
-    low: {
-      low: pg.min('low'),
-    },
-    high: {
-      high: pg.max('high'),
-    },
-    volume: {
-      volume: pg.sum('volume'),
-    },
-    quote_volume: {
-      quote_volume: pg.sum('quote_volume'),
-    },
-    max_height: {
-      max_height: pg.max('max_height'),
-    },
-    txs_count: {
-      txs_count: pg.sum('txs_count'),
-    },
-    weighted_average_price: {
-      weighted_average_price: pg.raw(
-        '(sum((volume * weighted_average_price)::numeric)::numeric / sum(volume)::numeric)::numeric'
+    candle_time: interval =>
+      pg.raw(
+        `to_timestamp(floor((extract('epoch' from time_start) / ${interval} )) * ${interval})`
       ),
-    },
-    open: {
-      open: pg.raw('(array_agg(open)::numeric[])[1]'),
-    },
-    close: {
-      close: pg.raw(
-        '(array_agg(close)::numeric[])[array_length(array_agg(close)::numeric[],1)]'
-      ),
-    },
-    interval_in_secs: interval => {
-      return {
-        interval_in_secs: interval,
-      };
-    },
+    low: pg.min('low'),
+    high: pg.max('high'),
+    volume: pg.sum('volume'),
+    quote_volume: pg.sum('quote_volume'),
+    max_height: pg.max('max_height'),
+    txs_count: pg.sum('txs_count'),
+    weighted_average_price: pg.raw(
+      '(sum(quote_volume)::numeric / sum(volume)::numeric)'
+    ),
+    open: pg.raw('(array_agg(open)::numeric[])[1]'),
+    close: pg.raw(
+      '(array_agg(close)::numeric[])[array_length(array_agg(close)::numeric[],1)]'
+    ),
   },
 };
 
