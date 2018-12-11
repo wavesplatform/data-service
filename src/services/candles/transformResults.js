@@ -7,9 +7,9 @@ const {
   toPairs,
   assoc,
   always,
+  identity,
   ifElse,
   clone,
-  evolve,
 } = require('ramda');
 const { renameKeys } = require('ramda-adjunct');
 const { Interval, List } = require('../../types');
@@ -24,14 +24,8 @@ const truncToMinutes = trunc('minutes');
 const transformCandle = ([time, candle]) => {
   const isEmpty = c => c.txs_count === 0;
 
-  const transformEmpty = c =>
-    compose(
-      assoc('time_start', new Date(time)),
-      map(always(null))
-    )(c);
-
   const renameFields = renameKeys({
-    price_volume: 'priceVolume',
+    quote_volume: 'quoteVolume',
     weighted_average_price: 'weightedAveragePrice',
     max_height: 'maxHeight',
     txs_count: 'txsCount',
@@ -41,7 +35,8 @@ const transformCandle = ([time, candle]) => {
   return compose(
     Candle,
     renameFields,
-    ifElse(isEmpty, transformEmpty, evolve({ time_start: t => new Date(t) }))
+    assoc('time_start', new Date(`${time}Z`)),
+    ifElse(isEmpty, map(always(null)), identity)
   )(candle);
 };
 

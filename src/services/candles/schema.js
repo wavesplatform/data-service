@@ -67,7 +67,7 @@ const customJoi = Joi.extend(joi => ({
           joi
             .string()
             .period()
-            .accept(['m', 'h', 'd', 'M', 'Y'])
+            .accept(['s', 'm', 'h', 'd', 'M', 'Y'])
             .divisibleBy('1m')
             .min('1m')
             .max('1M')
@@ -170,7 +170,7 @@ const output = Joi.object().keys({
   volume: Joi.object()
     .bignumber()
     .required(),
-  price_volume: Joi.object()
+  quote_volume: Joi.object()
     .bignumber()
     .required(),
   weighted_average_price: Joi.object()

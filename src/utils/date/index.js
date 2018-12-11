@@ -4,16 +4,62 @@ const roundTo = curry((direction, interval, date) => {
   let roundFn;
   switch (direction) {
     case 'up':
-      roundFn = (a, b) => Math.ceil(a, b);
+      roundFn = a => Math.ceil(a);
       break;
     case 'down':
-      roundFn = (a, b) => Math.floor(a, b);
+      roundFn = a => Math.floor(a);
       break;
     default:
-      roundFn = (a, b) => Math.round(a, b);
+      roundFn = a => Math.round(a);
       break;
   }
-  return new Date(roundFn(date.getTime() / interval.length) * interval.length);
+
+  let newDate;
+  const roundBound = {
+    Y: 12,
+  };
+  if (interval.unit == 'Y') {
+    newDate = new Date(date);
+    newDate = new Date(
+      newDate.setMonth(
+        roundFn(newDate.getMonth() / roundBound[interval.unit]) *
+          roundBound[interval.unit]
+      )
+    );
+  } else if (interval.unit == 'M') {
+    const d = daysInMonth(date.getFullYear(), date.getMonth());
+    newDate = new Date(date);
+    newDate = new Date(newDate.setUTCDate(roundFn(date.getUTCDate() / d) * d + 1));
+  } else {
+    newDate = new Date(
+      roundFn(date.getTime() / interval.length) * interval.length
+    );
+  }
+  const cleaning = ['Y', 'M', 'd', 'h', 'm', 's'];
+
+  if (cleaning.indexOf(interval.unit) <= cleaning.indexOf('Y')) {
+    newDate.setUTCMonth(0);
+  }
+
+  if (cleaning.indexOf(interval.unit) <= cleaning.indexOf('M')) {
+    newDate.setUTCDate(1);
+  }
+  
+  if (cleaning.indexOf(interval.unit) <= cleaning.indexOf('d')) {
+    newDate.setUTCHours(0);
+  }
+  
+  if (cleaning.indexOf(interval.unit) <= cleaning.indexOf('h')) {
+    newDate.setUTCMinutes(0);
+  }
+
+  if (cleaning.indexOf(interval.unit) <= cleaning.indexOf('m')) {
+    newDate.setUTCSeconds(0);
+  }
+
+  newDate.setUTCMilliseconds(0);
+  
+  return newDate;
 });
 
 const add = curry(
@@ -36,6 +82,8 @@ const trunc = curry((precision, date) => {
   return date.toISOString().substr(0, precisions[precision]);
 });
 
+const daysInMonth = (year, month) => new Date(year, month, 0).getDate();
+
 module.exports = {
   round: roundTo(undefined),
   floor: roundTo('down'),
@@ -43,4 +91,5 @@ module.exports = {
   add,
   subtract,
   trunc,
+  daysInMonth,
 };
