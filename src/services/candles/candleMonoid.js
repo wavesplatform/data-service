@@ -40,9 +40,8 @@ const bigNumberHighestMonoid = new Monoid({
 // individual
 const weightedAveragePriceMonoid = new Monoid({
   concat: (a, b) =>
-    a.weighted_average_price
-      .multipliedBy(a.volume)
-      .plus(b.weighted_average_price.multipliedBy(b.volume))
+    a.quote_volume
+      .plus(b.quote_volume)
       .dividedBy(a.volume.plus(b.volume)),
   empty: BigNumber(0),
 });

@@ -4,16 +4,51 @@ const roundTo = curry((direction, interval, date) => {
   let roundFn;
   switch (direction) {
     case 'up':
-      roundFn = (a, b) => Math.ceil(a, b);
+      roundFn = a => Math.ceil(a);
       break;
     case 'down':
-      roundFn = (a, b) => Math.floor(a, b);
+      roundFn = a => Math.floor(a);
       break;
     default:
-      roundFn = (a, b) => Math.round(a, b);
+      roundFn = a => Math.round(a);
       break;
   }
-  return new Date(roundFn(date.getTime() / interval.length) * interval.length);
+
+  let newDate = new Date(date);
+  if (interval.unit == 'Y') {
+    newDate.setMonth(roundFn(newDate.getMonth() / 12) * 12);
+  } else if (interval.unit == 'M') {
+    const d = daysInMonth(date.getFullYear(), date.getMonth());
+    newDate.setUTCDate(roundFn(date.getUTCDate() / d) * d + 1);
+  } else {
+    newDate = new Date(
+      roundFn(date.getTime() / interval.length) * interval.length
+    );
+  }
+
+  const unitBiggerThan = u => {
+    const units = ['Y', 'M', 'd', 'h', 'm', 's'];
+    return units.indexOf(interval.unit) <= units.indexOf(u);
+  };
+
+  if (unitBiggerThan('Y')) {
+    newDate.setUTCMonth(0);
+  }
+  if (unitBiggerThan('M')) {
+    newDate.setUTCDate(1);
+  }
+  if (unitBiggerThan('d')) {
+    newDate.setUTCHours(0);
+  }
+  if (unitBiggerThan('h')) {
+    newDate.setUTCMinutes(0);
+  }
+  if (unitBiggerThan('m')) {
+    newDate.setUTCSeconds(0);
+  }
+  newDate.setUTCMilliseconds(0);
+
+  return newDate;
 });
 
 const add = curry(
@@ -35,6 +70,8 @@ const trunc = curry((precision, date) => {
   };
   return date.toISOString().substr(0, precisions[precision]);
 });
+
+const daysInMonth = (year, month) => new Date(year, month, 0).getDate();
 
 module.exports = {
   round: roundTo(undefined),

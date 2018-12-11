@@ -7,6 +7,7 @@ const {
   toPairs,
   assoc,
   always,
+  identity,
   ifElse,
   clone,
   evolve,
@@ -25,12 +26,6 @@ const truncToMinutes = trunc('minutes');
 const transformCandle = ([time, candle]) => {
   const isEmpty = c => c.txs_count === 0;
 
-  const transformEmpty = c =>
-    compose(
-      assoc('time_start', new Date(time)),
-      map(always(null))
-    )(c);
-
   const renameFields = renameKeys({
     quote_volume: 'quoteVolume',
     weighted_average_price: 'weightedAveragePrice',
@@ -46,13 +41,8 @@ const transformCandle = ([time, candle]) => {
       'p_dec'
     ]),
     renameFields,
-    ifElse(
-      isEmpty,
-      transformEmpty,
-      evolve({
-        time_start: t => new Date(t),
-      })
-    )
+    assoc('time_start', new Date(`${time}Z`)),
+    ifElse(isEmpty, map(always(null)), identity)
   )(candle);
 };
 
