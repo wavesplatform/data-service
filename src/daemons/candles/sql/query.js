@@ -4,21 +4,23 @@ const pg = knex({ client: 'pg' });
 const { serializeCandle, candlePresets } = require('./utils');
 
 /** makeCandleCalculateColumns :: Number -> Array */
-const makeCandleCalculateColumns = longerInterval => [
-  candlePresets.aggregate.candle_time(longerInterval),
-  'amount_asset_id',
-  'price_asset_id',
-  candlePresets.aggregate.low,
-  candlePresets.aggregate.high,
-  candlePresets.aggregate.volume,
-  candlePresets.aggregate.price_volume,
-  candlePresets.aggregate.max_height,
-  candlePresets.aggregate.txs_count,
-  candlePresets.aggregate.weighted_average_price,
-  candlePresets.aggregate.open,
-  candlePresets.aggregate.close,
-  candlePresets.aggregate.interval_in_secs(longerInterval),
-];
+const makeCandleCalculateColumns = longerInterval => {
+  return {
+    candle_time: candlePresets.aggregate.candle_time(longerInterval),
+    amount_asset_id: 'amount_asset_id',
+    price_asset_id: 'price_asset_id',
+    low: candlePresets.aggregate.low,
+    high: candlePresets.aggregate.high,
+    volume: candlePresets.aggregate.volume,
+    quote_volume: candlePresets.aggregate.quote_volume,
+    max_height: candlePresets.aggregate.max_height,
+    txs_count: candlePresets.aggregate.txs_count,
+    weighted_average_price: candlePresets.aggregate.weighted_average_price,
+    open: candlePresets.aggregate.open,
+    close: candlePresets.aggregate.close,
+    interval_in_secs: longerInterval,
+  };
+};
 
 const candleSelectColumns = [
   {
@@ -36,7 +38,7 @@ const candleSelectColumns = [
     volume: pg.raw('sum(e.amount * 10 ^(-a_dec.decimals))'),
   },
   {
-    price_volume: pg.raw(
+    quote_volume: pg.raw(
       'sum(e.amount * 10 ^(-a_dec.decimals) * e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'
     ),
   },
@@ -50,7 +52,7 @@ const candleSelectColumns = [
   },
   {
     weighted_average_price: pg.raw(
-      'sum(e.amount * 10 ^(-a_dec.decimals) * e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))/sum(e.amount * 10 ^(-a_dec.decimals))'
+      'sum((e.amount * 10 ^(-a_dec.decimals))::numeric * (e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))::numeric)/sum((e.amount * 10 ^(-a_dec.decimals))::numeric)'
     ),
   },
   {
@@ -109,7 +111,7 @@ const updatedFieldsExcluded = [
   'low',
   'high',
   'max_height',
-  'price_volume',
+  'quote_volume',
   'txs_count',
   'volume',
   'weighted_average_price',

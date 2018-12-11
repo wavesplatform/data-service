@@ -82,7 +82,7 @@ describe('monoid', () => {
 
   describe('candle', () => {
     it('should return two concated candle monoids', () => {
-      expect(candleMonoid.concat(oneDayCandles[0], oneDayCandles[0])).toEqual({
+      expect(candleMonoid.concat(oneDayCandles[0], oneDayCandles[0])).toMatchObject({
         time_start: '2018-11-15T14:03:00.000Z',
         open: BigNumber(0.01),
         close: BigNumber(0.0001),

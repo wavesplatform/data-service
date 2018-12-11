@@ -1,4 +1,6 @@
+const http = require('http');
 const createService = require('../index');
+const json = require('@waves/json-bigint');
 
 // dependencies
 const { createPgDriver } = require('../../../db');
@@ -66,15 +68,35 @@ describe('Assets service', () => {
     });
 
     it('fetches non-WAVES asset by ticker (BTC)', async done => {
-      service
-        .search({ ticker: 'BTC' })
-        .run()
-        .promise()
-        .then(xs => {
-          expect(xs).toMatchSnapshot();
-          done();
-        })
-        .catch(e => done(JSON.stringify(e)));
+      http.get(
+        'http://nodes.wavesnodes.com/assets/details/8LQW8f7P5d5PZM7GtZEBgaqRPGSzS3DfPuiXrURJ4AJS',
+        res => {
+          let data = '';
+          res.on('data', chunk => (data += chunk));
+          res.on('end', () => {
+            data = json.parse(data);
+            service
+              .search({ ticker: 'BTC' })
+              .run()
+              .promise()
+              .then(xs => {
+                expect(xs.data[0].data).toMatchObject({
+                  description: data.description,
+                  height: data.issueHeight,
+                  id: data.assetId,
+                  name: data.name,
+                  precision: data.decimals,
+                  quantity: data.quantity,
+                  reissuable: data.reissuable,
+                  sender: data.issuer,
+                  ticker: 'BTC',
+                });
+                done();
+              })
+              .catch(e => done(JSON.stringify(e)));
+          });
+        }
+      );
     });
 
     it('fetches all assets with tickers by ticker=*', async done => {
