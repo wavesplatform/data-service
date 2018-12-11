@@ -73,10 +73,10 @@ describe('monoid', () => {
     it('should return weighted average price of candles monoid', () => {
       expect(
         weightedAveragePriceMonoid.concat(
-          { weighted_average_price: BigNumber(2), volume: BigNumber(3) },
-          { weighted_average_price: BigNumber(3), volume: BigNumber(2) }
+          { quote_volume: BigNumber(2), volume: BigNumber(3) },
+          { quote_volume: BigNumber(3), volume: BigNumber(2) }
         )
-      ).toEqual(BigNumber(2.4));
+      ).toEqual(BigNumber(1));
     });
   });
 
