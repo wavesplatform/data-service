@@ -3,8 +3,19 @@ const createService = require('../../services/pairs');
 const createManyMiddleware = require('../_common/many');
 
 const { parseArrayQuery } = require('../utils/parseArrayQuery');
+const { parseFilterValues } = require('../_common/filters');
 
-const { map, split, zipObj, compose } = require('ramda');
+const { defaultLimit } = require('../../services/pairs/schema');
+
+const {
+  map,
+  split,
+  zipObj,
+  compose,
+  defaultTo,
+  ifElse,
+  has,
+} = require('ramda');
 
 /**
  * @typedef {object} PairRequest
@@ -30,12 +41,21 @@ const parsePairs = map(
  */
 const pairsMany = createManyMiddleware(
   {
-    filterParsers: {
-      pairs: compose(
-        parsePairs,
-        parseArrayQuery
-      ),
-    },
+    parseFiltersFn: ifElse(
+      has('pairs'),
+      parseFilterValues({
+        pairs: compose(
+          parsePairs,
+          parseArrayQuery
+        ),
+      }),
+      parseFilterValues({
+        limit: compose(
+          parseInt,
+          defaultTo(defaultLimit)
+        ),
+      })
+    ),
     mgetFilterName: 'pairs',
   },
   '/pairs',

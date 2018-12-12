@@ -1,4 +1,3 @@
 module.exports = {
-  pg: require('./pg'),
-  redis: require('./redis'),
+  pg: require('./pg')
 };
