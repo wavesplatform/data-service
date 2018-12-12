@@ -7,7 +7,6 @@ const loadConfig = () => {
   checkEnv(['PGHOST', 'PGDATABASE', 'PGUSER', 'PGPASSWORD']);
 
   return {
-    port: parseInt(process.env.PORT) || 3000,
     postgresHost: process.env.PGHOST,
     postgresPort: parseInt(process.env.PGPORT) || 5432,
     postgresDatabase: process.env.PGDATABASE,
@@ -17,8 +16,8 @@ const loadConfig = () => {
 
     logLevel: process.env.LOG_LEVEL || 'info',
 
-    candlesUpdateInterval: process.env.CANDLES_UPDATE_INTERVAL_MS || 2500,
-    candlesUpdateTimeout: process.env.CANDLES_UPDATE_TIMEOUT_MS || 20000,
+    candlesUpdateInterval: process.env.CANDLES_UPDATE_INTERVAL || 2500,
+    candlesUpdateTimeout: process.env.CANDLES_UPDATE_TIMEOUT || 20000,
     candlesTruncateTable: process.env.RECALCULATE_ALL_CANDLES_ON_START || true,
     candlesTableName: process.env.CANDLES_TABLE_NAME || 'candles',
   };
