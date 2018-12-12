@@ -82,18 +82,23 @@ describe('monoid', () => {
 
   describe('candle', () => {
     it('should return two concated candle monoids', () => {
-      expect(candleMonoid.concat(oneDayCandles[0], oneDayCandles[0])).toMatchObject({
+      const monoid = candleMonoid.concat(oneDayCandles[0], oneDayCandles[0]);
+      expect(monoid).toMatchObject({
         time_start: '2018-11-15T14:03:00.000Z',
-        open: BigNumber(0.01),
-        close: BigNumber(0.0001),
-        low: BigNumber(1e-8),
-        high: BigNumber(0.01),
-        volume: BigNumber(5684),
-        quote_volume: BigNumber(6.6000884),
-        weighted_average_price: BigNumber(0.0011),
         max_height: 377979,
         txs_count: 40,
       });
+      expect(monoid.open.comparedTo(BigNumber(0.01))).toEqual(0);
+      expect(monoid.close.comparedTo(BigNumber(0.0001))).toEqual(0);
+      expect(monoid.low.comparedTo(BigNumber(1e-8))).toEqual(0);
+      expect(monoid.high.comparedTo(BigNumber(0.01))).toEqual(0);
+      expect(monoid.volume.comparedTo(BigNumber(5684))).toEqual(0);
+      expect(monoid.quote_volume.comparedTo(BigNumber(6.6000884))).toEqual(0);
+      expect(
+        monoid.weighted_average_price.comparedTo(
+          BigNumber('0.00116116966924700914')
+        )
+      ).toEqual(0);
     });
   });
 });
