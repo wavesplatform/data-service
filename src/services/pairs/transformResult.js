@@ -28,13 +28,11 @@ const transformResultSearch = compose(
   List,
   map(pair =>
     compose(
-      pairObject => {
-        return {
-          ...pairObject,
-          amountAsset: pair.amount_asset_id,
-          priceAsset: pair.price_asset_id,
-        };
-      },
+      pairObject => ({
+        ...pairObject,
+        amountAsset: pair.amount_asset_id,
+        priceAsset: pair.price_asset_id,
+      }),
       Pair,
       pickPairFields,
       renamePairFields
