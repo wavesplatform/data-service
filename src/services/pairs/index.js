@@ -10,14 +10,14 @@ const {
   result: resultSchema,
 } = require('./schema');
 const { transformResult, transformResultSearch } = require('./transformResult');
-const { get: sqlGet, mget: sqlMget, search: sqlSearch } = require('./sql');
+const sql = require('./sql');
 const matchRequestResult = require('./matchRequestResult');
 
 module.exports = ({ drivers, emitEvent }) => {
   return {
     get: getById({
       name: 'pairs.get',
-      sql: sqlGet,
+      sql: sql.get,
       inputSchema: inputGet,
       resultSchema,
       transformResult: transformResult,
@@ -25,7 +25,7 @@ module.exports = ({ drivers, emitEvent }) => {
     })({ pg: drivers.pg, emitEvent }),
     mget: mgetByIds({
       name: 'pairs.mget',
-      sql: sqlMget,
+      sql: sql.mget,
       inputSchema: inputMget,
       resultSchema,
       transformResult: transformResult,
@@ -34,7 +34,7 @@ module.exports = ({ drivers, emitEvent }) => {
     })({ pg: drivers.pg, emitEvent }),
     search: search({
       name: 'pairs.search',
-      sql: sqlSearch,
+      sql: sql.search,
       inputSchema: inputSearch,
       resultSchema,
       transformResult: transformResultSearch,
