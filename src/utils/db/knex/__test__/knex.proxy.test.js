@@ -1,6 +1,6 @@
 const { where, orWhere, hasMethod, limit } = require('../lib');
 
-const { create: createProxy } = require('../../../test/proxy');
+const { create: createProxy } = require('../../../__test__/proxy');
 
 const knexMock = {
   clone() {
