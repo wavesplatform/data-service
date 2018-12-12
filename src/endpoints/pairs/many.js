@@ -1,21 +1,12 @@
 const createService = require('../../services/pairs');
+const Maybe = require('folktale/maybe');
 
 const createManyMiddleware = require('../_common/many');
 
 const { parseArrayQuery } = require('../utils/parseArrayQuery');
-const { parseFilterValues } = require('../_common/filters');
+const { limit } = require('../_common/filters');
 
-const { defaultLimit } = require('../../services/pairs/schema');
-
-const {
-  map,
-  split,
-  zipObj,
-  compose,
-  defaultTo,
-  ifElse,
-  has,
-} = require('ramda');
+const { map, split, zipObj, compose } = require('ramda');
 
 /**
  * @typedef {object} PairRequest
@@ -41,21 +32,16 @@ const parsePairs = map(
  */
 const pairsMany = createManyMiddleware(
   {
-    parseFiltersFn: ifElse(
-      has('pairs'),
-      parseFilterValues({
-        pairs: compose(
-          parsePairs,
+    filterParsers: {
+      pairs: x =>
+        compose(
+          m => m.getOrElse(null),
+          map(parsePairs),
+          Maybe.fromNullable,
           parseArrayQuery
-        ),
-      }),
-      parseFilterValues({
-        limit: compose(
-          parseInt,
-          defaultTo(defaultLimit)
-        ),
-      })
-    ),
+        )(x),
+      limit,
+    },
     mgetFilterName: 'pairs',
   },
   '/pairs',

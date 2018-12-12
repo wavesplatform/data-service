@@ -1,6 +1,6 @@
 const Joi = require('../../utils/validation/joi');
 
-const defaultLimit = 1000;
+const limitMaximum = 1000;
 
 const inputGet = Joi.object().keys({
   amountAsset: Joi.string()
@@ -16,8 +16,7 @@ const inputMget = Joi.array().items(inputGet);
 const inputSearch = Joi.object().keys({
   limit: Joi.number()
     .min(1)
-    .max(defaultLimit)
-    .required(),
+    .max(limitMaximum)
 });
 
 const result = Joi.object().keys({
@@ -42,4 +41,4 @@ const result = Joi.object().keys({
     .allow(null),
 });
 
-module.exports = { inputGet, inputMget, inputSearch, result, defaultLimit };
+module.exports = { inputGet, inputMget, inputSearch, result };
