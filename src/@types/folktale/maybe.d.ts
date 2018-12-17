@@ -3,7 +3,7 @@ declare module 'folktale/maybe' {
 
   export type MaybePattern<A, B> = {
     Nothing: () => B;
-    Just: (a: A) => B;
+    Just: (a: { value: A }) => B;
   };
 
   export interface Maybe<A> extends Matchable {

@@ -2,8 +2,8 @@ declare module 'folktale/result' {
   import { Matchable, Semigroup } from 'folktale';
 
   export type ResultPattern<A, B, C> = {
-    Error: (a: A) => C;
-    Ok: (b: B) => C;
+    Error: (a: { value: A }) => C;
+    Ok: (b: { value: B }) => C;
   };
 
   export interface Result<A, B> extends Matchable {

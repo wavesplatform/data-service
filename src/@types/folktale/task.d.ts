@@ -3,8 +3,8 @@ declare module 'folktale/concurrency/task' {
 
   export type TaskPattern<A, B, C> = {
     Cancelled: () => C;
-    Rejected: (a: A) => C;
-    Resolved: (b: B) => C;
+    Rejected: (a: { value: A }) => C;
+    Resolved: (b: { value: B }) => C;
   };
 
   export interface TaskExecution<A, B> {
@@ -42,7 +42,8 @@ declare module 'folktale/concurrency/task' {
     or<C, D>(t: Task<C, D>): Task<A | C, B | D>;
 
     map<C>(f: (b: B) => C): Task<A, C>;
-    chain<C>(f: (b: B) => Task<A, C>): Task<A, C>;
+    // chain<C>(f: (b: B) => Task<A, C>): Task<A, C>;
+    chain<C, D>(f: (b: B) => Task<C, D>): Task<C, D>;
     mapRejected<C>(f: (a: A) => C): Task<C, B>;
     // checks if the current applicative contains an appropriate function
     // @todo consider using `never` instead
@@ -59,7 +60,7 @@ declare module 'folktale/concurrency/task' {
 
   export const task: <A, B>(computation: Computation<A, B>) => Task<A, B>;
   export const of: <A, B>(value: B) => Task<A, B>;
-  export const rejected: <A, B>(reason: B) => Task<A, B>;
+  export const rejected: <A, B>(reason: A) => Task<A, B>;
 
   function waitAny<A1, B1>(ts: [Task<A1, B1>]): Task<A1, [B1]>;
   function waitAny<A1, B1, A2, B2>(
