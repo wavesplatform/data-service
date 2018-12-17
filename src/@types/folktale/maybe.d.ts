@@ -1,9 +1,5 @@
 declare module 'folktale/maybe' {
-  import { Matchable } from 'folktale';
-
-  interface Semigroup<A> {
-    concat(a: A): A;
-  }
+  import { Matchable, Semigroup } from 'folktale';
 
   export type MaybePattern<A, B> = {
     Nothing: () => B;
@@ -27,13 +23,12 @@ declare module 'folktale/maybe' {
     orElse(f: () => Maybe<A>): Maybe<A>;
     or(m: Maybe<A>): Maybe<A>;
 
-    // @todo test
-    concat(m: Maybe<A>): A extends Semigroup<A> ? Maybe<A> : unknown;
+    concat(m: Maybe<A>): A extends Semigroup<any> ? Maybe<A> : unknown;
 
     fold<B>(l: () => B, r: (a: A) => B): B;
 
-    // @todo test
     filter<B extends A>(pred: (a: A) => a is B): Maybe<B>;
+    filter(pred: (a: A) => boolean): Maybe<A>;
   }
 
   export const of: <A>(value: A) => Maybe<A>;

@@ -17,9 +17,7 @@ declare module 'folktale/concurrency/task' {
       onResolved?: (b: B) => void;
     }): void;
 
-    link<C, D>(other: TaskExecution<C, D>): TaskExecution<C, D>;
-
-    c: ThisType<number>;
+    link<C, D>(other: TaskExecution<C, D>): TaskExecution<A, B>;
   }
 
   export type Computation<A, B> = (
@@ -33,21 +31,13 @@ declare module 'folktale/concurrency/task' {
     }
   ) => void;
 
-  interface TaskConstructor {
-    new <A, B>(computation: Computation<A, B>): Task<A, B>;
-    of<A, B>(value: B): Task<A, B>;
-    rejected<A, B>(reason: B): Task<A, B>;
-  }
-
   export interface Task<A, B> extends Matchable {
     // pattern matching
     // general
     matchWith<C>(pattern: TaskPattern<A, B, C>): C;
-    // type-specific
+    // task-specific
     willMatchWith<C, D>(pattern: TaskPattern<A, B, Task<C, D>>): Task<C, D>;
 
-    // combining tasks
-    // and<C, D>(t: Task<C, D>): Task<A | C, [B, D]>;
     and<C, D>(t: Task<C, D>): Task<A | C, [B, D]>;
     or<C, D>(t: Task<C, D>): Task<A | C, B | D>;
 
@@ -67,11 +57,10 @@ declare module 'folktale/concurrency/task' {
     run(): TaskExecution<A, B>;
   }
 
-  export const of: TaskConstructor['of'];
-  export const rejected: TaskConstructor['rejected'];
   export const task: <A, B>(computation: Computation<A, B>) => Task<A, B>;
+  export const of: <A, B>(value: B) => Task<A, B>;
+  export const rejected: <A, B>(reason: B) => Task<A, B>;
 
-  // one error parameter
   function waitAny<A1, B1>(ts: [Task<A1, B1>]): Task<A1, [B1]>;
   function waitAny<A1, B1, A2, B2>(
     ts: [Task<A1, B1>, Task<A2, B2>]
@@ -84,7 +73,6 @@ declare module 'folktale/concurrency/task' {
   ): Task<A1 | A2 | A3 | A4, B1 | B2 | B3 | B4>;
   export function waitAny<E, V>(ts: Task<E, V>[]): Task<E, V[]>;
 
-  // all errors parameters
   function waitAll<A1, B1>(ts: [Task<A1, B1>]): Task<A1, [B1]>;
   function waitAll<A1, B1, A2, B2>(
     ts: [Task<A1, B1>, Task<A2, B2>]
