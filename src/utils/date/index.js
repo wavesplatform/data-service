@@ -14,48 +14,40 @@ const roundTo = curry((direction, interval, date) => {
       break;
   }
 
-  let newDate;
+  let newDate = new Date(date);
   if (interval.unit == 'Y') {
-    newDate = new Date(date);
-    newDate = new Date(
-      newDate.setMonth(
-        roundFn(newDate.getMonth() / 12) *
-        12
-      )
-    );
+    newDate.setMonth(roundFn(newDate.getMonth() / 12) * 12);
   } else if (interval.unit == 'M') {
     const d = daysInMonth(date.getFullYear(), date.getMonth()) - 1;
-    newDate = new Date(date);
-    newDate = new Date(newDate.setUTCDate(roundFn((date.getUTCDate() - 1) / d) * d + 1));
+    newDate.setUTCDate(roundFn((date.getUTCDate() - 1) / d) * d + 1);
   } else {
     newDate = new Date(
       roundFn(date.getTime() / interval.length) * interval.length
     );
   }
-  const cleaning = ['Y', 'M', 'd', 'h', 'm', 's'];
 
-  if (cleaning.indexOf(interval.unit) <= cleaning.indexOf('Y')) {
+  const unitBiggerThan = u => {
+    const units = ['Y', 'M', 'd', 'h', 'm', 's'];
+    return units.indexOf(interval.unit) <= units.indexOf(u);
+  };
+
+  if (unitBiggerThan('Y')) {
     newDate.setUTCMonth(0);
   }
-
-  if (cleaning.indexOf(interval.unit) <= cleaning.indexOf('M')) {
+  if (unitBiggerThan('M')) {
     newDate.setUTCDate(1);
   }
-  
-  if (cleaning.indexOf(interval.unit) <= cleaning.indexOf('d')) {
+  if (unitBiggerThan('d')) {
     newDate.setUTCHours(0);
   }
-  
-  if (cleaning.indexOf(interval.unit) <= cleaning.indexOf('h')) {
+  if (unitBiggerThan('h')) {
     newDate.setUTCMinutes(0);
   }
-
-  if (cleaning.indexOf(interval.unit) <= cleaning.indexOf('m')) {
+  if (unitBiggerThan('m')) {
     newDate.setUTCSeconds(0);
   }
-
   newDate.setUTCMilliseconds(0);
-  
+
   return newDate;
 });
 
@@ -88,5 +80,4 @@ module.exports = {
   add,
   subtract,
   trunc,
-  daysInMonth,
 };
