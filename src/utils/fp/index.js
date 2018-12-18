@@ -1,6 +1,6 @@
 module.exports = {
   resultToTask: require('./resultToTask'),
-  swapMaybeF: require('./swapMaybeF'),
-  liftInnerMaybe: require('./liftInnerMaybe'),
+  swapMaybeF: require('./swapMaybeF').swapMaybeF,
+  liftInnerMaybe: require('./liftInnerMaybe').liftInnerMaybe,
   concatAll: require('./concatAll'),
 };
