@@ -15,21 +15,18 @@ const roundTo = curry((direction, interval, date) => {
   }
 
   let newDate;
-  const roundBound = {
-    Y: 12,
-  };
   if (interval.unit == 'Y') {
     newDate = new Date(date);
     newDate = new Date(
       newDate.setMonth(
-        roundFn(newDate.getMonth() / roundBound[interval.unit]) *
-          roundBound[interval.unit]
+        roundFn(newDate.getMonth() / 12) *
+        12
       )
     );
   } else if (interval.unit == 'M') {
-    const d = daysInMonth(date.getFullYear(), date.getMonth());
+    const d = daysInMonth(date.getFullYear(), date.getMonth()) - 1;
     newDate = new Date(date);
-    newDate = new Date(newDate.setUTCDate(roundFn(date.getUTCDate() / d) * d + 1));
+    newDate = new Date(newDate.setUTCDate(roundFn((date.getUTCDate() - 1) / d) * d + 1));
   } else {
     newDate = new Date(
       roundFn(date.getTime() / interval.length) * interval.length
