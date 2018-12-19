@@ -51,6 +51,7 @@ export abstract class AppError implements Matchable {
 }
 
 export class ResolverError extends AppError {
+  public readonly type: string = 'ResolverError';
   private readonly errorInfo: ErrorInfo;
 
   constructor(error: Error | string, meta?: ErrorMetaInfo) {
@@ -64,6 +65,7 @@ export class ResolverError extends AppError {
 }
 
 export class DbError extends AppError {
+  public readonly type: string = 'DbError';
   private readonly errorInfo: ErrorInfo;
 
   constructor(error: Error | string, meta?: ErrorMetaInfo) {
@@ -77,6 +79,7 @@ export class DbError extends AppError {
 }
 
 export class ValidationError extends AppError {
+  public readonly type: string = 'ValidationError';
   private readonly errorInfo: ErrorInfo;
 
   constructor(error: Error | string, meta?: ErrorMetaInfo) {
