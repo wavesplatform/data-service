@@ -37,8 +37,13 @@ describe('Pairs', () => {
 
       expect(result.data).toHaveProperty('firstPrice', pair.first_price);
       expect(result.data).toHaveProperty('lastPrice', pair.last_price);
+      expect(result.data).toHaveProperty('low', pair.low);
+      expect(result.data).toHaveProperty('high', pair.high);
       expect(result.data).toHaveProperty('volume', pair.volume);
+      expect(result.data).toHaveProperty('quoteVolume', pair.quote_volume);
       expect(result.data).toHaveProperty('volumeWaves', pair.volume_waves);
+      expect(result.data).toHaveProperty('weightedAveragePrice', pair.weighted_average_price);
+      expect(result.data).toHaveProperty('txsCount', pair.txs_count);
     });
 
     it('should return null for non existing pair', done => {
