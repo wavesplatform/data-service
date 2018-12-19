@@ -10,7 +10,7 @@ declare module 'folktale/result' {
     matchWith<C>(pattern: ResultPattern<A, B, C>): C;
 
     map<C>(f: (b: B) => C): Result<A, C>;
-    chain<C>(f: (b: B) => Result<A, C>): Result<A, C>;
+    chain<C, D>(f: (b: B) => Result<C, D>): Result<A | C, D>;
     mapError<C>(f: (a: A) => C): Result<C, B>;
     // checks if the current applicative contains an appropriate function
     // @todo consider using `never` instead
@@ -20,7 +20,7 @@ declare module 'folktale/result' {
     bimap<C, D>(lf: (a: A) => C, rf: (b: B) => D): Result<C, D>;
 
     // extracting values
-    getOrElse(b1: B): B;
+    getOrElse<C>(c: C): B | C;
     unsafeGet(): B;
 
     orElse<C, D>(f: (a: A) => Result<C, D>): Result<C, D>;

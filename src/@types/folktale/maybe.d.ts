@@ -17,7 +17,7 @@ declare module 'folktale/maybe' {
     apply<B>(f: Maybe<B>): A extends (b: B) => infer R ? Maybe<R> : unknown;
 
     // extracting values
-    getOrElse(a1: A): A;
+    getOrElse<B>(b: B): A | B;
     unsafeGet(): A;
 
     orElse(f: () => Maybe<A>): Maybe<A>;

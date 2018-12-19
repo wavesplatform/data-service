@@ -43,7 +43,7 @@ declare module 'folktale/concurrency/task' {
 
     map<C>(f: (b: B) => C): Task<A, C>;
     // chain<C>(f: (b: B) => Task<A, C>): Task<A, C>;
-    chain<C, D>(f: (b: B) => Task<C, D>): Task<C, D>;
+    chain<C, D>(f: (b: B) => Task<C, D>): Task<A | C, D>;
     mapRejected<C>(f: (a: A) => C): Task<C, B>;
     // checks if the current applicative contains an appropriate function
     // @todo consider using `never` instead

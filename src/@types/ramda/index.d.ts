@@ -88,5 +88,12 @@ declare module 'ramda' {
     chain<E, T, U>(
       fn: (value: T) => Task<E, U>
     ): (task: Task<E, T>) => Task<E, U>;
+
+    // // corrected traverse sig
+    traverse<A, U, R>(
+      of: (a: any) => any, // applicative type constructor
+      fn: (a: A) => U, // U — applicative
+      list: ReadonlyArray<A>
+    ): R;
   }
 }
