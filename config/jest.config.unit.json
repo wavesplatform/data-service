@@ -4,9 +4,8 @@
   },
   "verbose": true,
   "forceExit": true,
-  "rootDir": "../",
+  "rootDir": "../src",
   "testMatch": ["**/*.test.js", "**/*.test.ts"],
   "testURL": "http://localhost/",
-  "moduleFileExtensions": ["js", "ts", "json", "node"],
-  "moduleDirectories": ["node_modules", "src"]
+  "moduleFileExtensions": ["js", "ts", "json", "node"]
 }

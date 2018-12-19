@@ -6,7 +6,7 @@ import {
   ResolverError,
   DbError,
   AppError,
-} from 'errorHandling';
+} from '../../../errorHandling/';
 
 // @todo type DbDriver
 export type DbDriver = any;

@@ -13,5 +13,11 @@
     "noUnusedLocals": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "./src/typings"]
+  "exclude": [
+    "node_modules",
+    "**/__test__/**/*.ts",
+    "**/*.test.ts",
+    "**/*.test.int.ts",
+    "**/*.test.int.testnet.ts"
+  ]
 }

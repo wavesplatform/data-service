@@ -1,8 +1,7 @@
 import { of as maybeOf } from 'folktale/maybe';
 import { of as resultOf } from 'folktale/result';
 import { of as taskOf, waitAll } from 'folktale/concurrency/task';
-
-const swapMaybeF = require('./');
+import { swapMaybeF } from '.';
 
 test('swapMaybeF with Result as F', () => {
   const a = maybeOf(resultOf(1));

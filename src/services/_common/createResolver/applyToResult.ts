@@ -1,6 +1,6 @@
 import { Maybe } from 'folktale/maybe';
 import { of as resultOf, Result } from 'folktale/result';
-import { liftInnerMaybe } from 'utils/fp/liftInnerMaybe';
+import { liftInnerMaybe } from '../../../utils/fp/';
 import { traverse } from 'ramda';
 
 export namespace applyValidation {

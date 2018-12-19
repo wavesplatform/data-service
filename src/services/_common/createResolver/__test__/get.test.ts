@@ -2,7 +2,11 @@ import { of as taskOf } from 'folktale/concurrency/task';
 import { of as maybeOf, Maybe } from 'folktale/maybe';
 import { Ok, Error as error, Result } from 'folktale/result';
 import { identity } from 'ramda';
-import { AppError, ValidationError, ResolverError } from 'errorHandling';
+import {
+  AppError,
+  ValidationError,
+  ResolverError,
+} from '../../../../errorHandling/';
 
 import { get } from '../';
 

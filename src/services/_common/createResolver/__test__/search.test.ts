@@ -6,7 +6,7 @@ import {
   ValidationError,
   ResolverError,
   DbError,
-} from 'errorHandling';
+} from '../../../../errorHandling/';
 
 import { search } from '..';
 import { Validate } from '../types';

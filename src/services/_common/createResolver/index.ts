@@ -4,9 +4,9 @@ import { Maybe } from 'folktale/maybe';
 // @hack because of ramda 'tap' not working with null values
 // https://github.com/ramda/ramda/issues/2421
 // @todo refactor after ramda fix
-import { tap } from 'utils/tap';
+import { tap } from '../../../utils/tap';
 
-import { resultToTask } from 'utils/fp/resultToTask';
+import { resultToTask } from '../../../utils/fp/';
 
 import { applyValidation } from './applyToResult';
 export { applyTransformation } from './applyToResult';
@@ -16,7 +16,7 @@ import {
   ResolverError,
   DbError,
   AppError,
-} from 'errorHandling';
+} from '../../../errorHandling/';
 
 import {
   EmitEvent,

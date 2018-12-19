@@ -7,7 +7,7 @@ import {
   ValidationError,
   ResolverError,
   DbError,
-} from 'errorHandling';
+} from '../../../../errorHandling/';
 
 import { mget } from '..';
 import { Validate } from '../types';

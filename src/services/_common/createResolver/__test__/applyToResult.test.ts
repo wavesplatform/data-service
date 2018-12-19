@@ -1,11 +1,8 @@
-import { AppError } from 'errorHandling/AppError';
+import { AppError } from '../../../../errorHandling/';
 import { of as maybeOf, empty, Maybe } from 'folktale/maybe';
 import { Ok, Error /* Result */ } from 'folktale/result';
 
-import {
-  applyValidation,
-  applyTransformation,
-} from 'services/_common/createResolver/applyToResult';
+import { applyValidation, applyTransformation } from '../applyToResult';
 
 describe('Application of functions to db results', () => {
   describe('validation', () => {

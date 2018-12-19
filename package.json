@@ -19,7 +19,7 @@
     "test": "npm run test:u && npm run test:i",
     "test:t": "npm run test:u && npm run test:it",
     "test:u": "jest --config=config/jest.config.unit.json",
-    "test:i": "export $(cat variables.stage.env | xargs) && jest --config=config/jest.config.integration.json",
+    "test:i": "export $(cat variables.env | xargs) && jest --config=config/jest.config.integration.json",
     "test:it": "export $(cat variables.testnet.env | xargs) && jest --config=config/jest.config.integration.testnet.json"
   },
   "devDependencies": {
