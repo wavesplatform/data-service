@@ -1,8 +1,10 @@
 const createService = require('../../services/pairs');
+const Maybe = require('folktale/maybe');
 
 const createManyMiddleware = require('../_common/many');
 
 const { parseArrayQuery } = require('../utils/parseArrayQuery');
+const { limit } = require('../_common/filters');
 
 const { map, split, zipObj, compose } = require('ramda');
 
@@ -31,10 +33,14 @@ const parsePairs = map(
 const pairsMany = createManyMiddleware(
   {
     filterParsers: {
-      pairs: compose(
-        parsePairs,
-        parseArrayQuery
-      ),
+      pairs: x =>
+        compose(
+          m => m.getOrElse(null),
+          map(parsePairs),
+          Maybe.fromNullable,
+          parseArrayQuery
+        )(x),
+      limit,
     },
     mgetFilterName: 'pairs',
   },

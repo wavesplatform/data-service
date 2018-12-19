@@ -24,4 +24,8 @@ describe('sql query from pairs', () => {
       ])
     ).toMatchSnapshot();
   });
+
+  it('should search pairs', () => {
+    expect(sql.search({ limit: 1 })).toMatchSnapshot();
+  });
 });

@@ -24,20 +24,17 @@ It is possible to create your own instance of this service. To do so, follow the
 #### Installation and start
 
 The service uses following environment variables:
-```bash
-# server starts at localhost:PORT
-PORT=<xxxx -- optional -- default 3000>
 
-# standart postgres env vars
-PGHOST=<hostname.com -- required>
-PGPORT=<xxxx -- optional -- default 5432>
-PGDATABASE=<mainnet -- required>
-PGUSER=<myuser -- required>
-PGPASSWORD=<password -- required>
-
-# postgres connection pool size
-PGPOOLSIZE=<xx -- optional -- default 20>
-```
+|Env variable|Default|Required|Description|
+|------------|-------|--------|-----------|
+|`PORT`|3000|NO|HTTP service port|
+|`PGHOST`||YES|Postgres host address|
+|`PGPORT`|`5432`|NO|Postgres port|
+|`PGDATABASE`||YES|Postgres database name|
+|`PGUSER`||YES|Postgres user name|
+|`PGPASSWORD`||YES|Postgres password|
+|`PGPOOLSIZE`|`20`|NO|Postgres pool size|
+|`LOG_LEVEL`|`info`|NO|Log level `['info','warn','error']`|
 
 `PGPOOLSIZE` is used by the `pg-pool` library to determine Postgres connection pool size per NodeJS process instance. A good value depends on your server and db configuration and can be found empirically. You can leave it at the default value to start with.
 
@@ -72,6 +69,12 @@ When using the container in production, we recommend establishing a Docker loggi
 Server will start at `localhost:PORT` (defaults to 3000). Logs will be directed to stdout.
     
 If you decide to use NodeJS directly (without Docker), we recommend using a process manager, such as `pm2`.
+
+
+#### Daemons
+To add candles and pairs functionality the following Docker daemons must be used:
+- Candles — calculate candles for exchange transactions (see [description](https://hub.docker.com/r/wavesplatform/data-service-candles/))
+- Pairs — calculate last pairs for 24h exchange transactions (see [description](https://hub.docker.com/r/wavesplatform/data-service-pairs/))
 
 
 #### General recommendations

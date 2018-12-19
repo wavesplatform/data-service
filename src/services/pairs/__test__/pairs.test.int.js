@@ -4,6 +4,7 @@ const loadConfig = require('../../../loadConfig');
 const options = loadConfig();
 const pgDriver = createPgDriver(options);
 const create = require('../index');
+const { BigNumber } = require('@waves/data-entities');
 let pair;
 
 describe('Pairs', () => {
@@ -36,8 +37,13 @@ describe('Pairs', () => {
 
       expect(result.data).toHaveProperty('firstPrice', pair.first_price);
       expect(result.data).toHaveProperty('lastPrice', pair.last_price);
+      expect(result.data).toHaveProperty('low', pair.low);
+      expect(result.data).toHaveProperty('high', pair.high);
       expect(result.data).toHaveProperty('volume', pair.volume);
+      expect(result.data).toHaveProperty('quoteVolume', pair.quote_volume);
       expect(result.data).toHaveProperty('volumeWaves', pair.volume_waves);
+      expect(result.data).toHaveProperty('weightedAveragePrice', pair.weighted_average_price);
+      expect(result.data).toHaveProperty('txsCount', pair.txs_count);
     });
 
     it('should return null for non existing pair', done => {
@@ -97,6 +103,26 @@ describe('Pairs', () => {
             done();
           },
         });
+    });
+  });
+
+  describe('search pairs', () => {
+    it('should return Pairs correctly', async () => {
+      const result = await service
+        .search({
+          limit: 2
+        })
+        .run()
+        .promise();
+
+      result.data.forEach(pair => {
+        expect(typeof pair.amountAsset).toBe('string');
+        expect(typeof pair.priceAsset).toBe('string');
+        expect(pair.data.firstPrice).toBeInstanceOf(BigNumber);
+        expect(pair.data.lastPrice).toBeInstanceOf(BigNumber);
+        expect(pair.data.volume).toBeInstanceOf(BigNumber);
+        expect(pair.data.volumeWaves).toBeInstanceOf(BigNumber);
+      });
     });
   });
 });

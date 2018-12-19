@@ -14,6 +14,7 @@ const customJoi = Joi.extend(joi => ({
       },
       divisibleByLeftBound: 'must be divisible by left bound in {{bounds}}',
       limit: '{{candlesCount}} of candles is more then allowed of {{limit}}',
+      allow: 'must be one of {{allowed}} interval',
     },
   },
   rules: [
@@ -23,6 +24,7 @@ const customJoi = Joi.extend(joi => ({
         options: joi.object().keys({
           divisibleByLeftBound: joi.array().items(joi.string()),
           limit: joi.number().integer(),
+          allow: joi.array().items(joi.string()),
         }),
       },
       validate(params, value, state, options) {
@@ -88,7 +90,7 @@ const customJoi = Joi.extend(joi => ({
           for (let bound of params.options.divisibleByLeftBound) {
             const boundInterval = Interval(bound);
             if (
-              valueInterval.length > boundInterval.length &&
+              valueInterval.length >= boundInterval.length &&
               valueInterval.div(boundInterval) % 1 !== 0
             ) {
               return this.createError(
@@ -120,6 +122,20 @@ const customJoi = Joi.extend(joi => ({
           }
         }
 
+        if (params.options.allow) {
+          if (params.options.allow.indexOf(value.interval) === -1) {
+            return this.createError(
+              'object.period.allow',
+              {
+                value,
+                allowed: params.options.allow,
+              },
+              state,
+              options
+            );
+          }
+        }
+
         return value;
       },
     },
@@ -137,8 +153,8 @@ const inputSearch = Joi.object()
     params: customJoi
       .object()
       .period({
-        divisibleByLeftBound: ['1d', '1h', '1m'],
         limit: 1440,
+        allow: ['1d', '12h', '6h', '3h', '1h', '30m', '15m', '5m', '1m'],
       })
       .required(),
   })
@@ -179,7 +195,7 @@ const output = Joi.object().keys({
   txs_count: Joi.number().required(),
   interval_in_secs: Joi.number()
     .integer()
-    .valid([60, 300, 900, 1800, 3600, 86400]) // 1min, 5min, 15min, 30min, 1hour, 1day
+    .valid([60, 300, 900, 1800, 3600, 10800, 21600, 43200, 86400]) // 1min, 5min, 15min, 30min, 1hour, 3hours, 6hours, 12hours, 1day
     .required(),
   a_dec: Joi.number().required(),
   p_dec: Joi.number().required(),

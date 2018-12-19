@@ -18,8 +18,8 @@ const roundTo = curry((direction, interval, date) => {
   if (interval.unit == 'Y') {
     newDate.setMonth(roundFn(newDate.getMonth() / 12) * 12);
   } else if (interval.unit == 'M') {
-    const d = daysInMonth(date.getFullYear(), date.getMonth());
-    newDate.setUTCDate(roundFn(date.getUTCDate() / d) * d + 1);
+    const d = daysInMonth(date.getFullYear(), date.getMonth()) - 1;
+    newDate.setUTCDate(roundFn((date.getUTCDate() - 1) / d) * d + 1);
   } else {
     newDate = new Date(
       roundFn(date.getTime() / interval.length) * interval.length

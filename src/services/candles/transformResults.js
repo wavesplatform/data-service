@@ -57,7 +57,7 @@ const addMissingCandles = curryN(
     for (
       let it = ceil(interval, timeStart);
       it <= end;
-      it = add(interval, it)
+      it = floor(interval, add(interval, it))
     ) {
       const cur = truncToMinutes(it);
 
