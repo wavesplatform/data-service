@@ -36,7 +36,9 @@ const selectPairsCTE = pg
       ),
       high: pg.raw('max(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'),
       low: pg.raw('min(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'),
-      txs_count: pg.raw('count(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))')
+      txs_count: pg.raw(
+        'count(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'
+      ),
     })
       .from({ e: selectExchanges.clone() })
       .innerJoin(
@@ -62,6 +64,7 @@ const selectPairsCTE = pg
     'quote_volume',
     'high',
     'low',
+    'weighted_average_price',
     'txs_count'
   );
 
