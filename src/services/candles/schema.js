@@ -88,7 +88,7 @@ const customJoi = Joi.extend(joi => ({
           for (let bound of params.options.divisibleByLeftBound) {
             const boundInterval = Interval(bound);
             if (
-              valueInterval.length > boundInterval.length &&
+              valueInterval.length >= boundInterval.length &&
               valueInterval.div(boundInterval) % 1 !== 0
             ) {
               return this.createError(
@@ -137,7 +137,7 @@ const inputSearch = Joi.object()
     params: customJoi
       .object()
       .period({
-        divisibleByLeftBound: ['1d', '1h', '1m'],
+        divisibleByLeftBound: ['1d', '12h', '3h', '1h', '1m'],
         limit: 1440,
       })
       .required(),
