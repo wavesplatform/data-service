@@ -25,7 +25,7 @@ const selectPairsCTE = pg
         '(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))::numeric[])[array_length(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))::numeric[], 1)]'
       ),
       volume: pg.raw('sum(e.amount * 10 ^(-a_dec.decimals))'),
-      volume_price: pg.raw(
+      quote_volume: pg.raw(
         'sum(e.amount * 10 ^(-a_dec.decimals) * e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'
       ),
       weighted_average_price: pg.raw(
@@ -33,6 +33,11 @@ const selectPairsCTE = pg
       ),
       volume_waves: pg.raw(
         "case when amount_asset = 'WAVES' then sum(e.amount * 10 ^(-a_dec.decimals)) when price_asset = 'WAVES' then sum(e.amount * 10 ^(-a_dec.decimals) * e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals)) end"
+      ),
+      high: pg.raw('max(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'),
+      low: pg.raw('min(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'),
+      txs_count: pg.raw(
+        'count(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'
       ),
     })
       .from({ e: selectExchanges.clone() })
@@ -55,7 +60,12 @@ const selectPairsCTE = pg
       volume_waves: pg.raw(
         `coalesce(volume_waves, (${selectVolumeWavesFromPairsCTE.toString()}))`
       ),
-    }
+    },
+    'quote_volume',
+    'high',
+    'low',
+    'weighted_average_price',
+    'txs_count'
   );
 
 module.exports = tableName =>
