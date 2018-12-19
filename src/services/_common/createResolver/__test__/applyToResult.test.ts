@@ -3,74 +3,97 @@ import { of as maybeOf, empty, Maybe } from 'folktale/maybe';
 import { Ok, Error /* Result */ } from 'folktale/result';
 
 import {
-  applyToGetResult,
-  applyToMgetResult,
-  applyToSearchResult,
+  applyValidation,
+  applyTransformation,
 } from 'services/_common/createResolver/applyToResult';
 
-const validate = (res: number) =>
-  res === 2
-    ? Ok<AppError, number>(2)
-    : Error<AppError, number>(AppError.Validation('Bad value'));
+describe('Application of functions to db results', () => {
+  describe('validation', () => {
+    const validate = (res: number) =>
+      res === 2
+        ? Ok<AppError, number>(2)
+        : Error<AppError, number>(AppError.Validation('Bad value'));
+    describe('Get', () => {
+      it('valid result', () => {
+        expect(applyValidation.get(validate)(maybeOf(2))).toEqual(
+          Ok<AppError, Maybe<number>>(maybeOf(2))
+        );
+      });
+      it('invalid result', () => {
+        expect(applyValidation.get(validate)(maybeOf(-1))).toEqual(
+          Error<AppError, Maybe<number>>(AppError.Validation('Bad value'))
+        );
+      });
+      it('empty result', () => {
+        expect(applyValidation.get(validate)(empty())).toEqual(
+          Ok<AppError, Maybe<number>>(empty())
+        );
+      });
+    });
 
-describe('Application of function to db results', () => {
-  describe('Get', () => {
-    it('valid result', () => {
-      expect(applyToGetResult(validate)(maybeOf(2))).toEqual(
-        Ok<AppError, Maybe<number>>(maybeOf(2))
-      );
+    describe('Mget', () => {
+      it('valid results', () => {
+        const results = [maybeOf<number>(2), empty<number>()];
+        expect(applyValidation.mget(validate)(results)).toEqual(
+          Ok<AppError, Maybe<number>[]>(results)
+        );
+      });
+      it('invalid results', () => {
+        const results = [empty<number>(), maybeOf<number>(3)];
+        expect(applyValidation.mget(validate)(results)).toEqual(
+          Error<AppError, Maybe<number>[]>(AppError.Validation('Bad value'))
+        );
+      });
+      it('empty results', () => {
+        const results: Maybe<number>[] = [];
+        expect(applyValidation.mget(validate)(results)).toEqual(
+          Ok<AppError, Maybe<number>[]>([])
+        );
+      });
     });
-    it('invalid result', () => {
-      expect(applyToGetResult(validate)(maybeOf(-1))).toEqual(
-        Error<AppError, Maybe<number>>(AppError.Validation('Bad value'))
-      );
-    });
-    it('empty result', () => {
-      expect(applyToGetResult(validate)(empty())).toEqual(
-        Ok<AppError, Maybe<number>>(empty())
-      );
+
+    describe('Search', () => {
+      it('valid results', () => {
+        const results = [2, 2];
+        expect(applyValidation.search(validate)(results)).toEqual(
+          Ok<AppError, number[]>(results)
+        );
+      });
+      it('invalid results', () => {
+        const results = [2, 3];
+        expect(applyValidation.search(validate)(results)).toEqual(
+          Error<AppError, number[]>(AppError.Validation('Bad value'))
+        );
+      });
+      it('empty results', () => {
+        const results: number[] = [];
+        expect(applyValidation.search(validate)(results)).toEqual(
+          Ok<AppError, number[]>([])
+        );
+      });
     });
   });
 
-  describe('Mget', () => {
-    it('valid results', () => {
-      const results = [maybeOf<number>(2), empty<number>()];
-      expect(applyToMgetResult(validate)(results)).toEqual(
-        Ok<AppError, Maybe<number>[]>(results)
-      );
-    });
-    it('invalid results', () => {
-      const results = [empty<number>(), maybeOf<number>(3)];
-      expect(applyToMgetResult(validate)(results)).toEqual(
-        Error<AppError, Maybe<number>[]>(AppError.Validation('Bad value'))
-      );
-    });
-    it('empty results', () => {
-      const results: Maybe<number>[] = [];
-      expect(applyToMgetResult(validate)(results)).toEqual(
-        Ok<AppError, Maybe<number>[]>([])
-      );
-    });
-  });
+  describe('transformation', () => {
+    const transform = (res: number) => res.toString();
 
-  describe('Search', () => {
-    it('valid results', () => {
-      const results = [2, 2];
-      expect(applyToSearchResult(validate)(results)).toEqual(
-        Ok<AppError, number[]>(results)
-      );
+    describe('Get', () => {
+      it('valid result', () => {
+        expect(applyTransformation.get(transform)(maybeOf(2))).toEqual('2');
+      });
+      it('empty result', () => {
+        expect(applyTransformation.get(transform)(empty())).toBeNull();
+      });
     });
-    it('invalid results', () => {
-      const results = [2, 3];
-      expect(applyToSearchResult(validate)(results)).toEqual(
-        Error<AppError, number[]>(AppError.Validation('Bad value'))
-      );
-    });
-    it('empty results', () => {
-      const results: number[] = [];
-      expect(applyToSearchResult(validate)(results)).toEqual(
-        Ok<AppError, number[]>([])
-      );
+    describe('Mget', () => {
+      it('valid result', () => {
+        expect(
+          applyTransformation.mget(transform)([maybeOf(2), empty(), maybeOf(3)])
+        ).toEqual(['2', null, '3']);
+      });
+      it('empty result', () => {
+        expect(applyTransformation.mget(transform)([])).toEqual([]);
+      });
     });
   });
 });
