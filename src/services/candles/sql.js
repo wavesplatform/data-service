@@ -44,6 +44,9 @@ const sql = ({ amountAsset, priceAsset, params }) =>
         '15m',
         '30m',
         '1h',
+        '3h',
+        '6h',
+        '12h',
         '1d',
       ]).length / 1000
     )
