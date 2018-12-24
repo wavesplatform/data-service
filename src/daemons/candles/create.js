@@ -75,7 +75,7 @@ const updateCandlesLoop = (logTask, pg, tableName) => {
           return pgPromiseUpdateCandles(t, startHeight).then(() =>
             t.batch(
               intervalPairs.map(([shorter, longer]) =>
-                t.any(insertOrUpdateCandlesFromHeight(tableName, shorter, longer, startHeight))
+                t.any(insertOrUpdateCandlesFromHeight(tableName, shorter, longer))
               )
             )
           );

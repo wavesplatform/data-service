@@ -135,24 +135,21 @@ const insertOrUpdateCandles = (tableName, candles) => {
   return ';';
 };
 
-/** insertOrUpdateCandlesFromHeight :: (String, Number, Number, Number) -> String query */
+/** insertOrUpdateCandlesFromHeight :: (String, Number, Number) -> String query */
 const insertOrUpdateCandlesFromHeight = (
   tableName,
   shortInterval,
-  longerInterval,
-  startHeight
+  longerInterval
 ) =>
   pg
     .raw(
       `${insertIntoCandlesFromSelect(tableName, function() {
-        this.from(
-          pg(tableName)
-            .select('*')
-            .where('interval_in_secs', shortInterval)
-            .where('max_height', '>=', startHeight)
-            .as('d')
-        )
-          .column(makeCandleCalculateColumns(longerInterval))
+        this.from(tableName)
+          .select(makeCandleCalculateColumns(longerInterval))
+          .where('interval_in_secs', shortInterval)
+          .whereRaw(
+            `time_start >= to_timestamp(floor((extract('epoch' from now()) / ${longerInterval} )) * ${longerInterval})`
+          )
           .groupBy('candle_time', 'amount_asset_id', 'price_asset_id');
       })} on conflict (time_start,amount_asset_id, price_asset_id, interval_in_secs) do update set ${updatedFieldsExcluded}`
     )
