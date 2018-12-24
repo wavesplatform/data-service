@@ -7,7 +7,7 @@ Object {
     Object {
       "__type": "candle",
       "data": Object {
-        "close": "1",
+        "close": "3",
         "high": "12",
         "low": "1",
         "maxHeight": 436933,
@@ -64,7 +64,7 @@ Object {
         "high": "14",
         "low": "2",
         "maxHeight": 435299,
-        "open": "11",
+        "open": "12",
         "quoteVolume": "18080.08",
         "time": 2017-04-03T02:00:00.000Z,
         "txsCount": 166,

@@ -53,6 +53,6 @@ describe('candles daemon sql test', () => {
   });
 
   it('insert or update candles from height', () => {
-    expect(sql.insertOrUpdateCandlesFromHeight('candles', 60, 300, 211).toString()).toMatchSnapshot();
+    expect(sql.insertOrUpdateCandlesFromShortInterval('candles', 60, 300, 211).toString()).toMatchSnapshot();
   });
 });
