@@ -6,8 +6,13 @@ const { List, Pair } = require('../../types');
 const pickPairFields = pick([
   'firstPrice',
   'lastPrice',
+  'low',
+  'high',
+  'weightedAveragePrice',
   'volume',
+  'quoteVolume',
   'volumeWaves',
+  'txsCount'
 ]);
 
 /** renamePairFields :: Object -> Object */
@@ -15,6 +20,9 @@ const renamePairFields = renameKeys({
   first_price: 'firstPrice',
   last_price: 'lastPrice',
   volume_waves: 'volumeWaves',
+  weighted_average_price: 'weightedAveragePrice',
+  quote_volume: 'quoteVolume',
+  txs_count: 'txsCount',
 });
 
 /** transformResult :: Object -> Object */
