@@ -104,7 +104,7 @@ const selectLastExchangeTx = () =>
     .orderBy('height', 'desc')
     .toString();
 
-/** for make complex query with "on conflict (...) update ... without set concrete values" See insertOrUpdateCandles or insertOrUpdateCandlesFromHeight */
+/** for make complex query with "on conflict (...) update ... without set concrete values" See insertOrUpdateCandles or insertOrUpdateCandlesFromShortInterval */
 const updatedFieldsExcluded = [
   'open',
   'close',
@@ -135,8 +135,8 @@ const insertOrUpdateCandles = (tableName, candles) => {
   return ';';
 };
 
-/** insertOrUpdateCandlesFromHeight :: (String, Number, Number) -> String query */
-const insertOrUpdateCandlesFromHeight = (
+/** insertOrUpdateCandlesFromShortInterval :: (String, Number, Number) -> String query */
+const insertOrUpdateCandlesFromShortInterval = (
   tableName,
   shortInterval,
   longerInterval
@@ -211,5 +211,5 @@ module.exports = {
   insertOrUpdateCandles,
   selectLastCandle,
   selectLastExchangeTx,
-  insertOrUpdateCandlesFromHeight,
+  insertOrUpdateCandlesFromShortInterval,
 };

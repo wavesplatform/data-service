@@ -11,7 +11,7 @@ const {
   insertOrUpdateCandles,
   selectLastCandle,
   selectLastExchangeTx,
-  insertOrUpdateCandlesFromHeight,
+  insertOrUpdateCandlesFromShortInterval,
 } = require('./sql/query');
 
 /** for combining candles */
@@ -75,7 +75,7 @@ const updateCandlesLoop = (logTask, pg, tableName) => {
           return pgPromiseUpdateCandles(t, startHeight).then(() =>
             t.batch(
               intervalPairs.map(([shorter, longer]) =>
-                t.any(insertOrUpdateCandlesFromHeight(tableName, shorter, longer))
+                t.any(insertOrUpdateCandlesFromShortInterval(tableName, shorter, longer))
               )
             )
           );
