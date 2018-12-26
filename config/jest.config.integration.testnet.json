@@ -1,5 +1,7 @@
 {
   "verbose": true,
+  "forceExit": true,
   "rootDir": "../",
-  "testMatch": ["**/*.test.int.testnet.js"]
+  "testMatch": ["**/*.test.int.testnet.js"],
+  "testURL": "http://localhost/"
 }

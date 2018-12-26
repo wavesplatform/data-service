@@ -4,4 +4,4 @@ const input = Joi.string()
   .base58()
   .required();
 
-module.exports = { input };
+module.exports = { inputGet: input };

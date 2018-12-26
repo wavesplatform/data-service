@@ -1,0 +1,66 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Assets service get fetches a real asset 1`] = `
+Object {
+  "__type": "asset",
+  "data": Object {
+    "description": "ETLxxx",
+    "height": 238692,
+    "id": "G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH",
+    "name": "ETLxxx",
+    "precision": 8,
+    "quantity": "100000000",
+    "reissuable": false,
+    "sender": "3P7HKYe6HB8eK7uXxrztEYUSzZQyyYRnWHg",
+    "ticker": null,
+    "timestamp": 2016-11-19T19:45:07.045Z,
+  },
+}
+`;
+
+exports[`Assets service mget fetches real assets with nulls for unreal 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "asset",
+      "data": Object {
+        "description": "ETLxxx",
+        "height": 238692,
+        "id": "G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH",
+        "name": "ETLxxx",
+        "precision": 8,
+        "quantity": "100000000",
+        "reissuable": false,
+        "sender": "3P7HKYe6HB8eK7uXxrztEYUSzZQyyYRnWHg",
+        "ticker": null,
+        "timestamp": 2016-11-19T19:45:07.045Z,
+      },
+    },
+    null,
+  ],
+}
+`;
+
+exports[`Assets service search fetches WAVES by ticker 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "asset",
+      "data": Object {
+        "description": "",
+        "height": 0,
+        "id": "WAVES",
+        "name": "Waves",
+        "precision": 8,
+        "quantity": "10000000000000000",
+        "reissuable": false,
+        "sender": "",
+        "ticker": "WAVES",
+        "timestamp": 2016-04-11T18:00:00.000Z,
+      },
+    },
+  ],
+}
+`;

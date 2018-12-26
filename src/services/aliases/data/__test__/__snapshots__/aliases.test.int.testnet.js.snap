@@ -1,0 +1,139 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Aliases request by address should return List(Alias) if requested with showBroken 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
+        "alias": "test-alias",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
+        "alias": "test-alias-2",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
+        "alias": "test-alias-3",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
+        "alias": "test-alias-4",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
+        "alias": "test-alias-5",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
+        "alias": "test-alias-6",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
+        "alias": "test-alias-7",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
+        "alias": "test@test.test",
+      },
+    },
+  ],
+}
+`;
+
+exports[`Aliases request by address should return List(Alias) if requested without showBroken 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
+        "alias": "test-alias",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
+        "alias": "test-alias-2",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
+        "alias": "test-alias-3",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
+        "alias": "test-alias-4",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
+        "alias": "test-alias-5",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
+        "alias": "test-alias-6",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
+        "alias": "test-alias-7",
+      },
+    },
+    Object {
+      "__type": "alias",
+      "data": Object {
+        "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
+        "alias": "test@test.test",
+      },
+    },
+  ],
+}
+`;
+
+exports[`Aliases request by alias should return Alias for one correctly 1`] = `
+Object {
+  "__type": "alias",
+  "data": Object {
+    "address": "3NAkqT9JJHLF7hZyiZ5SncWsW8SQh2duZek",
+    "alias": "test-alias",
+  },
+}
+`;

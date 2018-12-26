@@ -15,7 +15,6 @@ const defaultFactory = type => (errorOrMessage, meta = {}) =>
 
 const AppError = union('AppError', {
   Resolver: defaultFactory('ResolverError'),
-  Router: defaultFactory('RouterError'),
   Db: defaultFactory('DBError'),
   Validation: defaultFactory('ValidationError'),
 });

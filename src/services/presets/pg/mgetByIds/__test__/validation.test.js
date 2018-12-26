@@ -4,12 +4,14 @@ const { always, identity, equals } = require('ramda');
 const Joi = require('joi');
 
 const mgetByIdsPreset = require('..');
+const { inputMget: input } = require('../inputSchema');
 
 const createService = resultSchema =>
   mgetByIdsPreset({
     name: 'some_name',
     sql: identity,
     matchRequestResult: equals,
+    inputSchema: input,
     resultSchema,
     transformResult: identity,
     resultTypeFactory: identity,

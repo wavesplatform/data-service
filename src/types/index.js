@@ -13,8 +13,10 @@ const fromMaybe = curry((Type, mb) =>
 module.exports = {
   Asset: createNamedType('asset'),
   Alias: createNamedType('alias'),
+  Candle: createNamedType('candle'),
   Pair: createNamedType('pair'),
   Transaction: createNamedType('transaction'),
   List: require('./List'),
+  Interval: require('./Interval'),
   fromMaybe,
 };

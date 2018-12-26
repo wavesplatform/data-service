@@ -1,8 +1,9 @@
 const rawJoi = require('joi');
 
 const { BigNumber } = require('@waves/data-entities');
-const Cursor = require('../../resolvers/pagination/cursor');
-const { base58: base58Regex } = require('../regex');
+const Cursor = require('../../services/_common/pagination/cursor');
+const { base58: base58Regex, interval: intervalRegex } = require('../regex');
+const Interval = require('../../types/Interval');
 
 module.exports = rawJoi
   .extend(joi => ({
@@ -10,6 +11,13 @@ module.exports = rawJoi
     name: 'string',
     language: {
       base58: 'must be a valid base58 string',
+      period: {
+        value: 'must be a valid interval value',
+        accept: 'must be in accepted',
+        divisibleBy: 'must be divisible by divider',
+        min: 'must be more then min',
+        max: 'must be less then max',
+      },
     },
     rules: [
       {
@@ -46,6 +54,109 @@ module.exports = rawJoi
             return this.createError('string.cursor', { value }, state, options);
           }
           return value; // Everything is OK
+        },
+      },
+      {
+        name: 'period',
+        validate(_, value, state, options) {
+          if (
+            joi
+              .string()
+              .regex(intervalRegex)
+              .validate(value).error
+          ) {
+            return this.createError(
+              'string.period.value',
+              { value },
+              state,
+              options
+            );
+          }
+
+          return value;
+        },
+      },
+      {
+        name: 'accept',
+        params: {
+          accept: joi.array(),
+        },
+        validate(params, value, state, options) {
+          const interval = Interval(value);
+
+          if (params.accept.indexOf(interval.unit) === -1) {
+            return this.createError(
+              'string.period.accept',
+              { value },
+              state,
+              options
+            );
+          }
+
+          return value;
+        },
+      },
+      {
+        name: 'divisibleBy',
+        params: {
+          divisibleBy: joi.string().regex(intervalRegex),
+        },
+        validate(params, value, state, options) {
+          const interval = Interval(value);
+          const divisibleByInterval = Interval(params.divisibleBy);
+
+          if (interval.div(divisibleByInterval) % 1 !== 0) {
+            return this.createError(
+              'string.period.divisibleBy',
+              { value },
+              state,
+              options
+            );
+          }
+
+          return value;
+        },
+      },
+      {
+        name: 'min',
+        params: {
+          min: joi.string().regex(intervalRegex),
+        },
+        validate(params, value, state, options) {
+          const interval = Interval(value);
+          const minInterval = Interval(params.min);
+
+          if (minInterval.length > interval.length) {
+            return this.createError(
+              'string.period.min',
+              { value },
+              state,
+              options
+            );
+          }
+
+          return value;
+        },
+      },
+      {
+        name: 'max',
+        params: {
+          max: joi.string().regex(intervalRegex),
+        },
+        validate(params, value, state, options) {
+          const interval = Interval(value);
+          const maxInterval = Interval(params.max);
+
+          if (maxInterval.length < interval.length) {
+            return this.createError(
+              'string.period.max',
+              { value },
+              state,
+              options
+            );
+          }
+
+          return value;
         },
       },
     ],

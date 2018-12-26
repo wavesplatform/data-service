@@ -4,14 +4,19 @@ const { always, identity } = require('ramda');
 
 const Joi = require('joi');
 
+const { Transaction } = require('../../../../../types');
+
 const getByIdPreset = require('..');
+const { inputGet: input } = require('../inputSchema');
 
 const createService = resultSchema =>
   getByIdPreset({
     name: 'some_name',
     sql: identity,
+    inputSchema: input,
     resultSchema,
     transformResult: identity,
+    resultTypeFactory: Transaction,
   })({
     pg: { oneOrNone: id => Task.of(Maybe.of(id)) },
     emitEvent: always(identity),

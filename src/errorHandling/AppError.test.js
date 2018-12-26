@@ -1,6 +1,6 @@
 const AppError = require('./AppError');
 
-const errorTypes = ['Resolver', 'Router', 'Db'];
+const errorTypes = ['Resolver', 'Db', 'Validation'];
 
 // spec
 describe('AppError', () => {
