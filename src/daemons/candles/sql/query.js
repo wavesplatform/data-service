@@ -47,7 +47,7 @@ const candleSelectColumns = [
   },
   {
     txs_count: pg.raw(
-      'count(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'
+      'count(e.price)'
     ),
   },
   {
@@ -57,12 +57,12 @@ const candleSelectColumns = [
   },
   {
     open: pg.raw(
-      '(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))::numeric[])[1]'
+      '(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals) ORDER BY e.candle_time)::numeric[])[1]'
     ),
   },
   {
     close: pg.raw(
-      '(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))::numeric[])[array_length(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))::numeric[], 1)]'
+      '(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals) ORDER BY e.candle_time DESC)::numeric[])[1]'
     ),
   },
   {
