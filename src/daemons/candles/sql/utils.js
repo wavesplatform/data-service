@@ -33,9 +33,9 @@ const candlePresets = {
     weighted_average_price: pg.raw(
       '(sum((weighted_average_price * volume)::numeric)::numeric / sum(volume)::numeric)::numeric'
     ),
-    open: pg.raw('(array_agg(open)::numeric[])[1]'),
+    open: pg.raw('(array_agg(open ORDER BY time_start)::numeric[])[1]'),
     close: pg.raw(
-      '(array_agg(close)::numeric[])[array_length(array_agg(close)::numeric[],1)]'
+      '(array_agg(close ORDER BY time_start DESC)::numeric[])[1]'
     ),
   },
 };
