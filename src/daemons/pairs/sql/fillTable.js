@@ -2,7 +2,7 @@ const knex = require('knex');
 const pg = knex({ client: 'pg' });
 
 const selectVolumeWavesFromPairsCTE = pg({ d: 'pairs_cte' })
-  .select({ volume_waves: pg.raw('p.volume * d.weighted_average_price') })
+  .select({ volume_waves: pg.raw(`case when d.amount_asset_id='WAVES' then p.quote_volume / d.weighted_average_price when d.price_asset_id='WAVES' then p.quote_volume * d.weighted_average_price end`) })
   .whereRaw(`(d.amount_asset_id=p.price_asset_id AND d.price_asset_id='WAVES')`)
   .orWhereRaw(
     `(d.price_asset_id=p.price_asset_id AND d.amount_asset_id='WAVES')`
