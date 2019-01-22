@@ -12,6 +12,7 @@ const transformAsset = compose(
     issue_timestamp: 'timestamp',
     total_quantity: 'quantity',
     decimals: 'precision',
+    has_script: 'hasScript'
   }),
   reject(isNil)
 );

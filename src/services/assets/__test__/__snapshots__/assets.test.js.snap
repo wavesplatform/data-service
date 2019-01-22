@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Assets SQL queries tests should build correct get sql query 1`] = `"select * from \\"assets\\" where \\"asset_id\\" in ('123')"`;
+
+exports[`Assets SQL queries tests should build correct mget sql query 1`] = `"select * from \\"assets\\" where \\"asset_id\\" in ('1', '2', '3')"`;
+
+exports[`Assets SQL queries tests should build correct search sql query 1`] = `"select * from \\"assets\\" where \\"ticker\\" is not null"`;
