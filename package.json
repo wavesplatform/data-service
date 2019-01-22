@@ -1,6 +1,10 @@
 {
   "name": "data-service",
+<<<<<<< HEAD
   "version": "0.18.0",
+=======
+  "version": "0.13.4",
+>>>>>>> origin/NOISSUE-hotfix-assets-schema
   "description": "Waves data service",
   "main": "src/index.js",
   "repository": "git@github.com:wavesplatform/data-service.git",
