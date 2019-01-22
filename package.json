@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@koa/cors": "^2.2.1",
-    "@waves/data-entities": "^1.1.0",
+    "@waves/data-entities": "^1.7.0",
     "@waves/json-bigint": "git+https://github.com/wavesplatform/json-bigint.git",
     "bignumber.js": "^7.0.1",
     "chalk": "^2.3.2",

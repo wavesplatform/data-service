@@ -23,6 +23,7 @@ const result = Joi.object().keys({
   issue_timestamp: Joi.object()
     .type(Date)
     .required(),
+  has_script: Joi.boolean().required(),
 });
 
 module.exports = { inputSearch, result };
