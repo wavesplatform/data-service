@@ -24,6 +24,10 @@ const result = Joi.object().keys({
     .type(Date)
     .required(),
   has_script: Joi.boolean().required(),
+  min_sponsored_asset_fee: Joi.object()
+    .bignumber()
+    .required()
+    .allow(null),
 });
 
 module.exports = { inputSearch, result };
