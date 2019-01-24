@@ -13,6 +13,7 @@ const columns = [
   'ticker',
   'issue_timestamp',
   'has_script',
+  'min_sponsored_asset_fee',
 ];
 
 const mget = ids =>
