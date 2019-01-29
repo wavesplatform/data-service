@@ -63,6 +63,7 @@ const transactionsEndpointsConfig = {
     service: issue,
     options: createOptions({
       assetId: identity,
+      script: identity
     }),
   },
   '/transactions/transfer': {
