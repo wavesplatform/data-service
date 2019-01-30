@@ -1,5 +1,5 @@
 const { renameKeys } = require('ramda-adjunct');
-const { compose, reject, isNil } = require('ramda');
+const { compose } = require('ramda');
 const { Asset } = require('@waves/data-entities');
 
 /** transformAssetInfo:: RawAssetInfo -> AssetInfo */
@@ -12,8 +12,9 @@ const transformAsset = compose(
     issue_timestamp: 'timestamp',
     total_quantity: 'quantity',
     decimals: 'precision',
-  }),
-  reject(isNil)
+    has_script: 'hasScript',
+    min_sponsored_asset_fee: 'minSponsoredFee',
+  })
 );
 
 module.exports = transformAsset;

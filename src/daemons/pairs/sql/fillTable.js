@@ -2,14 +2,14 @@ const knex = require('knex');
 const pg = knex({ client: 'pg' });
 
 const selectVolumeWavesFromPairsCTE = pg({ d: 'pairs_cte' })
-  .select({ volume_waves: pg.raw('p.volume * d.weighted_average_price') })
+  .select({ volume_waves: pg.raw(`case when d.amount_asset_id='WAVES' then p.quote_volume / d.weighted_average_price when d.price_asset_id='WAVES' then p.quote_volume * d.weighted_average_price end`) })
   .whereRaw(`(d.amount_asset_id=p.price_asset_id AND d.price_asset_id='WAVES')`)
   .orWhereRaw(
     `(d.price_asset_id=p.price_asset_id AND d.amount_asset_id='WAVES')`
   );
 
 const selectExchanges = pg('txs_7')
-  .select(['price_asset', 'amount_asset', 'amount', 'price'])
+  .select(['price_asset', 'amount_asset', 'amount', 'price', 'time_stamp'])
   .whereRaw(`time_stamp >= now() - interval '1 day'`)
   .orderBy('time_stamp', 'desc');
 
@@ -19,10 +19,10 @@ const selectPairsCTE = pg
       amount_asset_id: 'amount_asset',
       price_asset_id: 'price_asset',
       last_price: pg.raw(
-        '(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))::numeric[])[1]'
+        '(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals) ORDER BY e.time_stamp DESC)::numeric[])[1]'
       ),
       first_price: pg.raw(
-        '(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))::numeric[])[array_length(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))::numeric[], 1)]'
+        '(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals) ORDER BY e.time_stamp)::numeric[])[1]'
       ),
       volume: pg.raw('sum(e.amount * 10 ^(-a_dec.decimals))'),
       quote_volume: pg.raw(
@@ -37,7 +37,7 @@ const selectPairsCTE = pg
       high: pg.raw('max(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'),
       low: pg.raw('min(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'),
       txs_count: pg.raw(
-        'count(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'
+        'count(e.price)'
       ),
     })
       .from({ e: selectExchanges.clone() })

@@ -6,31 +6,19 @@ const commonFilters = require('../../presets/pg/searchWithPagination/commonFilte
 const result = Joi.object().keys({
   ...commonFields,
 
-  asset_id: Joi.string()
-    .base58()
-    .required(),
-  asset_name: Joi.string().required(),
-  description: Joi.string()
+  asset_id: Joi.string().base58().required(),
+  script: Joi.string()
     .required()
-    .allow(''),
-  quantity: Joi.object()
-    .bignumber()
-    .required(),
-  decimals: Joi.number().required(),
-  reissuable: Joi.boolean().required(),
-  script: Joi.string().allow(null),
+    .allow(null),
 });
 
 const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
-
-    script: Joi.string(),
+    sender: Joi.string(),
     assetId: Joi.string().base58(),
+    script: Joi.string(),
   })
   .required();
 
-module.exports = {
-  result,
-  inputSearch,
-};
+module.exports = { result, inputSearch };

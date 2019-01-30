@@ -47,7 +47,7 @@ const candleSelectColumns = [
   },
   {
     txs_count: pg.raw(
-      'count(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'
+      'count(e.price)'
     ),
   },
   {
@@ -57,12 +57,12 @@ const candleSelectColumns = [
   },
   {
     open: pg.raw(
-      '(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))::numeric[])[1]'
+      '(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals) ORDER BY e.candle_time)::numeric[])[1]'
     ),
   },
   {
     close: pg.raw(
-      '(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))::numeric[])[array_length(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))::numeric[], 1)]'
+      '(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals) ORDER BY e.candle_time DESC)::numeric[])[1]'
     ),
   },
   {
@@ -104,7 +104,7 @@ const selectLastExchangeTx = () =>
     .orderBy('height', 'desc')
     .toString();
 
-/** for make complex query with "on conflict (...) update ... without set concrete values" See insertOrUpdateCandles or insertOrUpdateCandlesFromHeight */
+/** for make complex query with "on conflict (...) update ... without set concrete values" See insertOrUpdateCandles or insertOrUpdateCandlesFromShortInterval */
 const updatedFieldsExcluded = [
   'open',
   'close',
@@ -135,24 +135,21 @@ const insertOrUpdateCandles = (tableName, candles) => {
   return ';';
 };
 
-/** insertOrUpdateCandlesFromHeight :: (String, Number, Number, Number) -> String query */
-const insertOrUpdateCandlesFromHeight = (
+/** insertOrUpdateCandlesFromShortInterval :: (String, Number, Number) -> String query */
+const insertOrUpdateCandlesFromShortInterval = (
   tableName,
   shortInterval,
-  longerInterval,
-  startHeight
+  longerInterval
 ) =>
   pg
     .raw(
       `${insertIntoCandlesFromSelect(tableName, function() {
-        this.from(
-          pg(tableName)
-            .select('*')
-            .where('interval_in_secs', shortInterval)
-            .where('max_height', '>=', startHeight)
-            .as('d')
-        )
-          .column(makeCandleCalculateColumns(longerInterval))
+        this.from(tableName)
+          .select(makeCandleCalculateColumns(longerInterval))
+          .where('interval_in_secs', shortInterval)
+          .whereRaw(
+            `time_start >= to_timestamp(floor((extract('epoch' from now()) / ${longerInterval} )) * ${longerInterval})`
+          )
           .groupBy('candle_time', 'amount_asset_id', 'price_asset_id');
       })} on conflict (time_start,amount_asset_id, price_asset_id, interval_in_secs) do update set ${updatedFieldsExcluded}`
     )
@@ -214,5 +211,5 @@ module.exports = {
   insertOrUpdateCandles,
   selectLastCandle,
   selectLastExchangeTx,
-  insertOrUpdateCandlesFromHeight,
+  insertOrUpdateCandlesFromShortInterval,
 };

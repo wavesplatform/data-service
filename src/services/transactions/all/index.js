@@ -32,6 +32,7 @@ const createServices = {
   12: require('../data'),
   13: require('../setScript'),
   14: require('../sponsorship'),
+  15: require('../setAssetScript'),
 };
 
 const getData = prop('data');
