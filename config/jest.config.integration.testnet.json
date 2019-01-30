@@ -1,7 +1,11 @@
 {
+  "transform": {
+    "^.+\\.ts$": "ts-jest"
+  },
   "verbose": true,
   "forceExit": true,
-  "rootDir": "../",
-  "testMatch": ["**/*.test.int.testnet.js"],
+  "rootDir": "../src",
+  "testMatch": ["**/*.test.int.testnet.js", "**/*.test.int.testnet.ts"],
+  "moduleFileExtensions": ["js", "ts", "json", "node"],
   "testURL": "http://localhost/"
 }

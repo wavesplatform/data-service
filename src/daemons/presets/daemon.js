@@ -1,7 +1,7 @@
 const Task = require('folktale/concurrency/task');
 const Maybe = require('folktale/maybe');
 
-const tap = require('../../utils/tap');
+const { tap } = require('../../utils/tap');
 const logTaskProgress = require('../utils/logTaskProgress');
 
 /** getSleepTime :: Date -> Number ms -> Number ms */
