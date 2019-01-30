@@ -49,7 +49,10 @@ Object {
         "type": 10,
       },
     },
-    null,
+    Object {
+      "__type": "transaction",
+      "data": null,
+    },
   ],
 }
 `;
@@ -73,57 +76,6 @@ Object {
     "type": 4,
     "version": 1,
   },
-}
-`;
-
-exports[`all transactions service mget fetches real txs with nulls for unreal 1`] = `
-Object {
-  "__type": "list",
-  "data": Array [
-    Object {
-      "__type": "transaction",
-      "data": Object {
-        "amount": "0.007",
-        "assetId": "WAVES",
-        "attachment": "",
-        "fee": "0.001",
-        "feeAsset": "WAVES",
-        "height": 240868,
-        "id": "Co8JB3md1hsnFKYS2xonipBFyQcB7qskyosoJf6YhBi1",
-        "recipient": "3PJkWhTJXrYWiSj6sxv9aoUrzoBbGZmzvQf",
-        "sender": "3P2b1YqpGNb57ftMQN5be25iKowq65GmkZ7",
-        "senderPublicKey": "J9LBb9ZixtDiLFxXocGXt69JU5vConrGYh7yM1mnAPWQ",
-        "signature": "4QgAFzCvEhMEEWuYvuPU8tw4bhSKzrfFW2RrhkEYFc82EVdmUV7HqRehpTxsvQ9V2dYd4yp4Ezez9RqVwDSKr2uz",
-        "timestamp": 2016-11-21T07:01:42.156Z,
-        "type": 4,
-        "version": 1,
-      },
-    },
-    Object {
-      "__type": "transaction",
-      "data": Object {
-        "data": Array [
-          Object {
-            "key": "company",
-            "type": "string",
-            "value": "Resonova",
-          },
-        ],
-        "fee": "0.001",
-        "height": 1060009,
-        "id": "AkM4bQ5dVkqWezSgMPdW5iieX98xDsiFjVDbEddntGNv",
-        "proofs": Array [
-          "2BFgwFEUwDYmCPdUbrX3W4QdPrcDX4ai6tmrY2ab4NgEg9aikUo7RzqHUsgBd5kBpFScxsLQWpE29k9cLPdF5YEt",
-        ],
-        "sender": "3PLZcCJyYQnfWfzhKXRA4rteCQC9J1ewf5K",
-        "senderPublicKey": "BQMVwAHwf2WEEwRsCxtMVcSLrXUhJ3XtCLmSptLx2e6L",
-        "timestamp": 2018-06-28T02:12:41.449Z,
-        "type": 12,
-        "version": 1,
-      },
-    },
-    null,
-  ],
 }
 `;
 
@@ -158,7 +110,10 @@ Object {
         "type": 12,
       },
     },
-    null,
+    Object {
+      "__type": "transaction",
+      "data": null,
+    },
   ],
 }
 `;
@@ -218,7 +173,10 @@ Object {
         "version": 1,
       },
     },
-    null,
+    Object {
+      "__type": "transaction",
+      "data": null,
+    },
   ],
 }
 `;
@@ -304,7 +262,10 @@ Object {
         "version": 1,
       },
     },
-    null,
+    Object {
+      "__type": "transaction",
+      "data": null,
+    },
   ],
 }
 `;
@@ -469,7 +430,10 @@ Object {
         "type": 7,
       },
     },
-    null,
+    Object {
+      "__type": "transaction",
+      "data": null,
+    },
   ],
 }
 `;
@@ -520,7 +484,10 @@ Object {
         "type": 1,
       },
     },
-    null,
+    Object {
+      "__type": "transaction",
+      "data": null,
+    },
   ],
 }
 `;
@@ -592,7 +559,10 @@ Object {
         "version": 1,
       },
     },
-    null,
+    Object {
+      "__type": "transaction",
+      "data": null,
+    },
   ],
 }
 `;
@@ -652,7 +622,10 @@ Object {
         "version": 1,
       },
     },
-    null,
+    Object {
+      "__type": "transaction",
+      "data": null,
+    },
   ],
 }
 `;
@@ -709,7 +682,10 @@ Object {
         "version": 1,
       },
     },
-    null,
+    Object {
+      "__type": "transaction",
+      "data": null,
+    },
   ],
 }
 `;
@@ -1981,7 +1957,10 @@ Object {
         "version": 1,
       },
     },
-    null,
+    Object {
+      "__type": "transaction",
+      "data": null,
+    },
   ],
 }
 `;
@@ -2044,7 +2023,10 @@ Object {
         "version": 1,
       },
     },
-    null,
+    Object {
+      "__type": "transaction",
+      "data": null,
+    },
   ],
 }
 `;
@@ -2101,7 +2083,10 @@ Object {
         "type": 2,
       },
     },
-    null,
+    Object {
+      "__type": "transaction",
+      "data": null,
+    },
   ],
 }
 `;
@@ -2164,7 +2149,10 @@ Object {
         "version": 1,
       },
     },
-    null,
+    Object {
+      "__type": "transaction",
+      "data": null,
+    },
   ],
 }
 `;
@@ -2230,7 +2218,10 @@ Object {
         "version": 1,
       },
     },
-    null,
+    Object {
+      "__type": "transaction",
+      "data": null,
+    },
   ],
 }
 `;
@@ -2297,7 +2288,10 @@ Object {
         "version": 1,
       },
     },
-    null,
+    Object {
+      "__type": "transaction",
+      "data": null,
+    },
   ],
 }
 `;

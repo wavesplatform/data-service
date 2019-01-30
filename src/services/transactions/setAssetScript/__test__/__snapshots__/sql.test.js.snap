@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Sql search by type-specific filters supports assetId and script filters 1`] = `"select \\"height\\", \\"tx_type\\", \\"id\\", \\"time_stamp\\", \\"signature\\", \\"proofs\\", \\"tx_version\\", \\"sender\\", \\"sender_public_key\\", \\"asset_id\\", \\"script\\", fee * 10^(-8) as \\"fee\\" from \\"txs_15\\" as \\"t\\" where \\"asset_id\\" = 'WAVES' and \\"script\\" = 'base64:somescript'"`;
+
+exports[`Sql search by type-specific filters supports assetId filter 1`] = `"select \\"height\\", \\"tx_type\\", \\"id\\", \\"time_stamp\\", \\"signature\\", \\"proofs\\", \\"tx_version\\", \\"sender\\", \\"sender_public_key\\", \\"asset_id\\", \\"script\\", fee * 10^(-8) as \\"fee\\" from \\"txs_15\\" as \\"t\\" where \\"asset_id\\" = 'WAVES'"`;
+
+exports[`Sql search by type-specific filters supports script filter 1`] = `"select \\"height\\", \\"tx_type\\", \\"id\\", \\"time_stamp\\", \\"signature\\", \\"proofs\\", \\"tx_version\\", \\"sender\\", \\"sender_public_key\\", \\"asset_id\\", \\"script\\", fee * 10^(-8) as \\"fee\\" from \\"txs_15\\" as \\"t\\" where \\"script\\" = 'base64:somescript'"`;

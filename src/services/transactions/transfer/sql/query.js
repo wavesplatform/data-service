@@ -40,7 +40,23 @@ const withDecimals = q =>
     )
     .select(columns);
 
-const select = pg({ t: 'txs_4' }).select('*');
+const select = pg({ t: 'txs_4' }).select([
+  'height',
+  'tx_type',
+  'id',
+  'time_stamp',
+  'signature',
+  'proofs',
+  'tx_version',
+  'fee',
+  'sender',
+  'sender_public_key',
+  'asset_id',
+  'amount',
+  'recipient',
+  'fee_asset',
+  'attachment',
+]);
 
 module.exports = {
   select,
