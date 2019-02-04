@@ -21,8 +21,8 @@ const searchById = q =>
     .columns({
       asset_id: 't.asset_id',
       asset_name: 't.asset_name',
-      height: 't.height',
       ticker: 'ti.ticker',
+      height: 't.height',
       rank: pg.raw(
         `ts_rank(to_tsvector('simple', t.asset_id), to_tsquery('${q
           .split(' ')
@@ -34,22 +34,20 @@ const searchById = q =>
     .leftJoin({ ti: 'tickers' }, 't.asset_id', 'ti.asset_id')
     .where('t.asset_id', q);
 
-const searchByNameInMeta = q =>
+const searchByNameInAdditional = q =>
   pg
-    .columns({
-      asset_id: 'asset_id',
-      asset_name: 'asset_name',
-      height: 'height',
-      ticker: 'ticker',
-      rank: pg.raw(
-        `ts_rank(to_tsvector('simple', asset_name), to_tsquery('${q}:*'), 3) * case when ticker is null then 64 else 128 end`
-      ),
-    })
-    .from(
-      pg.raw(
-        "(values ('8LQW8f7P5d5PZM7GtZEBgaqRPGSzS3DfPuiXrURJ4AJS', 'bitcoin', 1340000, 'wbtc')) as t (asset_id, asset_name, height, ticker)"
-      )
-    )
+    .columns([
+      'asset_id',
+      'asset_name',
+      'ticker',
+      'height',
+      {
+        rank: pg.raw(
+          `ts_rank(to_tsvector('simple', asset_name), to_tsquery('${q}:*'), 3) * case when ticker is null then 64 else 128 end`
+        ),
+      },
+    ])
+    .from('additional_assets_data')
     .where('asset_name', 'like', `${q}%`);
 
 const searchByTicker = q =>
@@ -57,8 +55,8 @@ const searchByTicker = q =>
     .columns({
       asset_id: 'ti.asset_id',
       asset_name: 't.asset_name',
-      height: 't.height',
       ticker: 'ti.ticker',
+      height: 't.height',
       rank: pg.raw(
         `ts_rank(to_tsvector('simple', ti.ticker), to_tsquery('${q
           .split(' ')
@@ -73,8 +71,8 @@ const searchByName = q =>
     .columns({
       asset_id: 't.asset_id',
       asset_name: 't.asset_name',
-      height: 't.height',
       ticker: 'ti.ticker',
+      height: 't.height',
       rank: pg.raw(
         `ts_rank(searchable_asset_name, to_tsquery('${q
           .split(' ')
@@ -107,7 +105,7 @@ const searchAssets = query =>
         },
       ]).from({
         r: searchById(query)
-          .unionAll(searchByNameInMeta(query))
+          .unionAll(searchByNameInAdditional(query))
           .unionAll(searchByTicker(query))
           .unionAll(searchByName(query)),
       });
@@ -125,7 +123,7 @@ const mget = ids =>
 module.exports = {
   get: id => mget([id]),
   mget,
-  search: ({ ticker, phrase, params }) => {
+  search: ({ ticker, search, after, limit }) => {
     const filter = q => {
       if (ticker === '*') return q.whereNotNull('ticker');
       else return q.where('ticker', ticker);
@@ -136,16 +134,13 @@ module.exports = {
         q => q.toString(),
         filter
       )(pg('assets').select(columns));
-    } else if (typeof phrase !== 'undefined') {
+    } else if (typeof search !== 'undefined') {
       return compose(
         q => q.toString(),
-        q => (params && params.limit ? q.clone().limit(params.limit) : q),
-        q =>
-          params && params.after
-            ? q.clone().where('rn', '>', getAssetIndex(params.after))
-            : q,
+        q => (limit ? q.clone().limit(limit) : q),
+        q => (after ? q.clone().where('rn', '>', getAssetIndex(after)) : q),
         searchAssets
-      )(phrase);
+      )(search);
     }
   },
 };
