@@ -12,4 +12,20 @@ describe('Assets SQL queries tests', () => {
   it('should build correct search sql query', () => {
     expect(search({ ticker: '*' })).toMatchSnapshot();
   });
+
+  it('should build correct search sql query', () => {
+    expect(search({ ticker: 'BTC' })).toMatchSnapshot();
+  });
+
+  it('should build correct search sql query', () => {
+    expect(search({ phrase: 'BIT' })).toMatchSnapshot();
+  });
+
+  it('should build correct search sql query', () => {
+    expect(search({ phrase: 'bitcoin cas' })).toMatchSnapshot();
+  });
+
+  it('should build correct search sql query', () => {
+    expect(search({ phrase: 'BIT', params: { after: 'FiKAykpjAFkiukke7ZpVX511HHumPZYKyu6GXokPEkcT', limit: 3 }})).toMatchSnapshot();
+  });
 });

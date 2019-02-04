@@ -16,6 +16,106 @@ const columns = [
   'min_sponsored_asset_fee',
 ];
 
+const searchById = q =>
+  pg({ t: 'txs_3' })
+    .columns({
+      asset_id: 't.asset_id',
+      asset_name: 't.asset_name',
+      height: 't.height',
+      ticker: 'ti.ticker',
+      rank: pg.raw(
+        `ts_rank(to_tsvector('simple', t.asset_id), to_tsquery('${q
+          .split(' ')
+          .join(
+            ' & '
+          )}:*'), 3) * case when ti.ticker is null then 128 else 256 end`
+      ),
+    })
+    .leftJoin({ ti: 'tickers' }, 't.asset_id', 'ti.asset_id')
+    .where('t.asset_id', q);
+
+const searchByNameInMeta = q =>
+  pg
+    .columns({
+      asset_id: 'asset_id',
+      asset_name: 'asset_name',
+      height: 'height',
+      ticker: 'ticker',
+      rank: pg.raw(
+        `ts_rank(to_tsvector('simple', asset_name), to_tsquery('${q}:*'), 3) * case when ticker is null then 64 else 128 end`
+      ),
+    })
+    .from(
+      pg.raw(
+        "(values ('8LQW8f7P5d5PZM7GtZEBgaqRPGSzS3DfPuiXrURJ4AJS', 'bitcoin', 1340000, 'wbtc')) as t (asset_id, asset_name, height, ticker)"
+      )
+    )
+    .where('asset_name', 'like', `${q}%`);
+
+const searchByTicker = q =>
+  pg({ ti: 'tickers' })
+    .columns({
+      asset_id: 'ti.asset_id',
+      asset_name: 't.asset_name',
+      height: 't.height',
+      ticker: 'ti.ticker',
+      rank: pg.raw(
+        `ts_rank(to_tsvector('simple', ti.ticker), to_tsquery('${q
+          .split(' ')
+          .join(' & ')}:*'), 3) * 32`
+      ),
+    })
+    .leftJoin({ t: 'txs_3' }, 'ti.asset_id', 't.asset_id')
+    .where('ticker', 'like', `${q}%`);
+
+const searchByName = q =>
+  pg({ t: 'txs_3' })
+    .columns({
+      asset_id: 't.asset_id',
+      asset_name: 't.asset_name',
+      height: 't.height',
+      ticker: 'ti.ticker',
+      rank: pg.raw(
+        `ts_rank(searchable_asset_name, to_tsquery('${q
+          .split(' ')
+          .join(
+            ' & '
+          )}:*'), 3) * case when ti.ticker is null then 16 else 32 end`
+      ),
+    })
+    .leftJoin({ ti: 'tickers' }, 't.asset_id', 'ti.asset_id')
+    .whereRaw(
+      `searchable_asset_name @@ to_tsquery('${q.split(' ').join(' & ')}:*')`
+    );
+
+const getAssetIndex = asset_id =>
+  pg('assets_cte')
+    .column('rn')
+    .where('asset_id', asset_id);
+
+const searchAssets = query =>
+  pg
+    .with('assets_cte', qb => {
+      qb.columns([
+        'asset_id',
+        'ticker',
+        'asset_name',
+        {
+          rn: pg.raw(
+            'row_number() over (order by r.rank desc, r.height asc, r.asset_id asc)'
+          ),
+        },
+      ]).from({
+        r: searchById(query)
+          .unionAll(searchByNameInMeta(query))
+          .unionAll(searchByTicker(query))
+          .unionAll(searchByName(query)),
+      });
+    })
+    .from('assets_cte')
+    .select(columns.map(col => 'a.' + col))
+    .innerJoin({ a: 'assets' }, 'assets_cte.asset_id', 'a.asset_id');
+
 const mget = ids =>
   pg('assets')
     .select(columns)
@@ -25,15 +125,27 @@ const mget = ids =>
 module.exports = {
   get: id => mget([id]),
   mget,
-  search: ({ ticker }) => {
+  search: ({ ticker, phrase, params }) => {
     const filter = q => {
       if (ticker === '*') return q.whereNotNull('ticker');
       else return q.where('ticker', ticker);
     };
 
-    return compose(
-      q => q.toString(),
-      filter
-    )(pg('assets').select(columns));
+    if (typeof ticker !== 'undefined') {
+      return compose(
+        q => q.toString(),
+        filter
+      )(pg('assets').select(columns));
+    } else if (typeof phrase !== 'undefined') {
+      return compose(
+        q => q.toString(),
+        q => (params && params.limit ? q.clone().limit(params.limit) : q),
+        q =>
+          params && params.after
+            ? q.clone().where('rn', '>', getAssetIndex(params.after))
+            : q,
+        searchAssets
+      )(phrase);
+    }
   },
 };
