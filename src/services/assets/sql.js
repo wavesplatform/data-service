@@ -34,7 +34,7 @@ const searchById = q =>
     .leftJoin({ ti: 'tickers' }, 't.asset_id', 'ti.asset_id')
     .where('t.asset_id', q);
 
-const searchByNameInAdditional = q =>
+const searchByNameInMeta = q =>
   pg
     .columns([
       'asset_id',
@@ -47,7 +47,7 @@ const searchByNameInAdditional = q =>
         ),
       },
     ])
-    .from('additional_assets_data')
+    .from('assets_metadata')
     .where('asset_name', 'like', `${q}%`);
 
 const searchByTicker = q =>
@@ -105,7 +105,7 @@ const searchAssets = query =>
         },
       ]).from({
         r: searchById(query)
-          .unionAll(searchByNameInAdditional(query))
+          .unionAll(searchByNameInMeta(query))
           .unionAll(searchByTicker(query))
           .unionAll(searchByName(query)),
       });
