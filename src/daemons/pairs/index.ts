@@ -1,12 +1,13 @@
 // configuration
-const loadConfig = require('./loadConfig');
+import loadConfig from './loadConfig';
 const configuration = loadConfig();
 
 // logger
+// TODO REFACTOR
 const createLogger = require('../../logger/winston');
 
 // pg driver
-const { createPgDriver } = require('../../db');
+import { createPgDriver } from '../../db';
 const pgDriver = createPgDriver(configuration);
 
 const { daemon: runDaemon } = require('../presets/daemon');

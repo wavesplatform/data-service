@@ -11,6 +11,7 @@ import {
 
 import { mget } from '..';
 import { Validate } from '../types';
+import { PgDriver } from '../../../../db/driver';
 
 const ids = [
   'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH',
@@ -26,14 +27,16 @@ const resultOk = (s: string) => Ok<ResolverError, string>(s);
 const resultError = (s: string) =>
   error<ResolverError, string>(AppError.Resolver(errorMessage));
 
-const mockDbQuery = (ids: string[]) =>
-  taskOf<DbError, Maybe<string>[]>(ids.map(maybeOf));
+const mockPgDriver: PgDriver = {
+  many: (query: string) => taskOf<DbError, string[]>(query.split('::')),
+} as PgDriver;
 
 const commonConfig = {
   transformInput: identity,
   transformResult: (rs: Maybe<string>[]): (string | null)[] =>
     rs.map(m => m.getOrElse(null)),
-  dbQuery: identity,
+  dbQuery: (driver: PgDriver) => (ids: string[]) =>
+    driver.many<string>(ids.join('::')).map(results => results.map(maybeOf)),
 };
 
 const createMockResolver = (
@@ -44,7 +47,9 @@ const createMockResolver = (
     ...commonConfig,
     validateInput,
     validateResult,
-  })({ db: mockDbQuery });
+  })({ db: mockPgDriver });
+
+afterEach(() => jest.clearAllMocks());
 
 describe('Resolver', () => {
   it('should return result if all validation pass', done => {
@@ -53,7 +58,7 @@ describe('Resolver', () => {
     goodResolver(ids)
       .run()
       .listen({
-        onResolved: data => {
+        onResolved: (data: (string | null)[]) => {
           expect(data).toEqual(ids);
           done();
         },
@@ -61,12 +66,12 @@ describe('Resolver', () => {
   });
 
   it('should call db query is everything is ok', done => {
-    const spiedDbQuery = jest.fn(mockDbQuery);
+    const spiedDbQuery = jest.spyOn(mockPgDriver, 'many');
     const goodResolver = mget({
       ...commonConfig,
       validateInput: inputOk,
       validateResult: resultOk,
-    })({ db: spiedDbQuery });
+    })({ db: mockPgDriver });
 
     goodResolver(ids)
       .run()
@@ -84,7 +89,7 @@ describe('Resolver', () => {
     badInputResolver(ids)
       .run()
       .listen({
-        onRejected: e => {
+        onRejected: (e: AppError) => {
           expect(e).toEqual(AppError.Validation(errorMessage));
           done();
         },
@@ -92,12 +97,12 @@ describe('Resolver', () => {
   });
 
   it('should NOT call db query if input validation fails', done => {
-    const spiedDbQuery = jest.fn(mockDbQuery);
+    const spiedDbQuery = jest.spyOn(mockPgDriver, 'many');
     const badInputResolver = mget({
       ...commonConfig,
       validateInput: inputError,
       validateResult: resultOk,
-    })({ db: spiedDbQuery });
+    })({ db: mockPgDriver });
 
     badInputResolver(ids)
       .run()
@@ -115,7 +120,7 @@ describe('Resolver', () => {
     badOutputResolver(ids)
       .run()
       .listen({
-        onRejected: e => {
+        onRejected: (e: AppError) => {
           expect(e).toEqual(AppError.Resolver(errorMessage));
           done();
         },

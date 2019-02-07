@@ -8,8 +8,10 @@ import {
   AppError,
 } from '../../../errorHandling/';
 
+import { PgDriver } from '../../../db/driver';
+
 // @todo type DbDriver
-export type DbDriver = any;
+// export type DbDriver = any;
 export type EmitEvent = {
   (name: string): <A>(object: A) => void;
 };
@@ -39,7 +41,7 @@ export type GetResolverDependencies<
   ResTransformed
 > & {
   dbQuery: (
-    db: DbDriver
+    db: PgDriver
   ) => (r: ReqTransformed) => Task<DbError, Maybe<ResRaw>>;
   transformResult: (result: Maybe<ResRaw>, request: ReqRaw) => ResTransformed;
 };
@@ -56,7 +58,7 @@ export type MgetResolverDependencies<
   ResTransformed
 > & {
   dbQuery: (
-    db: DbDriver
+    db: PgDriver
   ) => (r: ReqTransformed) => Task<DbError, Maybe<ResRaw>[]>;
   transformResult: (result: Maybe<ResRaw>[], request: ReqRaw) => ResTransformed;
 };
@@ -72,11 +74,11 @@ export type SearchResolverDependencies<
   ResRaw,
   ResTransformed
 > & {
-  dbQuery: (db: DbDriver) => (r: ReqTransformed) => Task<DbError, ResRaw[]>;
+  dbQuery: (db: PgDriver) => (r: ReqTransformed) => Task<DbError, ResRaw[]>;
   transformResult: (results: ResRaw[], request: ReqRaw) => ResTransformed;
 };
 
 export type RuntimeResolverDependenties = {
-  db: DbDriver;
+  db: PgDriver;
   emitEvent?: EmitEvent;
 };

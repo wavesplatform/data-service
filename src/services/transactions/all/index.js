@@ -45,6 +45,8 @@ module.exports = deps => {
   const commonTxData = commonData(deps);
   const txsServices = map(f => f(deps), createServices);
 
+  const isEmpty = t => isNil(t.data);
+
   /**
    * idTypeFromCommonData
    * List CommonData -> { id, type }[]
@@ -81,7 +83,7 @@ module.exports = deps => {
   return {
     get: id =>
       commonTxData
-        .get(id) //Task tx | null
+        .get(id) //Task tx
         .chain(
           ifElse(
             isNil,
@@ -95,20 +97,20 @@ module.exports = deps => {
 
     mget: ids =>
       commonTxData
-        .mget(ids) // Task (tx | null)[]
+        .mget(ids) // Task tx[]. tx can have data: null
         .chain(txsList =>
           pipe(
-            evolve({ data: reject(isNil) }),
+            evolve({ data: reject(isEmpty) }),
             idTypeFromCommonData,
             resultsFromIdType, // Task TxData[]
-            // format output
+            // format output,
             map(
               pipe(
                 indexBy(prop('id')),
                 resultsMap => ({
                   ...txsList,
                   data: txsList.data.map(
-                    ifElse(isNil, identity, t => ({
+                    ifElse(isEmpty, identity, t => ({
                       ...t,
                       data: resultsMap[t.data.id],
                     }))

@@ -1,4 +1,4 @@
-const truncateTable = require('../truncateTable');
+const { truncateTable } = require('../truncateTable');
 
 describe('pairs daemon sql test', () => {
   it('truncate table', () => {

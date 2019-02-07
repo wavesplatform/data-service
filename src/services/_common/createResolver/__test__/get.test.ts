@@ -6,9 +6,11 @@ import {
   AppError,
   ValidationError,
   ResolverError,
+  DbError,
 } from '../../../../errorHandling/';
 
 import { get } from '../';
+import { PgDriver } from '../../../../db/driver';
 
 const assetId = 'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH';
 
@@ -20,14 +22,19 @@ const resultOk = (s: string) => Ok<ResolverError, string>(s);
 const resultError = (s: string) =>
   error<ResolverError, string>(AppError.Resolver(s));
 
+afterEach(() => jest.clearAllMocks());
+
 describe('Resolver', () => {
   const commonConfig = {
     transformInput: identity,
     transformResult: (m: Maybe<string>) => m.getOrElse(null),
-    dbQuery: identity,
+    dbQuery: (driver: PgDriver) => (id: string) =>
+      driver.one<string>(id).map(maybeOf),
   };
 
-  const mockDbQuery = (s: string) => taskOf<string, Maybe<string>>(maybeOf(s));
+  const mockPgDriver: PgDriver = {
+    one: (s: string) => taskOf<DbError, string | null>(s),
+  } as PgDriver;
 
   const createMockResolver = (
     validateInput: (s: string) => Result<ValidationError, string>,
@@ -37,7 +44,7 @@ describe('Resolver', () => {
       ...commonConfig,
       validateInput,
       validateResult,
-    })({ db: mockDbQuery });
+    })({ db: mockPgDriver });
 
   it('should return result if all validation pass', done => {
     const goodResolver = createMockResolver(inputOk, resultOk);
@@ -45,7 +52,7 @@ describe('Resolver', () => {
     goodResolver(assetId)
       .run()
       .listen({
-        onResolved: data => {
+        onResolved: (data: string | null): void => {
           expect(data).toEqual(assetId);
           done();
         },
@@ -53,12 +60,13 @@ describe('Resolver', () => {
   });
 
   it('should call db query if everything is ok', done => {
-    const spiedDbQuery = jest.fn(mockDbQuery);
+    const spiedDbQuery = jest.spyOn(mockPgDriver, 'one');
+
     const goodResolver = get({
       ...commonConfig,
       validateInput: inputOk,
       validateResult: resultOk,
-    })({ db: spiedDbQuery });
+    })({ db: mockPgDriver });
 
     goodResolver(assetId)
       .run()
@@ -81,7 +89,7 @@ describe('Resolver', () => {
       ...commonConfig,
       validateInput: inputOk,
       validateResult: resultOk,
-    })({ db: mockDbQuery, emitEvent: outerSpy });
+    })({ db: mockPgDriver, emitEvent: outerSpy });
 
     goodResolver(assetId)
       .run()
@@ -121,7 +129,7 @@ describe('Resolver', () => {
     badInputResolver(assetId)
       .run()
       .listen({
-        onRejected: error => {
+        onRejected: (error: AppError): void => {
           expect(error).toEqual(AppError.Validation(assetId));
           done();
         },
@@ -129,12 +137,12 @@ describe('Resolver', () => {
   });
 
   it('should NOT call db query if input validation fails', done => {
-    const spiedDbQuery = jest.fn(mockDbQuery);
+    const spiedDbQuery = jest.spyOn(mockPgDriver, 'one');
     const badInputResolver = get({
       ...commonConfig,
       validateInput: inputError,
       validateResult: resultOk,
-    })({ db: spiedDbQuery });
+    })({ db: mockPgDriver });
 
     badInputResolver(assetId)
       .run()
@@ -152,7 +160,7 @@ describe('Resolver', () => {
     badOutputResolver(assetId)
       .run()
       .listen({
-        onRejected: e => {
+        onRejected: (e: AppError): void => {
           expect(e).toEqual(AppError.Resolver(assetId));
           done();
         },

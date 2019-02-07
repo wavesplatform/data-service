@@ -3,7 +3,7 @@ const { createPgDriver } = require('../../../../db');
 const { parseDate } = require('../../../../utils/parseDate');
 const Cursor = require('../../../_common/pagination/cursor');
 
-const loadConfig = require('../../../../loadConfig');
+const loadConfig = require('../../../../loadConfig').default;
 const options = loadConfig();
 
 const drivers = {

@@ -1,7 +1,7 @@
 import * as Koa from 'koa';
 import chalk from 'chalk';
 
-import * as loadConfig from './loadConfig';
+import loadConfig from './loadConfig';
 import * as router from './endpoints/';
 import * as injectDb from './middleware/injectDb';
 import * as injectEventBus from './middleware/injectEventBus';

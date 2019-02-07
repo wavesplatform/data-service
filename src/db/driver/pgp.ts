@@ -1,17 +1,20 @@
-const { BigNumber } = require('@waves/data-entities');
-const { compose, tail, init, split, map } = require('ramda');
+import { BigNumber } from '@waves/data-entities';
+import { compose, tail, init, split } from 'ramda';
+import { IMain } from 'pg-promise';
+import * as pgPromise from 'pg-promise';
 
-const pgp = require('pg-promise')();
-const toBigNumber = x => new BigNumber(x);
+const pgp: IMain = pgPromise();
+
+const toBigNumber = (x: BigNumber.Value): BigNumber => new BigNumber(x);
+
 const parsePgArray = compose(
   split(','),
   init,
   tail
 );
-const toBigNumberAll = compose(
-  map(toBigNumber),
-  parsePgArray
-);
+
+const toBigNumberAll = (s: string): BigNumber[] =>
+  parsePgArray(s).map(toBigNumber);
 
 const types = pgp.pg.types;
 
@@ -31,4 +34,4 @@ types.setTypeParser(1231, toBigNumberAll); // array/numeric
 // types.setTypeParser(700, toBigNumber); // real/float4
 // types.setTypeParser(1021, toBigNumberAll); // array/float
 
-module.exports = pgp;
+export const pgpConnect = pgp;
