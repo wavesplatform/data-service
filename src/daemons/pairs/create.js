@@ -19,9 +19,6 @@ const loop = ({ logTask, pg, tableName }) => {
     }),
   };
 
-  require('fs').writeFileSync('/home/peter/test.log', sql.truncateTable(tableName))
-  require('fs').writeFileSync('/home/peter/test.log', sql.fillTable(tableName))
-
   return logTask(
     logMessages,
     pg.tx(t =>
