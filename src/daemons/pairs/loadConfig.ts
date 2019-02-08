@@ -3,7 +3,7 @@ import {
   PostgresConfig,
   LoggerConfig,
   loadConfig as loadDataServiceConfig,
-} from 'loadConfig';
+} from '../../loadConfig';
 
 export type PairsConfig = PostgresConfig &
   LoggerConfig & {
