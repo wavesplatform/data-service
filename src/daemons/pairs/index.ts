@@ -1,5 +1,5 @@
 // configuration
-import loadConfig from './loadConfig';
+import { loadConfig } from './loadConfig';
 const configuration = loadConfig();
 
 // logger

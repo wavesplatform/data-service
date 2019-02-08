@@ -1,6 +1,6 @@
 const pg = require('knex')({ client: 'pg' });
 const { createPgDriver } = require('../../../db');
-const loadConfig = require('../../../loadConfig').default;
+const { loadConfig } = require('../../../loadConfig');
 const options = loadConfig();
 const pgDriver = createPgDriver(options);
 const create = require('../index');
@@ -102,7 +102,7 @@ describe('Pairs', () => {
         .listen({
           onResolved: pairs => {
             expect(pairs.__type).toEqual('list');
-            expect(pairs.data).toEqual([{"__type": "pair", "data": null}]);
+            expect(pairs.data).toEqual([{ __type: 'pair', data: null }]);
             done();
           },
         });

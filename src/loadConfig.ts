@@ -1,20 +1,28 @@
 import * as checkEnv from 'check-env';
 import { memoizeWith, always } from 'ramda';
 
-export type Configuration = {
-  port: number;
+export type PostgresConfig = {
   postgresHost: string;
   postgresPort: number;
   postgresDatabase: string;
   postgresUser: string;
   postgresPassword: string;
   postgresPoolSize: number;
+};
+
+export type LoggerConfig = {
   logLevel: string;
 };
 
+export type ServerConfig = {
+  port: number;
+};
+
+export type DataServiceConfig = PostgresConfig & ServerConfig & LoggerConfig;
+
 const envVariables = ['PGHOST', 'PGDATABASE', 'PGUSER', 'PGPASSWORD'];
 
-const loadConfig = (): Configuration => {
+const load = (): DataServiceConfig => {
   // assert all necessary env vars are set
   checkEnv(envVariables);
 
@@ -32,4 +40,4 @@ const loadConfig = (): Configuration => {
   };
 };
 
-export default memoizeWith(always('config'), loadConfig);
+export const loadConfig = memoizeWith(always('config'), load);

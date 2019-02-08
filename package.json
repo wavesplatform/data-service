@@ -37,9 +37,8 @@
     "typescript": "^3.2.2"
   },
   "dependencies": {
-    "@koa/cors": "^2.2.1",
+    "@koa/cors": "^2.2.3",
     "@types/knex": "^0.15.1",
-    "@types/koa-cors": "0.0.0",
     "@waves/data-entities": "^1.8.0",
     "@waves/json-bigint": "git+https://github.com/wavesplatform/json-bigint.git",
     "bignumber.js": "^7.0.1",

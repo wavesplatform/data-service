@@ -3,7 +3,7 @@ const { get, mget, search } = require('./presets');
 
 // dependencies
 const { createPgDriver } = require('../../../../db');
-const loadConfig = require('../../../../loadConfig').default;
+const { loadConfig }  = require('../../../../loadConfig');
 const options = loadConfig();
 const drivers = {
   pg: createPgDriver(options),
