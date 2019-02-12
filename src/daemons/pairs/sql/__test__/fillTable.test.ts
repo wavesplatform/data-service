@@ -1,4 +1,4 @@
-const fillTable = require('../fillTable');
+import { fillTable } from '../fillTable';
 
 describe('pairs daemon sql test', () => {
   it('fill table', () => {

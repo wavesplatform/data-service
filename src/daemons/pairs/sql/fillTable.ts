@@ -1,8 +1,12 @@
-const knex = require('knex');
+import * as knex from 'knex';
 const pg = knex({ client: 'pg' });
 
 const selectVolumeWavesFromPairsCTE = pg({ d: 'pairs_cte' })
-  .select({ volume_waves: pg.raw(`case when d.amount_asset_id='WAVES' then p.quote_volume / d.weighted_average_price when d.price_asset_id='WAVES' then p.quote_volume * d.weighted_average_price end`) })
+  .select(
+    pg.raw(
+      `case when d.amount_asset_id='WAVES' then p.quote_volume / d.weighted_average_price when d.price_asset_id='WAVES' then p.quote_volume * d.weighted_average_price end as volume_waves`
+    )
+  )
   .whereRaw(`(d.amount_asset_id=p.price_asset_id AND d.price_asset_id='WAVES')`)
   .orWhereRaw(
     `(d.price_asset_id=p.price_asset_id AND d.amount_asset_id='WAVES')`
@@ -36,17 +40,11 @@ const selectPairsCTE = pg
       ),
       high: pg.raw('max(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'),
       low: pg.raw('min(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'),
-      txs_count: pg.raw(
-        'count(e.price)'
-      ),
+      txs_count: pg.raw('count(e.price)'),
     })
-      .from({ e: selectExchanges.clone() })
-      .innerJoin(
-        { a_dec: 'asset_decimals' },
-        'e.amount_asset',
-        'a_dec.asset_id'
-      )
-      .innerJoin({ p_dec: 'asset_decimals' }, 'e.price_asset', 'p_dec.asset_id')
+      .from(selectExchanges.clone().as('e'))
+      .innerJoin('asset_decimals as a_dec', 'e.amount_asset', 'a_dec.asset_id')
+      .innerJoin('asset_decimals as p_dec', 'e.price_asset', 'p_dec.asset_id')
       .groupBy(['amount_asset', 'price_asset']);
   })
   .from({ p: 'pairs_cte' })
@@ -68,7 +66,7 @@ const selectPairsCTE = pg
     'txs_count'
   );
 
-module.exports = tableName =>
+export const fillTable = (tableName: string): string =>
   pg
     .into(tableName)
     .insert(selectPairsCTE)

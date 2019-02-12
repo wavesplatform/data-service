@@ -1,12 +1,12 @@
 // configuration
-const loadConfig = require('./loadConfig');
+import { loadConfig } from './loadConfig';
 const configuration = loadConfig();
 
 // logger
-const createLogger = require('../../logger/winston');
+import * as createLogger from '../../logger/winston';
 
 // pg driver
-const { createPgDriver } = require('../../db');
+import { createPgDriver } from '../../db';
 const pgDriver = createPgDriver(configuration);
 
 const { daemon: runDaemon } = require('../presets/daemon');

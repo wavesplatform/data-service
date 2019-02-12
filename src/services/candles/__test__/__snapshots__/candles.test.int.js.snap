@@ -7,7 +7,7 @@ Object {
     Object {
       "__type": "candle",
       "data": Object {
-        "close": "3",
+        "close": "1",
         "high": "12",
         "low": "1",
         "maxHeight": 436933,
@@ -60,11 +60,11 @@ Object {
     Object {
       "__type": "candle",
       "data": Object {
-        "close": "11",
+        "close": "10",
         "high": "14",
         "low": "2",
         "maxHeight": 435299,
-        "open": "12",
+        "open": "11",
         "quoteVolume": "18080.08",
         "time": 2017-04-03T02:00:00.000Z,
         "txsCount": 166,
@@ -140,7 +140,7 @@ Object {
         "low": "10",
         "maxHeight": 435551,
         "open": "10",
-        "quoteVolume": "997.99199999",
+        "quoteVolume": "997.992",
         "time": 2017-04-03T07:00:00.000Z,
         "txsCount": 311,
         "volume": "70.519",

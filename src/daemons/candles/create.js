@@ -16,11 +16,11 @@ const {
 
 /** for combining candles */
 const intervalPairs = [
-  [60, 300],      // 1m -> 5m
-  [300, 900],     // 5m -> 15m
-  [900, 1800],    // 15m -> 30m
-  [1800, 3600],   // 30m -> 1h
-  [3600, 10800],  // 1h -> 3h
+  [60, 300], // 1m -> 5m
+  [300, 900], // 5m -> 15m
+  [900, 1800], // 15m -> 30m
+  [1800, 3600], // 30m -> 1h
+  [3600, 10800], // 1h -> 3h
   [10800, 21600], // 3h -> 6h
   [21600, 43200], // 6h -> 12h
   [43200, 86400], // 12h -> 24h
@@ -75,7 +75,13 @@ const updateCandlesLoop = (logTask, pg, tableName) => {
           return pgPromiseUpdateCandles(t, startHeight).then(() =>
             t.batch(
               intervalPairs.map(([shorter, longer]) =>
-                t.any(insertOrUpdateCandlesFromShortInterval(tableName, shorter, longer))
+                t.any(
+                  insertOrUpdateCandlesFromShortInterval(
+                    tableName,
+                    shorter,
+                    longer
+                  )
+                )
               )
             )
           );

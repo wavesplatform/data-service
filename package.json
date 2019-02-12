@@ -9,13 +9,13 @@
   "scripts": {
     "build": "tsc",
     "start": "export $(cat variables.env | xargs) && NODE_ENV=production node dist/index.js",
-    "candles": "export $(cat variables.env | xargs) && NODE_ENV=production node src/daemons/candles/index.js",
-    "dev:candles:t": "export $(cat variables.testnet.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect src/daemons/candles/index.js",
-    "pairs": "export $(cat variables.env | xargs) && NODE_ENV=production node src/daemons/pairs/index.js",
-    "dev:pairs:t": "export $(cat variables.testnet.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect src/daemons/pairs/index.js",
+    "candles": "export $(cat variables.env | xargs) && NODE_ENV=production node dist/daemons/candles/index.js",
+    "dev:candles:t": "export $(cat variables.testnet.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect dist/daemons/candles/index.js",
+    "pairs": "export $(cat variables.env | xargs) && NODE_ENV=production node dist/daemons/pairs/index.js",
+    "dev:pairs:t": "export $(cat variables.testnet.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect dist/daemons/pairs/index.js",
     "lint": "eslint src",
     "dev": "export $(cat variables.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect",
-    "dev:t": "export $(cat variables.testnet.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect",
+    "dev:t": "export $(cat variables.testnet.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect dist/index.js",
     "test": "npm run test:u && npm run test:i",
     "test:t": "npm run test:u && npm run test:it",
     "test:u": "jest --config=config/jest.config.unit.json",
@@ -37,7 +37,8 @@
     "typescript": "^3.2.2"
   },
   "dependencies": {
-    "@koa/cors": "^2.2.1",
+    "@koa/cors": "^2.2.3",
+    "@types/knex": "^0.15.1",
     "@waves/data-entities": "^1.8.0",
     "@waves/json-bigint": "git+https://github.com/wavesplatform/json-bigint.git",
     "bignumber.js": "^7.0.1",

@@ -1,6 +1,6 @@
 const pg = require('knex')({ client: 'pg' });
 const { createPgDriver } = require('../../../db');
-const loadConfig = require('../../../loadConfig');
+const { loadConfig } = require('../../../loadConfig');
 const options = loadConfig();
 const pgDriver = createPgDriver(options);
 const create = require('../index');
@@ -42,7 +42,10 @@ describe('Pairs', () => {
       expect(result.data).toHaveProperty('volume', pair.volume);
       expect(result.data).toHaveProperty('quoteVolume', pair.quote_volume);
       expect(result.data).toHaveProperty('volumeWaves', pair.volume_waves);
-      expect(result.data).toHaveProperty('weightedAveragePrice', pair.weighted_average_price);
+      expect(result.data).toHaveProperty(
+        'weightedAveragePrice',
+        pair.weighted_average_price
+      );
       expect(result.data).toHaveProperty('txsCount', pair.txs_count);
     });
 
@@ -99,7 +102,7 @@ describe('Pairs', () => {
         .listen({
           onResolved: pairs => {
             expect(pairs.__type).toEqual('list');
-            expect(pairs.data).toEqual([null]);
+            expect(pairs.data).toEqual([{ __type: 'pair', data: null }]);
             done();
           },
         });
@@ -110,7 +113,7 @@ describe('Pairs', () => {
     it('should return Pairs correctly', async () => {
       const result = await service
         .search({
-          limit: 2
+          limit: 2,
         })
         .run()
         .promise();
