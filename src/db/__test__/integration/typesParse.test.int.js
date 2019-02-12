@@ -14,7 +14,7 @@ const q = fn =>
       onRejected: console.error, // eslint-disable-line
     });
 
-xdescribe('Type parsing should convert to BigNumber', () => {
+describe('Type parsing should convert to BigNumber', () => {
   it('bigint', done =>
     q(({ i8: x }) => {
       expect(x instanceof BigNumber).toBe(true);

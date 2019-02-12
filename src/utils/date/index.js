@@ -1,5 +1,6 @@
 const { curry } = require('ramda');
 
+/** roundTo :: String -> Interval -> Date -> Date */
 const roundTo = curry((direction, interval, date) => {
   let roundFn;
   switch (direction) {
@@ -51,24 +52,57 @@ const roundTo = curry((direction, interval, date) => {
   return newDate;
 });
 
+/**  add :: Interval -> Date -> Date */
 const add = curry(
   (interval, date) => new Date(date.getTime() + interval.length)
 );
+/**  add :: Interval -> Date -> Date */
 const subtract = curry(
   (interval, date) => new Date(date.getTime() - interval.length)
 );
 
+const spreadIntervalUnits = time => {
+  const t = time.substr(-1, 1);
+  const full = {
+    Y: 'year',
+    M: 'month',
+    d: 'days',
+    h: 'hours',
+    m: 'minutes',
+    s: 'seconds',
+  };
+  return full[t];
+};
+
 /** trunc :: String -> Date -> String */
 const trunc = curry((precision, date) => {
   const precisions = {
-    year: 4,
-    month: 7,
-    days: 10,
-    hours: 13,
-    minutes: 16,
-    seconds: 19,
+    year: {
+      precision: 4,
+      suffix: '-01-01T00:00:00.000Z',
+    },
+    month: {
+      precision: 7,
+      suffix: '-01T00:00:00.000Z',
+    },
+    days: {
+      precision: 10,
+      suffix: '',
+    },
+    hours: {
+      presicion: 13,
+      suffix: ':00:00.000Z',
+    },
+    minutes: {
+      presicion: 16,
+      suffix: ':00.000Z',
+    },
+    seconds: {
+      precision: 19,
+      suffix: '',
+    },
   };
-  return date.toISOString().substr(0, precisions[precision]);
+  return date.toISOString().substr(0, precisions[precision].presicion) + precisions[precision].suffix;
 });
 
 const daysInMonth = (year, month) => new Date(year, month, 0).getDate();
@@ -80,4 +114,5 @@ module.exports = {
   add,
   subtract,
   trunc,
+  spreadIntervalUnits,
 };

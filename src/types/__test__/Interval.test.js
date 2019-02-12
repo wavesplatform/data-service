@@ -36,4 +36,26 @@ describe('Interval', () => {
     expect(JSON.stringify(i)).toBe(JSON.stringify('180s'));
     expect(i.toString()).toBe('180s');
   });
+
+  describe('fromNumber method', () => {
+    it('should return Result.Ok if correct args are given', () => {
+      const i = Interval.fromNumber(900).getOrElse(null);
+      expect(i.toString()).toBe('15m');
+    });
+
+    it('should return Result.Ok if correct args are given', () => {
+      const i = Interval.fromNumber(3196800).getOrElse(null);
+      expect(i.toString()).toBe('37d');
+    });
+
+    it('should return Result.Ok if correct args are given', () => {
+      const i = Interval.fromNumber(1960588800).getOrElse(null);
+      expect(i.toString()).toBe('2Y');
+    });
+
+    it('should return Result.Error if wrong args are given', () => {
+      const i = Interval.fromNumber(2.5).getOrElse(null);
+      expect(i).toBe(null);
+    });
+  });
 });

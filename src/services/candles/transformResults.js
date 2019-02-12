@@ -41,7 +41,7 @@ const transformCandle = ([time, candle]) => {
       'p_dec'
     ]),
     renameFields,
-    assoc('time_start', new Date(`${time}Z`)),
+    assoc('time_start', new Date(`${time.substr(0, time.lastIndexOf('.'))}.000Z`)),
     ifElse(isEmpty, map(always(null)), identity)
   )(candle);
 };
