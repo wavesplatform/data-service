@@ -5,9 +5,9 @@ import { createPgDriver } from '../../driver';
 
 const dbT = createPgDriver(loadConfig());
 
-// type BigNumberArray = BigNumber[];
+type BigNumberArray = BigNumber[];
 type BigNumberResult = Record<string, BigNumber>;
-// type BigNumberArrayResult = Record<string, BigNumberArray>;
+type BigNumberArrayResult = Record<string, BigNumberArray>;
 
 const q = <T>(query: string, fn: (data: T) => void) =>
   dbT
@@ -29,19 +29,19 @@ describe('Type parsing should convert to BigNumber', () => {
       }
     ));
 
-  // it('float', done =>
-  //   q(({ f4: x }: BigNumberResult) => {
-  //     expect(x instanceof BigNumber).toBe(true);
-  //     expect(x).toEqual(new BigNumber('9.22337203685478'));
-  //     done();
-  //   }));
+  xit('float', done =>
+    q('HERE MUST BE QUERY', ({ f4: x }: BigNumberResult) => {
+      expect(x instanceof BigNumber).toBe(true);
+      expect(x).toEqual(new BigNumber('9.22337203685478'));
+      done();
+    }));
 
-  // it('double precision', done =>
-  //   q(({ f8: x }: BigNumberResult) => {
-  //     expect(x instanceof BigNumber).toBe(true);
-  //     expect(x).toEqual(new BigNumber('9.22337203685478'));
-  //     done();
-  //   }));
+  xit('double precision', done =>
+    q('HERE MUST BE QUERY', ({ f8: x }: BigNumberResult) => {
+      expect(x instanceof BigNumber).toBe(true);
+      expect(x).toEqual(new BigNumber('9.22337203685478'));
+      done();
+    }));
 
   it('numeric', done =>
     q(
@@ -53,47 +53,47 @@ describe('Type parsing should convert to BigNumber', () => {
       }
     ));
 
-  // it('array/bigint', done =>
-  //   q(({ i8a: xs }: BigNumberArrayResult) => {
-  //     xs.forEach(x => expect(x instanceof BigNumber).toBe(true));
+  xit('array/bigint', done =>
+    q('HERE MUST BE QUERY', ({ i8a: xs }: BigNumberArrayResult) => {
+      xs.forEach(x => expect(x instanceof BigNumber).toBe(true));
 
-  //     expect(xs).toEqual([
-  //       new BigNumber('9223372036854775803'),
-  //       new BigNumber('9223372036854775802'),
-  //     ]);
-  //     done();
-  //   }));
+      expect(xs).toEqual([
+        new BigNumber('9223372036854775803'),
+        new BigNumber('9223372036854775802'),
+      ]);
+      done();
+    }));
 
-  // it('array/float', done =>
-  //   q(({ f4a: xs }: BigNumberArrayResult) => {
-  //     xs.forEach(x => expect(x instanceof BigNumber).toBe(true));
+  xit('array/float', done =>
+    q('HERE MUST BE QUERY', ({ f4a: xs }: BigNumberArrayResult) => {
+      xs.forEach(x => expect(x instanceof BigNumber).toBe(true));
 
-  //     expect(xs).toEqual([
-  //       new BigNumber('9.22337203685478'),
-  //       new BigNumber('9.22337203685478'),
-  //     ]);
-  //     done();
-  //   }));
+      expect(xs).toEqual([
+        new BigNumber('9.22337203685478'),
+        new BigNumber('9.22337203685478'),
+      ]);
+      done();
+    }));
 
-  // it('array/double precision', done =>
-  //   q(({ f8a: xs }: BigNumberArrayResult) => {
-  //     xs.forEach(x => expect(x instanceof BigNumber).toBe(true));
+  xit('array/double precision', done =>
+    q('HERE MUST BE QUERY', ({ f8a: xs }: BigNumberArrayResult) => {
+      xs.forEach(x => expect(x instanceof BigNumber).toBe(true));
 
-  //     expect(xs).toEqual([
-  //       new BigNumber('9.22337203685478'),
-  //       new BigNumber('9.22337203685478'),
-  //     ]);
-  //     done();
-  //   }));
+      expect(xs).toEqual([
+        new BigNumber('9.22337203685478'),
+        new BigNumber('9.22337203685478'),
+      ]);
+      done();
+    }));
 
-  // it('array/numeric', done =>
-  //   q(({ na: xs }: BigNumberArrayResult) => {
-  //     xs.forEach((x: BigNumber) => expect(x instanceof BigNumber).toBe(true));
+  xit('array/numeric', done =>
+    q('HERE MUST BE QUERY', ({ na: xs }: BigNumberArrayResult) => {
+      xs.forEach((x: BigNumber) => expect(x instanceof BigNumber).toBe(true));
 
-  //     expect(xs).toEqual([
-  //       new BigNumber('9223372036854775797'),
-  //       new BigNumber('9223372036854775796'),
-  //     ]);
-  //     done();
-  //   }));
+      expect(xs).toEqual([
+        new BigNumber('9223372036854775797'),
+        new BigNumber('9223372036854775796'),
+      ]);
+      done();
+    }));
 });

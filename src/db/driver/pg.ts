@@ -34,8 +34,8 @@ export type PgDriver = {
   ): Task<DbError, T>;
   many<T>(query: SqlQuery, values?: any): Task<DbError, T[]>;
   any<T>(query: SqlQuery, values?: any): Task<DbError, T[]>;
-  task<T>(cb: (t: ITask<{}> & {}) => T | Promise<T>): Task<DbError, T>;
-  tx<T>(cb: (t: ITask<{}> & {}) => T | Promise<T>): Task<DbError, T>;
+  task<T>(cb: (t: ITask<{}>) => T | Promise<T>): Task<DbError, T>;
+  tx<T>(cb: (t: ITask<{}>) => T | Promise<T>): Task<DbError, T>;
 };
 
 export const createPgDriver = (
@@ -62,9 +62,9 @@ export const createPgDriver = (
       fromPromised<DbError, T[]>(() => driverP.many(query, values))(),
     any: <T>(query: SqlQuery, values?: any) =>
       fromPromised<DbError, T[]>(() => driverP.any(query, values))(),
-    task: <T>(cb: (t: ITask<{}> & {}) => T | Promise<T>) =>
+    task: <T>(cb: (t: ITask<{}>) => T | Promise<T>) =>
       fromPromised<DbError, T>(() => driverP.task(cb))(),
-    tx: <T>(cb: (t: ITask<{}> & {}) => T | Promise<T>) =>
+    tx: <T>(cb: (t: ITask<{}>) => T | Promise<T>) =>
       fromPromised<DbError, T>(() => driverP.tx(cb))(),
   };
 

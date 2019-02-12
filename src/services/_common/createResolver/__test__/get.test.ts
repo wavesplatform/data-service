@@ -52,7 +52,7 @@ describe('Resolver', () => {
     goodResolver(assetId)
       .run()
       .listen({
-        onResolved: (data: string | null): void => {
+        onResolved: data => {
           expect(data).toEqual(assetId);
           done();
         },
@@ -129,7 +129,7 @@ describe('Resolver', () => {
     badInputResolver(assetId)
       .run()
       .listen({
-        onRejected: (error: AppError): void => {
+        onRejected: error => {
           expect(error).toEqual(AppError.Validation(assetId));
           done();
         },
@@ -160,7 +160,7 @@ describe('Resolver', () => {
     badOutputResolver(assetId)
       .run()
       .listen({
-        onRejected: (e: AppError): void => {
+        onRejected: e => {
           expect(e).toEqual(AppError.Resolver(assetId));
           done();
         },

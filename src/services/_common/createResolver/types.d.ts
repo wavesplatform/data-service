@@ -10,8 +10,6 @@ import {
 
 import { PgDriver } from '../../../db/driver';
 
-// @todo type DbDriver
-// export type DbDriver = any;
 export type EmitEvent = {
   (name: string): <A>(object: A) => void;
 };

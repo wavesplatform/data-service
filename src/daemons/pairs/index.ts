@@ -3,8 +3,7 @@ import { loadConfig } from './loadConfig';
 const configuration = loadConfig();
 
 // logger
-// TODO REFACTOR
-const createLogger = require('../../logger/winston');
+import * as createLogger from '../../logger/winston';
 
 // pg driver
 import { createPgDriver } from '../../db';

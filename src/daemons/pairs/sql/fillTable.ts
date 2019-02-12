@@ -19,33 +19,29 @@ const selectExchanges = pg('txs_7')
 
 const selectPairsCTE = pg
   .with('pairs_cte', qp => {
-    qp.select([
-      { amount_asset_id: 'amount_asset' },
-      { price_asset_id: 'price_asset' },
-      pg.raw(
-        '(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals) ORDER BY e.time_stamp DESC)::numeric[])[1] as last_price'
+    qp.select({
+      amount_asset_id: 'amount_asset',
+      price_asset_id: 'price_asset',
+      last_price: pg.raw(
+        '(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals) ORDER BY e.time_stamp DESC)::numeric[])[1]'
       ),
-      pg.raw(
-        '(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals) ORDER BY e.time_stamp)::numeric[])[1] as first_price'
+      first_price: pg.raw(
+        '(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals) ORDER BY e.time_stamp)::numeric[])[1]'
       ),
-      pg.raw('sum(e.amount * 10 ^(-a_dec.decimals)) as volume'),
-      pg.raw(
-        'sum(e.amount * 10 ^(-a_dec.decimals) * e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals)) as quote_volume'
+      volume: pg.raw('sum(e.amount * 10 ^(-a_dec.decimals))'),
+      quote_volume: pg.raw(
+        'sum(e.amount * 10 ^(-a_dec.decimals) * e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'
       ),
-      pg.raw(
-        'sum(e.amount * 10 ^(-a_dec.decimals) * e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))/ sum(e.amount * 10 ^(-a_dec.decimals)) as weighted_average_price'
+      weighted_average_price: pg.raw(
+        'sum(e.amount * 10 ^(-a_dec.decimals) * e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))/ sum(e.amount * 10 ^(-a_dec.decimals))'
       ),
-      pg.raw(
-        "case when amount_asset = 'WAVES' then sum(e.amount * 10 ^(-a_dec.decimals)) when price_asset = 'WAVES' then sum(e.amount * 10 ^(-a_dec.decimals) * e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals)) end as volume_waves"
+      volume_waves: pg.raw(
+        "case when amount_asset = 'WAVES' then sum(e.amount * 10 ^(-a_dec.decimals)) when price_asset = 'WAVES' then sum(e.amount * 10 ^(-a_dec.decimals) * e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals)) end"
       ),
-      pg.raw(
-        'max(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals)) as high'
-      ),
-      pg.raw(
-        'min(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals)) as low'
-      ),
-      pg.raw('count(e.price) as txs_count'),
-    ])
+      high: pg.raw('max(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'),
+      low: pg.raw('min(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'),
+      txs_count: pg.raw('count(e.price)'),
+    })
       .from(selectExchanges.clone().as('e'))
       .innerJoin('asset_decimals as a_dec', 'e.amount_asset', 'a_dec.asset_id')
       .innerJoin('asset_decimals as p_dec', 'e.price_asset', 'p_dec.asset_id')
@@ -58,9 +54,11 @@ const selectPairsCTE = pg
     'first_price',
     'last_price',
     'volume',
-    pg.raw(
-      `coalesce(volume_waves, (${selectVolumeWavesFromPairsCTE.toString()})) as volume_waves`
-    ),
+    {
+      volume_waves: pg.raw(
+        `coalesce(volume_waves, (${selectVolumeWavesFromPairsCTE.toString()}))`
+      ),
+    },
     'quote_volume',
     'high',
     'low',
