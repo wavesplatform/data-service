@@ -59,7 +59,7 @@ describe('Tasked driver method', () => {
       .run()
       .listen({
         onResolved: xs => {
-          expect(xs).toEqual(['some sql']);
+          expect(xs).toEqual(['some sql', undefined]);
           done();
         },
       });
