@@ -2,7 +2,7 @@ const {
   transformResult,
   transformResultSearch,
 } = require('../transformResult');
-const { List, Pair } = require('../../../types');
+const { list, Pair } = require('../../../types');
 
 describe('sql query results transformation', () => {
   it('should return pair without asset and price asset for get one or many pair', () => {
@@ -36,7 +36,7 @@ describe('sql query results transformation', () => {
         },
       ])
     ).toEqual(
-      List([
+      list([
         {
           ...Pair({
             firstPrice: 1.2,

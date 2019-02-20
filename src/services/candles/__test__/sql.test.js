@@ -1,20 +1,37 @@
-const Interval = require('../../../types/Interval');
+const { Interval } = require('../../../types/');
 const { highestDividerLessThen, sql } = require('../sql');
+const { unsafeGetFromResult } = require('../../../utils/testUtils');
 
 describe('candles sql helper functions', () => {
   it('highest divider less then', () => {
     expect(
-      highestDividerLessThen(Interval('1m'), ['1m', '1h', '1d']).length
-    ).toBe(Interval('1m').length);
+      highestDividerLessThen(unsafeGetFromResult(Interval.from('1m')), [
+        '1m',
+        '1h',
+        '1d',
+      ]).length
+    ).toBe(unsafeGetFromResult(Interval.from('1m')).length);
     expect(
-      highestDividerLessThen(Interval('10m'), ['5m', '15m', '1h']).length
-    ).toBe(Interval('5m').length);
+      highestDividerLessThen(unsafeGetFromResult(Interval.from('10m')), [
+        '5m',
+        '15m',
+        '1h',
+      ]).length
+    ).toBe(unsafeGetFromResult(Interval.from('5m')).length);
     expect(
-      highestDividerLessThen(Interval('15m'), ['5m', '15m', '1h']).length
-    ).toBe(Interval('15m').length);
+      highestDividerLessThen(unsafeGetFromResult(Interval.from('15m')), [
+        '5m',
+        '15m',
+        '1h',
+      ]).length
+    ).toBe(unsafeGetFromResult(Interval.from('15m')).length);
     expect(
-      highestDividerLessThen(Interval('1h'), ['1m', '1h', '1d']).length
-    ).toBe(Interval('1h').length);
+      highestDividerLessThen(unsafeGetFromResult(Interval.from('1h')), [
+        '1m',
+        '1h',
+        '1d',
+      ]).length
+    ).toBe(unsafeGetFromResult(Interval.from('1h')).length);
   });
 });
 

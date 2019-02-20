@@ -1,8 +1,8 @@
-const createNamedType = require('../createNamedType');
+import createNamedType from '../createNamedType';
 
 describe('createNamedType function', () => {
   it('should create a simple named type', () => {
-    const MyType = createNamedType('my-type');
+    const MyType = createNamedType<number>('my-type');
     expect(MyType(1)).toEqual({
       __type: 'my-type',
       data: 1,
@@ -10,7 +10,7 @@ describe('createNamedType function', () => {
   });
 
   it('should provide `data: null` by default', () => {
-    const MyType = createNamedType('my-type');
+    const MyType = createNamedType<number>('my-type');
     expect(MyType()).toEqual({
       __type: 'my-type',
       data: null,
@@ -18,7 +18,7 @@ describe('createNamedType function', () => {
   });
 
   it('should create a type with custom default value', () => {
-    const MyList = createNamedType('my-list', []);
+    const MyList = createNamedType<number[]>('my-list', []);
 
     expect(MyList([1, 2, 3])).toEqual({
       __type: 'my-list',

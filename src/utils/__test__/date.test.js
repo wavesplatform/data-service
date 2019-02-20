@@ -1,25 +1,25 @@
 const { round, floor, ceil, add, subtract } = require('../date');
-
-const Interval = require('../../types/Interval');
+const { Interval } = require('../../types');
+const { unsafeGetFromResult } = require('../../utils/testUtils');
 
 describe('date helper functions', () => {
   describe('arithmetic functions', () => {
     const d = new Date('2018-11-22T17:55:46.045Z');
 
     it('add interval to date', () => {
-      expect(add(Interval('3m'), d)).toEqual(
+      expect(add(unsafeGetFromResult(Interval.from('3m')), d)).toEqual(
         new Date('2018-11-22T17:58:46.045Z')
       );
-      expect(add(Interval('3h'), d)).toEqual(
+      expect(add(unsafeGetFromResult(Interval.from('3h')), d)).toEqual(
         new Date('2018-11-22T20:55:46.045Z')
       );
     });
 
     it('subtract interval from date', () => {
-      expect(subtract(Interval('3m'), d)).toEqual(
+      expect(subtract(unsafeGetFromResult(Interval.from('3m')), d)).toEqual(
         new Date('2018-11-22T17:52:46.045Z')
       );
-      expect(subtract(Interval('3h'), d)).toEqual(
+      expect(subtract(unsafeGetFromResult(Interval.from('3h')), d)).toEqual(
         new Date('2018-11-22T14:55:46.045Z')
       );
     });
@@ -27,7 +27,7 @@ describe('date helper functions', () => {
 
   describe('round functions', () => {
     describe('should round down to a minute', () => {
-      const i = Interval('1m');
+      const i = unsafeGetFromResult(Interval.from('1m'));
       const d = new Date('2018-11-22T17:55:46.045Z');
 
       it('with floor/ceil', () => {
@@ -46,7 +46,7 @@ describe('date helper functions', () => {
     });
 
     describe('should round down to a hour', () => {
-      const i = Interval('1h');
+      const i = unsafeGetFromResult(Interval.from('1h'));
       const d = new Date('2018-11-22T23:55:46.045+00:00');
 
       it('with floor/ceil', () => {
@@ -64,7 +64,7 @@ describe('date helper functions', () => {
     });
 
     describe('should round down to a month', () => {
-      const i = Interval('1M');
+      const i = unsafeGetFromResult(Interval.from('1M'));
       const d = new Date('2018-11-22T23:55:46.045Z');
 
       it('with floor/ceil', () => {
@@ -82,7 +82,7 @@ describe('date helper functions', () => {
     });
 
     describe('should round down to a year', () => {
-      const i = Interval('1Y');
+      const i = unsafeGetFromResult(Interval.from('1Y'));
       const d = new Date('2018-11-22T23:55:46.045Z');
 
       it('with floor/ceil', () => {

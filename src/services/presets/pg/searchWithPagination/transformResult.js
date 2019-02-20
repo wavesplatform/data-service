@@ -1,6 +1,6 @@
 const Maybe = require('folktale/maybe');
 
-const { Transaction, List } = require('../../../../types');
+const { Transaction, list } = require('../../../../types');
 
 const { map, compose, pipe, last, prop, objOf } = require('ramda');
 const Cursor = require('../../../_common/pagination/cursor');
@@ -21,7 +21,7 @@ const createCursorMeta = (request, xs) =>
 /** transformResults :: RawTxsInfo[] -> List Transaction */
 const transformResults = transformTxInfo => (result, request) =>
   compose(
-    xs => List(xs, createCursorMeta(request, xs)),
+    xs => list(xs, createCursorMeta(request, xs)),
     map(Transaction),
     map(transformTxInfo)
   )(result);

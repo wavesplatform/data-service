@@ -1,5 +1,5 @@
 const Joi = require('../../utils/validation/joi');
-const Interval = require('../../types/Interval');
+const Interval = require('../../types/interval');
 
 const customJoi = Joi.extend(joi => ({
   base: joi.object(),

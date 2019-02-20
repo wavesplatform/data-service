@@ -3,7 +3,7 @@ const rawJoi = require('joi');
 const { BigNumber } = require('@waves/data-entities');
 const Cursor = require('../../services/_common/pagination/cursor');
 const { base58: base58Regex, interval: intervalRegex } = require('../regex');
-const Interval = require('../../types/Interval');
+const { Interval } = require('../../types');
 
 module.exports = rawJoi
   .extend(joi => ({
@@ -82,18 +82,29 @@ module.exports = rawJoi
           accept: joi.array(),
         },
         validate(params, value, state, options) {
-          const interval = Interval(value);
+          const interval = Interval.from(value);
 
-          if (params.accept.indexOf(interval.unit) === -1) {
-            return this.createError(
-              'string.period.accept',
-              { value },
-              state,
-              options
-            );
-          }
+          return interval.matchWith({
+            Ok: ({ value: i }) => {
+              if (params.accept.indexOf(i.unit) === -1) {
+                return this.createError(
+                  'string.period.accept',
+                  { value },
+                  state,
+                  options
+                );
+              }
 
-          return value;
+              return value;
+            },
+            Error: ({ value: e }) =>
+              this.createError(
+                'string.period.accept',
+                { value, e },
+                state,
+                options
+              ),
+          });
         },
       },
       {
@@ -102,19 +113,40 @@ module.exports = rawJoi
           divisibleBy: joi.string().regex(intervalRegex),
         },
         validate(params, value, state, options) {
-          const interval = Interval(value);
-          const divisibleByInterval = Interval(params.divisibleBy);
+          const interval = Interval.from(value);
+          const divisibleByInterval = Interval.from(params.divisibleBy);
 
-          if (interval.div(divisibleByInterval) % 1 !== 0) {
-            return this.createError(
-              'string.period.divisibleBy',
-              { value },
-              state,
-              options
-            );
-          }
+          return interval.matchWith({
+            Ok: ({ value: i }) =>
+              divisibleByInterval.matchWith({
+                Ok: ({ value: d }) => {
+                  if (i.div(d) % 1 !== 0) {
+                    return this.createError(
+                      'string.period.divisibleBy',
+                      { value },
+                      state,
+                      options
+                    );
+                  }
 
-          return value;
+                  return value;
+                },
+                Error: ({ value: e }) =>
+                  this.createError(
+                    'string.period.divisibleBy',
+                    { value, e },
+                    state,
+                    options
+                  ),
+              }),
+            Error: ({ value: e }) =>
+              this.createError(
+                'string.period.interval',
+                { value, e },
+                state,
+                options
+              ),
+          });
         },
       },
       {
@@ -123,19 +155,39 @@ module.exports = rawJoi
           min: joi.string().regex(intervalRegex),
         },
         validate(params, value, state, options) {
-          const interval = Interval(value);
-          const minInterval = Interval(params.min);
+          const interval = Interval.from(value);
+          const minInterval = Interval.from(params.min);
 
-          if (minInterval.length > interval.length) {
-            return this.createError(
-              'string.period.min',
-              { value },
-              state,
-              options
-            );
-          }
-
-          return value;
+          return interval.matchWith({
+            Ok: ({ value: i }) =>
+              minInterval.matchWith({
+                Ok: ({ value: d }) => {
+                  if (d.length > i.length) {
+                    return this.createError(
+                      'string.period.minInterval',
+                      { value },
+                      state,
+                      options
+                    );
+                  }
+                  return value;
+                },
+                Error: ({ value: e }) =>
+                  this.createError(
+                    'string.period.minInterval',
+                    { value, e },
+                    state,
+                    options
+                  ),
+              }),
+            Error: ({ value: e }) =>
+              this.createError(
+                'string.period.interval',
+                { value, e },
+                state,
+                options
+              ),
+          });
         },
       },
       {
@@ -144,19 +196,39 @@ module.exports = rawJoi
           max: joi.string().regex(intervalRegex),
         },
         validate(params, value, state, options) {
-          const interval = Interval(value);
-          const maxInterval = Interval(params.max);
+          const interval = Interval.from(value);
+          const maxInterval = Interval.from(params.max);
 
-          if (maxInterval.length < interval.length) {
-            return this.createError(
-              'string.period.max',
-              { value },
-              state,
-              options
-            );
-          }
-
-          return value;
+          return interval.matchWith({
+            Ok: ({ value: i }) =>
+              maxInterval.matchWith({
+                Ok: ({ value: d }) => {
+                  if (d.length < i.length) {
+                    return this.createError(
+                      'string.period.maxInterval',
+                      { value },
+                      state,
+                      options
+                    );
+                  }
+                  return value;
+                },
+                Error: ({ value: e }) =>
+                  this.createError(
+                    'string.period.maxInterval',
+                    { value, e },
+                    state,
+                    options
+                  ),
+              }),
+            Error: ({ value: e }) =>
+              this.createError(
+                'string.period.interval',
+                { value, e },
+                state,
+                options
+              ),
+          });
         },
       },
     ],
