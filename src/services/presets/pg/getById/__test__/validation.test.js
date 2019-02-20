@@ -28,7 +28,7 @@ const assertValidationError = (done, r, v) =>
     .promise()
     .then(() => done('Wrong branch, error'))
     .catch(e => {
-      expect(e.type).toBe('ValidationError');
+      expect(e.type).toBe('Validation');
       done();
     });
 
@@ -65,7 +65,7 @@ describe('getById', () => {
         .run()
         .listen({
           onRejected: e => {
-            expect(e.type).toBe('ResolverError');
+            expect(e.type).toBe('Resolver');
             done();
           },
         }));

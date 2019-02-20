@@ -29,7 +29,7 @@ const assertValidationError = (done, v) =>
     .promise()
     .then(() => done('Wrong branch, error'))
     .catch(e => {
-      expect(e.type).toBe('ValidationError');
+      expect(e.type).toBe('Validation');
       done();
     });
 
