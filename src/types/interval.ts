@@ -11,6 +11,15 @@ export enum Unit {
   Year = 'Y',
 }
 
+const units: Record<Unit, number> = {
+  [Unit.Second]: 1,
+  [Unit.Minute]: 60,
+  [Unit.Hour]: 60 * 60,
+  [Unit.Day]: 60 * 60 * 24,
+  [Unit.Month]: 60 * 60 * 24 * 31,
+  [Unit.Year]: 60 * 60 * 24 * 31 * 366,
+};
+
 const parseUnit = (s: string): Result<ValidationError, Unit> => {
   switch (s.substr(-1)) {
     case Unit.Second:
@@ -35,14 +44,6 @@ const parseLength = (
   s: string,
   unit: Unit
 ): Result<ValidationError, number> => {
-  const units: Record<Unit, number> = {
-    [Unit.Second]: 1,
-    [Unit.Minute]: 60,
-    [Unit.Hour]: 60 * 60,
-    [Unit.Day]: 60 * 60 * 24,
-    [Unit.Month]: 60 * 60 * 24 * 31,
-    [Unit.Year]: 60 * 60 * 24 * 31 * 366,
-  };
   const sub = s.substr(0, s.length - 1);
   const n = parseInt(sub);
   return !isNaN(n)

@@ -18,9 +18,10 @@ const { interval, list } = require('../../types');
 const concatAll = require('../../utils/fp/concatAll');
 const { floor, ceil, add, trunc } = require('../../utils/date');
 const { candle } = require('../../types');
+const { Unit } = require('../../types/interval');
 const { candleMonoid } = require('./candleMonoid');
 
-const truncToMinutes = trunc('minutes');
+const truncToMinutes = trunc(Unit.Minute);
 
 /** transformCandle :: [Date, CandleDbResponse] -> Candle */
 const transformCandle = ([time, c]) => {

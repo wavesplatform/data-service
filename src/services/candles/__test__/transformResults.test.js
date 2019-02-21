@@ -2,10 +2,11 @@ const { groupBy, map, pipe, toPairs } = require('ramda');
 const { addMissingCandles, transformCandle } = require('../transformResults');
 const { candleMonoid } = require('../candleMonoid');
 const { interval } = require('../../../types');
+const { Unit } = require('../../../types/interval');
 const { floor, trunc } = require('../../../utils/date');
 const concatAll = require('../../../utils/fp/concatAll');
 
-const truncToMinutes = trunc('minutes');
+const truncToMinutes = trunc(Unit.Minute);
 
 const oneDayCandles = require('./mocks/oneDayCandles');
 const monthCandles = require('./mocks/monthCandles');

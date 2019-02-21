@@ -3,7 +3,7 @@ const { always, identity } = require('ramda');
 
 const { parseDate } = require('../../../../../utils/parseDate');
 
-const Joi = require('joi');
+const { Joi } = require('../../../../../utils/validation');
 
 const searchWithPaginationPreset = require('..');
 const commonFilterSchemas = require('../commonFilterSchemas');

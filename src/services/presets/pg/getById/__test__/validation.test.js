@@ -2,7 +2,7 @@ const Task = require('folktale/concurrency/task');
 const Maybe = require('folktale/maybe');
 const { always, identity } = require('ramda');
 
-const Joi = require('joi');
+const { Joi } = require('../../../../../utils/validation');
 
 const { transaction } = require('../../../../../types');
 

@@ -1,4 +1,4 @@
-const Joi = require('../../../utils/validation/joi');
+const { Joi } = require('../../../utils/validation');
 
 module.exports = {
   id: Joi.string()

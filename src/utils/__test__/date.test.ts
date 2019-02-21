@@ -1,5 +1,5 @@
-const { round, floor, ceil, add, subtract } = require('../date');
-const { interval } = require('../../types');
+import { round, floor, ceil, add, subtract } from '../date';
+import { interval } from '../../types';
 
 describe('date helper functions', () => {
   describe('arithmetic functions', () => {

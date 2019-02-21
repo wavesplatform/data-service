@@ -1,6 +1,6 @@
-const { BigNumber } = require('@waves/data-entities');
+import { BigNumber } from '@waves/data-entities';
 
-const { convertAmount, convertPrice } = require('../satoshi');
+import { convertAmount, convertPrice } from '../satoshi';
 
 test('convertAmount should multiply by 10^-decimals', () => {
   expect(convertAmount(8, new BigNumber(100000000))).toEqual(new BigNumber(1));

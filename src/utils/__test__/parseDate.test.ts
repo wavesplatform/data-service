@@ -1,4 +1,4 @@
-const { parseDate } = require('../parseDate');
+import { parseDate } from '../parseDate';
 
 // parseDate always receives string from queryString
 describe('parseDate', () => {
