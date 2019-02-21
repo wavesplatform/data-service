@@ -1,5 +1,5 @@
 const { compose, findLast, map, prop, sortBy } = require('ramda');
-const { Interval } = require('../../types');
+const { interval, intervalDiv } = require('../../types');
 const pg = require('knex')({ client: 'pg' });
 
 const fields = [
@@ -21,11 +21,11 @@ const fields = [
 ];
 
 /** highestDividerLessThen :: Interval i => i -> String[] -> i */
-const highestDividerLessThen = (interval, dividers) =>
+const highestDividerLessThen = (inter, dividers) =>
   compose(
-    findLast(i => interval.div(i) >= 1),
+    findLast(i => intervalDiv(inter, i) >= 1),
     sortBy(prop('length')),
-    map(d => Interval.from(d).getOrElse(null))
+    map(d => interval(d).getOrElse(null))
   )(dividers);
 
 /** sql :: { String, String, Object } -> String */
@@ -38,7 +38,7 @@ const sql = ({ amountAsset, priceAsset, params }) =>
     .where('time_start', '<=', params.timeEnd)
     .where(
       'interval_in_secs',
-      highestDividerLessThen(Interval.from(params.interval).getOrElse(null), [
+      highestDividerLessThen(interval(params.interval).getOrElse(null), [
         '1m',
         '5m',
         '15m',

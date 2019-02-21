@@ -52,43 +52,41 @@ const parseLength = (
       );
 };
 
-export default class Interval {
-  private constructor(length: number, unit: Unit, source: string) {
-    this.length = length;
-    this.unit = unit;
-    this.source = source;
-  }
+export type Interval = {
+  length: number;
+  unit: Unit;
+  source: string;
+};
 
-  public static from(s: string): Result<ValidationError, Interval> {
-    if (!intervalRegex.test(s))
-      return error(
-        new ValidationError('String argument does not match interval pattern')
-      );
+export const interval = (source: string): Result<ValidationError, Interval> => {
+  if (!intervalRegex.test(source))
+    return error(
+      new ValidationError('String argument does not match interval pattern')
+    );
 
-    return parseUnit(s).matchWith({
-      Ok: ({ value: unit }) => {
-        return parseLength(s, unit).matchWith({
-          Ok: ({ value: length }) => ok(new Interval(length, unit, s)),
-          Error: ({ value: e }) => error(e),
-        });
-      },
-      Error: ({ value: e }) => error(e),
-    });
-  }
+  return parseUnit(source).matchWith({
+    Ok: ({ value: unit }) => {
+      return parseLength(source, unit).matchWith({
+        Ok: ({ value: length }) =>
+          ok({
+            length,
+            unit,
+            source,
+          }),
+        Error: ({ value: e }) => error(e),
+      });
+    },
+    Error: ({ value: e }) => error(e),
+  });
+};
 
-  public div(i: Interval): number {
-    return this.length / i.length;
-  }
+export const div = (a: Interval, b: Interval) => a.length / b.length;
 
-  public toString(): string {
-    return this.source;
-  }
+//   public toString(): string {
+//     return this.source;
+//   }
 
-  public toJSON(): string {
-    return this.source;
-  }
-
-  readonly unit: Unit;
-  readonly length: number;
-  private source: string;
-}
+//   public toJSON(): string {
+//     return this.source;
+//   }
+// }

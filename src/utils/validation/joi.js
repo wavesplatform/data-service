@@ -3,7 +3,7 @@ const rawJoi = require('joi');
 const { BigNumber } = require('@waves/data-entities');
 const Cursor = require('../../services/_common/pagination/cursor');
 const { base58: base58Regex, interval: intervalRegex } = require('../regex');
-const { Interval } = require('../../types');
+const { interval, intervalDiv } = require('../../types');
 
 module.exports = rawJoi
   .extend(joi => ({
@@ -82,9 +82,9 @@ module.exports = rawJoi
           accept: joi.array(),
         },
         validate(params, value, state, options) {
-          const interval = Interval.from(value);
+          const i = interval(value);
 
-          return interval.matchWith({
+          return i.matchWith({
             Ok: ({ value: i }) => {
               if (params.accept.indexOf(i.unit) === -1) {
                 return this.createError(
@@ -113,14 +113,14 @@ module.exports = rawJoi
           divisibleBy: joi.string().regex(intervalRegex),
         },
         validate(params, value, state, options) {
-          const interval = Interval.from(value);
-          const divisibleByInterval = Interval.from(params.divisibleBy);
+          const i = interval(value);
+          const divisibleByInterval = interval(params.divisibleBy);
 
-          return interval.matchWith({
+          return i.matchWith({
             Ok: ({ value: i }) =>
               divisibleByInterval.matchWith({
                 Ok: ({ value: d }) => {
-                  if (i.div(d) % 1 !== 0) {
+                  if (intervalDiv(i, d) % 1 !== 0) {
                     return this.createError(
                       'string.period.divisibleBy',
                       { value },
@@ -155,10 +155,10 @@ module.exports = rawJoi
           min: joi.string().regex(intervalRegex),
         },
         validate(params, value, state, options) {
-          const interval = Interval.from(value);
-          const minInterval = Interval.from(params.min);
+          const i = interval(value);
+          const minInterval = interval(params.min);
 
-          return interval.matchWith({
+          return i.matchWith({
             Ok: ({ value: i }) =>
               minInterval.matchWith({
                 Ok: ({ value: d }) => {
@@ -196,10 +196,10 @@ module.exports = rawJoi
           max: joi.string().regex(intervalRegex),
         },
         validate(params, value, state, options) {
-          const interval = Interval.from(value);
-          const maxInterval = Interval.from(params.max);
+          const i = interval(value);
+          const maxInterval = interval(params.max);
 
-          return interval.matchWith({
+          return i.matchWith({
             Ok: ({ value: i }) =>
               maxInterval.matchWith({
                 Ok: ({ value: d }) => {

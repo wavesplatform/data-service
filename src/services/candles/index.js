@@ -1,6 +1,6 @@
 const search = require('../presets/pg/search');
 
-const { Candle } = require('../../types');
+const { candle } = require('../../types');
 
 const { sql } = require('./sql');
 const { inputSearch, output } = require('./schema');
@@ -14,7 +14,7 @@ module.exports = ({ drivers, emitEvent }) => {
       inputSchema: inputSearch,
       resultSchema: output,
       transformResult: transformResults,
-      resultTypeFactory: Candle,
+      resultTypeFactory: candle,
     })({ pg: drivers.pg, emitEvent: emitEvent }),
   };
 };

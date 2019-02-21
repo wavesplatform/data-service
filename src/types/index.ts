@@ -1,6 +1,6 @@
 import createNamedType from './createNamedType';
 import { Maybe } from 'folktale/maybe';
-import Interval from './interval';
+import { Interval, interval, div } from './interval';
 
 export const fromMaybe = <A, B>(factory: (a?: A) => B) => (mb: Maybe<A>) =>
   mb.matchWith({
@@ -10,10 +10,10 @@ export const fromMaybe = <A, B>(factory: (a?: A) => B) => (mb: Maybe<A>) =>
 
 export type TransactionData = {};
 
-export const Asset = createNamedType('asset');
-export const Alias = createNamedType('alias');
-export const Candle = createNamedType('candle');
-export const Pair = createNamedType('pair');
-export const Transaction = createNamedType<TransactionData>('transaction');
+export const asset = createNamedType('asset');
+export const alias = createNamedType('alias');
+export const candle = createNamedType('candle');
+export const pair = createNamedType('pair');
+export const transaction = createNamedType<TransactionData>('transaction');
 export { List, list } from './list';
-export { Interval };
+export { Interval, interval, div as intervalDiv };

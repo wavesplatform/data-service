@@ -14,16 +14,16 @@ const {
   omit,
 } = require('ramda');
 const { renameKeys } = require('ramda-adjunct');
-const { Interval, list } = require('../../types');
+const { interval, list } = require('../../types');
 const concatAll = require('../../utils/fp/concatAll');
 const { floor, ceil, add, trunc } = require('../../utils/date');
-const { Candle } = require('../../types/index');
+const { candle } = require('../../types');
 const { candleMonoid } = require('./candleMonoid');
 
 const truncToMinutes = trunc('minutes');
 
 /** transformCandle :: [Date, CandleDbResponse] -> Candle */
-const transformCandle = ([time, candle]) => {
+const transformCandle = ([time, c]) => {
   const isEmpty = c => c.txs_count === 0;
 
   const renameFields = renameKeys({
@@ -35,15 +35,12 @@ const transformCandle = ([time, candle]) => {
   });
 
   return compose(
-    Candle,
-    omit([
-      'a_dec',
-      'p_dec'
-    ]),
+    candle,
+    omit(['a_dec', 'p_dec']),
     renameFields,
     assoc('time_start', new Date(`${time}Z`)),
     ifElse(isEmpty, map(always(null)), identity)
-  )(candle);
+  )(c);
 };
 
 /** addMissingCandles :: Interval -> Date -> Date
@@ -98,13 +95,16 @@ const transformResults = (result, request) =>
     ),
     map(concatAll(candleMonoid)),
     addMissingCandles(
-      Interval.from(request.params.interval).getOrElse(null),
+      interval(request.params.interval).getOrElse(null),
       request.params.timeStart,
       request.params.timeEnd
     ),
     groupBy(candle =>
       truncToMinutes(
-        floor(Interval.from(request.params.interval).getOrElse(null), candle.time_start)
+        floor(
+          interval(request.params.interval).getOrElse(null),
+          candle.time_start
+        )
       )
     )
   )(result);

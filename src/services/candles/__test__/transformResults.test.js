@@ -1,10 +1,9 @@
 const { groupBy, map, pipe, toPairs } = require('ramda');
 const { addMissingCandles, transformCandle } = require('../transformResults');
 const { candleMonoid } = require('../candleMonoid');
-const { Interval } = require('../../../types');
+const { interval } = require('../../../types');
 const { floor, trunc } = require('../../../utils/date');
 const concatAll = require('../../../utils/fp/concatAll');
-const { unsafeGetFromResult } = require('../../../utils/testUtils');
 
 const truncToMinutes = trunc('minutes');
 
@@ -15,9 +14,9 @@ const yearCandles = require('./mocks/yearCandles');
 const date1 = new Date('2018-11-01T00:00:00+03:00'),
   date2 = new Date('2018-12-01T00:00:00+03:00');
 
-const day = unsafeGetFromResult(Interval.from('1d')),
-  minute = unsafeGetFromResult(Interval.from('1m')),
-  month = unsafeGetFromResult(Interval.from('1M'));
+const day = interval('1d').unsafeGet(),
+  minute = interval('1m').unsafeGet(),
+  month = interval('1M').unsafeGet();
 
 const addMissing1mCandles = addMissingCandles(minute),
   addMissing1dCandles = addMissingCandles(day),
