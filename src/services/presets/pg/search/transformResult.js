@@ -1,11 +1,10 @@
-const { List } = require('../../../../types');
-
+const { list } = require('../../../../types');
 const { map, compose } = require('ramda');
 
 /** transformResults :: t -> transformDbResponse -> DbResponse[] -> List t */
 const transformResults = typeFactory => transformDbResponse =>
   compose(
-    List,
+    list,
     map(
       compose(
         typeFactory,

@@ -1,5 +1,5 @@
 const Joi = require('../../utils/validation/joi');
-const Interval = require('../../types/Interval');
+const { interval } = require('../../types');
 
 const customJoi = Joi.extend(joi => ({
   base: joi.object(),
@@ -84,11 +84,11 @@ const customJoi = Joi.extend(joi => ({
           );
         }
 
-        const valueInterval = Interval(value.interval);
+        const valueInterval = interval(value.interval).getOrElse(null);
 
         if (params.options.divisibleByLeftBound) {
           for (let bound of params.options.divisibleByLeftBound) {
-            const boundInterval = Interval(bound);
+            const boundInterval = interval(bound).getOrElse(null);
             if (
               valueInterval.length >= boundInterval.length &&
               valueInterval.div(boundInterval) % 1 !== 0

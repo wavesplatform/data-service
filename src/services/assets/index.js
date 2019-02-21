@@ -1,6 +1,6 @@
 const { propEq } = require('ramda');
 
-const { Asset } = require('../../types');
+const { asset } = require('../../types');
 
 // presets
 const getByIdPreset = require('../presets/pg/getById');
@@ -27,7 +27,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       inputSchema: inputGet,
       resultSchema,
       transformResult: transformAsset,
-      resultTypeFactory: Asset,
+      resultTypeFactory: asset,
     })({ pg, emitEvent }),
 
     mget: mgetByIdsPreset({
@@ -37,7 +37,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       inputSchema: inputMget,
       resultSchema,
       transformResult: transformAsset,
-      resultTypeFactory: Asset,
+      resultTypeFactory: asset,
     })({ pg, emitEvent }),
 
     search: searchPreset({
@@ -45,7 +45,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       sql: sql.search,
       inputSchema: inputSearchSchema,
       resultSchema,
-      transformResult: createTransformResult(Asset)(transformAsset),
+      transformResult: createTransformResult(asset)(transformAsset),
     })({ pg, emitEvent }),
   };
 };

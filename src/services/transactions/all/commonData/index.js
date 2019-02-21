@@ -1,6 +1,6 @@
 const { propEq } = require('ramda');
 
-const { Transaction } = require('../../../../types');
+const { transaction } = require('../../../../types');
 
 const getByIdPreset = require('../../../presets/pg/getById');
 const mgetByIdsPreset = require('../../../presets/pg/mgetByIds');
@@ -21,7 +21,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       sql: sql.get,
       inputSchema: inputGet,
       resultSchema: result,
-      resultTypeFactory: Transaction,
+      resultTypeFactory: transaction,
       transformResult: transformTxInfo,
     })({ pg, emitEvent }),
 
@@ -29,7 +29,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       name: 'transactions.all.commonData.mget',
       matchRequestResult: propEq('id'),
       sql: sql.mget,
-      resultTypeFactory: Transaction,
+      resultTypeFactory: transaction,
       inputSchema: inputMget,
       resultSchema: result,
       transformResult: transformTxInfo,

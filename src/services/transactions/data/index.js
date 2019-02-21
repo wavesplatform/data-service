@@ -15,7 +15,7 @@ const {
 const pgData = require('./pg');
 
 // transforms
-const { Transaction } = require('../../../types');
+const { transaction } = require('../../../types');
 
 const transformResultGet = require('../../presets/pg/getById/transformResult');
 const transformResultMget = require('../../presets/pg/mgetByIds/transformResult');
@@ -29,7 +29,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
   return {
     get: createResolver.get({
       transformInput: identity,
-      transformResult: transformResultGet(Transaction)(transformTxInfo),
+      transformResult: transformResultGet(transaction)(transformTxInfo),
       validateInput: validateInput(inputGet, createServiceName('get')),
       validateResult: validateResult(resultSchema, createServiceName('get')),
       dbQuery: pgData.get,
@@ -37,7 +37,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
 
     mget: createResolver.mget({
       transformInput: identity,
-      transformResult: transformResultMget(Transaction)(transformTxInfo),
+      transformResult: transformResultMget(transaction)(transformTxInfo),
       validateInput: validateInput(inputMget, createServiceName('mget')),
       validateResult: validateResult(resultSchema, createServiceName('mget')),
       dbQuery: pgData.mget,
