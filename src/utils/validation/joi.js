@@ -3,7 +3,8 @@ const rawJoi = require('joi');
 const { BigNumber } = require('@waves/data-entities');
 const Cursor = require('../../services/_common/pagination/cursor');
 const { base58: base58Regex, interval: intervalRegex } = require('../regex');
-const { interval, intervalDiv } = require('../../types');
+const { interval } = require('../../types');
+const { div } = require('../interval');
 
 module.exports = rawJoi
   .extend(joi => ({
@@ -120,7 +121,7 @@ module.exports = rawJoi
             Ok: ({ value: i }) =>
               divisibleByInterval.matchWith({
                 Ok: ({ value: d }) => {
-                  if (intervalDiv(i, d) % 1 !== 0) {
+                  if (div(i, d) % 1 !== 0) {
                     return this.createError(
                       'string.period.divisibleBy',
                       { value },

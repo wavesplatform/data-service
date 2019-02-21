@@ -1,9 +1,9 @@
-export type MonoidType<T> = {
+export type Monoid<T> = {
   concat: (a: T, b: T) => T;
-  empty: T | null;
+  empty: T;
 };
 
-export const monoid = <T>(props: MonoidType<T>) => ({
+export const monoid = <T>(props: Monoid<T>) => ({
   concat: props.concat,
   empty: props.empty,
 });

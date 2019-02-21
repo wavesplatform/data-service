@@ -1,4 +1,5 @@
-import { interval, div } from '../interval';
+import { interval } from '../interval';
+import { div } from '../../utils/interval';
 
 describe('Interval', () => {
   const i = interval('180s');

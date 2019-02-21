@@ -1,6 +1,6 @@
-import createNamedType from './createNamedType';
+import createNamedType, { NamedType } from './createNamedType';
 import { Maybe } from 'folktale/maybe';
-import { Interval, interval, div } from './interval';
+import { Interval, interval } from './interval';
 
 export const fromMaybe = <A, B>(factory: (a?: A) => B) => (mb: Maybe<A>) =>
   mb.matchWith({
@@ -8,12 +8,35 @@ export const fromMaybe = <A, B>(factory: (a?: A) => B) => (mb: Maybe<A>) =>
     Nothing: () => factory(),
   });
 
-export type TransactionData = {};
+// @todo AssetInfo
+type AssetInfo = unknown;
+type Asset = NamedType<'asset', AssetInfo>;
+export const asset = (data: AssetInfo = null): Asset =>
+  createNamedType('asset', data);
 
-export const asset = createNamedType('asset');
-export const alias = createNamedType('alias');
-export const candle = createNamedType('candle');
-export const pair = createNamedType('pair');
-export const transaction = createNamedType<TransactionData>('transaction');
+// @todo AliasInfo
+type AliasInfo = unknown;
+type Alias = NamedType<'alias', AliasInfo>;
+export const alias = (data: AliasInfo = null): Alias =>
+  createNamedType('alias', data);
+
+// @todo CandleInfo
+type CandleInfo = unknown;
+type Candle = NamedType<'candle', CandleInfo>;
+export const candle = (data: CandleInfo = null): Candle =>
+  createNamedType('candle', data);
+
+// @todo PairInfo
+type PairInfo = unknown;
+type Pair = NamedType<'pair', PairInfo>;
+export const pair = (data: PairInfo = null): Pair =>
+  createNamedType('pair', data);
+
+// @todo TransactionInfo
+type TransactionInfo = unknown;
+type Transaction = NamedType<'transaction', TransactionInfo>;
+export const transaction = (data: TransactionInfo = null): Transaction =>
+  createNamedType('transaction', data);
+
 export { List, list } from './list';
-export { Interval, interval, div as intervalDiv };
+export { Interval, interval };

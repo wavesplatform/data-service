@@ -1,5 +1,6 @@
 const { compose, findLast, map, prop, sortBy } = require('ramda');
-const { interval, intervalDiv } = require('../../types');
+const { interval } = require('../../types');
+const { div } = require('../../utils/interval');
 const pg = require('knex')({ client: 'pg' });
 
 const fields = [
@@ -23,7 +24,7 @@ const fields = [
 /** highestDividerLessThen :: Interval i => i -> String[] -> i */
 const highestDividerLessThen = (inter, dividers) =>
   compose(
-    findLast(i => intervalDiv(inter, i) >= 1),
+    findLast(i => div(inter, i) >= 1),
     sortBy(prop('length')),
     map(d => interval(d).getOrElse(null))
   )(dividers);

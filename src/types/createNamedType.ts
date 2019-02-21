@@ -1,13 +1,9 @@
-export type NamedType<T> = {
-  __type: string;
-  data: T | null;
+export type NamedType<T extends string, U> = {
+  __type: T;
+  data: U;
 };
 
-export type NamedTypeFactory<T> = (v?: T | null) => NamedType<T>;
-
-export default <T>(name: string, defaultData: T | null = null) => (
-  data = defaultData
-): NamedType<T> => ({
+export default <T extends string, U>(name: T, data: U): NamedType<T, U> => ({
   __type: name,
   data,
 });

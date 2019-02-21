@@ -79,14 +79,3 @@ export const interval = (source: string): Result<ValidationError, Interval> => {
     Error: ({ value: e }) => error(e),
   });
 };
-
-export const div = (a: Interval, b: Interval) => a.length / b.length;
-
-//   public toString(): string {
-//     return this.source;
-//   }
-
-//   public toJSON(): string {
-//     return this.source;
-//   }
-// }
