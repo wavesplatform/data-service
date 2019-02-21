@@ -8,11 +8,15 @@ Object {
     "fee": "0.001",
     "height": 922106,
     "id": "21BmkGpk98wWHrCydjwTFvHWPfQxtH5NEQd9X7wUpi5R",
+    "proofs": Array [
+      "54qNaDCCC3LoprhNcd6C4ytRbB2chDpYxEusmyVgmPg7PNQjvi7Ckc13mBn1M3zf8T5YgzfWDMnvE9rRLYyGSkSu",
+    ],
     "sender": "3P2DQSKgE7Hw9VhHfu5TkJxsh5GFRfShQpK",
     "senderPublicKey": "FTY2T2HLvyR7XQTvn5Eu56B8qGXcvosutTRq5TatcTMp",
     "signature": "54qNaDCCC3LoprhNcd6C4ytRbB2chDpYxEusmyVgmPg7PNQjvi7Ckc13mBn1M3zf8T5YgzfWDMnvE9rRLYyGSkSu",
     "timestamp": 2018-03-17T20:22:43.701Z,
     "type": 10,
+    "version": 1,
   },
 }
 `;
@@ -28,11 +32,15 @@ Object {
         "fee": "0.001",
         "height": 922106,
         "id": "21BmkGpk98wWHrCydjwTFvHWPfQxtH5NEQd9X7wUpi5R",
+        "proofs": Array [
+          "54qNaDCCC3LoprhNcd6C4ytRbB2chDpYxEusmyVgmPg7PNQjvi7Ckc13mBn1M3zf8T5YgzfWDMnvE9rRLYyGSkSu",
+        ],
         "sender": "3P2DQSKgE7Hw9VhHfu5TkJxsh5GFRfShQpK",
         "senderPublicKey": "FTY2T2HLvyR7XQTvn5Eu56B8qGXcvosutTRq5TatcTMp",
         "signature": "54qNaDCCC3LoprhNcd6C4ytRbB2chDpYxEusmyVgmPg7PNQjvi7Ckc13mBn1M3zf8T5YgzfWDMnvE9rRLYyGSkSu",
         "timestamp": 2018-03-17T20:22:43.701Z,
         "type": 10,
+        "version": 1,
       },
     },
     Object {
@@ -42,11 +50,15 @@ Object {
         "fee": "0.001",
         "height": 922106,
         "id": "HbgSfoQ7ftAF3TUQNovbFnohsRK7AdztFznrJHTqH7F7",
+        "proofs": Array [
+          "4oA22v2NsNNJafLJVEqwSJF74XvN1pxh9d72k2pe8kheMjrTf8E4exLUGAoGKKrZYcw9UzxVgFoeNNBQjcqRajHW",
+        ],
         "sender": "3P2DQSKgE7Hw9VhHfu5TkJxsh5GFRfShQpK",
         "senderPublicKey": "FTY2T2HLvyR7XQTvn5Eu56B8qGXcvosutTRq5TatcTMp",
         "signature": "4oA22v2NsNNJafLJVEqwSJF74XvN1pxh9d72k2pe8kheMjrTf8E4exLUGAoGKKrZYcw9UzxVgFoeNNBQjcqRajHW",
         "timestamp": 2018-03-17T20:22:39.158Z,
         "type": 10,
+        "version": 1,
       },
     },
     Object {

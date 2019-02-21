@@ -14,7 +14,7 @@ const {
   omit,
 } = require('ramda');
 const { renameKeys } = require('ramda-adjunct');
-const { Interval, List } = require('../../types');
+const { Interval, list } = require('../../types');
 const concatAll = require('../../utils/fp/concatAll');
 const { floor, ceil, add, trunc } = require('../../utils/date');
 const { Candle } = require('../../types/index');
@@ -87,7 +87,7 @@ const candleFixedDecimals = (candle, aDecimals, pDecimals) =>
 /** transformResults :: (CandleDbResponse[], request) -> List Maybe t */
 const transformResults = (result, request) =>
   compose(
-    List,
+    list,
     map(transformCandle),
     sort((a, b) => new Date(a[0]) - new Date(b[0])),
     toPairs,
@@ -98,13 +98,13 @@ const transformResults = (result, request) =>
     ),
     map(concatAll(candleMonoid)),
     addMissingCandles(
-      Interval(request.params.interval),
+      Interval.from(request.params.interval).getOrElse(null),
       request.params.timeStart,
       request.params.timeEnd
     ),
     groupBy(candle =>
       truncToMinutes(
-        floor(Interval(request.params.interval), candle.time_start)
+        floor(Interval.from(request.params.interval).getOrElse(null), candle.time_start)
       )
     )
   )(result);

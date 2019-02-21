@@ -3,7 +3,7 @@ const { list, fromMaybe } = require('../../../../types');
 const { map, compose } = require('ramda');
 
 /** transformResults t :: t -> transformDbResponse -> (Maybe DbResponse)[] -> List t */
-const transformResults = typeFactory => transformDbResponse =>
+const transformResults = typeFactory => transformDbResponse => a =>
   compose(
     list,
     map(
@@ -12,6 +12,6 @@ const transformResults = typeFactory => transformDbResponse =>
         map(transformDbResponse)
       )
     )
-  );
+  )(a);
 
 module.exports = transformResults;
