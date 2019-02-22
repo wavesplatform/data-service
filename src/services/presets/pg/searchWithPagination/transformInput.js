@@ -3,7 +3,7 @@ const Cursor = require('../../../_common/pagination/cursor');
 
 const decodeAfter = cursor => {
   const [date, id, sort] = Cursor.decode(cursor);
-  const parsedDate = parseDate(date);
+  const parsedDate = parseDate(date).unsafeGet();
   return {
     after: {
       timestamp: parsedDate,

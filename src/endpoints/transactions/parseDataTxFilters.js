@@ -25,8 +25,8 @@ const parseFilters = ({
 }) =>
   reject(isNil, {
     ids: ids && parseArrayQuery(ids),
-    timeStart: timeStart && parseDate(timeStart),
-    timeEnd: timeEnd && parseDate(timeEnd),
+    timeStart: timeStart && parseDate(timeStart).unsafeGet(),
+    timeEnd: timeEnd && parseDate(timeEnd).unsafeGet(),
     limit: parseInt(limit),
     sort,
     sender,
