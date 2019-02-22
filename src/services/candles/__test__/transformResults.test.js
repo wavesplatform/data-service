@@ -4,7 +4,7 @@ const { candleMonoid } = require('../candleMonoid');
 const { interval } = require('../../../types');
 const { Unit } = require('../../../types/interval');
 const { floor, trunc } = require('../../../utils/date');
-const concatAll = require('../../../utils/fp/concatAll');
+const { concatAll } = require('../../../utils/fp/concatAll');
 
 const truncToMinutes = trunc(Unit.Minute);
 
@@ -93,7 +93,7 @@ describe('add missing candles', () => {
 
 describe('candle monoid', () => {
   it('should calculate 1 candle for 1 interval', () => {
-    expect(concatAll(candleMonoid, monthCandles)).toMatchSnapshot();
+    expect(concatAll(candleMonoid)(monthCandles)).toMatchSnapshot();
   });
 
   it('should calculate several candles for period with several intervals', () => {

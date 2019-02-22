@@ -15,7 +15,7 @@ const {
 } = require('ramda');
 const { renameKeys } = require('ramda-adjunct');
 const { interval, list } = require('../../types');
-const concatAll = require('../../utils/fp/concatAll');
+const { concatAll } = require('../../utils/fp/concatAll');
 const { floor, ceil, add, trunc } = require('../../utils/date');
 const { candle } = require('../../types');
 const { Unit } = require('../../types/interval');
