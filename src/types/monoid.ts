@@ -3,7 +3,7 @@ export type Monoid<T> = {
   empty: T;
 };
 
-export const monoid = <T>(props: Monoid<T>) => ({
+export const monoid = <T>(props: Monoid<T>): Monoid<T> => ({
   concat: props.concat,
   empty: props.empty,
 });

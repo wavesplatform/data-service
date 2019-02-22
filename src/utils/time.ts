@@ -3,7 +3,7 @@ import { propIs, prop } from 'ramda';
 export type DateMap = { [key: string]: Date };
 let timeRepository = {} as DateMap;
 
-export const timeStart = (name: string) => (
+export const timeStart = (name: string): null => (
   (timeRepository[name] = new Date()), null
 );
 

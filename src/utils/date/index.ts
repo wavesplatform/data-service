@@ -29,7 +29,7 @@ const roundDown = (x: number) => Math.floor(x);
 const defaultRound = (x: number) => Math.round(x);
 
 const roundTo = curry(
-  (roundFn: RoundFunction, interval: Interval, date: Date) => {
+  (roundFn: RoundFunction, interval: Interval, date: Date): Date => {
     let newDate = new Date(date);
 
     switch (interval.unit) {
@@ -67,20 +67,24 @@ const roundTo = curry(
   }
 );
 
-export const trunc = curry((unit: Unit, date: Date) => {
-  return date.toISOString().substr(0, precisions[unit]);
-});
+export const trunc = curry(
+  (unit: Unit, date: Date): string => {
+    return date.toISOString().substr(0, precisions[unit]);
+  }
+);
 
 export const round = roundTo(defaultRound);
 export const floor = roundTo(roundDown);
 export const ceil = roundTo(roundUp);
 
 export const add = curry(
-  (interval: Interval, date: Date) => new Date(date.getTime() + interval.length)
+  (interval: Interval, date: Date): Date =>
+    new Date(date.getTime() + interval.length)
 );
 
 export const subtract = curry(
-  (interval: Interval, date: Date) => new Date(date.getTime() - interval.length)
+  (interval: Interval, date: Date): Date =>
+    new Date(date.getTime() - interval.length)
 );
 
 const daysInMonth = (year: number, month: number) =>

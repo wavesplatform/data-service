@@ -2,7 +2,7 @@ import createNamedType, { NamedType } from './createNamedType';
 import { Maybe } from 'folktale/maybe';
 import { Interval, interval } from './interval';
 
-export const fromMaybe = <A, B>(factory: (a?: A) => B) => (mb: Maybe<A>) =>
+export const fromMaybe = <A, B>(factory: (a?: A) => B) => (mb: Maybe<A>): B =>
   mb.matchWith({
     Just: ({ value }) => factory(value),
     Nothing: () => factory(),

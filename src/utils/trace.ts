@@ -1,6 +1,6 @@
 export type LogType = string | object;
 
-export const trace = (msg: LogType) => (x: any) => {
+export const trace = (msg: LogType) => (x: any): any => {
   // eslint-disable-next-line
   msg ? console.log(msg, x) : console.log(x);
   return x;
