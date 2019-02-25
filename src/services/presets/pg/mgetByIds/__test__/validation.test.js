@@ -1,7 +1,7 @@
 const Task = require('folktale/concurrency/task');
 const { always, identity, equals } = require('ramda');
 
-const Joi = require('joi');
+const { Joi } = require('../../../../../utils/validation');
 
 const mgetByIdsPreset = require('..');
 const { inputMget: input } = require('../inputSchema');

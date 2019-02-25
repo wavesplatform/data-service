@@ -210,7 +210,7 @@ const search = service =>
           service
             .search({
               limit: 1,
-              timeEnd: parseDate('1'),
+              timeEnd: parseDate('1').unsafeGet(),
             })
             .run()
             .promise()

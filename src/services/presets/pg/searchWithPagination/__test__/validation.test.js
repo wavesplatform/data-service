@@ -3,7 +3,7 @@ const { always, identity } = require('ramda');
 
 const { parseDate } = require('../../../../../utils/parseDate');
 
-const Joi = require('joi');
+const { Joi } = require('../../../../../utils/validation');
 
 const searchWithPaginationPreset = require('..');
 const commonFilterSchemas = require('../commonFilterSchemas');
@@ -37,26 +37,26 @@ describe('searchWithPagination preset validation', () => {
   describe('common filters', () => {
     it('fails if timeEnd < 0', done =>
       assertValidationError(done, {
-        timeEnd: parseDate('-1525132900000'),
+        timeEnd: parseDate('-1525132900000').unsafeGet(),
       }));
     it('fails if timeStart < 0', done =>
       assertValidationError(done, {
-        timeEnd: parseDate('1525132900000'),
-        timeStart: parseDate('-1525132800000'),
+        timeEnd: parseDate('1525132900000').unsafeGet(),
+        timeStart: parseDate('-1525132800000').unsafeGet(),
       }));
     it('fails if timeEnd < timeStart', done =>
       assertValidationError(done, {
-        timeEnd: parseDate('1525132700000'),
-        timeStart: parseDate('1525132800000'),
+        timeEnd: parseDate('1525132700000').unsafeGet(),
+        timeStart: parseDate('1525132800000').unsafeGet(),
       }));
-    it('fails if timeStart->invalid Date', done =>
-      assertValidationError(done, {
-        timeStart: parseDate(''),
-      }));
+    it('fails if timeStart->invalid Date', done => {
+      expect(parseDate('').unsafeGet).toThrowError();
+      done();
+    });
     it('passes if correct object is provided', done =>
       service({
-        timeStart: parseDate(0),
-        timeEnd: parseDate(Date.now()),
+        timeStart: parseDate(0).unsafeGet(),
+        timeEnd: parseDate(Date.now()).unsafeGet(),
         limit: 1,
         sort: 'asc',
       })
