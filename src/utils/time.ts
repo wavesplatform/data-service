@@ -1,13 +1,12 @@
 import { propIs, prop } from 'ramda';
 
-export type DateMap = { [key: string]: Date };
-let timeRepository = {} as DateMap;
+let timeRepository: Record<string, Date> = {};
 
-export const timeStart = (name: string): null => (
-  (timeRepository[name] = new Date()), null
-);
+export const timeStart = (name: string): void => {
+  timeRepository[name] = new Date();
+};
 
-export const timeEnd = (name: string): string =>
+export const timeEnd = (name: string): number =>
   propIs(Date, name, timeRepository)
-    ? `${new Date().getTime() - prop(name, timeRepository).getTime()} ms`
-    : `-/-`;
+    ? new Date().getTime() - prop(name, timeRepository).getTime()
+    : -Infinity;

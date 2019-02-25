@@ -49,10 +49,10 @@ describe('searchWithPagination preset validation', () => {
         timeEnd: parseDate('1525132700000').unsafeGet(),
         timeStart: parseDate('1525132800000').unsafeGet(),
       }));
-    it('fails if timeStart->invalid Date', done =>
-      assertValidationError(done, {
-        timeStart: parseDate('').getOrElse(null),
-      }));
+    it('fails if timeStart->invalid Date', done => {
+      expect(parseDate('').unsafeGet).toThrowError();
+      done();
+    });
     it('passes if correct object is provided', done =>
       service({
         timeStart: parseDate(0).unsafeGet(),
