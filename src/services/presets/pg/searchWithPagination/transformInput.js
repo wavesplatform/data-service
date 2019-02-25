@@ -3,7 +3,8 @@ const Cursor = require('../../../_common/pagination/cursor');
 
 const decodeAfter = cursor => {
   const [date, id, sort] = Cursor.decode(cursor);
-  const parsedDate = parseDate(date).unsafeGet();
+  // Date here is always valid, checked by validation step previously
+  const parsedDate = parseDate(date).getOrElse(null);
   return {
     after: {
       timestamp: parsedDate,

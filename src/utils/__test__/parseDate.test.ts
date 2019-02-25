@@ -12,7 +12,7 @@ describe('parseDate', () => {
     const dateStr = '-1525132800000';
     const expectedValue = new Date(-1525132800000);
 
-    expect(parseDate(dateStr).getOrElse(null)).toEqual(expectedValue);
+    expect(parseDate(dateStr).unsafeGet()).toEqual(expectedValue);
   });
   it('works with timestamp', () => {
     const dateStr = '2018-05-01T00:00:00.000Z';

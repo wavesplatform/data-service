@@ -37,17 +37,17 @@ describe('searchWithPagination preset validation', () => {
   describe('common filters', () => {
     it('fails if timeEnd < 0', done =>
       assertValidationError(done, {
-        timeEnd: parseDate('-1525132900000').getOrElse(null),
+        timeEnd: parseDate('-1525132900000').unsafeGet(),
       }));
     it('fails if timeStart < 0', done =>
       assertValidationError(done, {
-        timeEnd: parseDate('1525132900000').getOrElse(null),
-        timeStart: parseDate('-1525132800000').getOrElse(null),
+        timeEnd: parseDate('1525132900000').unsafeGet(),
+        timeStart: parseDate('-1525132800000').unsafeGet(),
       }));
     it('fails if timeEnd < timeStart', done =>
       assertValidationError(done, {
-        timeEnd: parseDate('1525132700000').getOrElse(null),
-        timeStart: parseDate('1525132800000').getOrElse(null),
+        timeEnd: parseDate('1525132700000').unsafeGet(),
+        timeStart: parseDate('1525132800000').unsafeGet(),
       }));
     it('fails if timeStart->invalid Date', done =>
       assertValidationError(done, {
@@ -55,8 +55,8 @@ describe('searchWithPagination preset validation', () => {
       }));
     it('passes if correct object is provided', done =>
       service({
-        timeStart: parseDate(0).getOrElse(null),
-        timeEnd: parseDate(Date.now()).getOrElse(null),
+        timeStart: parseDate(0).unsafeGet(),
+        timeEnd: parseDate(Date.now()).unsafeGet(),
         limit: 1,
         sort: 'asc',
       })

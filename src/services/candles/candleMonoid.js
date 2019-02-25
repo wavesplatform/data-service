@@ -1,50 +1,49 @@
-const { monoid } = require('../../types/monoid');
 const { BigNumber } = require('@waves/data-entities');
 
 // common
-const leftNotNullMonoid = monoid({
+const leftNotNullMonoid = {
   concat: (a, b) => a || b,
   empty: null,
-});
+};
 
-const rightNotNullMonoid = monoid({
+const rightNotNullMonoid = {
   concat: (a, b) => b || a,
   empty: null,
-});
+};
 
-const sumMonoid = monoid({
+const sumMonoid = {
   concat: (a, b) => a + b,
   empty: 0,
-});
+};
 
-const bigNumberPlusMonoid = monoid({
+const bigNumberPlusMonoid = {
   concat: (a, b) => a.plus(b),
   empty: BigNumber(0),
-});
+};
 
-const maxMonoid = monoid({
+const maxMonoid = {
   concat: (a, b) => Math.max(a, b),
   empty: 0,
-});
+};
 
-const bigNumberLowestMonoid = monoid({
+const bigNumberLowestMonoid = {
   concat: (a, b) => (a.comparedTo(b) === 1 ? b : a),
   empty: BigNumber(+Infinity),
-});
+};
 
-const bigNumberHighestMonoid = monoid({
+const bigNumberHighestMonoid = {
   concat: (a, b) => (a.comparedTo(b) === 1 ? a : b),
   empty: BigNumber(-Infinity),
-});
+};
 
 // individual
-const weightedAveragePriceMonoid = monoid({
+const weightedAveragePriceMonoid = {
   concat: (a, b) =>
     a.quote_volume.plus(b.quote_volume).dividedBy(a.volume.plus(b.volume)),
   empty: BigNumber(0),
-});
+};
 
-const candleMonoid = monoid({
+const candleMonoid = {
   concat: (a, b) => ({
     time_start: leftNotNullMonoid.concat(a.time_start, b.time_start),
     open: leftNotNullMonoid.concat(a.open, b.open),
@@ -73,7 +72,7 @@ const candleMonoid = monoid({
     a_dec: rightNotNullMonoid.empty,
     p_dec: rightNotNullMonoid.empty,
   },
-});
+};
 
 module.exports = {
   leftNotNullMonoid,
