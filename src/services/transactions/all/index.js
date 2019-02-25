@@ -90,7 +90,16 @@ module.exports = deps => {
             Task.of,
             pipe(
               getData,
-              t => txsServices[t.type].get(t.id)
+              t => {
+                if (t) {
+                  return txsServices[t.type].get(t.id);
+                } else {
+                  return Task.of({
+                    __type: 'transaction',
+                    data: null,
+                  });
+                }
+              }
             )
           )
         ),

@@ -36,7 +36,10 @@ describe('Assets service', () => {
         .run()
         .promise();
 
-      expect(tx).toBe(null);
+      expect(tx).toMatchObject({
+        __type: 'asset',
+        data: null,
+      });
     });
   });
 

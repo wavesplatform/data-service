@@ -58,7 +58,10 @@ describe('Pairs', () => {
         .run()
         .listen({
           onResolved: nullable => {
-            expect(nullable).toEqual(null);
+            expect(nullable).toEqual({
+              __type: 'pair',
+              data: null,
+            });
             done();
           },
         });

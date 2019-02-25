@@ -1,4 +1,4 @@
-const getById = require('../presets/pg/getById');
+const { getByIdPreset } = require('../presets/pg/getById');
 const mgetByIds = require('../presets/pg/mgetByIds');
 const search = require('../presets/pg/search');
 const { pair } = require('../../types');
@@ -15,7 +15,7 @@ const matchRequestResult = require('./matchRequestResult');
 
 module.exports = ({ drivers, emitEvent }) => {
   return {
-    get: getById({
+    get: getByIdPreset({
       name: 'pairs.get',
       sql: sql.get,
       inputSchema: inputGet,

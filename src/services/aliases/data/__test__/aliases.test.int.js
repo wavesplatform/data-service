@@ -1,5 +1,5 @@
 const { createPgDriver } = require('../../../../db');
-const { loadConfig }  = require('../../../../loadConfig');
+const { loadConfig } = require('../../../../loadConfig');
 const options = loadConfig();
 const create = require('../../index');
 
@@ -30,7 +30,10 @@ describe('Aliases', () => {
         .run()
         .listen({
           onResolved: maybeX => {
-            expect(maybeX).toEqual(null);
+            expect(maybeX).toEqual({
+              __type: 'alias',
+              data: null,
+            });
             done();
           },
         });

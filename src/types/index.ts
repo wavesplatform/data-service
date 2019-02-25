@@ -9,14 +9,14 @@ export const fromMaybe = <A, B>(factory: (a?: A) => B) => (mb: Maybe<A>): B =>
   });
 
 // @todo AssetInfo
-type AssetInfo = unknown;
-type Asset = NamedType<'asset', AssetInfo>;
+export type AssetInfo = unknown;
+export type Asset = NamedType<'asset', AssetInfo>;
 export const asset = (data: AssetInfo = null): Asset =>
   createNamedType('asset', data);
 
 // @todo AliasInfo
-type AliasInfo = unknown;
-type Alias = NamedType<'alias', AliasInfo>;
+export type AliasInfo = unknown;
+export type Alias = NamedType<'alias', AliasInfo>;
 export const alias = (data: AliasInfo = null): Alias =>
   createNamedType('alias', data);
 
@@ -27,14 +27,14 @@ export const candle = (data: CandleInfo = null): Candle =>
   createNamedType('candle', data);
 
 // @todo PairInfo
-type PairInfo = unknown;
-type Pair = NamedType<'pair', PairInfo>;
+export type PairInfo = unknown;
+export type Pair = NamedType<'pair', PairInfo>;
 export const pair = (data: PairInfo = null): Pair =>
   createNamedType('pair', data);
 
 // @todo TransactionInfo
-type TransactionInfo = unknown;
-type Transaction = NamedType<'transaction', TransactionInfo>;
+export type TransactionInfo = unknown;
+export type Transaction = NamedType<'transaction', TransactionInfo>;
 export const transaction = (data: TransactionInfo = null): Transaction =>
   createNamedType('transaction', data);
 
