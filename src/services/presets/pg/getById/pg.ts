@@ -13,4 +13,4 @@ export const getData = <T, ResponseRaw>({ name, sql }: GetByIdRequest<T>) => (
   pg
     .oneOrNone<ResponseRaw>(sql(id))
     .map(fromNullable)
-    .mapRejected(assoc('mets', { request: name, params: id }));
+    .mapRejected(assoc('meta', { request: name, params: id }));
