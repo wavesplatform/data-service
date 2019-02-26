@@ -50,33 +50,24 @@ export const createPgDriver = (
     max: options.postgresPoolSize, // max connection pool size
   });
 
+  const toTasked = <T>(promised: () => Promise<T>) =>
+    fromPromised<Error, T>(promised)().mapRejected(toDbError({}));
+
   const driverT: PgDriver = {
     none: (query: SqlQuery, values?: any) =>
-      fromPromised<Error, null>(() =>
-        driverP.none(query, values)
-      )().mapRejected(toDbError({})),
+      toTasked(() => driverP.none(query, values)),
     one: <T>(query: SqlQuery, values?: any) =>
-      fromPromised<Error, T>(() => driverP.one(query, values))().mapRejected(
-        toDbError({})
-      ),
+      toTasked<T>(() => driverP.one(query, values)),
     oneOrNone: <T>(query: SqlQuery, values?: any) =>
-      fromPromised<Error, T>(() =>
-        driverP.oneOrNone(query, values)
-      )().mapRejected(toDbError({})),
+      toTasked<T>(() => driverP.oneOrNone(query, values)),
     many: <T>(query: SqlQuery, values?: any) =>
-      fromPromised<Error, T[]>(() => driverP.many(query, values))().mapRejected(
-        toDbError({})
-      ),
+      toTasked<T[]>(() => driverP.many(query, values)),
     any: <T>(query: SqlQuery, values?: any) =>
-      fromPromised<Error, T[]>(() => driverP.any(query, values))().mapRejected(
-        toDbError({})
-      ),
+      toTasked<T[]>(() => driverP.any(query, values)),
     task: <T>(cb: (t: ITask<{}>) => T | Promise<T>) =>
-      fromPromised<Error, T>(() => driverP.task(cb))().mapRejected(
-        toDbError({})
-      ),
+      toTasked<T>(() => driverP.task(cb)),
     tx: <T>(cb: (t: ITask<{}>) => T | Promise<T>) =>
-      fromPromised<Error, T>(() => driverP.tx(cb))().mapRejected(toDbError({})),
+      toTasked<T>(() => driverP.tx(cb)),
   };
 
   return driverT;
