@@ -1,23 +1,17 @@
 import * as JoiRaw from './joi';
-import { Error, Ok } from 'folktale/result';
+import { Error as errorResult, Ok as okResult } from 'folktale/result';
 
-import { SchemaLike } from 'joi';
-import { ValidationError } from 'errorHandling';
-
-export type ValidationErrorFactory<ErrorType, T> = (
-  e: ValidationError,
-  value: T
-) => ErrorType;
+import { SchemaLike, ValidationError } from 'joi';
 
 export const validate = <ErrorType, T>(
   schema: SchemaLike,
-  errorFactory: ValidationErrorFactory<ErrorType, T>,
+  errorFactory: (e: ValidationError, value: T) => ErrorType,
   value: T
 ) => {
   const { error } = JoiRaw.validate(value, schema, { convert: false });
   return error
-    ? Error<ErrorType, T>(errorFactory(error, value))
-    : Ok<ErrorType, T>(value);
+    ? errorResult<ErrorType, T>(errorFactory(error, value))
+    : okResult<ErrorType, T>(value);
 };
 
 export const Joi = JoiRaw;

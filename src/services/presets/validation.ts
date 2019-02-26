@@ -1,10 +1,11 @@
-import { AppError } from '../../errorHandling';
+import { AppError, ValidationError, ResolverError } from '../../errorHandling';
 import { validate } from '../../utils/validation';
 import { SchemaLike } from 'joi';
+import { Result } from 'folktale/result';
 
 export const validateInput = <T>(schema: SchemaLike, name: string) => (
   value: T
-) =>
+): Result<ValidationError, T> =>
   validate(
     schema,
     (error, value) =>
@@ -18,7 +19,7 @@ export const validateInput = <T>(schema: SchemaLike, name: string) => (
 
 export const validateResult = <T>(schema: SchemaLike, name: string) => (
   value: T
-) =>
+): Result<ResolverError, T> =>
   validate(
     schema,
     (error, value) =>
