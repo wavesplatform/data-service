@@ -3,7 +3,7 @@ const { propEq } = require('ramda');
 const { asset } = require('../../types');
 
 // presets
-const getByIdPreset = require('../presets/pg/getById');
+const { getByIdPreset } = require('../presets/pg/getById');
 const mgetByIdsPreset = require('../presets/pg/mgetByIds');
 const searchPreset = require('../presets/pg/search');
 

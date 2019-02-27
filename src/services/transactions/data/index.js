@@ -17,7 +17,9 @@ const pgData = require('./pg');
 // transforms
 const { transaction } = require('../../../types');
 
-const transformResultGet = require('../../presets/pg/getById/transformResult');
+const {
+  transformResults: transformResultGet,
+} = require('../../presets/pg/getById/transformResult');
 const transformResultMget = require('../../presets/pg/mgetByIds/transformResult');
 const transformInputSearch = require('../../presets/pg/searchWithPagination/transformInput');
 const transformResultSearch = require('../../presets/pg/searchWithPagination/transformResult');

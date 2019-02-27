@@ -1,11 +1,10 @@
-import { DbError } from 'errorHandling';
-
 // Module transforms pg-promise into pg-task
 import { pgpConnect } from './pgp';
 import { ITask } from 'pg-promise';
 import { fromPromised } from 'folktale/concurrency/task';
 
 import { Task } from 'folktale/concurrency/task';
+import { DbError, toDbError } from '../../errorHandling';
 
 export type PgDriverOptions = {
   postgresHost: string;
@@ -51,21 +50,24 @@ export const createPgDriver = (
     max: options.postgresPoolSize, // max connection pool size
   });
 
+  const toTasked = <T>(promised: () => Promise<T>) =>
+    fromPromised<Error, T>(promised)().mapRejected(toDbError({}));
+
   const driverT: PgDriver = {
     none: (query: SqlQuery, values?: any) =>
-      fromPromised<DbError, null>(() => driverP.none(query, values))(),
+      toTasked(() => driverP.none(query, values)),
     one: <T>(query: SqlQuery, values?: any) =>
-      fromPromised<DbError, T>(() => driverP.one(query, values))(),
+      toTasked<T>(() => driverP.one(query, values)),
     oneOrNone: <T>(query: SqlQuery, values?: any) =>
-      fromPromised<DbError, T>(() => driverP.oneOrNone(query, values))(),
+      toTasked<T>(() => driverP.oneOrNone(query, values)),
     many: <T>(query: SqlQuery, values?: any) =>
-      fromPromised<DbError, T[]>(() => driverP.many(query, values))(),
+      toTasked<T[]>(() => driverP.many(query, values)),
     any: <T>(query: SqlQuery, values?: any) =>
-      fromPromised<DbError, T[]>(() => driverP.any(query, values))(),
+      toTasked<T[]>(() => driverP.any(query, values)),
     task: <T>(cb: (t: ITask<{}>) => T | Promise<T>) =>
-      fromPromised<DbError, T>(() => driverP.task(cb))(),
+      toTasked<T>(() => driverP.task(cb)),
     tx: <T>(cb: (t: ITask<{}>) => T | Promise<T>) =>
-      fromPromised<DbError, T>(() => driverP.tx(cb))(),
+      toTasked<T>(() => driverP.tx(cb)),
   };
 
   return driverT;

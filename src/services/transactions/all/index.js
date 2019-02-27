@@ -16,6 +16,7 @@ const {
 } = require('ramda');
 
 const commonData = require('./commonData');
+const { transaction } = require('../../../types');
 
 const createServices = {
   1: require('../genesis'),
@@ -90,7 +91,13 @@ module.exports = deps => {
             Task.of,
             pipe(
               getData,
-              t => txsServices[t.type].get(t.id)
+              t => {
+                if (t) {
+                  return txsServices[t.type].get(t.id);
+                } else {
+                  return Task.of(transaction());
+                }
+              }
             )
           )
         ),

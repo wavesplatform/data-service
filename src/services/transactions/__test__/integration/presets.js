@@ -28,7 +28,10 @@ const get = (service, txId) =>
           .run()
           .promise();
 
-        expect(tx).toBe(null);
+        expect(tx).toMatchObject({
+          __type: 'transaction',
+          data: null,
+        });
       },
       TIMEOUT
     );
