@@ -6,7 +6,7 @@ import * as router from './endpoints/';
 import * as injectDb from './middleware/injectDb';
 import * as injectEventBus from './middleware/injectEventBus';
 import * as accessLogMiddleware from './middleware/accessLog';
-import * as createEventBus from './eventBus/';
+import createEventBus from './eventBus/';
 import * as createAndSubscribeLogger from './logger';
 import * as removeErrorBodyProd from './middleware/removeErrorBodyProd';
 import * as serializer from './middleware/serializer';
