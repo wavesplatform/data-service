@@ -1,4 +1,4 @@
-const { searchPreset } = require('../presets/pg/search');
+const search = require('../presets/pg/search');
 
 const { candle } = require('../../types');
 
@@ -8,7 +8,7 @@ const { transformResults } = require('./transformResults');
 
 module.exports = ({ drivers, emitEvent }) => {
   return {
-    search: searchPreset({
+    search: search({
       name: 'candles.search',
       sql,
       inputSchema: inputSearch,
