@@ -13,8 +13,8 @@ import { transformResults as transformResultFn } from './transformResult';
 import { getData } from './pg';
 import { List } from 'types';
 
-export const mgetByIdPreset = <
-  Request extends Array<any>,
+export const mgetByIdsPreset = <
+  Id,
   ResponseRaw,
   ResponseTransformed extends NamedType<string, any>
 >({
@@ -32,21 +32,19 @@ export const mgetByIdPreset = <
   resultTypeFactory: (t?: DataType<ResponseTransformed>) => ResponseTransformed;
   transformResult: (
     response: ResponseRaw,
-    request?: Request
+    request?: Id[]
   ) => DataType<ResponseTransformed>;
-  sql: (r: Request) => string;
-  matchRequestResult: (req: Request, res: ResponseRaw) => boolean;
+  sql: (r: Id[]) => string;
+  matchRequestResult: (req: Id[], res: ResponseRaw) => boolean;
 }) => ({ pg, emitEvent }: ServicePresetInitOptions) =>
-  mget<Request, Request, ResponseRaw, List<ResponseTransformed>>({
+  mget<Id[], Id[], ResponseRaw, List<ResponseTransformed>>({
     transformInput: identity,
-    transformResult: transformResultFn<
-      Request,
-      ResponseRaw,
-      ResponseTransformed
-    >(resultTypeFactory)(transformResult),
+    transformResult: transformResultFn<Id[], ResponseRaw, ResponseTransformed>(
+      resultTypeFactory
+    )(transformResult),
     validateInput: validateInput(inputSchema, name),
     validateResult: validateResult<ResponseRaw>(resultSchema, name),
-    dbQuery: getData<Request, ResponseRaw>({
+    dbQuery: getData<ResponseRaw, Id>({
       name,
       sql,
       matchRequestResult,

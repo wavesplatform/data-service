@@ -3,7 +3,7 @@ import { always, identity, equals } from 'ramda';
 import { of as taskOf } from 'folktale/concurrency/task';
 import { Joi } from '../../../../../utils/validation';
 
-import { mgetByIdPreset } from '..';
+import { mgetByIdsPreset } from '..';
 import createNamedType, {
   NamedType,
 } from '../../../../../types/createNamedType';
@@ -11,7 +11,7 @@ import { PgDriver } from 'db/driver';
 const { inputMget: input } = require('../inputSchema');
 
 const createService = (resultSchema: SchemaLike) =>
-  mgetByIdPreset<string[], string, NamedType<string, string | null>>({
+  mgetByIdsPreset<string[], string, NamedType<string, string | null>>({
     name: 'some_name',
     sql: (s: string[]) => s.join(';'),
     matchRequestResult: equals,

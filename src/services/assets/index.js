@@ -4,7 +4,7 @@ const { asset } = require('../../types');
 
 // presets
 const { getByIdPreset } = require('../presets/pg/getById');
-const { mgetByIdPreset } = require('../presets/pg/mgetByIds');
+const { mgetByIdsPreset } = require('../presets/pg/mgetByIds');
 const { searchPreset } = require('../presets/pg/search');
 
 // validation
@@ -30,7 +30,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       resultTypeFactory: asset,
     })({ pg, emitEvent }),
 
-    mget: mgetByIdPreset({
+    mget: mgetByIdsPreset({
       name: 'assets.mget',
       matchRequestResult: propEq('asset_id'),
       sql: sql.mget,

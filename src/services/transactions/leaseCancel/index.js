@@ -3,7 +3,7 @@ const { propEq } = require('ramda');
 const { transaction } = require('../../../types');
 
 const { getByIdPreset } = require('../../presets/pg/getById');
-const { mgetByIdPreset } = require('../../presets/pg/mgetByIds');
+const { mgetByIdsPreset } = require('../../presets/pg/mgetByIds');
 const { inputGet } = require('../../presets/pg/getById/inputSchema');
 const { inputMget } = require('../../presets/pg/mgetByIds/inputSchema');
 const searchWithPaginationPreset = require('../../presets/pg/searchWithPagination');
@@ -28,7 +28,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       transformResult: transformTxInfo,
     })({ pg, emitEvent }),
 
-    mget: mgetByIdPreset({
+    mget: mgetByIdsPreset({
       name: 'transactions.leaseCancel.mget',
       matchRequestResult: propEq('id'),
       sql: sql.mget,

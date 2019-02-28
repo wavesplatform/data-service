@@ -3,7 +3,7 @@ const { propEq } = require('ramda');
 const { transaction } = require('../../../../types');
 
 const { getByIdPreset } = require('../../../presets/pg/getById');
-const { mgetByIdPreset } = require('../../../presets/pg/mgetByIds');
+const { mgetByIdsPreset } = require('../../../presets/pg/mgetByIds');
 const searchWithPaginationPreset = require('../../../presets/pg/searchWithPagination');
 
 const transformTxInfo = require('./transformTxInfo');
@@ -25,7 +25,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       transformResult: transformTxInfo,
     })({ pg, emitEvent }),
 
-    mget: mgetByIdPreset({
+    mget: mgetByIdsPreset({
       name: 'transactions.all.commonData.mget',
       matchRequestResult: propEq('id'),
       sql: sql.mget,
