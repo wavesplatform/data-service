@@ -14,7 +14,7 @@ import { ServicePresetInitOptions } from 'services/presets/types';
 import { NamedType } from 'types/createNamedType';
 
 export const getByIdPreset = <
-  Request,
+  Id,
   ResponseRaw,
   ResponseTransformed extends NamedType<string, any>
 >({
@@ -31,17 +31,15 @@ export const getByIdPreset = <
   resultTypeFactory: (t?: DataType<ResponseTransformed>) => ResponseTransformed;
   transformResult: (
     response: ResponseRaw,
-    request?: Request
+    request?: Id
   ) => DataType<ResponseTransformed>;
-  sql: (r: Request) => string;
+  sql: (r: Id) => string;
 }) => ({ pg, emitEvent }: ServicePresetInitOptions) =>
-  get<Request, Request, ResponseRaw, ResponseTransformed>({
+  get<Id, Id, ResponseRaw, ResponseTransformed>({
     transformInput: identity,
-    transformResult: transformResultFn<
-      Request,
-      ResponseRaw,
-      ResponseTransformed
-    >(resultTypeFactory)(transformResult),
+    transformResult: transformResultFn<Id, ResponseRaw, ResponseTransformed>(
+      resultTypeFactory
+    )(transformResult),
     validateInput: validateInput(inputSchema, name),
     validateResult: validateResult(resultSchema, name),
     dbQuery: getData({ name, sql }),

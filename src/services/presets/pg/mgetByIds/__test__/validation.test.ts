@@ -11,7 +11,7 @@ import { PgDriver } from 'db/driver';
 const { inputMget: input } = require('../inputSchema');
 
 const createService = (resultSchema: SchemaLike) =>
-  mgetByIdsPreset<string[], string, NamedType<string, string | null>>({
+  mgetByIdsPreset<string, string, NamedType<string, string | null>>({
     name: 'some_name',
     sql: (s: string[]) => s.join(';'),
     matchRequestResult: equals,

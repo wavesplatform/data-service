@@ -9,7 +9,7 @@ export type DataType<T extends NamedType<string, any>> = T extends NamedType<
   : never;
 
 export const transformResults = <
-  Request,
+  Id,
   ResponseRaw,
   ResponseTransformed extends NamedType<string, any>
 >(
@@ -17,12 +17,9 @@ export const transformResults = <
 ) => (
   transformDbResponse: (
     results: ResponseRaw,
-    request?: Request
+    request?: Id
   ) => DataType<ResponseTransformed>
-) => (
-  maybeResponse: Maybe<ResponseRaw>,
-  request?: Request
-): ResponseTransformed =>
+) => (maybeResponse: Maybe<ResponseRaw>, request?: Id): ResponseTransformed =>
   maybeResponse.map(transformDbResponse).matchWith({
     Just: ({ value }) => typeFactory(value),
     Nothing: () => typeFactory(),
