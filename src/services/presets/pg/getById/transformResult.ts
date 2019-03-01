@@ -1,12 +1,6 @@
 import { Maybe } from 'folktale/maybe';
 import { NamedType } from 'types/createNamedType';
-
-export type DataType<T extends NamedType<string, any>> = T extends NamedType<
-  string,
-  infer R
->
-  ? R
-  : never;
+import { DataType } from '../../types';
 
 export const transformResults = <
   Id,
