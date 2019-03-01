@@ -1,13 +1,13 @@
-import { SchemaLike } from 'joi';
 import { always, identity, equals } from 'ramda';
+import { SchemaLike } from 'joi';
 import { of as taskOf } from 'folktale/concurrency/task';
-import { Joi } from '../../../../../utils/validation';
 
+import { Joi } from '../../../../../utils/validation';
 import { mgetByIdsPreset } from '..';
 import createNamedType, {
   NamedType,
 } from '../../../../../types/createNamedType';
-import { PgDriver } from 'db/driver';
+import { PgDriver } from '../../../../../db/driver';
 const { inputMget: input } = require('../inputSchema');
 
 const createService = (resultSchema: SchemaLike) =>

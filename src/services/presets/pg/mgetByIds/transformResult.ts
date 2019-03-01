@@ -1,5 +1,6 @@
-import { list, List } from '../../../../types';
 import { Maybe } from 'folktale/maybe';
+
+import { list, List } from '../../../../types';
 import { NamedType } from 'types/createNamedType';
 import { DataType } from '../../types';
 

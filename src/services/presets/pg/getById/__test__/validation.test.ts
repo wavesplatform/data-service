@@ -6,8 +6,8 @@ import { Joi } from '../../../../../utils/validation';
 import { getByIdPreset } from '..';
 import { inputGet as input } from '../inputSchema';
 import { SchemaLike } from 'joi';
-import { PgDriver } from 'db/driver';
-import { NamedType } from 'types/createNamedType';
+import { PgDriver } from '../../../../../db/driver';
+import { NamedType } from '../../../../../types/createNamedType';
 
 const createService = (resultSchema: SchemaLike) =>
   getByIdPreset<string, string, NamedType<'test', string | undefined>>({

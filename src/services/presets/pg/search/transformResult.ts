@@ -1,5 +1,5 @@
 import { list, List } from '../../../../types';
-import { NamedType } from 'types/createNamedType';
+import { NamedType } from '../../../../types/createNamedType';
 import { DataType } from '../../types';
 
 export const transformResults = <

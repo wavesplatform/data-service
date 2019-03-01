@@ -1,6 +1,6 @@
-import { PgDriver } from 'db/driver';
 import { assoc } from 'ramda';
 
+import { PgDriver } from '../../../../db/driver';
 import { matchRequestsResults } from '../../../../utils/db/index';
 
 export const getData = <ResponseRaw, Id = string>({

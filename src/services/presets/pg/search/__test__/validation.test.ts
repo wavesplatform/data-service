@@ -7,7 +7,7 @@ import { searchPreset } from '..';
 import createNamedType, {
   NamedType,
 } from '../../../../../types/createNamedType';
-import { PgDriver } from 'db/driver';
+import { PgDriver } from '../../../../../db/driver';
 
 type TestTransaction = {
   id: string;

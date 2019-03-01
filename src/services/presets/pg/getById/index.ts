@@ -2,16 +2,11 @@ import { identity } from 'ramda';
 import { SchemaLike } from 'joi';
 
 import { get } from '../../../_common/createResolver';
-
 import { validateInput, validateResult } from '../../validation';
-import {
-  transformResults as transformResultFn,
-  DataType,
-} from './transformResult';
-
+import { transformResults as transformResultFn } from './transformResult';
 import { getData } from './pg';
-import { ServicePresetInitOptions } from 'services/presets/types';
-import { NamedType } from 'types/createNamedType';
+import { ServicePresetInitOptions, DataType } from '../../types';
+import { NamedType } from '../../../../types/createNamedType';
 
 export const getByIdPreset = <
   Id,

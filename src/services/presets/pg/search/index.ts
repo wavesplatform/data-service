@@ -1,8 +1,9 @@
 import { identity } from 'ramda';
+import { SchemaLike } from 'joi';
+
 import { getData } from './pg';
 import { search } from '../../../_common/createResolver';
 import { ServicePresetInitOptions } from '../../../presets/types';
-import { SchemaLike } from 'joi';
 import { validateInput, validateResult } from '../../validation';
 import { NamedType } from '../../../../types/createNamedType';
 import { List } from '../../../../types';

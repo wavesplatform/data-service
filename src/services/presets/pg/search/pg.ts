@@ -1,5 +1,6 @@
-import { PgDriver } from 'db/driver';
 import { assoc } from 'ramda';
+
+import { PgDriver } from '../../../../db/driver';
 
 export const getData = <Request, ResponseRaw>({
   name,
