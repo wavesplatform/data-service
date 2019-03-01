@@ -1,5 +1,5 @@
 import { always, identity } from 'ramda';
-import { of as taskOf } from 'folktale/concurrency/task';
+import { of as task } from 'folktale/concurrency/task';
 
 import { Joi } from '../../../../../utils/validation';
 import { list } from '../../../../../types';
@@ -36,7 +36,7 @@ const service = searchPreset<
   transformResult: (res: TestTransaction[]) =>
     list(res.map(tx => createNamedType<'tx', TestTransaction>('tx', tx))),
 })({
-  pg: { any: filters => taskOf(mockTxs) } as PgDriver,
+  pg: { any: filters => task(mockTxs) } as PgDriver,
   emitEvent: always(identity),
 });
 

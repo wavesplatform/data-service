@@ -13,12 +13,9 @@ export const transformResults = <
     results: ResponseRaw,
     request?: Request
   ) => DataType<ResponseTransformed>
-) => (
-  maybeResponses: ResponseRaw[],
-  request?: Request
-): List<ResponseTransformed> =>
+) => (responses: ResponseRaw[], request?: Request): List<ResponseTransformed> =>
   list(
-    maybeResponses.map(response =>
+    responses.map(response =>
       typeFactory(transformDbResponse(response, request))
     )
   );
