@@ -2,14 +2,13 @@ import { fromNullable } from 'folktale/maybe';
 import { PgDriver } from 'db/driver';
 import { assoc } from 'ramda';
 
-export type GetByIdRequest<T> = {
+export const getData = <ResponseRaw, Id = string>({
+  name,
+  sql,
+}: {
   name: string;
-  sql: (id: T) => string;
-};
-
-export const getData = <T, ResponseRaw>({ name, sql }: GetByIdRequest<T>) => (
-  pg: PgDriver
-) => (id: T) =>
+  sql: (id: Id) => string;
+}) => (pg: PgDriver) => (id: Id) =>
   pg
     .oneOrNone<ResponseRaw>(sql(id))
     .map(fromNullable)

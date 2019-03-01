@@ -1,5 +1,5 @@
 const { getByIdPreset } = require('../presets/pg/getById');
-const mgetByIds = require('../presets/pg/mgetByIds');
+const { mgetByIdsPreset } = require('../presets/pg/mgetByIds');
 const search = require('../presets/pg/search');
 const { pair } = require('../../types');
 
@@ -23,7 +23,7 @@ module.exports = ({ drivers, emitEvent }) => {
       transformResult: transformResult,
       resultTypeFactory: pair,
     })({ pg: drivers.pg, emitEvent }),
-    mget: mgetByIds({
+    mget: mgetByIdsPreset({
       name: 'pairs.mget',
       sql: sql.mget,
       inputSchema: inputMget,

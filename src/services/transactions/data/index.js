@@ -1,6 +1,6 @@
 const { identity } = require('ramda');
 
-const createResolver = require('../../_common/createResolver');
+const { get, mget, search } = require('../../_common/createResolver');
 
 // validation
 const { inputGet } = require('../../presets/pg/getById/inputSchema');
@@ -20,7 +20,9 @@ const { transaction } = require('../../../types');
 const {
   transformResults: transformResultGet,
 } = require('../../presets/pg/getById/transformResult');
-const transformResultMget = require('../../presets/pg/mgetByIds/transformResult');
+const {
+  transformResults: transformResultMget,
+} = require('../../presets/pg/mgetByIds/transformResult');
 const transformInputSearch = require('../../presets/pg/searchWithPagination/transformInput');
 const transformResultSearch = require('../../presets/pg/searchWithPagination/transformResult');
 const transformTxInfo = require('./transformTxInfo');
@@ -29,7 +31,7 @@ const createServiceName = type => `transactions.data.${type}`;
 
 module.exports = ({ drivers: { pg }, emitEvent }) => {
   return {
-    get: createResolver.get({
+    get: get({
       transformInput: identity,
       transformResult: transformResultGet(transaction)(transformTxInfo),
       validateInput: validateInput(inputGet, createServiceName('get')),
@@ -37,7 +39,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       dbQuery: pgData.get,
     })({ db: pg, emitEvent }),
 
-    mget: createResolver.mget({
+    mget: mget({
       transformInput: identity,
       transformResult: transformResultMget(transaction)(transformTxInfo),
       validateInput: validateInput(inputMget, createServiceName('mget')),
@@ -45,7 +47,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       dbQuery: pgData.mget,
     })({ db: pg, emitEvent }),
 
-    search: createResolver.search({
+    search: search({
       transformInput: transformInputSearch,
       transformResult: transformResultSearch(transformTxInfo),
       validateInput: validateInput(

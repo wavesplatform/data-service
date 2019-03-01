@@ -1,3 +1,4 @@
+import { list, List } from '../../../../types';
 import { Maybe } from 'folktale/maybe';
 import { NamedType } from 'types/createNamedType';
 
@@ -9,7 +10,7 @@ export type DataType<T extends NamedType<string, any>> = T extends NamedType<
   : never;
 
 export const transformResults = <
-  Id,
+  Request,
   ResponseRaw,
   ResponseTransformed extends NamedType<string, any>
 >(
@@ -17,10 +18,19 @@ export const transformResults = <
 ) => (
   transformDbResponse: (
     results: ResponseRaw,
-    request?: Id
+    request?: Request
   ) => DataType<ResponseTransformed>
-) => (maybeResponse: Maybe<ResponseRaw>, request?: Id): ResponseTransformed =>
-  maybeResponse.map(transformDbResponse).matchWith({
-    Just: ({ value }) => typeFactory(value),
-    Nothing: () => typeFactory(),
-  });
+) => (
+  maybeResponses: Maybe<ResponseRaw>[],
+  request?: Request
+): List<ResponseTransformed> =>
+  list(
+    maybeResponses.map(response =>
+      response
+        .map(res => transformDbResponse(res, request))
+        .matchWith({
+          Just: ({ value }) => typeFactory(value),
+          Nothing: () => typeFactory(),
+        })
+    )
+  );

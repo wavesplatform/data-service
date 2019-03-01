@@ -1,48 +1,46 @@
-const Task = require('folktale/concurrency/task');
-const { always, identity, equals } = require('ramda');
+import { SchemaLike } from 'joi';
+import { always, identity, equals } from 'ramda';
+import { of as taskOf } from 'folktale/concurrency/task';
+import { Joi } from '../../../../../utils/validation';
 
-const { Joi } = require('../../../../../utils/validation');
-
-const mgetByIdsPreset = require('..');
+import { mgetByIdsPreset } from '..';
+import createNamedType, {
+  NamedType,
+} from '../../../../../types/createNamedType';
+import { PgDriver } from 'db/driver';
 const { inputMget: input } = require('../inputSchema');
 
-const createService = resultSchema =>
-  mgetByIdsPreset({
+const createService = (resultSchema: SchemaLike) =>
+  mgetByIdsPreset<string, string, NamedType<string, string | null>>({
     name: 'some_name',
-    sql: identity,
+    sql: (s: string[]) => s.join(';'),
     matchRequestResult: equals,
     inputSchema: input,
     resultSchema,
     transformResult: identity,
-    resultTypeFactory: identity,
+    resultTypeFactory: (a?: string | null) =>
+      createNamedType<'test', string | null>('test', a ? a : null),
   })({
-    pg: { any: ids => Task.of(ids) },
+    pg: {
+      any: ids => taskOf(ids.split(';')),
+    } as PgDriver,
     emitEvent: always(identity),
   });
-
-const assertValidationError = (done, r, v) =>
-  r(v)
-    .run()
-    .promise()
-    .then(() => done('Wrong branch, error'))
-    .catch(e => {
-      expect(e.type).toBe('Validation');
-      done();
-    });
 
 describe('mgetByIds', () => {
   describe('input validation', () => {
     // passing result validation
     const service = createService(Joi.any());
 
-    it('fails if ids param is not provided', done =>
-      assertValidationError(done, service));
-    it('fails if ids params is not a base58 string array', done => {
-      assertValidationError(done, service, null);
-      assertValidationError(done, service, 1);
-      assertValidationError(done, service, {});
-      assertValidationError(done, service, ['1O']);
-    });
+    it('fails if ids params is not a base58 string array', done =>
+      service(['10'])
+        .run()
+        .promise()
+        .then(() => done('Wrong branch, error'))
+        .catch(e => {
+          expect(e.type).toBe('Validation');
+          done();
+        }));
     it('passes if ids param is an empty array', done =>
       service([])
         .run()
@@ -75,6 +73,7 @@ describe('mgetByIds', () => {
             expect(e.type).toBe('Resolver');
             done();
           },
+          onResolved: console.log,
         }));
   });
 });
