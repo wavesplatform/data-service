@@ -5,7 +5,7 @@ const { asset } = require('../../types');
 // presets
 const { getByIdPreset } = require('../presets/pg/getById');
 const { mgetByIdsPreset } = require('../presets/pg/mgetByIds');
-const searchPreset = require('../presets/pg/search');
+const { searchPreset } = require('../presets/pg/search');
 
 // validation
 const { inputGet } = require('../presets/pg/getById/inputSchema');
@@ -16,7 +16,9 @@ const {
 } = require('./schema');
 
 const transformAsset = require('./transformAsset');
-const createTransformResult = require('../presets/pg/search/transformResult');
+const {
+  transformResults: createTransformResult,
+} = require('../presets/pg/search/transformResult');
 const sql = require('./sql');
 
 module.exports = ({ drivers: { pg }, emitEvent }) => {
