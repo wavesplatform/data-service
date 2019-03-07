@@ -1,10 +1,8 @@
-import { has } from 'ramda';
-
+import { decode } from '../../../_common/pagination/cursor';
 import {
-  decode,
-  SortAscend,
-  SortDescend,
-} from '../../../_common/pagination/cursor';
+  RequestRaw as RequestRawWithCursor,
+  RequestTransformed as RequestTransformedWithCursor,
+} from './index';
 
 const decodeAfter = (cursorString: string) =>
   decode(cursorString).matchWith({
@@ -15,15 +13,9 @@ const decodeAfter = (cursorString: string) =>
     Error: () => ({}),
   });
 
-export const transformInput = <
-  RequestRaw extends RequestTransformed & { after?: SortAscend | SortDescend },
-  RequestTransformed
->(
-  filters: RequestRaw
-): RequestTransformed => {
-  if (has('after', filters)) {
-    return { ...filters, ...decodeAfter(filters.after) };
-  }
-
-  return filters;
-};
+export const transformInput = <Request>(
+  request: RequestRawWithCursor<Request>
+): RequestTransformedWithCursor<Request> =>
+  request.after
+    ? { ...request, ...decodeAfter(request.after) }
+    : { ...request, after: undefined };

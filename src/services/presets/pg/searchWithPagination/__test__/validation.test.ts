@@ -1,12 +1,10 @@
-const Task = require('folktale/concurrency/task');
-const { always, identity } = require('ramda');
+import Task = require('folktale/concurrency/task');
+import { always, identity } from 'ramda';
 
-const { parseDate } = require('../../../../../utils/parseDate');
-
-const { Joi } = require('../../../../../utils/validation');
-
-const searchWithPaginationPreset = require('..');
-const commonFilterSchemas = require('../commonFilterSchemas');
+import { parseDate } from '../../../../../utils/parseDate';
+import { Joi } from '../../../../../utils/validation';
+import searchWithPaginationPreset from '..';
+import commonFilterSchemas from '../commonFilterSchemas';
 
 const mockTxs = [
   { id: 'q', timestamp: new Date() },

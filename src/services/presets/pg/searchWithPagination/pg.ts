@@ -8,7 +8,7 @@ export const getData = <Request, ResponseRaw>({
 }: {
   name: string;
   sql: (req: Request) => string;
-}) => (pg: PgDriver) => (filters: Request) =>
+}) => (pg: PgDriver) => (request: Request) =>
   pg
-    .any<ResponseRaw>(sql(filters))
-    .mapRejected(assoc('meta', { request: name, params: filters }));
+    .any<ResponseRaw>(sql(request))
+    .mapRejected(assoc('meta', { request: name, params: request }));
