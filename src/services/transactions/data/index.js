@@ -23,8 +23,12 @@ const {
 const {
   transformResults: transformResultMget,
 } = require('../../presets/pg/mgetByIds/transformResult');
-const transformInputSearch = require('../../presets/pg/searchWithPagination/transformInput');
-const transformResultSearch = require('../../presets/pg/searchWithPagination/transformResult');
+const {
+  transformInput: transformInputSearch,
+} = require('../../presets/pg/searchWithPagination/transformInput');
+const {
+  transformResults: transformResultSearch,
+} = require('../../presets/pg/searchWithPagination/transformResult');
 const transformTxInfo = require('./transformTxInfo');
 
 const createServiceName = type => `transactions.data.${type}`;

@@ -4,7 +4,9 @@ const { transaction } = require('../../../../types');
 
 const { getByIdPreset } = require('../../../presets/pg/getById');
 const { mgetByIdsPreset } = require('../../../presets/pg/mgetByIds');
-const searchWithPaginationPreset = require('../../../presets/pg/searchWithPagination');
+const {
+  searchWithPaginationPreset,
+} = require('../../../presets/pg/searchWithPagination');
 
 const transformTxInfo = require('./transformTxInfo');
 

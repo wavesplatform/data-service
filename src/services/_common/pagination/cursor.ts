@@ -1,7 +1,7 @@
 import { Result, Error as error, Ok as ok } from 'folktale/result';
 import { ValidationError } from '../../../errorHandling';
 
-export type SortAscend = 'ask';
+export type SortAscend = 'asc';
 export type SortDescend = 'desc';
 
 export type Cursor = {

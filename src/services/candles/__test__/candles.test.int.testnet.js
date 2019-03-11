@@ -1,5 +1,5 @@
 const { createPgDriver } = require('../../../db');
-const loadConfig = require('../../../loadConfig');
+const { loadConfig } = require('../../../loadConfig');
 
 const options = loadConfig();
 const create = require('../index');
@@ -30,7 +30,7 @@ describe('Candles', () => {
           onResolved: value => {
             expect(value).toMatchSnapshot();
             done();
-          }
+          },
         });
     });
 
@@ -50,7 +50,7 @@ describe('Candles', () => {
           onResolved: value => {
             expect(value).toMatchSnapshot();
             done();
-          }
+          },
         });
     });
   });

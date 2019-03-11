@@ -73,7 +73,10 @@ export type SearchResolverDependencies<
   ResTransformed
 > & {
   dbQuery: (db: PgDriver) => (r: ReqTransformed) => Task<DbError, ResRaw[]>;
-  transformResult: (results: ResRaw[], request: ReqRaw) => ResTransformed;
+  transformResult: (
+    results: ResRaw[],
+    request: ReqTransformed
+  ) => ResTransformed;
 };
 
 export type RuntimeResolverDependenties = {

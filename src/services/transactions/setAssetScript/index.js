@@ -6,7 +6,9 @@ const { getByIdPreset } = require('../../presets/pg/getById');
 const { mgetByIdsPreset } = require('../../presets/pg/mgetByIds');
 const { inputGet } = require('../../presets/pg/getById/inputSchema');
 const { inputMget } = require('../../presets/pg/mgetByIds/inputSchema');
-const searchWithPaginationPreset = require('../../presets/pg/searchWithPagination');
+const {
+  searchWithPaginationPreset,
+} = require('../../presets/pg/searchWithPagination');
 
 const transformTxInfo = require('./transformTxInfo');
 

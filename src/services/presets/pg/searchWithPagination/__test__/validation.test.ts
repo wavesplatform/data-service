@@ -1,27 +1,51 @@
-import Task = require('folktale/concurrency/task');
+import { of as task } from 'folktale/concurrency/task';
 import { always, identity } from 'ramda';
 
 import { parseDate } from '../../../../../utils/parseDate';
 import { Joi } from '../../../../../utils/validation';
-import searchWithPaginationPreset from '..';
-import commonFilterSchemas from '../commonFilterSchemas';
+import { searchWithPaginationPreset, RequestRaw } from '..';
+import * as commonFilterSchemas from '../commonFilterSchemas';
+import createNamedType, {
+  NamedType,
+} from '../../../../../types/createNamedType';
+import { PgDriver } from '../../../../../db/driver';
 
-const mockTxs = [
+const mockTxs: ResponseRaw[] = [
   { id: 'q', timestamp: new Date() },
   { id: 'w', timestamp: new Date() },
 ];
-const service = searchWithPaginationPreset({
+
+type Request = {
+  timeEnd?: Date;
+  timeStart?: Date;
+  limit?: number;
+};
+
+type ResponseRaw = {
+  id: string;
+  timestamp: Date;
+};
+
+const service = searchWithPaginationPreset<
+  Request,
+  ResponseRaw,
+  NamedType<string, ResponseRaw>
+>({
   name: 'some_name',
-  sql: identity,
+  sql: () => '',
   inputSchema: Joi.object().keys(commonFilterSchemas),
   resultSchema: Joi.any(),
-  transformResult: identity,
+  transformResult: (response: ResponseRaw) =>
+    createNamedType<'tx', ResponseRaw>('tx', response),
 })({
-  pg: { any: () => Task.of(mockTxs) },
+  pg: { any: filters => task(mockTxs) } as PgDriver,
   emitEvent: always(identity),
 });
 
-const assertValidationError = (done, v) =>
+const assertValidationError = (
+  done: jest.DoneCallback,
+  v: RequestRaw<Request>
+) =>
   service(v)
     .run()
     .promise()
@@ -36,16 +60,19 @@ describe('searchWithPagination preset validation', () => {
     it('fails if timeEnd < 0', done =>
       assertValidationError(done, {
         timeEnd: parseDate('-1525132900000').unsafeGet(),
+        sort: 'asc',
       }));
     it('fails if timeStart < 0', done =>
       assertValidationError(done, {
         timeEnd: parseDate('1525132900000').unsafeGet(),
         timeStart: parseDate('-1525132800000').unsafeGet(),
+        sort: 'asc',
       }));
     it('fails if timeEnd < timeStart', done =>
       assertValidationError(done, {
         timeEnd: parseDate('1525132700000').unsafeGet(),
         timeStart: parseDate('1525132800000').unsafeGet(),
+        sort: 'asc',
       }));
     it('fails if timeStart->invalid Date', done => {
       expect(parseDate('').unsafeGet).toThrowError();
@@ -53,8 +80,8 @@ describe('searchWithPagination preset validation', () => {
     });
     it('passes if correct object is provided', done =>
       service({
-        timeStart: parseDate(0).unsafeGet(),
-        timeEnd: parseDate(Date.now()).unsafeGet(),
+        timeStart: new Date(0),
+        timeEnd: new Date(),
         limit: 1,
         sort: 'asc',
       })

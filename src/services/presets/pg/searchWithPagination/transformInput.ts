@@ -13,9 +13,13 @@ const decodeAfter = (cursorString: string) =>
     Error: () => ({}),
   });
 
+// REFACTOR
 export const transformInput = <Request>(
   request: RequestRawWithCursor<Request>
 ): RequestTransformedWithCursor<Request> =>
   request.after
-    ? { ...request, ...decodeAfter(request.after) }
-    : { ...request, after: undefined };
+    ? ({
+        ...request,
+        ...decodeAfter(request.after),
+      } as RequestTransformedWithCursor<Request>)
+    : ({ ...request } as RequestTransformedWithCursor<Request>);

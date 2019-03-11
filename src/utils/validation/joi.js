@@ -1,7 +1,7 @@
 const rawJoi = require('joi');
 
 const { BigNumber } = require('@waves/data-entities');
-const Cursor = require('../../services/_common/pagination/cursor');
+const { decode } = require('../../services/_common/pagination/cursor');
 const { base58: base58Regex, interval: intervalRegex } = require('../regex');
 const { interval } = require('../../types');
 const { div } = require('../interval');
@@ -49,12 +49,11 @@ module.exports = rawJoi
             return this.createError('string.base64', { value }, state, options);
           }
 
-          const [ts, id, sort] = Cursor.decode(value);
-          if (!ts || !id || !sort) {
-            // Generate an error, state and options need to be passed
-            return this.createError('string.cursor', { value }, state, options);
-          }
-          return value; // Everything is OK
+          return decode(value).matchWith({
+            Ok: () => value,
+            Error: () =>
+              this.createError('string.cursor', { value }, state, options),
+          });
         },
       },
       {
