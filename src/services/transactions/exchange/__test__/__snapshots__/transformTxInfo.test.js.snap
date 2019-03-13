@@ -2,11 +2,19 @@
 
 exports[`transformTxInfo for exchange tx should correctly transform fields 1`] = `
 Object {
+  "__type": "transaction",
   "amount": "1",
   "buyMatcherFee": "1",
-  "fee": "1",
-  "height": 809923,
-  "id": "8rEwYY4wQ4bkEkk95EiyeQnvnonX6TAnU6eiBAbVSADk",
+  "data": Object {
+    "fee": "1",
+    "height": 809923,
+    "id": "8rEwYY4wQ4bkEkk95EiyeQnvnonX6TAnU6eiBAbVSADk",
+    "sender": "3PJaDyprvekvPXPuAtxrapacuDJopgJRaU3",
+    "senderPublicKey": "7kPFrHDiGw1rCm7LPszuECwWYL3dMf6iMifLRDJQZMzy",
+    "signature": "N6p6eqNP8875kd8m3KxwH6MD7RUFA9epdShxSjPJt7YqKa8qF2K9UD2SGNERY9GdfMABRX2KBn1bCdHJym9wBHP",
+    "timestamp": 2017-12-26T09:32:29.000Z,
+    "type": 7,
+  },
   "order1": Object {
     "amount": "1",
     "assetPair": Object {
@@ -43,10 +51,5 @@ Object {
   },
   "price": "1",
   "sellMatcherFee": "1",
-  "sender": "3PJaDyprvekvPXPuAtxrapacuDJopgJRaU3",
-  "senderPublicKey": "7kPFrHDiGw1rCm7LPszuECwWYL3dMf6iMifLRDJQZMzy",
-  "signature": "N6p6eqNP8875kd8m3KxwH6MD7RUFA9epdShxSjPJt7YqKa8qF2K9UD2SGNERY9GdfMABRX2KBn1bCdHJym9wBHP",
-  "timestamp": 2017-12-26T09:32:29.000Z,
-  "type": 7,
 }
 `;

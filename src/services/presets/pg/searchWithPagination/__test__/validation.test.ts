@@ -3,19 +3,20 @@ import { always, identity } from 'ramda';
 
 import { parseDate } from '../../../../../utils/parseDate';
 import { Joi } from '../../../../../utils/validation';
-import { searchWithPaginationPreset, RequestRaw } from '..';
+import { searchWithPaginationPreset, WithSortOrder } from '..';
 import * as commonFilterSchemas from '../commonFilterSchemas';
 import createNamedType, {
   NamedType,
 } from '../../../../../types/createNamedType';
 import { PgDriver } from '../../../../../db/driver';
+import { SortOrder } from '../../../../_common/pagination/cursor';
 
 const mockTxs: ResponseRaw[] = [
   { id: 'q', timestamp: new Date() },
   { id: 'w', timestamp: new Date() },
 ];
 
-type Request = {
+type Request = WithSortOrder & {
   timeEnd?: Date;
   timeStart?: Date;
   limit?: number;
@@ -42,10 +43,7 @@ const service = searchWithPaginationPreset<
   emitEvent: always(identity),
 });
 
-const assertValidationError = (
-  done: jest.DoneCallback,
-  v: RequestRaw<Request>
-) =>
+const assertValidationError = (done: jest.DoneCallback, v: Request) =>
   service(v)
     .run()
     .promise()
@@ -60,19 +58,19 @@ describe('searchWithPagination preset validation', () => {
     it('fails if timeEnd < 0', done =>
       assertValidationError(done, {
         timeEnd: parseDate('-1525132900000').unsafeGet(),
-        sort: 'asc',
+        sort: SortOrder.Ascending,
       }));
     it('fails if timeStart < 0', done =>
       assertValidationError(done, {
         timeEnd: parseDate('1525132900000').unsafeGet(),
         timeStart: parseDate('-1525132800000').unsafeGet(),
-        sort: 'asc',
+        sort: SortOrder.Ascending,
       }));
     it('fails if timeEnd < timeStart', done =>
       assertValidationError(done, {
         timeEnd: parseDate('1525132700000').unsafeGet(),
         timeStart: parseDate('1525132800000').unsafeGet(),
-        sort: 'asc',
+        sort: SortOrder.Ascending,
       }));
     it('fails if timeStart->invalid Date', done => {
       expect(parseDate('').unsafeGet).toThrowError();
@@ -83,7 +81,7 @@ describe('searchWithPagination preset validation', () => {
         timeStart: new Date(0),
         timeEnd: new Date(),
         limit: 1,
-        sort: 'asc',
+        sort: SortOrder.Ascending,
       })
         .run()
         .listen({

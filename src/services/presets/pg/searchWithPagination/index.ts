@@ -7,26 +7,30 @@ import { transformResults } from './transformResult';
 import { NamedType } from '../../../../types/createNamedType';
 import { getData } from './pg';
 import { ServicePresetInitOptions } from '../../../presets/types';
-import {
-  Cursor,
-  SortAscend,
-  SortDescend,
-} from 'services/_common/pagination/cursor';
+import { Cursor, SortOrder } from 'services/_common/pagination/cursor';
 import { List } from '../../../../types';
 
-export type RequestRaw<Request> = Request & {
-  after?: string;
-  sort: SortAscend | SortDescend;
+export type WithSortOrder = {
+  sort: SortOrder
 };
-export type RequestTransformed<Request> = Request & {
-  after?: Cursor;
-  sort: SortAscend | SortDescend;
+
+export type RequestWithCursor<
+  Request extends WithSortOrder,
+  CursorType
+> = Request & {
+  after?: CursorType;
+};
+
+export type BaseResponse = {
+  timestamp: Date;
+  id: string;
+  [key: string]: any;
 };
 
 export const searchWithPaginationPreset = <
-  Request,
+  Request extends WithSortOrder,
   ResponseRaw,
-  ResponseTransformed extends NamedType<string, any>
+  ResponseTransformed extends NamedType<string, BaseResponse>
 >({
   name,
   sql,
@@ -35,17 +39,17 @@ export const searchWithPaginationPreset = <
   transformResult,
 }: {
   name: string;
-  sql: (r: RequestTransformed<Request>) => string;
+  sql: (r: RequestWithCursor<Request, Cursor>) => string;
   inputSchema: SchemaLike;
   resultSchema: SchemaLike;
   transformResult: (
     response: ResponseRaw,
-    request?: RequestTransformed<Request>
+    request?: RequestWithCursor<Request, Cursor>
   ) => ResponseTransformed;
 }) => ({ pg, emitEvent }: ServicePresetInitOptions) =>
   search<
-    RequestRaw<Request>,
-    RequestTransformed<Request>,
+    RequestWithCursor<Request, string>,
+    RequestWithCursor<Request, Cursor>,
     ResponseRaw,
     List<ResponseTransformed>
   >({
@@ -53,5 +57,8 @@ export const searchWithPaginationPreset = <
     transformResult: transformResults(transformResult),
     validateInput: validateInput(inputSchema, name),
     validateResult: validateResult(resultSchema, name),
-    dbQuery: getData<RequestTransformed<Request>, ResponseRaw>({ name, sql }),
+    dbQuery: getData<RequestWithCursor<Request, Cursor>, ResponseRaw>({
+      name,
+      sql,
+    }),
   })({ db: pg, emitEvent });

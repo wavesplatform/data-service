@@ -1,5 +1,6 @@
 const { renameKeys } = require('ramda-adjunct');
 const { compose, ifElse, propEq, omit, identity, pathEq } = require('ramda');
+const { transaction } = require('../../../types');
 
 const hasNullSig = propEq('signature', null);
 const hasZeroProofs = pathEq(['proofs', 'length'], 0);
@@ -12,6 +13,7 @@ const processProofsAndSignature = ifElse(
 
 /** transformTxInfo:: RawTxInfo -> TxInfo */
 const transformTxInfo = compose(
+  transaction,
   processProofsAndSignature,
   // remove version if it is null
   ifElse(propEq('version', null), omit(['version']), identity),

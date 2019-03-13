@@ -4,47 +4,50 @@ import { last, objOf } from 'ramda';
 import { NamedType } from '../../../../types/createNamedType';
 import { encode, Cursor } from '../../../_common/pagination/cursor';
 import { List, list } from '../../../../types';
-import { RequestTransformed as RequestTransformedWithCursor } from '.';
+import { RequestWithCursor, WithSortOrder } from '.';
 
 const maybeLastItem = <ResponseTransformed>(data: ResponseTransformed[]) =>
   fromNullable(last(data));
 
 const makeCursorFromLastData = <
-  Request,
-  ResponseTransformed extends NamedType<string, any>
+  Request extends WithSortOrder,
+  ResponseTransformed extends Record<string, any>
 >(
-  request: RequestTransformedWithCursor<Request>,
-  item: ResponseTransformed
+  request: RequestWithCursor<Request, Cursor>,
+  response: ResponseTransformed
 ): Cursor => ({
-  timestamp: item.data ? item.data.timestamp : new Date(),
-  id: item.data.id,
+  timestamp: response.data.timestamp,
+  id: response.data.id,
   sort: request.sort,
 });
 
 const createCursorMeta = <
-  Request,
+  Request extends WithSortOrder,
   ResponseTransformed extends NamedType<string, any>
 >(
-  request: RequestTransformedWithCursor<Request>,
+  request: RequestWithCursor<Request, Cursor>,
   responses: ResponseTransformed[]
 ) =>
   maybeLastItem(responses)
-    .map(lastItem => encode(makeCursorFromLastData(request, lastItem)))
+    .map(lastItem => {
+      lastItem.data ? {} : console.log('##########################################', lastItem);
+      return encode(makeCursorFromLastData(request, lastItem));
+    })
     .map(objOf('lastCursor'))
     .getOrElse({});
 
 export const transformResults = <
-  Request,
+  Request extends WithSortOrder,
   ResponseRaw,
   ResponseTransformed extends NamedType<string, any>
 >(
   transformDbResponse: (
     results: ResponseRaw,
-    request?: RequestTransformedWithCursor<Request>
+    request?: RequestWithCursor<Request, Cursor>
   ) => ResponseTransformed
 ) => (
   responses: ResponseRaw[],
-  request: RequestTransformedWithCursor<Request>
+  request: RequestWithCursor<Request, Cursor>
 ): List<ResponseTransformed> => {
   const transformedData = responses.map(response =>
     transformDbResponse(response, request)

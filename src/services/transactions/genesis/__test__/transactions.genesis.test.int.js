@@ -1,7 +1,7 @@
 const createService = require('..');
 const { createPgDriver } = require('../../../../db');
 const { parseDate } = require('../../../../utils/parseDate');
-const Cursor = require('../../../_common/pagination/cursor');
+const { encode } = require('../../../_common/pagination/cursor');
 
 const { loadConfig } = require('../../../../loadConfig');
 const options = loadConfig();
@@ -17,22 +17,19 @@ const service = createService({
 
 describe('Genesis transaction service', () => {
   describe('search', () => {
-    it(
-      'fetches all 6 genesis txs',
-      async () => {
-        const tx = await service
-          .search({ limit: 20, sort: 'asc' })
-          .run()
-          .promise();
+    it('fetches all 6 genesis txs', async () => {
+      const tx = await service
+        .search({ limit: 20, sort: 'asc' })
+        .run()
+        .promise();
 
-        expect(tx).toBeDefined();
-        expect(tx.data).toHaveLength(6);
-      },
-      10000
-    );
+      expect(tx).toBeDefined();
+      expect(tx.data).toHaveLength(6);
+    }, 10000);
 
     describe('Pagination ', async () => {
-      const createCursor = sort => ({ data }) => Cursor.encode(sort, data);
+      const createCursor = sort => ({ data }) =>
+        encode({ sort, id: data.id, timestamp: data.timestamp });
 
       it('doesnt get 2 identical entries for limit 1 asc with next page fetching', async () => {
         const baseParams = {
@@ -68,7 +65,7 @@ describe('Genesis transaction service', () => {
           .promise();
 
         const secondThree = await service
-          .search({
+          .search({ 
             limit: LIMIT,
             sort,
             after: createCursor(sort)(firstThree.data[2]),
