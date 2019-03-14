@@ -38,6 +38,7 @@ const transformCandle = ([time, c]) => {
     omit(['a_dec', 'p_dec']),
     renameFields,
     assoc('time_start', new Date(`${time}Z`)),
+    assoc('txs_count', c.txs_count),
     ifElse(isEmpty, map(always(null)), identity)
   )(c);
 };
