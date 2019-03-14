@@ -1,6 +1,4 @@
-const { propEq } = require('ramda');
-
-const { transaction } = require('../../../types');
+const { propEq, compose } = require('ramda');
 
 const { getByIdPreset } = require('../../presets/pg/getById');
 const { mgetByIdsPreset } = require('../../presets/pg/mgetByIds');
@@ -15,6 +13,7 @@ const transformTxInfo = require('./transformTxInfo');
 const sql = require('./sql');
 
 const { result, inputSearch } = require('./schema');
+const { transaction } = require('../../../types');
 
 module.exports = ({ drivers: { pg }, emitEvent }) => {
   return {
@@ -42,7 +41,10 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       sql: sql.search,
       inputSchema: inputSearch,
       resultSchema: result,
-      transformResult: transformTxInfo,
+      transformResult: compose(
+        transaction,
+        transformTxInfo
+      ),
     })({ pg, emitEvent }),
   };
 };

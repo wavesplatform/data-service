@@ -16,11 +16,10 @@ export type Cursor = {
   sort: SortOrder;
 };
 
-export const encode = (cursor: Cursor): string => {
-  return Buffer.from(
+export const encode = (cursor: Cursor): string =>
+  Buffer.from(
     `${cursor.timestamp.toISOString()}::${cursor.id}::${cursor.sort}`
   ).toString('base64');
-};
 
 export const decode = (cursor: string): Result<ValidationError, Cursor> => {
   const data = Buffer.from(cursor, 'base64')

@@ -13,6 +13,7 @@ const {
   indexBy,
   identity,
   evolve,
+  compose,
 } = require('ramda');
 
 const commonData = require('./commonData');
@@ -87,7 +88,10 @@ module.exports = deps => {
         .get(id) //Task tx
         .chain(
           ifElse(
-            isNil,
+            compose(
+              isNil,
+              getData
+            ),
             Task.of,
             pipe(
               getData,
@@ -113,7 +117,7 @@ module.exports = deps => {
             // format output,
             map(
               pipe(
-                indexBy(prop('id')),
+                indexBy(compose(prop('id'))),
                 resultsMap => ({
                   ...txsList,
                   data: txsList.data.map(

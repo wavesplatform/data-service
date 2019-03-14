@@ -27,7 +27,6 @@ const get = (service, txId) =>
           .get('UNREAL')
           .run()
           .promise();
-
         expect(tx).toMatchObject({
           __type: 'transaction',
           data: null,

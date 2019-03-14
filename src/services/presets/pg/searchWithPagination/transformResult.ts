@@ -29,10 +29,7 @@ const createCursorMeta = <
   responses: ResponseTransformed[]
 ) =>
   maybeLastItem(responses)
-    .map(lastItem => {
-      lastItem.data ? {} : console.log('##########################################', lastItem);
-      return encode(makeCursorFromLastData(request, lastItem));
-    })
+    .map(lastItem => encode(makeCursorFromLastData(request, lastItem)))
     .map(objOf('lastCursor'))
     .getOrElse({});
 

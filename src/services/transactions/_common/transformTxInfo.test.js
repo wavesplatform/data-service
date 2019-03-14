@@ -14,15 +14,15 @@ describe('Common transactions info transform', () => {
   const tx = transformTxInfo(txRaw);
 
   it('transforms field names', () => {
-    expect(tx.data).toHaveProperty('type');
-    expect(tx.data).toHaveProperty('version');
-    expect(tx.data).toHaveProperty('timestamp');
-    expect(tx.data).toHaveProperty('senderPublicKey');
+    expect(tx).toHaveProperty('type');
+    expect(tx).toHaveProperty('version');
+    expect(tx).toHaveProperty('timestamp');
+    expect(tx).toHaveProperty('senderPublicKey');
   });
 
   it('handles proofs/signature', () => {
-    expect(tx.data).toHaveProperty('signature');
-    expect(tx.data).not.toHaveProperty('proofs');
+    expect(tx).toHaveProperty('signature');
+    expect(tx).not.toHaveProperty('proofs');
 
     const txWithProofs = transformTxInfo({
       ...txRaw,
@@ -31,8 +31,8 @@ describe('Common transactions info transform', () => {
         '5CVsdA6Weyx28MyGAQoFD8HdSBMmop3RQJvGv8w4k2axRyJ4f76oV4vWoCoV31B4Dv2dRcSfG6N88AzszccH9xV',
       ],
     });
-    expect(txWithProofs.data).not.toHaveProperty('signature');
-    expect(txWithProofs.data).toHaveProperty('proofs');
+    expect(txWithProofs).not.toHaveProperty('signature');
+    expect(txWithProofs).toHaveProperty('proofs');
   });
 
   it('if tx version is null removes it', () => {

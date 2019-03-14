@@ -1,6 +1,7 @@
-const { identity } = require('ramda');
+const { identity, compose } = require('ramda');
 
 const { get, mget, search } = require('../../_common/createResolver');
+const { transaction } = require('../../../types');
 
 // validation
 const { inputGet } = require('../../presets/pg/getById/inputSchema');
@@ -13,9 +14,6 @@ const {
 
 // data retrieve
 const pgData = require('./pg');
-
-// transforms
-const { transaction } = require('../../../types');
 
 const {
   transformResults: transformResultGet,
@@ -53,7 +51,12 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
 
     search: search({
       transformInput: transformInputSearch,
-      transformResult: transformResultSearch(transformTxInfo),
+      transformResult: transformResultSearch(
+        compose(
+          transaction,
+          transformTxInfo
+        )
+      ),
       validateInput: validateInput(
         inputSearchSchema,
         createServiceName('search')

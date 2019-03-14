@@ -28,8 +28,8 @@ describe('Genesis transaction service', () => {
     }, 10000);
 
     describe('Pagination ', async () => {
-      const createCursor = sort => ({ data }) =>
-        encode({ sort, id: data.id, timestamp: data.timestamp });
+      const createCursor = sort => ({ id, timestamp }) =>
+        encode({ sort, id, timestamp });
 
       it('doesnt get 2 identical entries for limit 1 asc with next page fetching', async () => {
         const baseParams = {
@@ -65,10 +65,10 @@ describe('Genesis transaction service', () => {
           .promise();
 
         const secondThree = await service
-          .search({ 
+          .search({
             limit: LIMIT,
             sort,
-            after: createCursor(sort)(firstThree.data[2]),
+            after: createCursor(sort)(firstThree.data[2].data),
           })
           .run()
           .promise();
