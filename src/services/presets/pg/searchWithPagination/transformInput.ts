@@ -1,6 +1,7 @@
+import { omit } from 'ramda';
+
 import { decode, Cursor } from '../../../_common/pagination/cursor';
 import { RequestWithCursor, WithSortOrder } from './index';
-import { omit } from 'ramda';
 
 const decodeAfter = (cursorString: string) =>
   decode(cursorString).matchWith({

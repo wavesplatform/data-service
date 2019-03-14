@@ -1,6 +1,8 @@
-import createNamedType, { NamedType } from './createNamedType';
+import { toSerializable, Serializable } from './serialization';
 import { Maybe } from 'folktale/maybe';
-import { Interval, interval } from './interval';
+import { Interval, interval, Unit } from './interval';
+
+export { Serializable, FromSerializable } from './serialization';
 
 export const fromMaybe = <A, B>(factory: (a?: A) => B) => (mb: Maybe<A>): B =>
   mb.matchWith({
@@ -10,33 +12,33 @@ export const fromMaybe = <A, B>(factory: (a?: A) => B) => (mb: Maybe<A>): B =>
 
 // @todo AssetInfo
 export type AssetInfo = unknown;
-export type Asset = NamedType<'asset', AssetInfo>;
+export type Asset = Serializable<'asset', AssetInfo>;
 export const asset = (data: AssetInfo = null): Asset =>
-  createNamedType('asset', data);
+  toSerializable('asset', data);
 
 // @todo AliasInfo
 export type AliasInfo = unknown;
-export type Alias = NamedType<'alias', AliasInfo>;
+export type Alias = Serializable<'alias', AliasInfo>;
 export const alias = (data: AliasInfo = null): Alias =>
-  createNamedType('alias', data);
+  toSerializable('alias', data);
 
 // @todo CandleInfo
 type CandleInfo = unknown;
-type Candle = NamedType<'candle', CandleInfo>;
+type Candle = Serializable<'candle', CandleInfo>;
 export const candle = (data: CandleInfo = null): Candle =>
-  createNamedType('candle', data);
+  toSerializable('candle', data);
 
 // @todo PairInfo
 export type PairInfo = unknown;
-export type Pair = NamedType<'pair', PairInfo>;
+export type Pair = Serializable<'pair', PairInfo>;
 export const pair = (data: PairInfo = null): Pair =>
-  createNamedType('pair', data);
+  toSerializable('pair', data);
 
 // @todo TransactionInfo
 export type TransactionInfo = unknown;
-export type Transaction = NamedType<'transaction', TransactionInfo>;
+export type Transaction = Serializable<'transaction', TransactionInfo>;
 export const transaction = (data: TransactionInfo = null): Transaction =>
-  createNamedType('transaction', data);
+  toSerializable('transaction', data);
 
 export { List, list } from './list';
-export { Interval, interval };
+export { Interval, interval, Unit };

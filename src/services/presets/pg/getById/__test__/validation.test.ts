@@ -7,16 +7,18 @@ import { getByIdPreset } from '..';
 import { inputGet as input } from '../inputSchema';
 import { SchemaLike } from 'joi';
 import { PgDriver } from '../../../../../db/driver';
-import { NamedType } from '../../../../../types/createNamedType';
+import { Serializable } from '../../../../../types';
 
 const createService = (resultSchema: SchemaLike) =>
-  getByIdPreset<string, string, NamedType<'test', string | undefined>>({
+  getByIdPreset<string, string, Serializable<'test', string | undefined>>({
     name: 'some_name',
     sql: identity,
     inputSchema: input,
     resultSchema,
     transformResult: identity,
-    resultTypeFactory: (s?: string): NamedType<'test', string | undefined> => ({
+    resultTypeFactory: (
+      s?: string
+    ): Serializable<'test', string | undefined> => ({
       data: s,
       __type: 'test',
     }),

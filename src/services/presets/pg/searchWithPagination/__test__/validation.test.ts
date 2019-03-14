@@ -5,9 +5,10 @@ import { parseDate } from '../../../../../utils/parseDate';
 import { Joi } from '../../../../../utils/validation';
 import { searchWithPaginationPreset, WithSortOrder } from '..';
 import * as commonFilterSchemas from '../commonFilterSchemas';
-import createNamedType, {
-  NamedType,
-} from '../../../../../types/createNamedType';
+import {
+  Serializable,
+  toSerializable,
+} from '../../../../../types/serialization';
 import { PgDriver } from '../../../../../db/driver';
 import { SortOrder } from '../../../../_common/pagination/cursor';
 
@@ -30,14 +31,14 @@ type ResponseRaw = {
 const service = searchWithPaginationPreset<
   Request,
   ResponseRaw,
-  NamedType<string, ResponseRaw>
+  Serializable<string, ResponseRaw>
 >({
   name: 'some_name',
   sql: () => '',
   inputSchema: Joi.object().keys(commonFilterSchemas),
   resultSchema: Joi.any(),
   transformResult: (response: ResponseRaw) =>
-    createNamedType<'tx', ResponseRaw>('tx', response),
+    toSerializable<'tx', ResponseRaw>('tx', response),
 })({
   pg: { any: filters => task(mockTxs) } as PgDriver,
   emitEvent: always(identity),

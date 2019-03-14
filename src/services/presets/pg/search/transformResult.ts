@@ -1,18 +1,18 @@
-import { list, List } from '../../../../types';
-import { NamedType } from '../../../../types/createNamedType';
-import { DataType } from '../../types';
+import { FromSerializable, list, List, Serializable } from '../../../../types';
 
 export const transformResults = <
   Request,
   ResponseRaw,
-  ResponseTransformed extends NamedType<string, any>
+  ResponseTransformed extends Serializable<string, any>
 >(
-  typeFactory: (d?: DataType<ResponseTransformed>) => ResponseTransformed
+  typeFactory: (
+    d?: FromSerializable<ResponseTransformed>
+  ) => ResponseTransformed
 ) => (
   transformDbResponse: (
     results: ResponseRaw,
     request?: Request
-  ) => DataType<ResponseTransformed>
+  ) => FromSerializable<ResponseTransformed>
 ) => (responses: ResponseRaw[], request?: Request): List<ResponseTransformed> =>
   list(
     responses.map(response =>

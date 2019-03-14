@@ -1,8 +1,8 @@
-import createNamedType from '../createNamedType';
+import { toSerializable } from '../serialization';
 
-describe('createNamedType function', () => {
+describe('toSerializable function', () => {
   it('should create a simple named type', () => {
-    const MyType = createNamedType('my-type', 1);
+    const MyType = toSerializable('my-type', 1);
     expect(MyType).toEqual({
       __type: 'my-type',
       data: 1,
@@ -10,7 +10,7 @@ describe('createNamedType function', () => {
   });
 
   it('should provide `data: null` by default', () => {
-    const MyType = createNamedType('my-type', null);
+    const MyType = toSerializable('my-type', null);
     expect(MyType).toEqual({
       __type: 'my-type',
       data: null,
@@ -18,7 +18,7 @@ describe('createNamedType function', () => {
   });
 
   it('should create a type with custom default value', () => {
-    const MyList = createNamedType('my-list', [1, 2, 3]);
+    const MyList = toSerializable('my-list', [1, 2, 3]);
 
     expect(MyList).toEqual({
       __type: 'my-list',

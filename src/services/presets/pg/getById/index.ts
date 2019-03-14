@@ -5,13 +5,13 @@ import { get } from '../../../_common/createResolver';
 import { validateInput, validateResult } from '../../validation';
 import { transformResults as transformResultFn } from './transformResult';
 import { getData } from './pg';
-import { ServicePresetInitOptions, DataType } from '../../types';
-import { NamedType } from '../../../../types/createNamedType';
+import { ServicePresetInitOptions } from '../../types';
+import { Serializable, FromSerializable } from '../../../../types';
 
 export const getByIdPreset = <
   Id,
   ResponseRaw,
-  ResponseTransformed extends NamedType<string, any>
+  ResponseTransformed extends Serializable<string, any>
 >({
   name,
   sql,
@@ -23,11 +23,13 @@ export const getByIdPreset = <
   name: string;
   inputSchema: SchemaLike;
   resultSchema: SchemaLike;
-  resultTypeFactory: (t?: DataType<ResponseTransformed>) => ResponseTransformed;
+  resultTypeFactory: (
+    t?: FromSerializable<ResponseTransformed>
+  ) => ResponseTransformed;
   transformResult: (
     response: ResponseRaw,
     request?: Id
-  ) => DataType<ResponseTransformed>;
+  ) => FromSerializable<ResponseTransformed>;
   sql: (r: Id) => string;
 }) => ({ pg, emitEvent }: ServicePresetInitOptions) =>
   get<Id, Id, ResponseRaw, ResponseTransformed>({

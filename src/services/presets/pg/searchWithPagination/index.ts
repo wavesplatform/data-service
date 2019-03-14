@@ -4,14 +4,13 @@ import { search } from '../../../_common/createResolver';
 import { validateInput, validateResult } from '../../validation';
 import { transformInput } from './transformInput';
 import { transformResults } from './transformResult';
-import { NamedType } from '../../../../types/createNamedType';
+import { Serializable, List } from '../../../../types';
 import { getData } from './pg';
 import { ServicePresetInitOptions } from '../../../presets/types';
 import { Cursor, SortOrder } from 'services/_common/pagination/cursor';
-import { List } from '../../../../types';
 
 export type WithSortOrder = {
-  sort: SortOrder
+  sort: SortOrder;
 };
 
 export type RequestWithCursor<
@@ -30,7 +29,7 @@ export type BaseResponse = {
 export const searchWithPaginationPreset = <
   Request extends WithSortOrder,
   ResponseRaw,
-  ResponseTransformed extends NamedType<string, BaseResponse>
+  ResponseTransformed extends Serializable<string, BaseResponse>
 >({
   name,
   sql,

@@ -1,9 +1,8 @@
 import { fromNullable } from 'folktale/maybe';
 import { last, objOf } from 'ramda';
 
-import { NamedType } from '../../../../types/createNamedType';
+import { Serializable, List, list } from '../../../../types';
 import { encode, Cursor } from '../../../_common/pagination/cursor';
-import { List, list } from '../../../../types';
 import { RequestWithCursor, WithSortOrder } from '.';
 
 const maybeLastItem = <ResponseTransformed>(data: ResponseTransformed[]) =>
@@ -23,7 +22,7 @@ const makeCursorFromLastData = <
 
 const createCursorMeta = <
   Request extends WithSortOrder,
-  ResponseTransformed extends NamedType<string, any>
+  ResponseTransformed extends Serializable<string, any>
 >(
   request: RequestWithCursor<Request, Cursor>,
   responses: ResponseTransformed[]
@@ -36,7 +35,7 @@ const createCursorMeta = <
 export const transformResults = <
   Request extends WithSortOrder,
   ResponseRaw,
-  ResponseTransformed extends NamedType<string, any>
+  ResponseTransformed extends Serializable<string, any>
 >(
   transformDbResponse: (
     results: ResponseRaw,
