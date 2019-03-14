@@ -3,7 +3,7 @@ import { identity } from 'ramda';
 import { ServicePresetInitOptions } from 'services/presets/types';
 import { SchemaLike } from 'joi';
 import { NamedType } from 'types/createNamedType';
-import { DataType } from './transformResult';
+import { DataType } from '../../types';
 
 import { mget } from '../../../_common/createResolver';
 
