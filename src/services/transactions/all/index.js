@@ -117,7 +117,7 @@ module.exports = deps => {
             // format output,
             map(
               pipe(
-                indexBy(compose(prop('id'))),
+                indexBy(prop('id')),
                 resultsMap => ({
                   ...txsList,
                   data: txsList.data.map(
