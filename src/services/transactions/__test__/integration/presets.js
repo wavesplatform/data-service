@@ -65,6 +65,7 @@ const search = service =>
             .search({ limit: 20, sort: 'asc' })
             .run()
             .promise();
+
           expect(tx).toBeDefined();
           expect(tx.data).toHaveLength(20);
         },
@@ -72,13 +73,14 @@ const search = service =>
       );
     });
 
-    describe('Pagination ', async () => {
+    describe('Pagination ', () => {
       const LIMIT = 21;
-      const createCursor = sort => ({ data }) => encode({
-        sort,
-        id: data.id,
-        timestamp: new Date(data.timestamp)
-      });
+      const createCursor = sort => ({ data }) =>
+        encode({
+          sort,
+          id: data.id,
+          timestamp: new Date(data.timestamp),
+        });
       it(
         'doesnt get 2 identical entries for limit 1 asc with next page fetching',
         async () => {
