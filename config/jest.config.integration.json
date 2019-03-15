@@ -4,6 +4,7 @@
   },
   "verbose": true,
   "forceExit": true,
+  "bail": true,
   "rootDir": "../src",
   "testMatch": ["**/*.test.int.js", "**/*.test.int.ts"],
   "moduleFileExtensions": ["js", "ts", "json", "node"],

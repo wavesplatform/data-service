@@ -4,10 +4,11 @@ import { of as task } from 'folktale/concurrency/task';
 import { Joi } from '../../../../../utils/validation';
 import { list } from '../../../../../types';
 import { searchPreset } from '..';
-import createNamedType, {
-  NamedType,
-} from '../../../../../types/createNamedType';
-import { PgDriver } from 'db/driver';
+import {
+  Serializable,
+  toSerializable,
+} from '../../../../../types/serialization';
+import { PgDriver } from '../../../../../db/driver';
 
 type TestTransaction = {
   id: string;
@@ -27,14 +28,14 @@ const mockTxs: TestTransaction[] = [
 const service = searchPreset<
   TestQueryOptions,
   TestTransaction,
-  NamedType<string, TestTransaction>
+  Serializable<string, TestTransaction>
 >({
   name: 'some_name',
   sql: () => '',
   inputSchema: Joi.any(),
   resultSchema: Joi.any(),
   transformResult: (res: TestTransaction[]) =>
-    list(res.map(tx => createNamedType<'tx', TestTransaction>('tx', tx))),
+    list(res.map(tx => toSerializable<'tx', TestTransaction>('tx', tx))),
 })({
   pg: { any: filters => task(mockTxs) } as PgDriver,
   emitEvent: always(identity),

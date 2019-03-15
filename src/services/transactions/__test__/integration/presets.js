@@ -1,5 +1,5 @@
 const { parseDate } = require('../../../../utils/parseDate');
-const Cursor = require('../../../_common/pagination/cursor');
+const { encode } = require('../../../_common/pagination/cursor');
 
 const TIMEOUT = 10000;
 
@@ -27,7 +27,6 @@ const get = (service, txId) =>
           .get('UNREAL')
           .run()
           .promise();
-
         expect(tx).toMatchObject({
           __type: 'transaction',
           data: null,
@@ -75,7 +74,11 @@ const search = service =>
 
     describe('Pagination ', async () => {
       const LIMIT = 21;
-      const createCursor = sort => ({ data }) => Cursor.encode(sort, data);
+      const createCursor = sort => ({ data }) => encode({
+        sort,
+        id: data.id,
+        timestamp: new Date(data.timestamp)
+      });
       it(
         'doesnt get 2 identical entries for limit 1 asc with next page fetching',
         async () => {

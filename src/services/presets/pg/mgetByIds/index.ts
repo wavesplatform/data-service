@@ -1,22 +1,17 @@
 import { identity } from 'ramda';
-
-import { ServicePresetInitOptions } from 'services/presets/types';
 import { SchemaLike } from 'joi';
-import { NamedType } from 'types/createNamedType';
-import { DataType } from '../../types';
 
+import { ServicePresetInitOptions } from '../../types';
+import { Serializable, FromSerializable, List } from '../../../../types';
 import { mget } from '../../../_common/createResolver';
-
 import { validateInput, validateResult } from '../../validation';
 import { transformResults as transformResultFn } from './transformResult';
-
 import { getData } from './pg';
-import { List } from 'types';
 
 export const mgetByIdsPreset = <
   Id,
   ResponseRaw,
-  ResponseTransformed extends NamedType<string, any>
+  ResponseTransformed extends Serializable<string, any>
 >({
   name,
   sql,
@@ -29,11 +24,13 @@ export const mgetByIdsPreset = <
   name: string;
   inputSchema: SchemaLike;
   resultSchema: SchemaLike;
-  resultTypeFactory: (t?: DataType<ResponseTransformed>) => ResponseTransformed;
+  resultTypeFactory: (
+    t?: FromSerializable<ResponseTransformed>
+  ) => ResponseTransformed;
   transformResult: (
     response: ResponseRaw,
     request?: Id[]
-  ) => DataType<ResponseTransformed>;
+  ) => FromSerializable<ResponseTransformed>;
   sql: (r: Id[]) => string;
   matchRequestResult: (req: Id[], res: ResponseRaw) => boolean;
 }) => ({ pg, emitEvent }: ServicePresetInitOptions) =>

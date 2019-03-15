@@ -1,14 +1,15 @@
-const { propEq } = require('ramda');
-
-const { transaction } = require('../../../types');
+const { propEq, compose } = require('ramda');
 
 const { getByIdPreset } = require('../../presets/pg/getById');
 const { mgetByIdsPreset } = require('../../presets/pg/mgetByIds');
 const { inputGet } = require('../../presets/pg/getById/inputSchema');
 const { inputMget } = require('../../presets/pg/mgetByIds/inputSchema');
-const searchWithPaginationPreset = require('../../presets/pg/searchWithPagination');
+const {
+  searchWithPaginationPreset,
+} = require('../../presets/pg/searchWithPagination');
 
 const transformTxInfo = require('../_common/transformTxInfo');
+const { transaction } = require('../../../types');
 
 const sql = require('./sql');
 
@@ -43,7 +44,10 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       sql: sql.search,
       inputSchema: inputSearchSchema,
       resultSchema,
-      transformResult: transformTxInfo,
+      transformResult: compose(
+        transaction,
+        transformTxInfo
+      ),
     })({ pg, emitEvent }),
   };
 };

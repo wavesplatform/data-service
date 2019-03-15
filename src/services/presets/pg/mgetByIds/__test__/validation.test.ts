@@ -1,17 +1,18 @@
-import { SchemaLike } from 'joi';
 import { always, identity, equals } from 'ramda';
+import { SchemaLike } from 'joi';
 import { of as taskOf } from 'folktale/concurrency/task';
-import { Joi } from '../../../../../utils/validation';
 
+import { Joi } from '../../../../../utils/validation';
 import { mgetByIdsPreset } from '..';
-import createNamedType, {
-  NamedType,
-} from '../../../../../types/createNamedType';
-import { PgDriver } from 'db/driver';
+import {
+  Serializable,
+  toSerializable,
+} from '../../../../../types/serialization';
+import { PgDriver } from '../../../../../db/driver';
 const { inputMget: input } = require('../inputSchema');
 
 const createService = (resultSchema: SchemaLike) =>
-  mgetByIdsPreset<string, string, NamedType<string, string | null>>({
+  mgetByIdsPreset<string, string, Serializable<string, string | null>>({
     name: 'some_name',
     sql: (s: string[]) => s.join(';'),
     matchRequestResult: equals,
@@ -19,7 +20,7 @@ const createService = (resultSchema: SchemaLike) =>
     resultSchema,
     transformResult: identity,
     resultTypeFactory: (a?: string | null) =>
-      createNamedType<'test', string | null>('test', a ? a : null),
+      toSerializable<'test', string | null>('test', a ? a : null),
   })({
     pg: {
       any: ids => taskOf(ids.split(';')),

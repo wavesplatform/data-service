@@ -4,6 +4,7 @@
   },
   "verbose": true,
   "forceExit": true,
+  "bail": true,
   "rootDir": "../src",
   "testMatch": ["**/*.test.js", "**/*.test.ts"],
   "testURL": "http://localhost/",

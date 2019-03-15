@@ -1,6 +1,7 @@
-import { fromNullable } from 'folktale/maybe';
-import { PgDriver } from 'db/driver';
 import { assoc } from 'ramda';
+import { fromNullable } from 'folktale/maybe';
+
+import { PgDriver } from '../../../../db/driver';
 
 export const getData = <ResponseRaw, Id = string>({
   name,

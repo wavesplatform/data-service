@@ -143,7 +143,11 @@ const searchResolver = <
     dependencies.transformInput,
     dependencies.dbQuery(db),
     applyValidation.search(dependencies.validateResult),
-    result => dependencies.transformResult(result, request),
+    result =>
+      dependencies.transformResult(
+        result,
+        dependencies.transformInput(request)
+      ),
     emitEvent,
     request
   );

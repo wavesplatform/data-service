@@ -1,6 +1,5 @@
 import { curry } from 'ramda';
-import { Interval } from '../../types';
-import { Unit } from '../../types/interval';
+import { Interval, Unit } from '../../types';
 
 const precisions: Record<Unit, number> = {
   [Unit.Year]: 4,

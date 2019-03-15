@@ -1,19 +1,20 @@
-import { list, List } from '../../../../types';
 import { Maybe } from 'folktale/maybe';
-import { NamedType } from 'types/createNamedType';
-import { DataType } from '../../types';
+
+import { list, List, FromSerializable, Serializable } from '../../../../types';
 
 export const transformResults = <
   Request,
   ResponseRaw,
-  ResponseTransformed extends NamedType<string, any>
+  ResponseTransformed extends Serializable<string, any>
 >(
-  typeFactory: (d?: DataType<ResponseTransformed>) => ResponseTransformed
+  typeFactory: (
+    d?: FromSerializable<ResponseTransformed>
+  ) => ResponseTransformed
 ) => (
   transformDbResponse: (
     results: ResponseRaw,
     request?: Request
-  ) => DataType<ResponseTransformed>
+  ) => FromSerializable<ResponseTransformed>
 ) => (
   maybeResponses: Maybe<ResponseRaw>[],
   request?: Request

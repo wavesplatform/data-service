@@ -1,16 +1,16 @@
 import { identity } from 'ramda';
+import { SchemaLike } from 'joi';
+
 import { getData } from './pg';
 import { search } from '../../../_common/createResolver';
 import { ServicePresetInitOptions } from '../../../presets/types';
-import { SchemaLike } from 'joi';
 import { validateInput, validateResult } from '../../validation';
-import { NamedType } from '../../../../types/createNamedType';
-import { List } from '../../../../types';
+import { List, Serializable } from '../../../../types';
 
 export const searchPreset = <
   Request,
   ResponseRaw,
-  ResponseTransformed extends NamedType<string, any>
+  ResponseTransformed extends Serializable<string, any>
 >({
   name,
   sql,

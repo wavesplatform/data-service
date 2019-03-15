@@ -1,8 +1,7 @@
 const { groupBy, map, pipe, toPairs } = require('ramda');
 const { addMissingCandles, transformCandle } = require('../transformResults');
 const { candleMonoid } = require('../candleMonoid');
-const { interval } = require('../../../types');
-const { Unit } = require('../../../types/interval');
+const { interval, Unit } = require('../../../types');
 const { floor, trunc } = require('../../../utils/date');
 const { concatAll } = require('../../../utils/fp/concatAll');
 

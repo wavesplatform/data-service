@@ -1,29 +1,50 @@
-const Task = require('folktale/concurrency/task');
-const { always, identity } = require('ramda');
+import { of as task } from 'folktale/concurrency/task';
+import { always, identity } from 'ramda';
 
-const { parseDate } = require('../../../../../utils/parseDate');
+import { parseDate } from '../../../../../utils/parseDate';
+import { Joi } from '../../../../../utils/validation';
+import { searchWithPaginationPreset, WithSortOrder } from '..';
+import * as commonFilterSchemas from '../commonFilterSchemas';
+import {
+  Serializable,
+  toSerializable,
+} from '../../../../../types/serialization';
+import { PgDriver } from '../../../../../db/driver';
+import { SortOrder } from '../../../../_common/pagination/cursor';
 
-const { Joi } = require('../../../../../utils/validation');
-
-const searchWithPaginationPreset = require('..');
-const commonFilterSchemas = require('../commonFilterSchemas');
-
-const mockTxs = [
+const mockTxs: ResponseRaw[] = [
   { id: 'q', timestamp: new Date() },
   { id: 'w', timestamp: new Date() },
 ];
-const service = searchWithPaginationPreset({
+
+type Request = WithSortOrder & {
+  timeEnd?: Date;
+  timeStart?: Date;
+  limit?: number;
+};
+
+type ResponseRaw = {
+  id: string;
+  timestamp: Date;
+};
+
+const service = searchWithPaginationPreset<
+  Request,
+  ResponseRaw,
+  Serializable<string, ResponseRaw>
+>({
   name: 'some_name',
-  sql: identity,
+  sql: () => '',
   inputSchema: Joi.object().keys(commonFilterSchemas),
   resultSchema: Joi.any(),
-  transformResult: identity,
+  transformResult: (response: ResponseRaw) =>
+    toSerializable<'tx', ResponseRaw>('tx', response),
 })({
-  pg: { any: () => Task.of(mockTxs) },
+  pg: { any: filters => task(mockTxs) } as PgDriver,
   emitEvent: always(identity),
 });
 
-const assertValidationError = (done, v) =>
+const assertValidationError = (done: jest.DoneCallback, v: Request) =>
   service(v)
     .run()
     .promise()
@@ -38,16 +59,19 @@ describe('searchWithPagination preset validation', () => {
     it('fails if timeEnd < 0', done =>
       assertValidationError(done, {
         timeEnd: parseDate('-1525132900000').unsafeGet(),
+        sort: SortOrder.Ascending,
       }));
     it('fails if timeStart < 0', done =>
       assertValidationError(done, {
         timeEnd: parseDate('1525132900000').unsafeGet(),
         timeStart: parseDate('-1525132800000').unsafeGet(),
+        sort: SortOrder.Ascending,
       }));
     it('fails if timeEnd < timeStart', done =>
       assertValidationError(done, {
         timeEnd: parseDate('1525132700000').unsafeGet(),
         timeStart: parseDate('1525132800000').unsafeGet(),
+        sort: SortOrder.Ascending,
       }));
     it('fails if timeStart->invalid Date', done => {
       expect(parseDate('').unsafeGet).toThrowError();
@@ -55,10 +79,10 @@ describe('searchWithPagination preset validation', () => {
     });
     it('passes if correct object is provided', done =>
       service({
-        timeStart: parseDate(0).unsafeGet(),
-        timeEnd: parseDate(Date.now()).unsafeGet(),
+        timeStart: new Date(0),
+        timeEnd: new Date(),
         limit: 1,
-        sort: 'asc',
+        sort: SortOrder.Ascending,
       })
         .run()
         .listen({
