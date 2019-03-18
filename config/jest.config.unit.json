@@ -8,5 +8,6 @@
   "rootDir": "../src",
   "testMatch": ["**/*.test.js", "**/*.test.ts"],
   "testURL": "http://localhost/",
-  "moduleFileExtensions": ["js", "ts", "json", "node"]
+  "moduleFileExtensions": ["js", "ts", "json", "node"],
+  "setupFilesAfterEnv": ["../config/jest.extentions.js"]
 }

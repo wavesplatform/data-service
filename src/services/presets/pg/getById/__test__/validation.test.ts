@@ -35,15 +35,19 @@ describe('getById', () => {
         .run()
         .listen({
           onResolved: x =>
-            x.matchWith({
-              Just: ({ value }) => {
-                expect(value.__type).toBe('test');
-                done();
-              },
-              Nothing: () => {
-                throw `Can't get response from Maybe`;
-              },
+            expect(x).toBeJust({
+              data: 'someidgoeshere2942415',
+              __type: 'test',
             }),
+          // x.matchWith({
+          //   Just: ({ value }) => {
+          //     expect(value.__type).toBe('test');
+          //     done();
+          //   },
+          //   Nothing: () => {
+          //     throw `Can't get response from Maybe`;
+          //   },
+          // }),
         }));
   });
 

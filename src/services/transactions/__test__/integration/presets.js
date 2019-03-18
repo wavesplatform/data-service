@@ -13,7 +13,7 @@ const get = (service, txId) =>
           .run()
           .promise()
           .then(x => {
-            expect(x.getOrElse(null)).toMatchSnapshot();
+            expect(x.unsafeGet()).toMatchSnapshot();
             done();
           })
           .catch(e => done(JSON.stringify(e)));
@@ -27,7 +27,7 @@ const get = (service, txId) =>
           .get('UNREAL')
           .run()
           .promise();
-        expect(tx.getOrElse(null)).toEqual(null);
+        expect(tx).toBeNothing();
       },
       TIMEOUT
     );
