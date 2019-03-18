@@ -41,7 +41,10 @@ export type GetResolverDependencies<
   dbQuery: (
     db: PgDriver
   ) => (r: ReqTransformed) => Task<DbError, Maybe<ResRaw>>;
-  transformResult: (result: Maybe<ResRaw>, request: ReqRaw) => ResTransformed;
+  transformResult: (
+    result: Maybe<ResRaw>,
+    request: ReqRaw
+  ) => Maybe<ResTransformed>;
 };
 
 export type MgetResolverDependencies<

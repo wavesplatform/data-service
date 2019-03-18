@@ -27,13 +27,13 @@ describe('Pairs', () => {
 
   describe('get one pair', () => {
     it('should return Pair for one correctly', async () => {
-      const result = await service
+      const result = (await service
         .get({
           amountAsset: pair.amount_asset_id,
           priceAsset: pair.price_asset_id,
         })
         .run()
-        .promise();
+        .promise()).getOrElse(null);
 
       expect(result.data).toHaveProperty('firstPrice', pair.first_price);
       expect(result.data).toHaveProperty('lastPrice', pair.last_price);
@@ -57,13 +57,10 @@ describe('Pairs', () => {
         })
         .run()
         .listen({
-          onResolved: pair => {
-            expect(pair).toEqual({
-              __type: 'pair',
-              data: null,
-            });
-            done();
-          },
+          onResolved: pair =>
+            pair.matchWith({
+              Nothing: () => done(),
+            }),
         });
     });
   });

@@ -24,7 +24,7 @@ describe('Assets service', () => {
         .run()
         .promise()
         .then(x => {
-          expect(x).toMatchSnapshot();
+          expect(x.getOrElse(null)).toMatchSnapshot();
           done();
         })
         .catch(e => done(JSON.stringify(e)));
@@ -36,10 +36,7 @@ describe('Assets service', () => {
         .run()
         .promise();
 
-      expect(tx).toMatchObject({
-        __type: 'asset',
-        data: null,
-      });
+      expect(tx.getOrElse(null)).toEqual(null);
     });
   });
 

@@ -10,15 +10,13 @@ import { PgDriver } from '../../../../../db/driver';
 import { Serializable } from '../../../../../types';
 
 const createService = (resultSchema: SchemaLike) =>
-  getByIdPreset<string, string, Serializable<'test', string | undefined>>({
+  getByIdPreset<string, string, Serializable<'test', string>>({
     name: 'some_name',
     sql: identity,
     inputSchema: input,
     resultSchema,
     transformResult: identity,
-    resultTypeFactory: (
-      s?: string
-    ): Serializable<'test', string | undefined> => ({
+    resultTypeFactory: (s: string): Serializable<'test', string> => ({
       data: s,
       __type: 'test',
     }),
@@ -36,10 +34,16 @@ describe('getById', () => {
       service('someidgoeshere2942415')
         .run()
         .listen({
-          onResolved: x => {
-            expect(x.__type).toBe('test');
-            done();
-          },
+          onResolved: x =>
+            x.matchWith({
+              Just: ({ value }) => {
+                expect(value.__type).toBe('test');
+                done();
+              },
+              Nothing: () => {
+                throw `Can't get response from Maybe`;
+              },
+            }),
         }));
   });
 

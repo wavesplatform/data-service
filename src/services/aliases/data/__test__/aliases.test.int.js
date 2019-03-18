@@ -18,7 +18,7 @@ describe('Aliases', () => {
         .run()
         .listen({
           onResolved: maybeX => {
-            expect(maybeX).toMatchSnapshot();
+            expect(maybeX.getOrElse(null)).toMatchSnapshot();
             done();
           },
         });
@@ -30,10 +30,7 @@ describe('Aliases', () => {
         .run()
         .listen({
           onResolved: maybeX => {
-            expect(maybeX).toEqual({
-              __type: 'alias',
-              data: null,
-            });
+            expect(maybeX.getOrElse(null)).toEqual(null);
             done();
           },
         });
