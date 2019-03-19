@@ -49,12 +49,8 @@ const createGetMiddleware = (url, service) => {
     });
 
     x.matchWith({
-      Just: ({ value }) => {
-        ctx.state.returnValue = value;
-      },
-      Nothing: () => {
-        ctx.status = 404;
-      },
+      Just: ({ value }) => (ctx.state.returnValue = value),
+      Nothing: () => (ctx.status = 404),
     });
   });
 };
