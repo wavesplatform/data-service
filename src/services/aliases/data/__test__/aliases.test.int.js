@@ -18,9 +18,10 @@ describe('Aliases', () => {
         .run()
         .listen({
           onResolved: maybeX => {
-            expect(maybeX).toMatchSnapshot();
+            expect(maybeX.unsafeGet()).toMatchSnapshot();
             done();
           },
+          onRejected: done.fail,
         });
     });
 
@@ -30,12 +31,10 @@ describe('Aliases', () => {
         .run()
         .listen({
           onResolved: maybeX => {
-            expect(maybeX).toEqual({
-              __type: 'alias',
-              data: null,
-            });
+            expect(maybeX).toBeNothing();
             done();
           },
+          onRejected: done.fail,
         });
     });
   });
@@ -50,6 +49,7 @@ describe('Aliases', () => {
             expect(mxs).toMatchSnapshot();
             done();
           },
+          onRejected: done.fail,
         });
     });
 
@@ -65,6 +65,7 @@ describe('Aliases', () => {
             expect(mxs).toMatchSnapshot();
             done();
           },
+          onRejected: done.fail,
         });
     });
   });

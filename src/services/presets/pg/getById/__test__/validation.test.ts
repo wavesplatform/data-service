@@ -10,15 +10,13 @@ import { PgDriver } from '../../../../../db/driver';
 import { Serializable } from '../../../../../types';
 
 const createService = (resultSchema: SchemaLike) =>
-  getByIdPreset<string, string, Serializable<'test', string | undefined>>({
+  getByIdPreset<string, string, Serializable<'test', string>>({
     name: 'some_name',
     sql: identity,
     inputSchema: input,
     resultSchema,
     transformResult: identity,
-    resultTypeFactory: (
-      s?: string
-    ): Serializable<'test', string | undefined> => ({
+    resultTypeFactory: (s: string): Serializable<'test', string> => ({
       data: s,
       __type: 'test',
     }),
@@ -37,9 +35,13 @@ describe('getById', () => {
         .run()
         .listen({
           onResolved: x => {
-            expect(x.__type).toBe('test');
+            expect(x).toBeJust({
+              data: 'someidgoeshere2942415',
+              __type: 'test',
+            });
             done();
           },
+          onRejected: () => done.fail,
         }));
   });
 

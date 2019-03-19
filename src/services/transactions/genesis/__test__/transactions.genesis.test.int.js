@@ -27,7 +27,7 @@ describe('Genesis transaction service', () => {
       expect(tx.data).toHaveLength(6);
     }, 10000);
 
-    describe('Pagination ', async () => {
+    describe('Pagination ', () => {
       const createCursor = sort => ({ id, timestamp }) =>
         encode({ sort, id, timestamp });
 

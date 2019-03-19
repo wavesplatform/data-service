@@ -1,5 +1,5 @@
 import { of as taskOf } from 'folktale/concurrency/task';
-import { of as maybeOf, Maybe } from 'folktale/maybe';
+import { of as maybeOf } from 'folktale/maybe';
 import { Ok, Error as error, Result } from 'folktale/result';
 import { identity } from 'ramda';
 import {
@@ -27,20 +27,20 @@ afterEach(() => jest.clearAllMocks());
 describe('Resolver', () => {
   const commonConfig = {
     transformInput: identity,
-    transformResult: (m: Maybe<string>) => m.getOrElse(null),
+    transformResult: identity,
     dbQuery: (driver: PgDriver) => (id: string) =>
       driver.one<string>(id).map(maybeOf),
   };
 
   const mockPgDriver: PgDriver = {
-    one: (s: string) => taskOf<DbError, string | null>(s),
+    one: (s: string) => taskOf<DbError, string>(s),
   } as PgDriver;
 
   const createMockResolver = (
     validateInput: (s: string) => Result<ValidationError, string>,
     validateResult: (s: string) => Result<ResolverError, string>
   ) =>
-    get<string, string, string, string | null>({
+    get<string, string, string, string>({
       ...commonConfig,
       validateInput,
       validateResult,
@@ -53,7 +53,7 @@ describe('Resolver', () => {
       .run()
       .listen({
         onResolved: data => {
-          expect(data).toEqual(assetId);
+          expect(data.getOrElse(null)).toEqual(assetId);
           done();
         },
       });
@@ -114,7 +114,7 @@ describe('Resolver', () => {
             ],
             [
               'TRANSFORM_RESULT_OK',
-              'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH',
+              maybeOf('G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH'),
             ],
           ]);
 

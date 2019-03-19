@@ -1,4 +1,5 @@
 const Task = require('folktale/concurrency/task');
+const Maybe = require('folktale/maybe');
 const {
   pipe,
   map,
@@ -13,11 +14,9 @@ const {
   indexBy,
   identity,
   evolve,
-  compose,
 } = require('ramda');
 
 const commonData = require('./commonData');
-const { transaction } = require('../../../types');
 
 const createServices = {
   1: require('../genesis'),
@@ -87,25 +86,15 @@ module.exports = deps => {
       commonTxData
         .get(id) //Task tx
         .chain(
-          ifElse(
-            compose(
-              isNil,
-              getData
-            ),
-            Task.of,
-            pipe(
-              getData,
-              t => {
-                if (t) {
-                  return txsServices[t.type].get(t.id);
-                } else {
-                  return Task.of(transaction());
-                }
-              }
-            )
+          pipe(
+            map(getData),
+            m =>
+              m.matchWith({
+                Just: ({ value }) => txsServices[value.type].get(value.id),
+                Nothing: () => Task.of(Maybe.Nothing()),
+              })
           )
         ),
-
     mget: ids =>
       commonTxData
         .mget(ids) // Task tx[]. tx can have data: null

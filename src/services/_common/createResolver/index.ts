@@ -77,7 +77,7 @@ const getResolver = <
     RequestRaw,
     RequestTransformed,
     Maybe<ResponseRaw>,
-    ResponseTransformed
+    Maybe<ResponseTransformed>
   >(
     dependencies.validateInput,
     dependencies.transformInput,

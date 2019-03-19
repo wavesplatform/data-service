@@ -24,7 +24,7 @@ export const getByIdPreset = <
   inputSchema: SchemaLike;
   resultSchema: SchemaLike;
   resultTypeFactory: (
-    t?: FromSerializable<ResponseTransformed>
+    t: FromSerializable<ResponseTransformed>
   ) => ResponseTransformed;
   transformResult: (
     response: ResponseRaw,

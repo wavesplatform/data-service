@@ -7,16 +7,14 @@ export const transformResults = <
   ResponseRaw,
   ResponseTransformed extends Serializable<string, any>
 >(
-  typeFactory: (
-    d?: FromSerializable<ResponseTransformed>
-  ) => ResponseTransformed
+  typeFactory: (d: FromSerializable<ResponseTransformed>) => ResponseTransformed
 ) => (
   transformDbResponse: (
     results: ResponseRaw,
     request?: Id
   ) => FromSerializable<ResponseTransformed>
-) => (maybeResponse: Maybe<ResponseRaw>, request?: Id): ResponseTransformed =>
-  maybeResponse.map(transformDbResponse).matchWith({
-    Just: ({ value }) => typeFactory(value),
-    Nothing: () => typeFactory(),
-  });
+) => (
+  maybeResponse: Maybe<ResponseRaw>,
+  request?: Id
+): Maybe<ResponseTransformed> =>
+  maybeResponse.map(transformDbResponse).map(typeFactory);
