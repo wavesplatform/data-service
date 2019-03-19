@@ -30,6 +30,7 @@ describe('Candles', () => {
             expect(value).toMatchSnapshot();
             done();
           },
+          onRejected: () => done.fail(),
         });
     });
 
@@ -50,6 +51,7 @@ describe('Candles', () => {
             expect(value).toMatchSnapshot();
             done();
           },
+          onRejected: () => done.fail(),
         });
     });
   });

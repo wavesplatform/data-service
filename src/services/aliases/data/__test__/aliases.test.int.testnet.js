@@ -18,9 +18,10 @@ describe('Aliases', () => {
         .run()
         .listen({
           onResolved: alias => {
-            expect(alias).toMatchSnapshot();
+            expect(alias.unsafeGet()).toMatchSnapshot();
             done();
           },
+          onRejected: () => done.fail(),
         });
     });
 
@@ -30,12 +31,10 @@ describe('Aliases', () => {
         .run()
         .listen({
           onResolved: nullable => {
-            expect(nullable).toMatchObject({
-              __type: 'alias',
-              data: null,
-            });
+            expect(nullable).toBeNothing();
             done();
           },
+          onRejected: () => done.fail(),
         });
     });
   });
@@ -50,6 +49,7 @@ describe('Aliases', () => {
             expect(mxs).toMatchSnapshot();
             done();
           },
+          onRejected: () => done.fail(),
         });
     });
 
@@ -65,6 +65,7 @@ describe('Aliases', () => {
             expect(mxs).toMatchSnapshot();
             done();
           },
+          onRejected: () => done.fail(),
         });
     });
   });

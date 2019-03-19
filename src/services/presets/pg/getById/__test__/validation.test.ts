@@ -34,20 +34,14 @@ describe('getById', () => {
       service('someidgoeshere2942415')
         .run()
         .listen({
-          onResolved: x =>
+          onResolved: x => {
             expect(x).toBeJust({
               data: 'someidgoeshere2942415',
               __type: 'test',
-            }),
-          // x.matchWith({
-          //   Just: ({ value }) => {
-          //     expect(value.__type).toBe('test');
-          //     done();
-          //   },
-          //   Nothing: () => {
-          //     throw `Can't get response from Maybe`;
-          //   },
-          // }),
+            });
+            done();
+          },
+          onRejected: () => done.fail(),
         }));
   });
 

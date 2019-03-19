@@ -24,10 +24,10 @@ describe('Assets service', () => {
         .run()
         .promise()
         .then(x => {
-          expect(x.getOrElse(null)).toMatchSnapshot();
+          expect(x.unsafeGet()).toMatchSnapshot();
           done();
         })
-        .catch(e => done(JSON.stringify(e)));
+        .catch(() => done.fail());
     });
 
     it('returns null for unreal tx', async () => {
@@ -36,7 +36,7 @@ describe('Assets service', () => {
         .run()
         .promise();
 
-      expect(tx.getOrElse(null)).toEqual(null);
+      expect(tx).toBeNothing();
     });
   });
 

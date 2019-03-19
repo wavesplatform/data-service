@@ -33,7 +33,7 @@ describe('Pairs', () => {
           priceAsset: pair.price_asset_id,
         })
         .run()
-        .promise()).getOrElse(null);
+        .promise()).unsafeGet();
 
       expect(result.data).toHaveProperty('firstPrice', pair.first_price);
       expect(result.data).toHaveProperty('lastPrice', pair.last_price);
@@ -57,10 +57,11 @@ describe('Pairs', () => {
         })
         .run()
         .listen({
-          onResolved: pair =>
-            pair.matchWith({
-              Nothing: () => done(),
-            }),
+          onResolved: pair => {
+            expect(pair).toBeNothing();
+            done();
+          },
+          onRejected: () => done.fail(),
         });
     });
   });

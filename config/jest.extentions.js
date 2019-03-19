@@ -1,4 +1,5 @@
 const Maybe = require('folktale/maybe');
+const { equals } = require('ramda');
 
 expect.extend({
   toBeNothing(maybe) {
@@ -26,9 +27,9 @@ expect.extend({
         Just: ({ value }) => ({
           message: () =>
             `${maybe} is ${
-              value === expected ? '' : 'not'
+              equals(value, expected) ? '' : 'not'
             } equal to ${expected}`,
-          pass: value == expected,
+          pass: equals(value, expected),
         }),
         Nothing: () => ({
           message: () => `${maybe} should to be instance of Maybe.Just`,
