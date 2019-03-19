@@ -21,7 +21,7 @@ describe('Aliases', () => {
             expect(maybeX.unsafeGet()).toMatchSnapshot();
             done();
           },
-          onRejected: () => done.fail(),
+          onRejected: done.fail,
         });
     });
 
@@ -34,7 +34,7 @@ describe('Aliases', () => {
             expect(maybeX).toBeNothing();
             done();
           },
-          onRejected: () => done.fail(),
+          onRejected: done.fail,
         });
     });
   });
@@ -49,7 +49,7 @@ describe('Aliases', () => {
             expect(mxs).toMatchSnapshot();
             done();
           },
-          onRejected: () => done.fail(),
+          onRejected: done.fail,
         });
     });
 
@@ -65,7 +65,7 @@ describe('Aliases', () => {
             expect(mxs).toMatchSnapshot();
             done();
           },
-          onRejected: () => done.fail(),
+          onRejected: done.fail,
         });
     });
   });

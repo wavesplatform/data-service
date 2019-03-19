@@ -41,7 +41,7 @@ describe('getById', () => {
             });
             done();
           },
-          onRejected: () => done.fail(),
+          onRejected: () => done.fail,
         }));
   });
 

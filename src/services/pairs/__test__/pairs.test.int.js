@@ -61,7 +61,7 @@ describe('Pairs', () => {
             expect(pair).toBeNothing();
             done();
           },
-          onRejected: () => done.fail(),
+          onRejected: done.fail,
         });
     });
   });

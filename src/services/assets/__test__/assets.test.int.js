@@ -27,7 +27,7 @@ describe('Assets service', () => {
           expect(x.unsafeGet()).toMatchSnapshot();
           done();
         })
-        .catch(() => done.fail());
+        .catch(done.fail);
     });
 
     it('returns null for unreal tx', async () => {

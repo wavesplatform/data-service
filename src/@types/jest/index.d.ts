@@ -3,8 +3,8 @@ import { Maybe as FolktaleMaybe } from 'folktale/maybe';
 declare global {
   namespace jest {
     interface FolktaleMaybeMatchers<R> extends Matchers<R> {
-      toBeJust: (value: R) => R;
-      toBeNothing: () => R
+      toBeJust: (maybe: R) => R;
+      toBeNothing: () => R;
     }
 
     interface Expect {
