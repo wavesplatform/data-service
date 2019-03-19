@@ -1,9 +1,14 @@
-declare namespace jest {
-  interface Matchers<R> {
-    toBeJust: <T>(m: Maybe<T>) => object;
-  }
+import { Maybe as FolktaleMaybe } from 'folktale/maybe';
 
-  interface Expect {
-    toBeJust: <T>(m: Maybe<T>) => object;
+declare global {
+  namespace jest {
+    interface FolktaleMaybeMatchers<R> extends Matchers<R> {
+      toBeJust: (value: R) => R;
+      toBeNothing: () => R
+    }
+
+    interface Expect {
+      <T>(actual: FolktaleMaybe<T>): FolktaleMaybeMatchers<T>;
+    }
   }
 }

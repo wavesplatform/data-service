@@ -6,7 +6,7 @@ expect.extend({
     if (Maybe.hasInstance(maybe)) {
       return maybe.matchWith({
         Just: () => ({
-          message: () => `${maybe} should to be instance of Maybe.Nothing`,
+          message: () => `${maybe} should be instance of Maybe.Nothing`,
           pass: false,
         }),
         Nothing: () => ({
@@ -16,7 +16,7 @@ expect.extend({
       });
     } else {
       return {
-        message: () => `${maybe} should to be instance of Maybe`,
+        message: () => `${maybe} should be instance of Maybe`,
         pass: false,
       };
     }
