@@ -1,12 +1,13 @@
-const { propEq } = require('ramda');
+const { propEq, compose } = require('ramda');
 
-const { Transaction } = require('../../../../types');
-
-const getByIdPreset = require('../../../presets/pg/getById');
-const mgetByIdsPreset = require('../../../presets/pg/mgetByIds');
-const searchWithPaginationPreset = require('../../../presets/pg/searchWithPagination');
+const { getByIdPreset } = require('../../../presets/pg/getById');
+const { mgetByIdsPreset } = require('../../../presets/pg/mgetByIds');
+const {
+  searchWithPaginationPreset,
+} = require('../../../presets/pg/searchWithPagination');
 
 const transformTxInfo = require('./transformTxInfo');
+const { transaction } = require('../../../../types');
 
 const sql = require('./sql');
 
@@ -21,7 +22,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       sql: sql.get,
       inputSchema: inputGet,
       resultSchema: result,
-      resultTypeFactory: Transaction,
+      resultTypeFactory: transaction,
       transformResult: transformTxInfo,
     })({ pg, emitEvent }),
 
@@ -29,7 +30,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       name: 'transactions.all.commonData.mget',
       matchRequestResult: propEq('id'),
       sql: sql.mget,
-      resultTypeFactory: Transaction,
+      resultTypeFactory: transaction,
       inputSchema: inputMget,
       resultSchema: result,
       transformResult: transformTxInfo,
@@ -40,7 +41,10 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       sql: sql.search,
       inputSchema: inputSearch,
       resultSchema: result,
-      transformResult: transformTxInfo,
+      transformResult: compose(
+        transaction,
+        transformTxInfo
+      ),
     })({ pg, emitEvent }),
   };
 };

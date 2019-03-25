@@ -1,14 +1,16 @@
 import { of as taskOf } from 'folktale/concurrency/task';
-import { of as maybeOf, Maybe } from 'folktale/maybe';
+import { of as maybeOf } from 'folktale/maybe';
 import { Ok, Error as error, Result } from 'folktale/result';
 import { identity } from 'ramda';
 import {
   AppError,
   ValidationError,
   ResolverError,
+  DbError,
 } from '../../../../errorHandling/';
 
 import { get } from '../';
+import { PgDriver } from '../../../../db/driver';
 
 const assetId = 'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH';
 
@@ -20,24 +22,29 @@ const resultOk = (s: string) => Ok<ResolverError, string>(s);
 const resultError = (s: string) =>
   error<ResolverError, string>(AppError.Resolver(s));
 
+afterEach(() => jest.clearAllMocks());
+
 describe('Resolver', () => {
   const commonConfig = {
     transformInput: identity,
-    transformResult: (m: Maybe<string>) => m.getOrElse(null),
-    dbQuery: identity,
+    transformResult: identity,
+    dbQuery: (driver: PgDriver) => (id: string) =>
+      driver.one<string>(id).map(maybeOf),
   };
 
-  const mockDbQuery = (s: string) => taskOf<string, Maybe<string>>(maybeOf(s));
+  const mockPgDriver: PgDriver = {
+    one: (s: string) => taskOf<DbError, string>(s),
+  } as PgDriver;
 
   const createMockResolver = (
     validateInput: (s: string) => Result<ValidationError, string>,
     validateResult: (s: string) => Result<ResolverError, string>
   ) =>
-    get<string, string, string, string | null>({
+    get<string, string, string, string>({
       ...commonConfig,
       validateInput,
       validateResult,
-    })({ db: mockDbQuery });
+    })({ db: mockPgDriver });
 
   it('should return result if all validation pass', done => {
     const goodResolver = createMockResolver(inputOk, resultOk);
@@ -46,19 +53,20 @@ describe('Resolver', () => {
       .run()
       .listen({
         onResolved: data => {
-          expect(data).toEqual(assetId);
+          expect(data.getOrElse(null)).toEqual(assetId);
           done();
         },
       });
   });
 
   it('should call db query if everything is ok', done => {
-    const spiedDbQuery = jest.fn(mockDbQuery);
+    const spiedDbQuery = jest.spyOn(mockPgDriver, 'one');
+
     const goodResolver = get({
       ...commonConfig,
       validateInput: inputOk,
       validateResult: resultOk,
-    })({ db: spiedDbQuery });
+    })({ db: mockPgDriver });
 
     goodResolver(assetId)
       .run()
@@ -81,7 +89,7 @@ describe('Resolver', () => {
       ...commonConfig,
       validateInput: inputOk,
       validateResult: resultOk,
-    })({ db: mockDbQuery, emitEvent: outerSpy });
+    })({ db: mockPgDriver, emitEvent: outerSpy });
 
     goodResolver(assetId)
       .run()
@@ -106,7 +114,7 @@ describe('Resolver', () => {
             ],
             [
               'TRANSFORM_RESULT_OK',
-              'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH',
+              maybeOf('G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH'),
             ],
           ]);
 
@@ -129,12 +137,12 @@ describe('Resolver', () => {
   });
 
   it('should NOT call db query if input validation fails', done => {
-    const spiedDbQuery = jest.fn(mockDbQuery);
+    const spiedDbQuery = jest.spyOn(mockPgDriver, 'one');
     const badInputResolver = get({
       ...commonConfig,
       validateInput: inputError,
       validateResult: resultOk,
-    })({ db: spiedDbQuery });
+    })({ db: mockPgDriver });
 
     badInputResolver(assetId)
       .run()

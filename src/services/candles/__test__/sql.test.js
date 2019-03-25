@@ -1,20 +1,24 @@
-const Interval = require('../../../types/Interval');
+const { interval } = require('../../../types/');
 const { highestDividerLessThen, sql } = require('../sql');
 
 describe('candles sql helper functions', () => {
   it('highest divider less then', () => {
     expect(
-      highestDividerLessThen(Interval('1m'), ['1m', '1h', '1d']).length
-    ).toBe(Interval('1m').length);
+      highestDividerLessThen(interval('1m').unsafeGet(), ['1m', '1h', '1d'])
+        .length
+    ).toBe(interval('1m').unsafeGet().length);
     expect(
-      highestDividerLessThen(Interval('10m'), ['5m', '15m', '1h']).length
-    ).toBe(Interval('5m').length);
+      highestDividerLessThen(interval('10m').unsafeGet(), ['5m', '15m', '1h'])
+        .length
+    ).toBe(interval('5m').unsafeGet().length);
     expect(
-      highestDividerLessThen(Interval('15m'), ['5m', '15m', '1h']).length
-    ).toBe(Interval('15m').length);
+      highestDividerLessThen(interval('15m').unsafeGet(), ['5m', '15m', '1h'])
+        .length
+    ).toBe(interval('15m').unsafeGet().length);
     expect(
-      highestDividerLessThen(Interval('1h'), ['1m', '1h', '1d']).length
-    ).toBe(Interval('1h').length);
+      highestDividerLessThen(interval('1h').unsafeGet(), ['1m', '1h', '1d'])
+        .length
+    ).toBe(interval('1h').unsafeGet().length);
   });
 });
 

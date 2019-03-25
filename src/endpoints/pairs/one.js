@@ -20,7 +20,7 @@ const pairsOneEndpoint = async ctx => {
     emitEvent: ctx.eventBus.emit,
   });
 
-  const pairs = await service
+  const pair = await service
     .get({
       amountAsset: id1,
       priceAsset: id2,
@@ -29,15 +29,13 @@ const pairsOneEndpoint = async ctx => {
     .promise();
 
   ctx.eventBus.emit('ENDPOINT_RESOLVED', {
-    value: pairs,
+    value: pair,
   });
 
-  if (pairs) {
-    ctx.state.returnValue = pairs;
-  } else {
-    ctx.status = 404;
-    ctx.body = `Pair for ${id1}/${id2} not found`;
-  }
+  pair.matchWith({
+    Just: ({ value }) => (ctx.state.returnValue = value),
+    Nothing: () => (ctx.status = 404),
+  });
 };
 
 const handleError = ({ ctx, error }) => {

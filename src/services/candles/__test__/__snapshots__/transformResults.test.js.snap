@@ -453,7 +453,7 @@ Object {
     "open": null,
     "quoteVolume": null,
     "time": 2018-11-01T00:00:00.000Z,
-    "txsCount": null,
+    "txsCount": 0,
     "volume": null,
     "weightedAveragePrice": null,
   },

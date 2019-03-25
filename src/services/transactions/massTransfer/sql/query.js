@@ -12,6 +12,7 @@ const transfers = pg('txs_11_transfers').select([
   'recipient',
   'amount',
   'tx_id',
+  'position_in_tx',
 ]);
 const withTransfers = q =>
   q.clone().join({ tfs: transfers }, 'tfs.tx_id', '=', 'txs.id');
@@ -41,8 +42,10 @@ const withGrouping = q =>
 const columns = {
   id: 'txs.id',
   fee: pg.raw('(fee * 10^(-8)) :: DOUBLE PRECISION'),
-  recipients: pg.raw('array_agg(recipient)'),
-  amounts: pg.raw('array_agg (amount * 10^(-ad.decimals) :: double precision)'),
+  recipients: pg.raw('array_agg(recipient order by position_in_tx)'),
+  amounts: pg.raw(
+    'array_agg (amount * 10^(-ad.decimals) :: double precision order by position_in_tx)'
+  ),
   height: 'height',
   tx_type: 'tx_type',
   time_stamp: 'time_stamp',

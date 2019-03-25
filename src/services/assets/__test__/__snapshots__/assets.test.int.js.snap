@@ -5,8 +5,10 @@ Object {
   "__type": "asset",
   "data": Object {
     "description": "ETLxxx",
+    "hasScript": false,
     "height": 238692,
     "id": "G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH",
+    "minSponsoredFee": null,
     "name": "ETLxxx",
     "precision": 8,
     "quantity": "100000000",
@@ -26,8 +28,10 @@ Object {
       "__type": "asset",
       "data": Object {
         "description": "ETLxxx",
+        "hasScript": false,
         "height": 238692,
         "id": "G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH",
+        "minSponsoredFee": null,
         "name": "ETLxxx",
         "precision": 8,
         "quantity": "100000000",
@@ -37,7 +41,10 @@ Object {
         "timestamp": 2016-11-19T19:45:07.045Z,
       },
     },
-    null,
+    Object {
+      "__type": "asset",
+      "data": null,
+    },
   ],
 }
 `;
@@ -50,8 +57,10 @@ Object {
       "__type": "asset",
       "data": Object {
         "description": "",
+        "hasScript": false,
         "height": 0,
         "id": "WAVES",
+        "minSponsoredFee": null,
         "name": "Waves",
         "precision": 8,
         "quantity": "10000000000000000",

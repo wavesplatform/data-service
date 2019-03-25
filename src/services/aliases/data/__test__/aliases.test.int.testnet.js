@@ -1,5 +1,5 @@
 const { createPgDriver } = require('../../../../db');
-const loadConfig = require('../../../../loadConfig');
+const { loadConfig } = require('../../../../loadConfig');
 const options = loadConfig();
 const create = require('../../index');
 
@@ -18,9 +18,10 @@ describe('Aliases', () => {
         .run()
         .listen({
           onResolved: alias => {
-            expect(alias).toMatchSnapshot();
+            expect(alias.unsafeGet()).toMatchSnapshot();
             done();
           },
+          onRejected: done.fail,
         });
     });
 
@@ -30,9 +31,10 @@ describe('Aliases', () => {
         .run()
         .listen({
           onResolved: nullable => {
-            expect(nullable).toEqual(null);
+            expect(nullable).toBeNothing();
             done();
           },
+          onRejected: done.fail,
         });
     });
   });
@@ -47,6 +49,7 @@ describe('Aliases', () => {
             expect(mxs).toMatchSnapshot();
             done();
           },
+          onRejected: done.fail,
         });
     });
 
@@ -62,6 +65,7 @@ describe('Aliases', () => {
             expect(mxs).toMatchSnapshot();
             done();
           },
+          onRejected: done.fail,
         });
     });
   });
