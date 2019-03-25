@@ -14,16 +14,15 @@ const {
   omit,
 } = require('ramda');
 const { renameKeys } = require('ramda-adjunct');
-const { Interval, List } = require('../../types');
-const concatAll = require('../../utils/fp/concatAll');
+const { interval, list, candle, Unit } = require('../../types');
+const { concatAll } = require('../../utils/fp/concatAll');
 const { floor, ceil, add, trunc } = require('../../utils/date');
-const { Candle } = require('../../types/index');
 const { candleMonoid } = require('./candleMonoid');
 
-const truncToMinutes = trunc('minutes');
+const truncToMinutes = trunc(Unit.Minute);
 
 /** transformCandle :: [Date, CandleDbResponse] -> Candle */
-const transformCandle = ([time, candle]) => {
+const transformCandle = ([time, c]) => {
   const isEmpty = c => c.txs_count === 0;
 
   const renameFields = renameKeys({
@@ -33,17 +32,15 @@ const transformCandle = ([time, candle]) => {
     txs_count: 'txsCount',
     time_start: 'time',
   });
-
+  
   return compose(
-    Candle,
-    omit([
-      'a_dec',
-      'p_dec'
-    ]),
+    candle,
+    omit(['a_dec', 'p_dec']),
     renameFields,
-    assoc('time_start', new Date(`${time.substr(0, time.lastIndexOf('.'))}.000Z`)),
+    assoc('time_start', time),
+    assoc('txs_count', c.txs_count),
     ifElse(isEmpty, map(always(null)), identity)
-  )(candle);
+  )(c)
 };
 
 /** addMissingCandles :: Interval -> Date -> Date
@@ -53,10 +50,10 @@ const addMissingCandles = curryN(
   (interval, timeStart, timeEnd, candlesGroupedByTime) => {
     const end = timeEnd;
     const res = clone(candlesGroupedByTime);
-
+    
     for (
       let it = ceil(interval, timeStart);
-      it <= end;
+      it < end;
       it = floor(interval, add(interval, it))
     ) {
       const cur = truncToMinutes(it);
@@ -65,7 +62,7 @@ const addMissingCandles = curryN(
         res[cur] = [];
       }
     }
-
+    
     return res;
   }
 );
@@ -87,7 +84,7 @@ const candleFixedDecimals = (candle, aDecimals, pDecimals) =>
 /** transformResults :: (CandleDbResponse[], request) -> List Maybe t */
 const transformResults = (result, request) =>
   compose(
-    List,
+    list,
     map(transformCandle),
     sort((a, b) => new Date(a[0]) - new Date(b[0])),
     toPairs,
@@ -98,13 +95,16 @@ const transformResults = (result, request) =>
     ),
     map(concatAll(candleMonoid)),
     addMissingCandles(
-      Interval(request.params.interval),
+      interval(request.params.interval).getOrElse(null),
       request.params.timeStart,
       request.params.timeEnd
     ),
     groupBy(candle =>
       truncToMinutes(
-        floor(Interval(request.params.interval), candle.time_start)
+        floor(
+          interval(request.params.interval).getOrElse(null),
+          candle.time_start
+        )
       )
     )
   )(result);

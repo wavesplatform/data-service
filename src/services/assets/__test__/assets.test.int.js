@@ -4,7 +4,7 @@ const json = require('@waves/json-bigint');
 
 // dependencies
 const { createPgDriver } = require('../../../db');
-const loadConfig = require('../../../loadConfig');
+const { loadConfig } = require('../../../loadConfig');
 const options = loadConfig();
 const drivers = {
   pg: createPgDriver(options),
@@ -24,10 +24,10 @@ describe('Assets service', () => {
         .run()
         .promise()
         .then(x => {
-          expect(x).toMatchSnapshot();
+          expect(x.unsafeGet()).toMatchSnapshot();
           done();
         })
-        .catch(e => done(JSON.stringify(e)));
+        .catch(done.fail);
     });
 
     it('returns null for unreal tx', async () => {
@@ -36,7 +36,7 @@ describe('Assets service', () => {
         .run()
         .promise();
 
-      expect(tx).toBe(null);
+      expect(tx).toBeNothing();
     });
   });
 

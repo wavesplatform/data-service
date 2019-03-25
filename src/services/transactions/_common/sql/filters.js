@@ -14,8 +14,8 @@ const sort = s => q =>
     .orderBy('time_stamp', s)
     .orderBy('id', s);
 
-const after = ({ timestamp, id, sortDirection }) => q => {
-  const comparator = sortDirection === 'desc' ? '<' : '>';
+const after = ({ timestamp, id, sort }) => q => {
+  const comparator = sort === 'desc' ? '<' : '>';
   return q
     .clone()
     .whereRaw(`(time_stamp, id) ${comparator} (?, ?)`, [timestamp, id]);

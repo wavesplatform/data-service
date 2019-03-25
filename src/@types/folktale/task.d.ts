@@ -62,6 +62,8 @@ declare module 'folktale/concurrency/task' {
   export const of: <A, B>(value: B) => Task<A, B>;
   export const rejected: <A, B>(reason: A) => Task<A, B>;
 
+  export const fromPromised: <A, B>(promised: () => Promise<B>) => () => Task<A, B>;
+
   function waitAny<A1, B1>(ts: [Task<A1, B1>]): Task<A1, [B1]>;
   function waitAny<A1, B1, A2, B2>(
     ts: [Task<A1, B1>, Task<A2, B2>]

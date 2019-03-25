@@ -5,7 +5,7 @@ const createLogger = require('../../logger/winston');
 
 // pg
 const { createPgDriver } = require('../../db');
-const loadConfig = require('./loadConfig');
+const { loadConfig } = require('./loadConfig');
 const options = loadConfig();
 const pgDriver = createPgDriver(options);
 const logger = createLogger({

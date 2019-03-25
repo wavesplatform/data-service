@@ -1,6 +1,7 @@
-const { identity } = require('ramda');
+const { identity, compose } = require('ramda');
 
-const createResolver = require('../../_common/createResolver');
+const { get, mget, search } = require('../../_common/createResolver');
+const { transaction } = require('../../../types');
 
 // validation
 const { inputGet } = require('../../presets/pg/getById/inputSchema');
@@ -14,38 +15,48 @@ const {
 // data retrieve
 const pgData = require('./pg');
 
-// transforms
-const { Transaction } = require('../../../types');
-
-const transformResultGet = require('../../presets/pg/getById/transformResult');
-const transformResultMget = require('../../presets/pg/mgetByIds/transformResult');
-const transformInputSearch = require('../../presets/pg/searchWithPagination/transformInput');
-const transformResultSearch = require('../../presets/pg/searchWithPagination/transformResult');
+const {
+  transformResults: transformResultGet,
+} = require('../../presets/pg/getById/transformResult');
+const {
+  transformResults: transformResultMget,
+} = require('../../presets/pg/mgetByIds/transformResult');
+const {
+  transformInput: transformInputSearch,
+} = require('../../presets/pg/searchWithPagination/transformInput');
+const {
+  transformResults: transformResultSearch,
+} = require('../../presets/pg/searchWithPagination/transformResult');
 const transformTxInfo = require('./transformTxInfo');
 
 const createServiceName = type => `transactions.data.${type}`;
 
 module.exports = ({ drivers: { pg }, emitEvent }) => {
   return {
-    get: createResolver.get({
+    get: get({
       transformInput: identity,
-      transformResult: transformResultGet(Transaction)(transformTxInfo),
+      transformResult: transformResultGet(transaction)(transformTxInfo),
       validateInput: validateInput(inputGet, createServiceName('get')),
       validateResult: validateResult(resultSchema, createServiceName('get')),
       dbQuery: pgData.get,
     })({ db: pg, emitEvent }),
 
-    mget: createResolver.mget({
+    mget: mget({
       transformInput: identity,
-      transformResult: transformResultMget(Transaction)(transformTxInfo),
+      transformResult: transformResultMget(transaction)(transformTxInfo),
       validateInput: validateInput(inputMget, createServiceName('mget')),
       validateResult: validateResult(resultSchema, createServiceName('mget')),
       dbQuery: pgData.mget,
     })({ db: pg, emitEvent }),
 
-    search: createResolver.search({
+    search: search({
       transformInput: transformInputSearch,
-      transformResult: transformResultSearch(transformTxInfo),
+      transformResult: transformResultSearch(
+        compose(
+          transaction,
+          transformTxInfo
+        )
+      ),
       validateInput: validateInput(
         inputSearchSchema,
         createServiceName('search')

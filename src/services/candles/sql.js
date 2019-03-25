@@ -7,8 +7,12 @@ const {
   prop,
   sortBy,
 } = require('ramda');
-const Interval = require('../../types/Interval');
-const { add, trunc, spreadIntervalUnits } = require('../../utils/date');
+const { interval, Unit } = require('../../types');
+const {
+  div,
+  fromMillisecs: intervalFromMillisecs,
+} = require('../../utils/interval');
+const { add, trunc } = require('../../utils/date');
 const pg = require('knex')({ client: 'pg' });
 
 const fields = [
@@ -34,11 +38,11 @@ const fieldsWithDecimals = [
 ];
 
 /** highestDividerLessThen :: Interval i => i -> String[] -> i */
-const highestDividerLessThen = (interval, dividers) =>
+const highestDividerLessThen = (inter, dividers) =>
   compose(
-    findLast(i => interval.div(i) >= 1),
+    findLast(i => div(inter, i) >= 1),
     sortBy(prop('length')),
-    map(Interval)
+    map(d => interval(d).getOrElse(null))
   )(dividers);
 
 /** selectCandles :: { amountAsset: String, priceAsset: String, timeStart: Date, timeEnd: Date, interval: String } -> knex.QueryBuilder */
@@ -47,7 +51,7 @@ const selectCandles = ({
   priceAsset,
   timeStart,
   timeEnd,
-  interval,
+  interval: inter,
 }) =>
   pg('candles')
     .select(fields)
@@ -57,7 +61,7 @@ const selectCandles = ({
     .where('time_start', '<=', timeEnd)
     .where(
       'interval_in_secs',
-      highestDividerLessThen(Interval(interval), [
+      highestDividerLessThen(interval(inter).getOrElse(null), [
         '1m',
         '5m',
         '15m',
@@ -70,7 +74,7 @@ const selectCandles = ({
       ]).length / 1000
     );
 
-/** periodToQueries :: { timeStart: Date, period: String } -> [knex.QueryBuilder] */
+/** periodToQueries :: { amountAsset: String, priceAsset: String, timeStart: Date, period: String, dividers: [String] } -> [knex.QueryBuilder] */
 const periodToQueries = ({
   amountAsset,
   priceAsset,
@@ -80,24 +84,32 @@ const periodToQueries = ({
 }) => {
   const queries = [];
 
-  let interval = Interval(period);
+  let periodInterval = interval(period).getOrElse(null);
 
-  let itTimestamp = new Date(trunc('minutes', timeStart)).getTime();
+  if (!periodInterval) {
+    return queries;
+  }
+
+  let itTimestamp = new Date(trunc(Unit.Minute, timeStart)).getTime();
   const endTimestamp = new Date(
-    trunc('minutes', add(interval, timeStart))
+    trunc(Unit.Minute, add(periodInterval, timeStart))
   ).getTime();
 
   while (itTimestamp < endTimestamp) {
     const theBiggestInterval = compose(
-      find(i => interval.div(i) >= 1),
+      find(i => div(periodInterval, i) >= 1),
       sortBy(
         compose(
           multiply(-1),
           prop('length')
         )
       ), // desc sorting
-      map(Interval)
+      map(d => interval(d).getOrElse(null))
     )(dividers);
+
+    if (!theBiggestInterval) {
+      break;
+    }
 
     const timeEnd = add(theBiggestInterval, new Date(itTimestamp));
 
@@ -107,16 +119,16 @@ const periodToQueries = ({
         priceAsset,
         timeStart: new Date(itTimestamp),
         timeEnd: timeEnd,
-        interval: theBiggestInterval.toString(),
+        interval: theBiggestInterval.source,
       })
     );
 
     itTimestamp = timeEnd.getTime();
-    interval = Interval.fromNumber(
-      interval.length - theBiggestInterval.length
+    periodInterval = intervalFromMillisecs(
+      periodInterval.length - theBiggestInterval.length
     ).getOrElse(null);
 
-    if (interval === null) {
+    if (periodInterval === null) {
       break;
     }
   }
@@ -126,15 +138,13 @@ const periodToQueries = ({
 
 /** sql :: { String, String, { timeStart: Date, timeEnd: Date, interval: String } } -> String */
 const sql = ({ amountAsset, priceAsset, params }) => {
-  const ts = new Date(
-    trunc(spreadIntervalUnits(params.interval), params.timeEnd)
-  );
+  const paramsInterval = interval(params.interval).getOrElse(null);
 
-  const te = new Date(trunc('minutes', params.timeEnd));
+  const ts = new Date(trunc(paramsInterval.unit, params.timeEnd));
+  const te = new Date(trunc(Unit.Minute, params.timeEnd));
 
-  const p = Interval.fromNumber(te.getTime() - ts.getTime())
-    .getOrElse('')
-    .toString();
+  const p = intervalFromMillisecs(te.getTime() - ts.getTime()).getOrElse('')
+    .source;
 
   return pg('candles')
     .select(fieldsWithDecimals)
@@ -181,5 +191,6 @@ const assetDecimals = asset =>
 module.exports = {
   highestDividerLessThen,
   assetDecimals,
+  periodToQueries,
   sql,
 };

@@ -1,6 +1,7 @@
 const rawJoi = require('joi');
-const Cursor = require('../../../_common/pagination/cursor');
+const { decode } = require('../../../_common/pagination/cursor');
 const DATE0 = new Date(0);
+
 const Joi = rawJoi.extend(joi => ({
   base: joi.string().base64({ paddingRequired: false }),
   name: 'cursor',
@@ -8,12 +9,11 @@ const Joi = rawJoi.extend(joi => ({
     {
       name: 'valid',
       validate(_, value, state, options) {
-        const [ts, id, sort] = Cursor.decode(value);
-        if (!ts || !id || !sort) {
-          // Generate an error, state and options need to be passed
-          return this.createError('cursor.wrong', { v: value }, state, options);
-        }
-        return value; // Everything is OK
+        return decode(value).matchWith({
+          Ok: () => value,
+          Error: () =>
+            this.createError('cursor.wrong', { v: value }, state, options),
+        });
       },
     },
   ],

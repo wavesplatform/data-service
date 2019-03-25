@@ -1,11 +1,11 @@
 const { propEq } = require('ramda');
 
-const { Asset } = require('../../types');
+const { asset } = require('../../types');
 
 // presets
-const getByIdPreset = require('../presets/pg/getById');
-const mgetByIdsPreset = require('../presets/pg/mgetByIds');
-const searchPreset = require('../presets/pg/search');
+const { getByIdPreset } = require('../presets/pg/getById');
+const { mgetByIdsPreset } = require('../presets/pg/mgetByIds');
+const { searchPreset } = require('../presets/pg/search');
 
 // validation
 const { inputGet } = require('../presets/pg/getById/inputSchema');
@@ -16,7 +16,9 @@ const {
 } = require('./schema');
 
 const transformAsset = require('./transformAsset');
-const createTransformResult = require('../presets/pg/search/transformResult');
+const {
+  transformResults: createTransformResult,
+} = require('../presets/pg/search/transformResult');
 const sql = require('./sql');
 
 module.exports = ({ drivers: { pg }, emitEvent }) => {
@@ -27,7 +29,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       inputSchema: inputGet,
       resultSchema,
       transformResult: transformAsset,
-      resultTypeFactory: Asset,
+      resultTypeFactory: asset,
     })({ pg, emitEvent }),
 
     mget: mgetByIdsPreset({
@@ -37,7 +39,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       inputSchema: inputMget,
       resultSchema,
       transformResult: transformAsset,
-      resultTypeFactory: Asset,
+      resultTypeFactory: asset,
     })({ pg, emitEvent }),
 
     search: searchPreset({
@@ -45,7 +47,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       sql: sql.search,
       inputSchema: inputSearchSchema,
       resultSchema,
-      transformResult: createTransformResult(Asset)(transformAsset),
+      transformResult: createTransformResult(asset)(transformAsset),
     })({ pg, emitEvent }),
   };
 };

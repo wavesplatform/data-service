@@ -10,6 +10,7 @@ import {
 
 import { search } from '..';
 import { Validate } from '../types';
+import { PgDriver } from '../../../../db/driver';
 
 const ids = [
   'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH',
@@ -25,12 +26,15 @@ const resultOk = (s: string) => Ok<ResolverError, string>(s);
 const resultError = (s: string) =>
   error<ResolverError, string>(AppError.Resolver(errorMessage));
 
-const mockDbQuery = (ids: string[]) => taskOf<DbError, string[]>(ids);
+const mockPgDriver: PgDriver = {
+  many: (query: string) => taskOf<DbError, string[]>(query.split('::')),
+} as PgDriver;
 
 const commonConfig = {
   transformInput: identity,
   transformResult: identity,
-  dbQuery: identity,
+  dbQuery: (driver: PgDriver) => (ids: string[]) =>
+    driver.many<string>(ids.join('::')),
 };
 
 const createMockResolver = (
@@ -41,7 +45,9 @@ const createMockResolver = (
     ...commonConfig,
     validateInput,
     validateResult,
-  })({ db: mockDbQuery });
+  })({ db: mockPgDriver });
+
+afterEach(() => jest.clearAllMocks());
 
 describe('Resolver', () => {
   it('should return result if all validation pass', done => {
@@ -58,12 +64,12 @@ describe('Resolver', () => {
   });
 
   it('should call db query is everything is ok', done => {
-    const spiedDbQuery = jest.fn(mockDbQuery);
+    const spiedDbQuery = jest.spyOn(mockPgDriver, 'many');
     const goodResolver = search({
       ...commonConfig,
       validateInput: inputOk,
       validateResult: resultOk,
-    })({ db: spiedDbQuery });
+    })({ db: mockPgDriver });
 
     goodResolver(ids)
       .run()
@@ -89,12 +95,12 @@ describe('Resolver', () => {
   });
 
   it('should NOT call db query if input validation fails', done => {
-    const spiedDbQuery = jest.fn(mockDbQuery);
+    const spiedDbQuery = jest.spyOn(mockPgDriver, 'many');
     const badInputResolver = search({
       ...commonConfig,
       validateInput: inputError,
       validateResult: resultOk,
-    })({ db: spiedDbQuery });
+    })({ db: mockPgDriver });
 
     badInputResolver(ids)
       .run()

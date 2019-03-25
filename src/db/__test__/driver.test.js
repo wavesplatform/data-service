@@ -1,9 +1,9 @@
-const { pg } = require('../driver');
+const { createPgDriver } = require('../driver');
 
 const { driver } = require('./mocks');
 
 describe('Tasked driver method', () => {
-  const driverT = pg({}, () =>
+  const driverT = createPgDriver({}, () =>
     driver.create(x => Promise.resolve(x), (...args) => args)
   );
 
@@ -13,7 +13,7 @@ describe('Tasked driver method', () => {
       .run()
       .listen({
         onResolved: xs => {
-          expect(xs).toEqual(['some sql']);
+          expect(xs).toEqual(['some sql', undefined]);
           done();
         },
       });
@@ -59,7 +59,7 @@ describe('Tasked driver method', () => {
       .run()
       .listen({
         onResolved: xs => {
-          expect(xs).toEqual(['some sql']);
+          expect(xs).toEqual(['some sql', undefined]);
           done();
         },
       });

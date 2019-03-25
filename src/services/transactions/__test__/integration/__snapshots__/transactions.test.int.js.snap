@@ -8,11 +8,15 @@ Object {
     "fee": "0.001",
     "height": 922106,
     "id": "21BmkGpk98wWHrCydjwTFvHWPfQxtH5NEQd9X7wUpi5R",
+    "proofs": Array [
+      "54qNaDCCC3LoprhNcd6C4ytRbB2chDpYxEusmyVgmPg7PNQjvi7Ckc13mBn1M3zf8T5YgzfWDMnvE9rRLYyGSkSu",
+    ],
     "sender": "3P2DQSKgE7Hw9VhHfu5TkJxsh5GFRfShQpK",
     "senderPublicKey": "FTY2T2HLvyR7XQTvn5Eu56B8qGXcvosutTRq5TatcTMp",
     "signature": "54qNaDCCC3LoprhNcd6C4ytRbB2chDpYxEusmyVgmPg7PNQjvi7Ckc13mBn1M3zf8T5YgzfWDMnvE9rRLYyGSkSu",
     "timestamp": 2018-03-17T20:22:43.701Z,
     "type": 10,
+    "version": 1,
   },
 }
 `;
@@ -28,11 +32,15 @@ Object {
         "fee": "0.001",
         "height": 922106,
         "id": "21BmkGpk98wWHrCydjwTFvHWPfQxtH5NEQd9X7wUpi5R",
+        "proofs": Array [
+          "54qNaDCCC3LoprhNcd6C4ytRbB2chDpYxEusmyVgmPg7PNQjvi7Ckc13mBn1M3zf8T5YgzfWDMnvE9rRLYyGSkSu",
+        ],
         "sender": "3P2DQSKgE7Hw9VhHfu5TkJxsh5GFRfShQpK",
         "senderPublicKey": "FTY2T2HLvyR7XQTvn5Eu56B8qGXcvosutTRq5TatcTMp",
         "signature": "54qNaDCCC3LoprhNcd6C4ytRbB2chDpYxEusmyVgmPg7PNQjvi7Ckc13mBn1M3zf8T5YgzfWDMnvE9rRLYyGSkSu",
         "timestamp": 2018-03-17T20:22:43.701Z,
         "type": 10,
+        "version": 1,
       },
     },
     Object {
@@ -42,11 +50,15 @@ Object {
         "fee": "0.001",
         "height": 922106,
         "id": "HbgSfoQ7ftAF3TUQNovbFnohsRK7AdztFznrJHTqH7F7",
+        "proofs": Array [
+          "4oA22v2NsNNJafLJVEqwSJF74XvN1pxh9d72k2pe8kheMjrTf8E4exLUGAoGKKrZYcw9UzxVgFoeNNBQjcqRajHW",
+        ],
         "sender": "3P2DQSKgE7Hw9VhHfu5TkJxsh5GFRfShQpK",
         "senderPublicKey": "FTY2T2HLvyR7XQTvn5Eu56B8qGXcvosutTRq5TatcTMp",
         "signature": "4oA22v2NsNNJafLJVEqwSJF74XvN1pxh9d72k2pe8kheMjrTf8E4exLUGAoGKKrZYcw9UzxVgFoeNNBQjcqRajHW",
         "timestamp": 2018-03-17T20:22:39.158Z,
         "type": 10,
+        "version": 1,
       },
     },
     Object {
@@ -76,6 +88,60 @@ Object {
     "type": 4,
     "version": 1,
   },
+}
+`;
+
+exports[`all transactions service mget fetches real txs with nulls for unreal 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "amount": "0.007",
+        "assetId": "WAVES",
+        "attachment": "",
+        "fee": "0.001",
+        "feeAsset": "WAVES",
+        "height": 240868,
+        "id": "Co8JB3md1hsnFKYS2xonipBFyQcB7qskyosoJf6YhBi1",
+        "recipient": "3PJkWhTJXrYWiSj6sxv9aoUrzoBbGZmzvQf",
+        "sender": "3P2b1YqpGNb57ftMQN5be25iKowq65GmkZ7",
+        "senderPublicKey": "J9LBb9ZixtDiLFxXocGXt69JU5vConrGYh7yM1mnAPWQ",
+        "signature": "4QgAFzCvEhMEEWuYvuPU8tw4bhSKzrfFW2RrhkEYFc82EVdmUV7HqRehpTxsvQ9V2dYd4yp4Ezez9RqVwDSKr2uz",
+        "timestamp": 2016-11-21T07:01:42.156Z,
+        "type": 4,
+        "version": 1,
+      },
+    },
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "data": Array [
+          Object {
+            "key": "company",
+            "type": "string",
+            "value": "Resonova",
+          },
+        ],
+        "fee": "0.001",
+        "height": 1060009,
+        "id": "AkM4bQ5dVkqWezSgMPdW5iieX98xDsiFjVDbEddntGNv",
+        "proofs": Array [
+          "2BFgwFEUwDYmCPdUbrX3W4QdPrcDX4ai6tmrY2ab4NgEg9aikUo7RzqHUsgBd5kBpFScxsLQWpE29k9cLPdF5YEt",
+        ],
+        "sender": "3PLZcCJyYQnfWfzhKXRA4rteCQC9J1ewf5K",
+        "senderPublicKey": "BQMVwAHwf2WEEwRsCxtMVcSLrXUhJ3XtCLmSptLx2e6L",
+        "timestamp": 2018-06-28T02:12:41.449Z,
+        "type": 12,
+        "version": 1,
+      },
+    },
+    Object {
+      "__type": "transaction",
+      "data": null,
+    },
+  ],
 }
 `;
 
@@ -505,6 +571,7 @@ Object {
     "name": "CORE",
     "quantity": "0.01",
     "reissuable": false,
+    "script": null,
     "sender": "3P7HKYe6HB8eK7uXxrztEYUSzZQyyYRnWHg",
     "senderPublicKey": "9ASL55YRs78rW5hjRAgjyWww7QqP99HwuB8dG6AqtnFm",
     "signature": "iN5XQwAAQN1ySVF7BwV8ash6sEW7b1zCH8XhYBDbqZwPMeZHQyvNJtjq46Q9VCDjPv4UV2rFCKvdyev35dTUKAX",
@@ -531,6 +598,7 @@ Object {
         "name": "CORE",
         "quantity": "0.01",
         "reissuable": false,
+        "script": null,
         "sender": "3P7HKYe6HB8eK7uXxrztEYUSzZQyyYRnWHg",
         "senderPublicKey": "9ASL55YRs78rW5hjRAgjyWww7QqP99HwuB8dG6AqtnFm",
         "signature": "iN5XQwAAQN1ySVF7BwV8ash6sEW7b1zCH8XhYBDbqZwPMeZHQyvNJtjq46Q9VCDjPv4UV2rFCKvdyev35dTUKAX",
@@ -551,6 +619,7 @@ Object {
         "name": "CoreMedia",
         "quantity": "0.01",
         "reissuable": false,
+        "script": null,
         "sender": "3P7HKYe6HB8eK7uXxrztEYUSzZQyyYRnWHg",
         "senderPublicKey": "9ASL55YRs78rW5hjRAgjyWww7QqP99HwuB8dG6AqtnFm",
         "signature": "MwtQXaycbwF3ZUQyZJ6f2viA7UEZx7esH8ysgc2WsLYtNKx7L7oPJ3XDLCSUebY96hfFqPYbEiWnE5gDJibf1YS",

@@ -5,9 +5,9 @@ export type ErrorMetaInfo = Record<string, unknown>;
 export type ErrorType = keyof AppErrorPattern<any>;
 
 export type ErrorInfo = {
-  error: Error;
-  type: ErrorType;
-  meta?: ErrorMetaInfo;
+  readonly error: Error;
+  readonly type: ErrorType;
+  readonly meta?: ErrorMetaInfo;
 };
 
 export type AppErrorPattern<C> = {
@@ -16,27 +16,32 @@ export type AppErrorPattern<C> = {
   Db: (e: ErrorInfo) => C;
 };
 
+const ensureError = (e: Error | string): Error =>
+  e instanceof Error ? e : new Error(e);
+
 const createErrorInfo = (
   type: ErrorType,
-  error: Error | string,
+  error: Error,
   meta?: ErrorMetaInfo
-) => {
-  const errInfo: ErrorInfo =
-    error instanceof Error
-      ? {
-          error,
-          type,
-        }
-      : {
-          error: new Error(error),
-          type,
-        };
-
-  if (meta) errInfo.meta = meta;
-  return errInfo;
+): ErrorInfo => {
+  if (typeof meta !== 'undefined')
+    return {
+      error,
+      type,
+      meta,
+    };
+  else
+    return {
+      error,
+      type,
+    };
 };
 
-export abstract class AppError implements Matchable {
+export abstract class AppError implements Matchable, ErrorInfo {
+  public abstract readonly type: ErrorInfo['type'];
+  public abstract readonly error: ErrorInfo['error'];
+  public abstract readonly meta: ErrorInfo['meta'];
+
   public abstract matchWith<C>(pattern: AppErrorPattern<C>): C;
 
   public static Db(error: Error | string, meta?: ErrorMetaInfo) {
@@ -51,43 +56,49 @@ export abstract class AppError implements Matchable {
 }
 
 export class ResolverError extends AppError {
-  public readonly type: string = 'ResolverError';
-  private readonly errorInfo: ErrorInfo;
+  public readonly type = 'Resolver';
+  public readonly error: ErrorInfo['error'];
+  public readonly meta: ErrorInfo['meta'];
 
   constructor(error: Error | string, meta?: ErrorMetaInfo) {
     super();
-    this.errorInfo = createErrorInfo('Resolver', error, meta);
+    this.error = ensureError(error);
+    this.meta = meta;
   }
 
   public matchWith<C>(pattern: AppErrorPattern<C>): C {
-    return pattern.Resolver(this.errorInfo);
+    return pattern.Resolver(createErrorInfo(this.type, this.error, this.meta));
   }
 }
 
 export class DbError extends AppError {
-  public readonly type: string = 'DbError';
-  private readonly errorInfo: ErrorInfo;
+  public readonly type = 'Db';
+  public readonly error: ErrorInfo['error'];
+  public readonly meta: ErrorInfo['meta'];
 
   constructor(error: Error | string, meta?: ErrorMetaInfo) {
     super();
-    this.errorInfo = createErrorInfo('Db', error, meta);
+    this.error = ensureError(error);
+    this.meta = meta;
   }
 
   public matchWith<C>(pattern: AppErrorPattern<C>): C {
-    return pattern.Db(this.errorInfo);
+    return pattern.Db(createErrorInfo(this.type, this.error, this.meta));
   }
 }
 
 export class ValidationError extends AppError {
-  public readonly type: string = 'ValidationError';
-  private readonly errorInfo: ErrorInfo;
+  public readonly type = 'Validation';
+  public readonly error: ErrorInfo['error'];
+  public readonly meta: ErrorInfo['meta'];
 
   constructor(error: Error | string, meta?: ErrorMetaInfo) {
     super();
-    this.errorInfo = createErrorInfo('Validation', error, meta);
+    this.error = ensureError(error);
+    this.meta = meta;
   }
 
   public matchWith<C>(pattern: AppErrorPattern<C>): C {
-    return pattern.Validation(this.errorInfo);
+    return pattern.Validation(createErrorInfo(this.type, this.error, this.meta));
   }
 }
