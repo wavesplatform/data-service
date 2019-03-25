@@ -124,7 +124,7 @@ const mget = ids =>
 module.exports = {
   get: id => mget([id]),
   mget,
-  search: ({ ticker, phrase, params: { after, limit } }) => {
+  search: ({ ticker, search, after, limit }) => {
     const filter = q => {
       if (ticker === '*') return q.whereNotNull('ticker');
       else return q.where('ticker', ticker);
@@ -135,13 +135,13 @@ module.exports = {
         q => q.toString(),
         filter
       )(pg('assets').select(columns));
-    } else if (typeof phrase !== 'undefined') {
+    } else if (typeof search !== 'undefined') {
       return compose(
         q => q.toString(),
         q => (limit ? q.clone().limit(limit) : q),
         q => (after ? q.clone().where('rn', '>', getAssetIndex(after)) : q),
         searchAssets
-      )(phrase);
+      )(search);
     }
   },
 };
