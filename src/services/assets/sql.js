@@ -112,7 +112,8 @@ const searchAssets = query =>
     })
     .from('assets_cte')
     .select(columns.map(col => 'a.' + col))
-    .innerJoin({ a: 'assets' }, 'assets_cte.asset_id', 'a.asset_id');
+    .innerJoin({ a: 'assets' }, 'assets_cte.asset_id', 'a.asset_id')
+    .orderBy('rn', 'asc');
 
 const mget = ids =>
   pg('assets')
@@ -123,7 +124,7 @@ const mget = ids =>
 module.exports = {
   get: id => mget([id]),
   mget,
-  search: ({ ticker, phrase, after, limit }) => {
+  search: ({ ticker, phrase, params: { after, limit } }) => {
     const filter = q => {
       if (ticker === '*') return q.whereNotNull('ticker');
       else return q.where('ticker', ticker);
