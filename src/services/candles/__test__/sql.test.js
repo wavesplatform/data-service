@@ -1,5 +1,6 @@
+// @todo to typescript
 const { interval } = require('../../../types');
-const { highestDividerLessThen, periodToQueries, sql } = require('../sql');
+const { highestDividerLessThen, periodToQueries, sql } = require('../sql/sql');
 
 describe('candles sql helper functions', () => {
   it('highest divider less then', () => {

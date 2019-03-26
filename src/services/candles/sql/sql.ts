@@ -1,3 +1,5 @@
+import { Interval } from '../../../types';
+
 const {
   compose,
   find,
@@ -15,7 +17,7 @@ const {
 const { add, trunc } = require('../../utils/date');
 const pg = require('knex')({ client: 'pg' });
 
-const fields = [
+const FIELDS = [
   'time_start',
   'amount_asset_id',
   'price_asset_id',
@@ -31,14 +33,16 @@ const fields = [
   'interval_in_secs',
 ];
 
-const fieldsWithDecimals = [
-  ...fields,
+const FIELDS_WITH_DECIMALS = [
+  ...FIELDS,
   { a_dec: 'a_dec.decimals' },
   { p_dec: 'p_dec.decimals' },
 ];
 
-/** highestDividerLessThen :: Interval i => i -> String[] -> i */
-const highestDividerLessThen = (inter, dividers) =>
+const DIVIDERS = ['1m', '5m', '15m', '30m', '1h', '3h', '6h', '12h', '1d'];
+
+/** highestDividerLessThan :: Interval i => (Interval i, String[]) -> i */
+export const highestDividerLessThan = (inter: Interval, dividers: string[]) =>
   compose(
     findLast(i => div(inter, i) >= 1),
     sortBy(prop('length')),
@@ -46,36 +50,59 @@ const highestDividerLessThen = (inter, dividers) =>
   )(dividers);
 
 /** selectCandles :: { amountAsset: String, priceAsset: String, timeStart: Date, timeEnd: Date, interval: String } -> knex.QueryBuilder */
-const selectCandles = ({
+export const selectCandles = ({
   amountAsset,
   priceAsset,
   timeStart,
   timeEnd,
   interval: inter,
+}: {
+  amountAsset: string;
+  priceAsset: string;
+  timeStart: Date;
+  timeEnd: Date;
+  interval: string;
 }) =>
   pg('candles')
-    .select(fields)
+    .select(FIELDS)
     .where('amount_asset_id', amountAsset)
     .where('price_asset_id', priceAsset)
     .where('time_start', '>=', timeStart)
     .where('time_start', '<=', timeEnd)
     .where(
       'interval_in_secs',
-      highestDividerLessThen(interval(inter).getOrElse(null), [
-        '1m',
-        '5m',
-        '15m',
-        '30m',
-        '1h',
-        '3h',
-        '6h',
-        '12h',
-        '1d',
-      ]).length / 1000
+      highestDividerLessThan(interval(inter).getOrElse(null), DIVIDERS).length /
+        1000
     );
 
+// @todo test
+/**
+ * Composes sum using a polynom with additives from given units array
+ * Uses a greedy algorithm
+ * @param sum
+ * @param units is sorted asc
+ */
+export const numberToUnitsPolynom = (
+  units: number[],
+  sum: number
+): number[][] => {
+  const [_, result] = units.reduce<[number, number[][]]>(
+    ([remaining, result], unit) => {
+      const k = Math.floor(remaining / unit);
+      if (k > 0) {
+        return [remaining - k * unit, [...result, [unit, k]]];
+      } else {
+        return [remaining, result];
+      }
+    },
+    [sum, [[]]]
+  );
+  return result;
+};
+
+// @todo refactor
 /** periodToQueries :: { amountAsset: String, priceAsset: String, timeStart: Date, period: String, dividers: [String] } -> [knex.QueryBuilder] */
-const periodToQueries = ({
+export const periodToQueries = ({
   amountAsset,
   priceAsset,
   timeStart,
@@ -84,11 +111,7 @@ const periodToQueries = ({
 }) => {
   const queries = [];
 
-  let periodInterval = interval(period).getOrElse(null);
-
-  if (!periodInterval) {
-    return queries;
-  }
+  let periodInterval = interval(period).unsafeGet();
 
   let itTimestamp = new Date(trunc(Unit.Minute, timeStart)).getTime();
   const endTimestamp = new Date(
@@ -137,17 +160,20 @@ const periodToQueries = ({
 };
 
 /** sql :: { String, String, { timeStart: Date, timeEnd: Date, interval: String } } -> String */
-const sql = ({ amountAsset, priceAsset, params }) => {
-  const paramsInterval = interval(params.interval).getOrElse(null);
+export const sql = ({ amountAsset, priceAsset, params }) => {
+  // should always be valid after validation
+  const paramsInterval = interval(params.interval).unsafeGet();
 
-  const ts = new Date(trunc(paramsInterval.unit, params.timeEnd));
-  const te = new Date(trunc(Unit.Minute, params.timeEnd));
-
-  const p = intervalFromMillisecs(te.getTime() - ts.getTime()).getOrElse('')
-    .source;
+  const p = interval(params.interval)
+    .chain(i => {
+      const ts = new Date(trunc(i.unit, params.timeEnd));
+      const te = new Date(trunc(Unit.Minute, params.timeEnd));
+      return intervalFromMillisecs(te - ts);
+    })
+    .map(i => i.source);
 
   return pg('candles')
-    .select(fieldsWithDecimals)
+    .select(FIELDS_WITH_DECIMALS)
     .from(
       selectCandles({
         amountAsset,
@@ -182,14 +208,14 @@ const sql = ({ amountAsset, priceAsset, params }) => {
 };
 
 /** sql :: String -> String */
-const assetDecimals = asset =>
+export const assetDecimals = asset =>
   pg('asset_decimals')
     .select('decimals')
     .where('asset_id', asset)
     .toString();
 
 module.exports = {
-  highestDividerLessThen,
+  highestDividerLessThan,
   assetDecimals,
   periodToQueries,
   sql,
