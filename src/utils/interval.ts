@@ -5,11 +5,11 @@ import { Interval, units, parseUnit } from '../types/interval';
 
 export const div = (a: Interval, b: Interval): number => a.length / b.length;
 
-/** fromMillisecs :: number -> Result<ValidationError, Interval>  */
-export const fromMillisecs = (
-  millisecs: number
+/** fromMilliseconds :: number -> Result<ValidationError, Interval>  */
+export const fromMilliseconds = (
+  milliseconds: number
 ): Result<ValidationError, Interval> => {
-  const secs = millisecs / 1000;
+  const secs = milliseconds / 1000;
 
   const unitsValues = values(units);
   let unitIndex = findLastIndex((x: number) => x >= secs && secs % x == 0)(
@@ -27,13 +27,13 @@ export const fromMillisecs = (
       // whether length is integer
       if (length % 1 === 0) {
         return ok({
-          length: millisecs,
+          length: milliseconds,
           unit,
           source: `${length}${unit}`,
         });
       } else {
         return error(
-          new ValidationError('Provided millisecs number is not a valid number')
+          new ValidationError('Provided milliseconds number is not a valid number')
         );
       }
     },

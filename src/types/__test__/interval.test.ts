@@ -1,5 +1,5 @@
 import { interval } from '../interval';
-import { div, fromMillisecs } from '../../utils/interval';
+import { div, fromMilliseconds } from '../../utils/interval';
 
 describe('Interval', () => {
   const i = interval('180s');
@@ -35,9 +35,9 @@ describe('Interval', () => {
     });
   });
 
-  describe('fromMillisecs method', () => {
+  describe('fromMilliseconds method', () => {
     it('should return Result.Ok if correct args are given', () => {
-      const i = fromMillisecs(900000);
+      const i = fromMilliseconds(900000);
       expect(
         i.matchWith({
           Error: () => null,
@@ -47,7 +47,7 @@ describe('Interval', () => {
     });
 
     it('should return Result.Ok if correct args are given', () => {
-      const i = fromMillisecs(3196800000);
+      const i = fromMilliseconds(3196800000);
       expect(
         i.matchWith({
           Error: () => null,
@@ -57,7 +57,7 @@ describe('Interval', () => {
     });
 
     it('should return Result.Ok if correct args are given', () => {
-      const i = fromMillisecs(1960588800000);
+      const i = fromMilliseconds(1960588800000);
       expect(
         i.matchWith({
           Error: () => null,
@@ -67,7 +67,7 @@ describe('Interval', () => {
     });
 
     it('should return Result.Error if wrong args are given', () => {
-      const i = fromMillisecs(2500).getOrElse(null);
+      const i = fromMilliseconds(2500).getOrElse(null);
       expect(i).toBe(null);
     });
   });
