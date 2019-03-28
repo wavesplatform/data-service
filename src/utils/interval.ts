@@ -1,7 +1,7 @@
 import { Result, Ok as ok, Error as error } from 'folktale/result';
 import { ValidationError } from '../errorHandling';
-import { findLastIndex, values } from 'ramda';
-import { Interval, units, parseUnit } from '../types/interval';
+import { compose, findLastIndex, memoizeWith, reverse, values } from 'ramda';
+import { Interval, interval, units, parseUnit } from '../types/interval';
 
 export const div = (a: Interval, b: Interval): number => a.length / b.length;
 
@@ -33,10 +33,20 @@ export const fromMilliseconds = (
         });
       } else {
         return error(
-          new ValidationError('Provided milliseconds number is not a valid number')
+          new ValidationError(
+            'Provided milliseconds number is not a valid number'
+          )
         );
       }
     },
     Error: ({ value: e }) => error(e),
   });
 };
+
+export const unsafeIntervalsFromStrings = (strings: string[]): Interval[] =>
+  strings.map(str => interval(str).unsafeGet());
+
+export const unsafeIntervalsFromStringsReversed = memoizeWith(
+  reverse,
+  unsafeIntervalsFromStrings
+);

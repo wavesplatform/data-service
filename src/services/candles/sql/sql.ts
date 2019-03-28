@@ -1,9 +1,12 @@
-import { QueryBuilder } from 'knex';
 import * as knex from 'knex';
 import { repeat } from 'ramda';
 import { Interval, Unit, interval } from '../../../types';
 import { add, trunc } from '../../../utils/date';
-import { fromMilliseconds } from '../../../utils/interval';
+import {
+  fromMilliseconds,
+  unsafeIntervalsFromStrings,
+  unsafeIntervalsFromStringsReversed,
+} from '../../../utils/interval';
 import { highestDividerLessThan, numberToUnitsPolynom } from './utils';
 
 const pg = knex({ client: 'pg' });
@@ -24,7 +27,7 @@ const FIELDS = [
   'interval_in_secs',
 ];
 
-const FIELDS_WITH_DECIMALS: (string | Record<string, string>)[] = [
+const FIELDS_WITH_DECIMALS: knex.ColumnName[] = [
   ...FIELDS,
   { a_dec: 'a_dec.decimals' },
   { p_dec: 'p_dec.decimals' },
@@ -32,7 +35,6 @@ const FIELDS_WITH_DECIMALS: (string | Record<string, string>)[] = [
 
 const DIVIDERS = ['1m', '5m', '15m', '30m', '1h', '3h', '6h', '12h', '1d'];
 
-/** selectCandles :: { amountAsset: string, priceAsset: string, timeStart: Date, timeEnd: Date, interval: string } -> knex.QueryBuilder */
 export const selectCandles = ({
   amountAsset,
   priceAsset,
@@ -45,7 +47,7 @@ export const selectCandles = ({
   timeStart: Date;
   timeEnd: Date;
   interval: string;
-}): QueryBuilder =>
+}): knex.QueryBuilder =>
   pg('candles')
     .select(FIELDS)
     .where('amount_asset_id', amountAsset)
@@ -55,11 +57,15 @@ export const selectCandles = ({
     .where(
       'interval_in_secs',
       // should always be valid after validation
-      highestDividerLessThan(interval(inter).unsafeGet(), DIVIDERS).length /
-        1000
+      highestDividerLessThan(
+        interval(inter).unsafeGet(),
+        unsafeIntervalsFromStrings(DIVIDERS)
+      ).matchWith({
+        Ok: ({ value: i }) => i.length / 1000,
+        Error: ({ value: error }) => interval('1m').unsafeGet().length / 1000,
+      })
     );
 
-/** periodsToQueries :: { amountAsset: string, priceAsset: string, timeStart: Date, periods: Interval[] } -> QueryBuilder[] */
 export const periodsToQueries = ({
   amountAsset,
   priceAsset,
@@ -70,12 +76,12 @@ export const periodsToQueries = ({
   priceAsset: string;
   timeStart: Date;
   periods: Interval[];
-}): any[] => {
-  const queries: QueryBuilder[] = [];
+}): knex.QueryBuilder[] => {
+  const queries: knex.QueryBuilder[] = [];
 
   let itTimestamp = new Date(trunc(Unit.Minute, timeStart)).getTime();
-  
-  periods.map(period => {
+
+  periods.forEach(period => {
     const timeEnd = add(period, new Date(itTimestamp));
 
     queries.push(
@@ -94,7 +100,6 @@ export const periodsToQueries = ({
   return queries;
 };
 
-/** sql :: { string, string, { timeStart: Date, timeEnd: Date, interval: string } } -> string */
 export const sql = ({
   amountAsset,
   priceAsset,
@@ -107,17 +112,17 @@ export const sql = ({
     timeEnd: Date;
     interval: string;
   };
-}) => {
+}): string => {
   // should always be valid after validation
   const paramsInterval = interval(inter).unsafeGet();
 
   const ts = new Date(trunc(paramsInterval.unit, timeEnd));
   const te = new Date(trunc(Unit.Minute, timeEnd));
   const periodInMinutes = (te.getTime() - ts.getTime()) / (1000 * 60);
-  
+
   const periodsForQueries = numberToUnitsPolynom(
-    DIVIDERS.map(d => interval(d).unsafeGet().length / (1000 * 60)).sort(
-      (a, b) => b - a
+    unsafeIntervalsFromStringsReversed(DIVIDERS).map(
+      i => i.length / (1000 * 60)
     ),
     periodInMinutes
   ).reduce<Interval[]>((periods, polynom) => {
@@ -129,7 +134,7 @@ export const sql = ({
       ),
     ];
   }, []);
-  
+
   return pg('candles')
     .select(FIELDS_WITH_DECIMALS)
     .from(
@@ -164,8 +169,7 @@ export const sql = ({
     .toString();
 };
 
-/** sql :: string -> string */
-export const assetDecimals = (asset: string) =>
+export const assetDecimals = (asset: string): string =>
   pg('asset_decimals')
     .select('decimals')
     .where('asset_id', asset)

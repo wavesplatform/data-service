@@ -1,6 +1,6 @@
 import { QueryBuilder } from 'knex';
-import { interval } from '../../../../types';
-const { periodsToQueries, sql } = require('../sql');
+import { unsafeIntervalsFromStrings } from '../../../../utils/interval';
+import { periodsToQueries, sql } from '../sql';
 
 describe('sql queries from period', () => {
   it('should return empty array', () => {
@@ -19,12 +19,13 @@ describe('sql queries from period', () => {
       amountAsset: '111',
       priceAsset: '222',
       timeStart: new Date('2019-03-25T00:00:00.000Z'),
-      periods: ['30m', '5m', '1m'].map(inter => interval(inter).unsafeGet()),
+      periods: unsafeIntervalsFromStrings(['30m', '5m', '1m']),
     });
     expect(periodQueries.length).toBe(3);
     expect(
       periodQueries.reduce(
-        (sql: string, q: QueryBuilder) => `${sql} UNION ${q.toString()}`
+        (sql: string, q: QueryBuilder) => `${sql} UNION ${q.toString()}`,
+        ''
       )
     ).toMatchSnapshot();
   });
@@ -34,14 +35,13 @@ describe('sql queries from period', () => {
       amountAsset: '111',
       priceAsset: '222',
       timeStart: new Date('2019-03-25T00:00:00.000Z'),
-      periods: ['30m', '15m', '1m', '1m', '1m'].map(inter =>
-        interval(inter).unsafeGet()
-      ),
+      periods: unsafeIntervalsFromStrings(['30m', '15m', '1m', '1m', '1m']),
     });
     expect(periodQueries.length).toBe(5);
     expect(
       periodQueries.reduce(
-        (sql: string, q: QueryBuilder) => `${sql} UNION ${q.toString()}`
+        (sql: string, q: QueryBuilder) => `${sql} UNION ${q.toString()}`,
+        ''
       )
     ).toMatchSnapshot();
   });

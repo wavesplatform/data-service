@@ -1,15 +1,16 @@
-import { Interval, interval } from '../../../types';
+import { findLast } from 'ramda';
+import { Result, Ok as ok, Error as error } from 'folktale/result';
+import { Interval } from '../../../types';
 import { div } from '../../../utils/interval';
-const { compose, findLast, map, prop, sortBy, tail } = require('ramda');
+import { ValidationError } from 'errorHandling';
 
-/** highestDividerLessThan :: Interval i => (Interval i, string[]) -> i */
-export const highestDividerLessThan = (inter: Interval, dividers: string[]) =>
-  compose(
-    findLast((i: Interval) => div(inter, i) >= 1),
-    sortBy(prop('length')),
-    // should always be valid cause its constants
-    map((d: string) => interval(d).unsafeGet())
-  )(dividers);
+export const highestDividerLessThan = (
+  inter: Interval,
+  dividers: Interval[]
+): Result<ValidationError, Interval> => {
+  const i = findLast((i: Interval) => div(inter, i) >= 1, dividers);
+  return i ? ok(i) : error(new ValidationError('Divider not found'));
+};
 
 /**
  * Composes sum using a polynom with additives from given units array
@@ -30,8 +31,8 @@ export const numberToUnitsPolynom = (
         return [remaining, result];
       }
     },
-    [sum, [[]]]
+    [sum, []]
   );
 
-  return tail(result);
+  return result;
 };
