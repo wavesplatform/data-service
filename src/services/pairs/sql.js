@@ -11,12 +11,13 @@ const query = pairs =>
     .toString();
 
 /** search :: Object -> String */
-const search = ({ limit }) =>
+const search = ({ limit }) => {
   pg({ t: 'pairs' })
     .select('*')
     .orderByRaw('t.volume_waves desc NULLS LAST')
     .limit(limit)
     .toString();
+};
 
 module.exports = {
   /** get :: Object -> String */

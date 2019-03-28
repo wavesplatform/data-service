@@ -40,6 +40,7 @@ const pairsMany = createManyMiddleware(
           Maybe.fromNullable,
           parseArrayQuery
         )(x),
+      search: x => x,
       limit,
     },
     mgetFilterName: 'pairs',

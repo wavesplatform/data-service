@@ -14,6 +14,7 @@ const inputGet = Joi.object().keys({
 const inputMget = Joi.array().items(inputGet);
 
 const inputSearch = Joi.object().keys({
+  search: Joi.string(),
   limit: Joi.number()
     .min(1)
     .max(limitMaximum),
