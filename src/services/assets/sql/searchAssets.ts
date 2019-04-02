@@ -21,8 +21,9 @@ const searchById = (q: string) =>
     .leftJoin({ ti: 'tickers' }, 't.asset_id', 'ti.asset_id')
     .where('t.asset_id', q);
 
-const searchByNameInMeta = (q: string) =>
-  pg('assets_metadata')
+const searchByNameInMeta = (qb: knex.QueryBuilder, q: string) =>
+  qb
+    .table('assets_metadata')
     .columns([
       'asset_id',
       'asset_name',
@@ -36,8 +37,9 @@ const searchByNameInMeta = (q: string) =>
     ])
     .where('asset_name', 'like', `${q}%`);
 
-const searchByTicker = (q: string) =>
-  pg({ ti: 'tickers' })
+const searchByTicker = (qb: knex.QueryBuilder, q: string) =>
+  qb
+    .table({ ti: 'tickers' })
     .columns({
       asset_id: 'ti.asset_id',
       asset_name: 't.asset_name',
@@ -52,8 +54,9 @@ const searchByTicker = (q: string) =>
     .leftJoin({ t: 'txs_3' }, 'ti.asset_id', 't.asset_id')
     .where('ticker', 'like', `${q}%`);
 
-const searchByName = (q: string) =>
-  pg({ t: 'txs_3' })
+const searchByName = (qb: knex.QueryBuilder, q: string) =>
+  qb
+    .table({ t: 'txs_3' })
     .columns({
       asset_id: 't.asset_id',
       asset_name: 't.asset_name',
@@ -86,9 +89,9 @@ export const searchAssets = (query: string) =>
         },
       ]).from({
         r: searchById(query)
-          .unionAll(() => searchByNameInMeta(query))
-          .unionAll(() => searchByTicker(query))
-          .unionAll(() => searchByName(query)),
+          .unionAll(qb => searchByNameInMeta(qb, query))
+          .unionAll(qb => searchByTicker(qb, query))
+          .unionAll(qb => searchByName(qb, query)),
       });
     })
     .from('assets_cte')

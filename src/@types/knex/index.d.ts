@@ -1,4 +1,4 @@
-import { QueryBuilder, Raw } from 'knex';
+import { QueryBuilder, Raw, QueryCallback } from 'knex';
 
 declare module 'knex' {
   type Column = string | Raw | QueryBuilder;
@@ -13,5 +13,9 @@ declare module 'knex' {
   interface Select {
     (aliases: ColumnName[]): QueryBuilder;
     (...aliases: ColumnName[]): QueryBuilder;
+  }
+
+  interface Join {
+    (qb: QueryCallback): QueryBuilder;
   }
 }

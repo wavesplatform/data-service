@@ -114,6 +114,7 @@ describe('Pairs', () => {
     it('should return Pairs correctly', async () => {
       const result = await service
         .search({
+          search: 'WAVES/BTC',
           limit: 2,
         })
         .run()
