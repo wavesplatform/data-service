@@ -10,6 +10,15 @@ const precisions: Record<Unit, number> = {
   [Unit.Second]: 19,
 };
 
+const suffixes: Record<Unit, string> = {
+  [Unit.Year]: '-01-01T00:00:00.000Z',
+  [Unit.Month]: '-01T00:00:00.000Z',
+  [Unit.Day]: 'T00:00:00.000Z',
+  [Unit.Hour]: ':00:00.000Z',
+  [Unit.Minute]: ':00.000Z',
+  [Unit.Second]: 'Z',
+};
+
 const units = [
   Unit.Year,
   Unit.Month,
@@ -68,7 +77,7 @@ const roundTo = curry(
 
 export const trunc = curry(
   (unit: Unit, date: Date): string => {
-    return date.toISOString().substr(0, precisions[unit]);
+    return date.toISOString().substr(0, precisions[unit]) + suffixes[unit];
   }
 );
 

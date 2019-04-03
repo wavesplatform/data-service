@@ -32,15 +32,15 @@ const transformCandle = ([time, c]) => {
     txs_count: 'txsCount',
     time_start: 'time',
   });
-
+  
   return compose(
     candle,
     omit(['a_dec', 'p_dec']),
     renameFields,
-    assoc('time_start', new Date(`${time}Z`)),
+    assoc('time_start', time),
     assoc('txs_count', c.txs_count),
     ifElse(isEmpty, map(always(null)), identity)
-  )(c);
+  )(c)
 };
 
 /** addMissingCandles :: Interval -> Date -> Date
@@ -50,10 +50,10 @@ const addMissingCandles = curryN(
   (interval, timeStart, timeEnd, candlesGroupedByTime) => {
     const end = timeEnd;
     const res = clone(candlesGroupedByTime);
-
+    
     for (
       let it = ceil(interval, timeStart);
-      it <= end;
+      it < end;
       it = floor(interval, add(interval, it))
     ) {
       const cur = truncToMinutes(it);
@@ -62,7 +62,7 @@ const addMissingCandles = curryN(
         res[cur] = [];
       }
     }
-
+    
     return res;
   }
 );

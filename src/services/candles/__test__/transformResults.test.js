@@ -11,8 +11,8 @@ const oneDayCandles = require('./mocks/oneDayCandles');
 const monthCandles = require('./mocks/monthCandles');
 const yearCandles = require('./mocks/yearCandles');
 
-const date1 = new Date('2018-11-01T00:00:00+03:00'),
-  date2 = new Date('2018-12-01T00:00:00+03:00');
+const date1 = new Date('2018-11-01T00:00:00.000Z'),
+  date2 = new Date('2018-12-01T00:00:00.000Z');
 
 const day = interval('1d').unsafeGet(),
   minute = interval('1m').unsafeGet(),
@@ -33,7 +33,7 @@ describe('add missing candles', () => {
           addMissing1mCandles(date1, date2),
           toPairs
         )(oneDayCandles).length
-      ).toBe(43201);
+      ).toBe(43200);
     });
     it('should add empty candles for period with 1 candle at each day', () => {
       expect(
@@ -44,7 +44,7 @@ describe('add missing candles', () => {
           addMissing1mCandles(date1, date2),
           toPairs
         )(monthCandles).length
-      ).toBe(43201);
+      ).toBe(43200);
     });
   });
 

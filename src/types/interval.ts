@@ -11,7 +11,7 @@ export enum Unit {
   Year = 'Y',
 }
 
-const units: Record<Unit, number> = {
+export const units: Record<Unit, number> = {
   [Unit.Second]: 1,
   [Unit.Minute]: 60,
   [Unit.Hour]: 60 * 60,
@@ -20,7 +20,7 @@ const units: Record<Unit, number> = {
   [Unit.Year]: 60 * 60 * 24 * 31 * 366,
 };
 
-const parseUnit = (s: string): Result<ValidationError, Unit> => {
+export const parseUnit = (s: string): Result<ValidationError, Unit> => {
   switch (s.substr(-1)) {
     case Unit.Second:
       return ok(Unit.Second);
