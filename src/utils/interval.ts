@@ -1,11 +1,10 @@
 import { Result, Ok as ok, Error as error } from 'folktale/result';
 import { ValidationError } from '../errorHandling';
-import { compose, findLastIndex, memoizeWith, reverse, values } from 'ramda';
+import { findLastIndex, memoizeWith, reverse, values } from 'ramda';
 import { Interval, interval, units, parseUnit } from '../types/interval';
 
 export const div = (a: Interval, b: Interval): number => a.length / b.length;
 
-/** fromMilliseconds :: number -> Result<ValidationError, Interval>  */
 export const fromMilliseconds = (
   milliseconds: number
 ): Result<ValidationError, Interval> => {
