@@ -17,8 +17,7 @@ const COLUMNS = [
   'volume_waves',
 ];
 
-/** query :: Array[Object] -> String */
-const query = (pairs: { amountAsset: string; priceAsset: string }[]) =>
+const query = (pairs: { amountAsset: string; priceAsset: string }[]): string =>
   pg({ t: 'pairs' })
     .select(COLUMNS)
     .whereIn(
@@ -44,8 +43,10 @@ const searchAssets = (
         .join(' & ')}${exactly ? '' : ':*'}')`
     );
 
-export const get = (pair: { amountAsset: string; priceAsset: string }) =>
-  query([pair]);
+export const get = (pair: {
+  amountAsset: string;
+  priceAsset: string;
+}): string => query([pair]);
 export const mget = query;
 export const search = ({
   search,
@@ -53,10 +54,10 @@ export const search = ({
 }: {
   search: string;
   limit: number;
-}) => {
+}): string => {
   // asset - fuzzy search of amount or price assets
   // asset/ - exact search amount or price assets
-  // /asset - same as asset/
+  // /asset - same as asset
   // asset1/asset2 - exact search of amount asset by asset1
   //                 and fuzzy search of price asset by asset2
   //                 or amount asset by asset2 and price asset by asset1

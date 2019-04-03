@@ -75,7 +75,7 @@ const searchByName = (qb: knex.QueryBuilder, q: string) =>
       `searchable_asset_name @@ to_tsquery('${q.split(' ').join(' & ')}:*')`
     );
 
-export const searchAssets = (query: string) =>
+export const searchAssets = (query: string): knex.QueryBuilder =>
   pg
     .with('assets_cte', qb => {
       qb.columns([
