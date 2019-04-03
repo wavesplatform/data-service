@@ -26,21 +26,16 @@ const query = (pairs: { amountAsset: string; priceAsset: string }[]): string =>
     )
     .toString();
 
-const searchAssets = (
-  qb: knex.QueryBuilder,
-  query: string,
-  exactly: boolean,
-  t: string = 't'
-) =>
+const searchAssets = (qb: knex.QueryBuilder, query: string, t: string = 't') =>
   qb
     .table({ [t]: 'assets' })
     .where(`${t}.asset_id`, query)
-    .orWhere(`${t}.asset_name`, 'like', `${query}${exactly ? '' : '%'}`)
-    .orWhere(`${t}.ticker`, 'like', `${query}${exactly ? '' : '%'}`)
+    .orWhere(`${t}.asset_name`, 'like', `${query}%`)
+    .orWhere(`${t}.ticker`, 'like', `${query}%`)
     .orWhereRaw(
       `to_tsvector(${t}.asset_name) @@ to_tsquery('${query
         .split(' ')
-        .join(' & ')}${exactly ? '' : ':*'}')`
+        .join(' & ')}:*')`
     );
 
 export const get = (pair: {
@@ -55,11 +50,9 @@ export const search = ({
   search: string;
   limit: number;
 }): string => {
-  // asset - fuzzy search of amount or price assets
-  // asset/ - exact search amount or price assets
-  // /asset - same as asset
-  // asset1/asset2 - exact search of amount asset by asset1
-  //                 and fuzzy search of price asset by asset2
+  // asset - prefix search of amount or price assets
+  // asset1/asset2 - prefix search of amount asset by asset1
+  //                 and prefix search of price asset by asset2
   //                 or amount asset by asset2 and price asset by asset1
   const [asset1, priceAsset] = search.split('/');
   const amountAsset = !asset1.length ? priceAsset : asset1;
@@ -75,10 +68,8 @@ export const search = ({
       priceAsset
         ? q
             .with('assets_cte', (qb: knex.QueryBuilder) =>
-              searchAssets(qb, amountAsset, true, 'a')
-                .crossJoin(qb =>
-                  searchAssets(qb, priceAsset, false, 'p').as('cj')
-                )
+              searchAssets(qb, amountAsset, 'a')
+                .crossJoin(qb => searchAssets(qb, priceAsset, 'p').as('cj'))
                 .select([
                   { amount_asset_id: 'a.asset_id' },
                   { price_asset_id: 'cj.asset_id' },
@@ -105,7 +96,7 @@ export const search = ({
             )
         : q
             .with('assets_cte', (qb: knex.QueryBuilder) =>
-              searchAssets(qb, amountAsset, typeof priceAsset !== 'undefined')
+              searchAssets(qb, amountAsset)
             )
             .innerJoin(
               { amountCte: 'assets_cte' },
