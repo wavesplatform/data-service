@@ -28,7 +28,7 @@ describe('sql query from pairs', () => {
   it('should search pairs for one asset', () => {
     expect(
       search({
-        search: '7FJhS4wyEKqsp77VCMfCZWKLSMuy1TWskYAyZ28amWFj',
+        search_by_asset: '7FJhS4wyEKqsp77VCMfCZWKLSMuy1TWskYAyZ28amWFj',
         limit: 10,
       })
     ).toMatchSnapshot();
@@ -37,13 +37,42 @@ describe('sql query from pairs', () => {
   it('should search pairs for one asset exactly', () => {
     expect(
       search({
-        search: '7FJhS4wyEKqsp77VCMfCZWKLSMuy1TWskYAyZ28amWFj/',
+        search_by_asset: '7FJhS4wyEKqsp77VCMfCZWKLSMuy1TWskYAyZ28amWFj',
+        match_exactly: true,
+        limit: 10,
+      })
+    ).toMatchSnapshot();
+  });
+
+  it('should search pairs for one asset exactly', () => {
+    expect(
+      search({
+        search_by_asset: '¯\\_(ツ)_/¯',
+        match_exactly: true,
         limit: 10,
       })
     ).toMatchSnapshot();
   });
 
   it('should search pairs for two assets (amount and price)', () => {
-    expect(search({ search: 'BTC/WAVES', limit: 10 })).toMatchSnapshot();
+    expect(
+      search({ search_by_assets: ['BTC', 'WAVES'], limit: 10 })
+    ).toMatchSnapshot();
+  });
+
+  it('should search pairs for two assets (amount and price)', () => {
+    expect(
+      search({ search_by_assets: ['¯\\_(ツ)_/¯', 'WAVES'], limit: 10 })
+    ).toMatchSnapshot();
+  });
+
+  it('should search pairs for two assets (amount and price)', () => {
+    expect(
+      search({
+        search_by_assets: ['¯\\_(ツ)_/¯', 'WAVES'],
+        match_exactly: [true, false],
+        limit: 10,
+      })
+    ).toMatchSnapshot();
   });
 });

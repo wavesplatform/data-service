@@ -13,6 +13,7 @@ module.exports = rawJoi
     language: {
       base58: 'must be a valid base58 string',
       cursor: 'must be a valid cursor string',
+      pair: 'must be a valid pair string',
       period: {
         value: 'must be a valid interval value',
         accept: 'must be in accepted',

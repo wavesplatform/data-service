@@ -17,6 +17,33 @@ const COLUMNS = [
   'volume_waves',
 ];
 
+type SearchByAssetRequest = {
+  search_by_asset: string;
+  match_exactly?: boolean;
+  limit: number;
+};
+
+type SearchByAssetsRequest = {
+  search_by_assets: [string, string];
+  match_exactly?: [boolean, boolean];
+  limit: number;
+};
+
+const isSearchByAssetRequest = (
+  searchByAssetRequest: SearchByAssetRequest | object
+): searchByAssetRequest is SearchByAssetRequest => {
+  return (
+    Object.keys(searchByAssetRequest).find(key => key === 'search_by_asset') !==
+    undefined
+  );
+};
+
+const isMatchExactlyArray = (
+  matchExactly: boolean | boolean[]
+): matchExactly is Array<boolean> => {
+  return Array.isArray(matchExactly);
+};
+
 const query = (pairs: { amountAsset: string; priceAsset: string }[]): string =>
   pg({ t: 'pairs' })
     .select(COLUMNS)
@@ -26,16 +53,22 @@ const query = (pairs: { amountAsset: string; priceAsset: string }[]): string =>
     )
     .toString();
 
-const searchAssets = (qb: knex.QueryBuilder, query: string, t: string = 't') =>
+const searchAssets = (
+  qb: knex.QueryBuilder,
+  query: string,
+  exactly: boolean,
+  t: string = 't'
+) =>
   qb
     .table({ [t]: 'assets' })
     .where(`${t}.asset_id`, query)
-    .orWhere(`${t}.asset_name`, 'like', `${query}%`)
-    .orWhere(`${t}.ticker`, 'like', `${query}%`)
+    .orWhere(`${t}.asset_name`, 'like', `${query}${exactly ? '' : '%'}`)
+    .orWhere(`${t}.ticker`, 'like', `${query}${exactly ? '' : '%'}`)
     .orWhereRaw(
       `to_tsvector(${t}.asset_name) @@ to_tsquery('${query
+        .replace(/[()]/g, '')
         .split(' ')
-        .join(' & ')}:*')`
+        .join(exactly ? ' & ' : ':* & ')}${exactly ? '' : ':*'}')`
     );
 
 export const get = (pair: {
@@ -43,19 +76,23 @@ export const get = (pair: {
   priceAsset: string;
 }): string => query([pair]);
 export const mget = query;
-export const search = ({
-  search,
-  limit,
-}: {
-  search: string;
-  limit: number;
-}): string => {
+export const search = (
+  req: SearchByAssetRequest | SearchByAssetsRequest
+): string => {
   // asset - prefix search of amount or price assets
   // asset1/asset2 - prefix search of amount asset by asset1
   //                 and prefix search of price asset by asset2
   //                 or amount asset by asset2 and price asset by asset1
-  const [asset1, priceAsset] = search.split('/');
-  const amountAsset = !asset1.length ? priceAsset : asset1;
+  const [amountAsset, priceAsset] = isSearchByAssetRequest(req)
+    ? [req.search_by_asset, undefined]
+    : req.search_by_assets;
+
+  const { match_exactly, limit } = req;
+  const [amountAssetExactly, priceAssetExaclty] = match_exactly
+    ? isMatchExactlyArray(match_exactly)
+      ? match_exactly
+      : [match_exactly, false]
+    : [false, false];
 
   const q = pg({ t: 'pairs' })
     .select(COLUMNS.map(column => `t.${column}`))
@@ -68,8 +105,10 @@ export const search = ({
       priceAsset
         ? q
             .with('assets_cte', (qb: knex.QueryBuilder) =>
-              searchAssets(qb, amountAsset, 'a')
-                .crossJoin(qb => searchAssets(qb, priceAsset, 'p').as('cj'))
+              searchAssets(qb, amountAsset, amountAssetExactly, 'a')
+                .crossJoin((qb: knex.QueryBuilder) =>
+                  searchAssets(qb, priceAsset, priceAssetExaclty, 'p').as('cj')
+                )
                 .select([
                   { amount_asset_id: 'a.asset_id' },
                   { price_asset_id: 'cj.asset_id' },
@@ -96,7 +135,7 @@ export const search = ({
             )
         : q
             .with('assets_cte', (qb: knex.QueryBuilder) =>
-              searchAssets(qb, amountAsset)
+              searchAssets(qb, amountAsset, amountAssetExactly)
             )
             .innerJoin(
               { amountCte: 'assets_cte' },
