@@ -1,4 +1,4 @@
-const { get, mget, search } = require('../sql');
+const { get, mget, search } = require('../');
 
 describe('Assets SQL queries tests', () => {
   it('should build correct get sql query', () => {

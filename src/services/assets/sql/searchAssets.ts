@@ -1,22 +1,9 @@
-const pg = require('knex')({ client: 'pg' });
-const { compose } = require('ramda');
+import * as knex from 'knex';
+import { columns } from './common';
 
-const columns = [
-  'asset_id',
-  'asset_name',
-  'description',
-  'sender',
-  'issue_height',
-  'total_quantity',
-  'decimals',
-  'reissuable',
-  'ticker',
-  'issue_timestamp',
-  'has_script',
-  'min_sponsored_asset_fee',
-];
+const pg = knex({ client: 'pg' });
 
-const searchById = q =>
+const searchById = (q: string) =>
   pg({ t: 'txs_3' })
     .columns({
       asset_id: 't.asset_id',
@@ -34,8 +21,9 @@ const searchById = q =>
     .leftJoin({ ti: 'tickers' }, 't.asset_id', 'ti.asset_id')
     .where('t.asset_id', q);
 
-const searchByNameInMeta = q =>
-  pg
+const searchByNameInMeta = (qb: knex.QueryBuilder, q: string) =>
+  qb
+    .table('assets_metadata')
     .columns([
       'asset_id',
       'asset_name',
@@ -47,11 +35,11 @@ const searchByNameInMeta = q =>
         ),
       },
     ])
-    .from('assets_metadata')
     .where('asset_name', 'like', `${q}%`);
 
-const searchByTicker = q =>
-  pg({ ti: 'tickers' })
+const searchByTicker = (qb: knex.QueryBuilder, q: string) =>
+  qb
+    .table({ ti: 'tickers' })
     .columns({
       asset_id: 'ti.asset_id',
       asset_name: 't.asset_name',
@@ -66,8 +54,9 @@ const searchByTicker = q =>
     .leftJoin({ t: 'txs_3' }, 'ti.asset_id', 't.asset_id')
     .where('ticker', 'like', `${q}%`);
 
-const searchByName = q =>
-  pg({ t: 'txs_3' })
+const searchByName = (qb: knex.QueryBuilder, q: string) =>
+  qb
+    .table({ t: 'txs_3' })
     .columns({
       asset_id: 't.asset_id',
       asset_name: 't.asset_name',
@@ -86,12 +75,7 @@ const searchByName = q =>
       `searchable_asset_name @@ to_tsquery('${q.split(' ').join(' & ')}:*')`
     );
 
-const getAssetIndex = asset_id =>
-  pg('assets_cte')
-    .column('rn')
-    .where('asset_id', asset_id);
-
-const searchAssets = query =>
+export const searchAssets = (query: string): knex.QueryBuilder =>
   pg
     .with('assets_cte', qb => {
       qb.columns([
@@ -105,43 +89,12 @@ const searchAssets = query =>
         },
       ]).from({
         r: searchById(query)
-          .unionAll(searchByNameInMeta(query))
-          .unionAll(searchByTicker(query))
-          .unionAll(searchByName(query)),
+          .unionAll(qb => searchByNameInMeta(qb, query))
+          .unionAll(qb => searchByTicker(qb, query))
+          .unionAll(qb => searchByName(qb, query)),
       });
     })
     .from('assets_cte')
     .select(columns.map(col => 'a.' + col))
     .innerJoin({ a: 'assets' }, 'assets_cte.asset_id', 'a.asset_id')
     .orderBy('rn', 'asc');
-
-const mget = ids =>
-  pg('assets')
-    .select(columns)
-    .whereIn('asset_id', ids)
-    .toString();
-
-module.exports = {
-  get: id => mget([id]),
-  mget,
-  search: ({ ticker, search, after, limit }) => {
-    const filter = q => {
-      if (ticker === '*') return q.whereNotNull('ticker');
-      else return q.where('ticker', ticker);
-    };
-
-    if (typeof ticker !== 'undefined') {
-      return compose(
-        q => q.toString(),
-        filter
-      )(pg('assets').select(columns));
-    } else if (typeof search !== 'undefined') {
-      return compose(
-        q => q.toString(),
-        q => (limit ? q.clone().limit(limit) : q),
-        q => (after ? q.clone().where('rn', '>', getAssetIndex(after)) : q),
-        searchAssets
-      )(search);
-    }
-  },
-};
