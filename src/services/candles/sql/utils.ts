@@ -2,7 +2,7 @@ import { findLast } from 'ramda';
 import { Result, Ok as ok, Error as error } from 'folktale/result';
 import { Interval } from '../../../types';
 import { div } from '../../../utils/interval';
-import { ValidationError } from 'errorHandling';
+import { ValidationError } from '../../../errorHandling';
 
 export const highestDividerLessThan = (
   inter: Interval,
