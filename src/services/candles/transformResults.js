@@ -9,7 +9,7 @@ const {
   always,
   identity,
   ifElse,
-  clone,
+  merge,
   evolve,
   omit,
 } = require('ramda');
@@ -32,7 +32,7 @@ const transformCandle = ([time, c]) => {
     txs_count: 'txsCount',
     time_start: 'time',
   });
-  
+
   return compose(
     candle,
     omit(['a_dec', 'p_dec']),
@@ -40,7 +40,7 @@ const transformCandle = ([time, c]) => {
     assoc('time_start', time),
     assoc('txs_count', c.txs_count),
     ifElse(isEmpty, map(always(null)), identity)
-  )(c)
+  )(c);
 };
 
 /** addMissingCandles :: Interval -> Date -> Date
@@ -49,8 +49,7 @@ const addMissingCandles = curryN(
   4,
   (interval, timeStart, timeEnd, candlesGroupedByTime) => {
     const end = timeEnd;
-    const res = clone(candlesGroupedByTime);
-    
+    const res = merge({}, candlesGroupedByTime);
     for (
       let it = ceil(interval, timeStart);
       it < end;
@@ -62,7 +61,7 @@ const addMissingCandles = curryN(
         res[cur] = [];
       }
     }
-    
+
     return res;
   }
 );
