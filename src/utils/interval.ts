@@ -1,6 +1,6 @@
 import { Result, Ok as ok, Error as error } from 'folktale/result';
 import { ValidationError } from '../errorHandling';
-import { findLastIndex, memoizeWith, reverse, values } from 'ramda';
+import { compose, findLastIndex, reverse, values } from 'ramda';
 import { Interval, interval, units, parseUnit } from '../types/interval';
 
 export const div = (a: Interval, b: Interval): number => a.length / b.length;
@@ -45,7 +45,11 @@ export const fromMilliseconds = (
 export const unsafeIntervalsFromStrings = (strings: string[]): Interval[] =>
   strings.map(str => interval(str).unsafeGet());
 
-export const unsafeIntervalsFromStringsReversed = memoizeWith(
+export const unsafeIntervalsFromStringsReversed = compose<
+  string[],
+  Interval[],
+  Interval[]
+>(
   reverse,
   unsafeIntervalsFromStrings
 );

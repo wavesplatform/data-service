@@ -91,7 +91,7 @@ export const periodsToQueries = ({
         timeStart: new Date(itTimestamp),
         timeEnd: timeEnd,
         interval: period.source,
-      })
+      }).limit(1)
     );
 
     itTimestamp = timeEnd.getTime();
@@ -125,15 +125,16 @@ export const sql = ({
       i => i.length / (1000 * 60)
     ),
     periodInMinutes
-  ).reduce<Interval[]>((periods, polynom) => {
-    return [
+  ).reduce<Interval[]>(
+    (periods, polynom) => [
       ...periods,
       ...repeat(
         fromMilliseconds(polynom[0] * 1000 * 60).unsafeGet(),
         polynom[1]
       ),
-    ];
-  }, []);
+    ],
+    []
+  );
 
   return pg('candles')
     .select(FIELDS_WITH_DECIMALS)
@@ -151,7 +152,8 @@ export const sql = ({
             priceAsset,
             timeStart: ts,
             periods: periodsForQueries,
-          })
+          }),
+          true
         )
         .as('c')
     )
