@@ -1,7 +1,7 @@
 const Joi = require('../../../utils/validation/joi');
 
 const commonFields = require('../_common/commonFieldsSchemas');
-const commonFilters = require('../../presets/pg/searchWithPagination/commonFilterSchemas');
+import commonFilters from '../../presets/pg/searchWithPagination/commonFilterSchemas';
 
 const orderTypes = prefix => ({
   [`${prefix}_id`]: Joi.string().required(),
