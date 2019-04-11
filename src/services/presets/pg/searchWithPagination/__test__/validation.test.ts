@@ -4,7 +4,7 @@ import { always, identity } from 'ramda';
 import { parseDate } from '../../../../../utils/parseDate';
 import { Joi } from '../../../../../utils/validation';
 import { searchWithPaginationPreset, WithSortOrder } from '..';
-import * as commonFilterSchemas from '../commonFilterSchemas';
+import commonFilterSchemas from '../commonFilterSchemas';
 import {
   Serializable,
   toSerializable,

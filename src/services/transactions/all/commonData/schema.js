@@ -1,6 +1,6 @@
 const Joi = require('../../../../utils/validation/joi');
 
-const commonFilters = require('../../../presets/pg/searchWithPagination/commonFilterSchemas');
+import commonFilters from '../../../presets/pg/searchWithPagination/commonFilterSchemas';
 
 const result = Joi.object().keys({
   tx_type: Joi.number()
