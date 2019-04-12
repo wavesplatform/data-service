@@ -3,6 +3,12 @@ const pg = knex({ client: 'pg' });
 
 const { serializeCandle, candlePresets } = require('./utils');
 
+const getNow = () =>
+  pg
+    .select()
+    .column(pg.raw('now()'))
+    .toString();
+
 /** makeCandleCalculateColumns :: Number -> Array */
 const makeCandleCalculateColumns = longerInterval => {
   return {
@@ -46,9 +52,7 @@ const candleSelectColumns = [
     max_height: pg.max('height'),
   },
   {
-    txs_count: pg.raw(
-      'count(e.price)'
-    ),
+    txs_count: pg.raw('count(e.price)'),
   },
   {
     weighted_average_price: pg.raw(
@@ -135,9 +139,10 @@ const insertOrUpdateCandles = (tableName, candles) => {
   return ';';
 };
 
-/** insertOrUpdateCandlesFromShortInterval :: (String, Number, Number) -> String query */
+/** insertOrUpdateCandlesFromShortInterval :: (String, String, Number, Number) -> String query */
 const insertOrUpdateCandlesFromShortInterval = (
   tableName,
+  now,
   shortInterval,
   longerInterval
 ) =>
@@ -148,7 +153,7 @@ const insertOrUpdateCandlesFromShortInterval = (
           .select(makeCandleCalculateColumns(longerInterval))
           .where('interval_in_secs', shortInterval)
           .whereRaw(
-            `time_start >= to_timestamp(floor((extract('epoch' from now()) / ${longerInterval} )) * ${longerInterval})`
+            `time_start >= to_timestamp(floor((extract('epoch' from '${now}'::timestamp) / ${longerInterval} )) * ${longerInterval})`
           )
           .groupBy('candle_time', 'amount_asset_id', 'price_asset_id');
       })} on conflict (time_start,amount_asset_id, price_asset_id, interval_in_secs) do update set ${updatedFieldsExcluded}`
@@ -204,6 +209,7 @@ const selectCandlesByMinute = startHeight =>
     .toString();
 
 module.exports = {
+  getNow,
   truncateTable,
   insertAllMinuteCandles,
   insertAllCandles,
