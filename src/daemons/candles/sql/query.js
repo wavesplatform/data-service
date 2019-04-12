@@ -139,7 +139,7 @@ const insertOrUpdateCandles = (tableName, candles) => {
   return ';';
 };
 
-/** insertOrUpdateCandlesFromShortInterval :: (String, String, Number, Number) -> String query */
+/** insertOrUpdateCandlesFromShortInterval :: (String, Date, Number, Number) -> String query */
 const insertOrUpdateCandlesFromShortInterval = (
   tableName,
   now,
@@ -153,7 +153,7 @@ const insertOrUpdateCandlesFromShortInterval = (
           .select(makeCandleCalculateColumns(longerInterval))
           .where('interval_in_secs', shortInterval)
           .whereRaw(
-            `time_start >= to_timestamp(floor((extract('epoch' from '${now}'::timestamp) / ${longerInterval} )) * ${longerInterval})`
+            `time_start >= to_timestamp(floor((extract('epoch' from '${now.toISOString()}'::timestamp) / ${longerInterval} )) * ${longerInterval})`
           )
           .groupBy('candle_time', 'amount_asset_id', 'price_asset_id');
       })} on conflict (time_start,amount_asset_id, price_asset_id, interval_in_secs) do update set ${updatedFieldsExcluded}`

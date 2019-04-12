@@ -83,7 +83,7 @@ const updateCandlesLoop = (logTask, pg, tableName) => {
               t.any(
                 insertOrUpdateCandlesFromShortInterval(
                   tableName,
-                  now.toISOString(),
+                  now,
                   interval[0],
                   interval[1]
                 )

@@ -58,7 +58,7 @@ describe('candles daemon sql test', () => {
       sql
         .insertOrUpdateCandlesFromShortInterval(
           'candles',
-          new Date(0).toISOString(),
+          new Date(0),
           60,
           300
         )
