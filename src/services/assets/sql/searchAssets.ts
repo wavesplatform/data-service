@@ -63,7 +63,7 @@ const searchByName = (qb: knex.QueryBuilder, q: string) =>
       ticker: 'ti.ticker',
       height: 't.height',
       rank: pg.raw(
-        `ts_rank(searchable_asset_name, to_tsquery('${q
+        `ts_rank(to_tsvector('simple', t.asset_name), to_tsquery('${q
           .split(' ')
           .join(
             ' & '
@@ -72,7 +72,7 @@ const searchByName = (qb: knex.QueryBuilder, q: string) =>
     })
     .leftJoin({ ti: 'tickers' }, 't.asset_id', 'ti.asset_id')
     .whereRaw(
-      `searchable_asset_name @@ to_tsquery('${q.split(' ').join(' & ')}:*')`
+      `to_tsvector('simple', t.asset_name) @@ to_tsquery('${q.split(' ').join(' & ')}:*')`
     );
 
 export const searchAssets = (query: string): knex.QueryBuilder =>
