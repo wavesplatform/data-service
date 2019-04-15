@@ -26,6 +26,7 @@ import {
   RuntimeResolverDependenties,
   Validate,
 } from './types';
+import { PgDriver } from '../../../db/driver';
 
 const createResolver = <
   RequestRaw,
@@ -70,7 +71,7 @@ const getResolver = <
     ResponseRaw,
     ResponseTransformed
   >
-) => ({ db, emitEvent = () => () => {} }: RuntimeResolverDependenties) => (
+) => ({ db, emitEvent = () => () => {} }: RuntimeResolverDependenties<PgDriver>) => (
   request: RequestRaw
 ) =>
   createResolver<
@@ -100,7 +101,7 @@ const mgetResolver = <
     ResponseRaw,
     ResponseTransformed
   >
-) => ({ db, emitEvent = () => () => {} }: RuntimeResolverDependenties) => (
+) => ({ db, emitEvent = () => () => {} }: RuntimeResolverDependenties<PgDriver>) => (
   request: RequestRaw
 ) =>
   createResolver<
@@ -119,18 +120,20 @@ const mgetResolver = <
   );
 
 const searchResolver = <
+  Driver,
   RequestRaw,
   RequestTransformed,
   ResponseRaw,
   ResponseTransformed
 >(
   dependencies: SearchResolverDependencies<
+    Driver,
     RequestRaw,
     RequestTransformed,
     ResponseRaw,
     ResponseTransformed
   >
-) => ({ db, emitEvent = () => () => {} }: RuntimeResolverDependenties) => (
+) => ({ db, emitEvent = () => () => {} }: RuntimeResolverDependenties<Driver>) => (
   request: RequestRaw
 ) =>
   createResolver<

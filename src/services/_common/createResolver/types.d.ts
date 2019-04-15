@@ -9,6 +9,7 @@ import {
 } from '../../../errorHandling/';
 
 import { PgDriver } from '../../../db/driver';
+import { BalancesClient } from '../../../protobuf/balances_grpc_pb';
 
 export type EmitEvent = {
   (name: string): <A>(object: A) => void;
@@ -65,6 +66,7 @@ export type MgetResolverDependencies<
 };
 
 export type SearchResolverDependencies<
+  Driver,
   ReqRaw,
   ReqTransformed,
   ResRaw,
@@ -75,14 +77,14 @@ export type SearchResolverDependencies<
   ResRaw,
   ResTransformed
 > & {
-  dbQuery: (db: PgDriver) => (r: ReqTransformed) => Task<DbError, ResRaw[]>;
+  dbQuery: (r: ReqTransformed) => Task<DbError, ResRaw[]>;
   transformResult: (
     results: ResRaw[],
     request: ReqTransformed
   ) => ResTransformed;
 };
 
-export type RuntimeResolverDependenties = {
-  db: PgDriver;
+export type RuntimeResolverDependenties<Driver> = {
+  db: Driver;
   emitEvent?: EmitEvent;
 };

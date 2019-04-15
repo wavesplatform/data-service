@@ -20,9 +20,11 @@
     "test:t": "npm run test:u && npm run test:it",
     "test:u": "jest --runInBand --detectOpenHandles --config=config/jest.config.unit.json",
     "test:i": "export $(cat variables.env | xargs) && jest --runInBand --detectOpenHandles --config=config/jest.config.integration.json",
-    "test:it": "export $(cat variables.testnet.env | xargs) && jest --runInBand --detectOpenHandles --config=config/jest.config.integration.testnet.json"
+    "test:it": "export $(cat variables.testnet.env | xargs) && jest --runInBand --detectOpenHandles --config=config/jest.config.integration.testnet.json",
+    "protobuf": "sh generate_protobuf.sh"
   },
   "devDependencies": {
+    "@types/google-protobuf": "^3.2.7",
     "@types/jest": "^23.3.10",
     "@types/joi": "^14.3.2",
     "@types/knex": "^0.15.1",
@@ -30,8 +32,10 @@
     "@types/koa-bodyparser": "^4.2.1",
     "@types/koa-qs": "^2.0.0",
     "@types/node": "^10.12.14",
+    "@types/protobufjs": "^6.0.0",
     "@types/ramda": "^0.25.43",
     "eslint": "^5.15.1",
+    "grpc_tools_node_protoc_ts": "^2.5.0",
     "jest": "^24.5.0",
     "nodemon": "^1.18.8",
     "ts-jest": "^23.10.5",

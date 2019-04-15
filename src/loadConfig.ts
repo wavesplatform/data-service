@@ -18,7 +18,11 @@ export type ServerConfig = {
   port: number;
 };
 
-export type DataServiceConfig = PostgresConfig & ServerConfig & LoggerConfig;
+export type BalancesServiceConfig = {
+  balancesServiceHost: string;
+}
+
+export type DataServiceConfig = PostgresConfig & ServerConfig & LoggerConfig & BalancesServiceConfig;
 
 const envVariables = ['PGHOST', 'PGDATABASE', 'PGUSER', 'PGPASSWORD'];
 
@@ -37,6 +41,7 @@ const load = (): DataServiceConfig => {
       ? parseInt(process.env.PGPOOLSIZE)
       : 20,
     logLevel: process.env.LOG_LEVEL || 'info',
+    balancesServiceHost: '127.0.0.1:50051',
   };
 };
 

@@ -33,15 +33,15 @@ const mockPgDriver: PgDriver = {
 const commonConfig = {
   transformInput: identity,
   transformResult: identity,
-  dbQuery: (driver: PgDriver) => (ids: string[]) =>
-    driver.many<string>(ids.join('::')),
+  dbQuery: ({ db }: { db: PgDriver }) => (ids: string[]) =>
+    db.many<string>(ids.join('::')),
 };
 
 const createMockResolver = (
   validateInput: Validate<ValidationError, string[]>,
   validateResult: Validate<ResolverError, string>
 ) =>
-  search<string[], string[], string, string[]>({
+  search<PgDriver, string[], string[], string, string[]>({
     ...commonConfig,
     validateInput,
     validateResult,
