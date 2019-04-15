@@ -8,12 +8,14 @@ const pairs = require('./pairs');
 const transactions = require('./transactions');
 const aliases = require('./aliases');
 const candles = require('./candles');
+const balances = require('./balances');
 
 router.use(assets.routes());
 router.use(pairs.routes());
 router.use(transactions.routes());
 router.use(aliases.routes());
 router.use(candles.routes());
+router.use(balances.routes());
 
 router.get('/version', version);
 router.get('/', root);

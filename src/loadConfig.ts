@@ -41,7 +41,7 @@ const load = (): DataServiceConfig => {
       ? parseInt(process.env.PGPOOLSIZE)
       : 20,
     logLevel: process.env.LOG_LEVEL || 'info',
-    balancesServiceHost: '127.0.0.1:50051',
+    balancesServiceHost: process.env.BALANCES_SERVICE_HOST || 'localhost:3001',
   };
 };
 

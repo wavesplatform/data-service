@@ -33,7 +33,7 @@ const mockPgDriver: PgDriver = {
 const commonConfig = {
   transformInput: identity,
   transformResult: identity,
-  dbQuery: ({ db }: { db: PgDriver }) => (ids: string[]) =>
+  dbQuery: (db: PgDriver) => (ids: string[]) =>
     db.many<string>(ids.join('::')),
 };
 

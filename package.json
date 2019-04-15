@@ -59,6 +59,7 @@
     "koa-requestid": "^2.0.1",
     "koa-router": "^7.4.0",
     "pg-promise": "^8.2.3",
+    "protobufjs": "^6.8.8",
     "qs": "^6.5.2",
     "ramda": "^0.25.0",
     "ramda-adjunct": "^2.6.0",

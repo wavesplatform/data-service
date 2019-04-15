@@ -25,11 +25,7 @@ export const searchPreset = <
   transformResult,
 }: {
   name: string;
-  getData: ({
-    db,
-  }: {
-    db: Driver;
-  }) => (request: Request) => Task<DbError, ResponseRaw[]>;
+  getData: (db: Driver) => (request: Request) => Task<DbError, ResponseRaw[]>;
   inputSchema: SchemaLike;
   resultSchema: SchemaLike;
   transformResult: (
@@ -42,5 +38,5 @@ export const searchPreset = <
     transformResult,
     validateInput: validateInput(inputSchema, name),
     validateResult: validateResult(resultSchema, name),
-    dbQuery: getData({ db }),
+    dbQuery: getData,
   })({ db, emitEvent });

@@ -1,6 +1,7 @@
 import { identity } from 'ramda';
 import { SchemaLike } from 'joi';
 
+import { PgDriver } from '../../../../db/driver';
 import { getData } from './pg';
 import { search } from '../../../_common/createResolver';
 import { ServicePresetInitOptions } from '../../../presets/types';
@@ -27,7 +28,7 @@ export const searchPreset = <
     request?: Request
   ) => List<ResponseTransformed>;
 }) => ({ pg, emitEvent }: ServicePresetInitOptions) =>
-  search<Request, Request, ResponseRaw, List<ResponseTransformed>>({
+  search<PgDriver, Request, Request, ResponseRaw, List<ResponseTransformed>>({
     transformInput: identity,
     transformResult,
     validateInput: validateInput(inputSchema, name),

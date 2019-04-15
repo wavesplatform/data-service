@@ -26,7 +26,6 @@ import {
   RuntimeResolverDependenties,
   Validate,
 } from './types';
-import { PgDriver } from '../../../db/driver';
 
 const createResolver = <
   RequestRaw,
@@ -60,20 +59,23 @@ const createResolver = <
     .map(tap(emitEvent('TRANSFORM_RESULT_OK')));
 
 const getResolver = <
+  DbDriver,
   RequestRaw,
   RequestTransformed,
   ResponseRaw,
   ResponseTransformed
 >(
   dependencies: GetResolverDependencies<
+    DbDriver,
     RequestRaw,
     RequestTransformed,
     ResponseRaw,
     ResponseTransformed
   >
-) => ({ db, emitEvent = () => () => {} }: RuntimeResolverDependenties<PgDriver>) => (
-  request: RequestRaw
-) =>
+) => ({
+  db,
+  emitEvent = () => () => {},
+}: RuntimeResolverDependenties<DbDriver>) => (request: RequestRaw) =>
   createResolver<
     RequestRaw,
     RequestTransformed,
@@ -90,20 +92,23 @@ const getResolver = <
   );
 
 const mgetResolver = <
+  DbDriver,
   RequestRaw,
   RequestTransformed,
   ResponseRaw,
   ResponseTransformed
 >(
   dependencies: MgetResolverDependencies<
+    DbDriver,
     RequestRaw,
     RequestTransformed,
     ResponseRaw,
     ResponseTransformed
   >
-) => ({ db, emitEvent = () => () => {} }: RuntimeResolverDependenties<PgDriver>) => (
-  request: RequestRaw
-) =>
+) => ({
+  db,
+  emitEvent = () => () => {},
+}: RuntimeResolverDependenties<DbDriver>) => (request: RequestRaw) =>
   createResolver<
     RequestRaw,
     RequestTransformed,
@@ -120,22 +125,23 @@ const mgetResolver = <
   );
 
 const searchResolver = <
-  Driver,
+  DbDriver,
   RequestRaw,
   RequestTransformed,
   ResponseRaw,
   ResponseTransformed
 >(
   dependencies: SearchResolverDependencies<
-    Driver,
+    DbDriver,
     RequestRaw,
     RequestTransformed,
     ResponseRaw,
     ResponseTransformed
   >
-) => ({ db, emitEvent = () => () => {} }: RuntimeResolverDependenties<Driver>) => (
-  request: RequestRaw
-) =>
+) => ({
+  db,
+  emitEvent = () => () => {},
+}: RuntimeResolverDependenties<DbDriver>) => (request: RequestRaw) =>
   createResolver<
     RequestRaw,
     RequestTransformed,

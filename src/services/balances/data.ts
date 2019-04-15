@@ -2,51 +2,55 @@ import * as grpc from 'grpc';
 import { BalancesClient } from '../../protobuf/balances_grpc_pb';
 import { GetBalancesRequest, Balance } from '../../protobuf/balances_pb';
 
-import { task } from 'folktale/concurrency/task';
+import { Task, task } from 'folktale/concurrency/task';
+import { DbError, toDbError } from '../../errorHandling';
 
-export const getBalances = ({ db }: { db: BalancesClient }) => ({
-  address,
-  assetId,
-  height,
-  timestamp,
-  transactionId,
-}: {
-  address?: string | Uint8Array;
-  assetId?: string | Uint8Array;
+type BalancesRequest = {
+  address?: string;
+  asset_id?: string;
   height?: number;
   timestamp?: Date;
-  transactionId: string;
-}) => {
+  transaction_id: string;
+};
+
+export const getBalances = (db: BalancesClient) => (
+  req: BalancesRequest
+): Task<DbError, Balance.AsObject[]> => {
   return task(resolver => {
     const request = new GetBalancesRequest();
-    if (address) {
-      request.setAddress(address);
+
+    if (req.address) {
+      request.setAddress(Buffer.from(req.address).toString('base64'));
     }
-    if (assetId) {
-      request.setAssetId(assetId);
+    if (req.asset_id) {
+      request.setAssetId(Buffer.from(req.asset_id).toString('base64'));
     }
-    if (height) {
-      request.setHeight(height);
+    if (req.height) {
+      request.setHeight(req.height);
     }
-    if (timestamp) {
-      request.setTimestamp(timestamp.getTime());
+    if (req.timestamp) {
+      request.setTimestamp(req.timestamp.getTime());
     }
-    if (transactionId) {
-      request.setTransactionId(Buffer.from('test').toString('base64'));
+    if (req.transaction_id) {
+      request.setTransactionId(
+        Buffer.from(req.transaction_id).toString('base64')
+      );
     }
-    console.log(`[getBalances] Request: ${JSON.stringify(request.toObject())}`);
 
     const stream: grpc.ClientReadableStream<Balance> = db.getBalances(request);
 
     const response: Balance.AsObject[] = [];
 
     stream.on('data', (data: Balance) => {
-      console.log(`[getBalances] Balance: ${JSON.stringify(data.toObject())}`);
       response.push(data.toObject());
     });
+
     stream.on('end', () => {
-      console.log('[getBalances] Done.');
       resolver.resolve(response);
+    });
+
+    stream.on('error', e => {
+      resolver.reject(toDbError({}, e))
     });
   });
 };

@@ -29,6 +29,7 @@ type CommonResolverDependencies<
 };
 
 export type GetResolverDependencies<
+  DbDriver,
   ReqRaw,
   ReqTransformed,
   ResRaw,
@@ -40,7 +41,7 @@ export type GetResolverDependencies<
   ResTransformed
 > & {
   dbQuery: (
-    db: PgDriver
+    db: DbDriver
   ) => (r: ReqTransformed) => Task<DbError, Maybe<ResRaw>>;
   transformResult: (
     result: Maybe<ResRaw>,
@@ -49,6 +50,7 @@ export type GetResolverDependencies<
 };
 
 export type MgetResolverDependencies<
+  DbDriver,
   ReqRaw,
   ReqTransformed,
   ResRaw,
@@ -60,13 +62,13 @@ export type MgetResolverDependencies<
   ResTransformed
 > & {
   dbQuery: (
-    db: PgDriver
+    db: DbDriver
   ) => (r: ReqTransformed) => Task<DbError, Maybe<ResRaw>[]>;
   transformResult: (result: Maybe<ResRaw>[], request: ReqRaw) => ResTransformed;
 };
 
 export type SearchResolverDependencies<
-  Driver,
+  DbDriver,
   ReqRaw,
   ReqTransformed,
   ResRaw,
@@ -77,14 +79,14 @@ export type SearchResolverDependencies<
   ResRaw,
   ResTransformed
 > & {
-  dbQuery: (r: ReqTransformed) => Task<DbError, ResRaw[]>;
+  dbQuery: (db: DbDriver) => (r: ReqTransformed) => Task<DbError, ResRaw[]>;
   transformResult: (
     results: ResRaw[],
     request: ReqTransformed
   ) => ResTransformed;
 };
 
-export type RuntimeResolverDependenties<Driver> = {
-  db: Driver;
+export type RuntimeResolverDependenties<DbDriver> = {
+  db: DbDriver;
   emitEvent?: EmitEvent;
 };

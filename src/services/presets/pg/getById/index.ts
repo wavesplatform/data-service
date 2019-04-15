@@ -1,6 +1,7 @@
 import { identity } from 'ramda';
 import { SchemaLike } from 'joi';
 
+import { PgDriver } from '../../../../db/driver';
 import { get } from '../../../_common/createResolver';
 import { validateInput, validateResult } from '../../validation';
 import { transformResults as transformResultFn } from './transformResult';
@@ -32,7 +33,7 @@ export const getByIdPreset = <
   ) => FromSerializable<ResponseTransformed>;
   sql: (r: Id) => string;
 }) => ({ pg, emitEvent }: ServicePresetInitOptions) =>
-  get<Id, Id, ResponseRaw, ResponseTransformed>({
+  get<PgDriver, Id, Id, ResponseRaw, ResponseTransformed>({
     transformInput: identity,
     transformResult: transformResultFn<Id, ResponseRaw, ResponseTransformed>(
       resultTypeFactory

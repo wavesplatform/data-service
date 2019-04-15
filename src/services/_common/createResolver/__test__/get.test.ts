@@ -40,7 +40,7 @@ describe('Resolver', () => {
     validateInput: (s: string) => Result<ValidationError, string>,
     validateResult: (s: string) => Result<ResolverError, string>
   ) =>
-    get<string, string, string, string>({
+    get<PgDriver, string, string, string, string>({
       ...commonConfig,
       validateInput,
       validateResult,

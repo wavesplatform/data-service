@@ -43,7 +43,7 @@ const createMockResolver = (
   validateInput: Validate<ValidationError, string[]>,
   validateResult: Validate<ResolverError, string>
 ) =>
-  mget<string[], string[], string, (string | null)[]>({
+  mget<PgDriver, string[], string[], string, (string | null)[]>({
     ...commonConfig,
     validateInput,
     validateResult,
