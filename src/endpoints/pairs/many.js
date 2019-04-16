@@ -45,9 +45,9 @@ const pairsMany = createManyMiddleware(
       search_by_assets: parseArrayQuery,
       match_exactly: x =>
         compose(
-          map(m => m.getOrElse(null)),
+          m => m.getOrElse(null),
           map(map(parseBool)),
-          map(Maybe.fromNullable),
+          Maybe.fromNullable,
           parseArrayQuery
         )(x),
       limit,
