@@ -6,6 +6,7 @@ import { searchPreset } from '../presets/common/search';
 import { getBalances } from './data';
 
 import { inputSearch, output } from './schema';
+import base58 from '../../utils/base58';
 
 export default ({
   drivers,
@@ -23,7 +24,31 @@ export default ({
       transformResult: res =>
         compose(
           l => list<Balance>(l),
-          (l: PBBalance.AsObject[]) => l.map(x => balance(x))
+          (l: PBBalance.AsObject[]) =>
+            l.map(b =>
+              balance({
+                address: base58.encode(
+                  Buffer.from(b.address.toString(), 'base64')
+                ),
+                amount: b.amount
+                  ? b.amount.assetAmount
+                    ? {
+                        assetAmount: {
+                          assetId: base58.encode(
+                            Buffer.from(
+                              b.amount.assetAmount.assetId.toString(),
+                              'base64'
+                            )
+                          ),
+                          amount: b.amount.assetAmount.amount,
+                        },
+                      }
+                    : {
+                        wavesAmount: b.amount.wavesAmount,
+                      }
+                  : null,
+              })
+            )
         )(res),
     })({ db: drivers.balances, emitEvent: emitEvent }),
   };

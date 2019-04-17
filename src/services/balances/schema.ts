@@ -12,13 +12,14 @@ export const inputSearch = Joi.object()
 
 export const output = Joi.object().keys({
   address: Joi.string()
+    .base64()
     .required()
     .allow(null),
   amount: Joi.object()
     .keys({
       wavesAmount: Joi.number(),
       assetAmount: Joi.object().keys({
-        assetId: Joi.string().base58(),
+        assetId: Joi.string().base64(),
         amount: Joi.number(),
       }),
     })

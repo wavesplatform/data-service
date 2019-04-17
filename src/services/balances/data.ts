@@ -4,6 +4,7 @@ import { GetBalancesRequest, Balance } from '../../protobuf/balances_pb';
 
 import { Task, task } from 'folktale/concurrency/task';
 import { DbError, toDbError } from '../../errorHandling';
+import base58 from '../../utils/base58';
 
 type BalancesRequest = {
   address?: string;
@@ -20,10 +21,10 @@ export const getBalances = (db: BalancesClient) => (
     const request = new GetBalancesRequest();
 
     if (req.address) {
-      request.setAddress(Buffer.from(req.address).toString('base64'));
+      request.setAddress(base58.decode(req.address));
     }
     if (req.asset_id) {
-      request.setAssetId(Buffer.from(req.asset_id).toString('base64'));
+      request.setAssetId(base58.decode(req.asset_id));
     }
     if (req.height) {
       request.setHeight(req.height);
