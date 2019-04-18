@@ -5,7 +5,7 @@ const { parseArrayQuery } = require('../../utils/parseArrayQuery');
 
 const dateOrNull = str => parseDate(str).getOrElse(null);
 const trimedStringOrNull = q =>
-  typeof q === 'undefined' ? null : q.toString().trim();
+  typeof q === 'undefined' ? undefined : q.toString().trim();
 
 module.exports = {
   timeStart: dateOrNull,

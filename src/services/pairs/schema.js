@@ -17,7 +17,7 @@ const inputSearch = Joi.object()
   .keys({
     search_by_asset: Joi.string(),
     search_by_assets: Joi.array()
-      .items(Joi.string().required(), Joi.string().required())
+      .items(Joi.string(), Joi.string())
       .length(2),
     match_exactly: Joi.array()
       .items(Joi.boolean(), Joi.boolean())
