@@ -34,22 +34,20 @@ const parsePairs = map(
 const pairsMany = createManyMiddleware(
   {
     filterParsers: {
-      pairs: x =>
-        compose(
-          m => m.getOrElse(null),
-          map(parsePairs),
-          Maybe.fromNullable,
-          parseArrayQuery
-        )(x),
+      pairs: compose(
+        m => m.getOrElse(null),
+        map(parsePairs),
+        Maybe.fromNullable,
+        parseArrayQuery
+      ),
       search_by_asset: query,
       search_by_assets: parseArrayQuery,
-      match_exactly:
-        compose(
-          m => m.getOrElse(null),
-          map(map(parseBool)),
-          Maybe.fromNullable,
-          parseArrayQuery
-        ),
+      match_exactly: compose(
+        m => m.getOrElse(undefined),
+        map(map(parseBool)),
+        Maybe.fromNullable,
+        parseArrayQuery
+      ),
       limit,
     },
     mgetFilterName: 'pairs',

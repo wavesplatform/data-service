@@ -16,18 +16,22 @@ const COLUMNS = [
   'volume_waves',
 ];
 
+const DEFAULT_MATCH_EXACTLY = false;
+
 type SearchWithLimitRequest = {
   limit: number;
 };
 
-type SearchByAssetRequest = SearchWithLimitRequest & {
-  search_by_asset: string;
-  match_exactly?: boolean;
+type SearchWithMatchExactly = SearchWithLimitRequest & {
+  match_exactly?: boolean[];
 };
 
-type SearchByAssetsRequest = SearchWithLimitRequest & {
+type SearchByAssetRequest = SearchWithMatchExactly & {
+  search_by_asset: string;
+};
+
+type SearchByAssetsRequest = SearchWithMatchExactly & {
   search_by_assets: [string, string];
-  match_exactly?: [boolean, boolean];
 };
 
 type SearchRequest =
@@ -53,6 +57,18 @@ const isSearchByAssetsRequest = (
     searchByAssetRequest !== null &&
     searchByAssetRequest.hasOwnProperty('search_by_assets')
   );
+};
+
+const getMatchExactly = (matchExactly: boolean[] | undefined) => {
+  if (typeof matchExactly === 'undefined') {
+    return [DEFAULT_MATCH_EXACTLY, DEFAULT_MATCH_EXACTLY];
+  } else {
+    if (matchExactly.length === 1) {
+      return [matchExactly[0], matchExactly[0]];
+    } else {
+      return matchExactly;
+    }
+  }
 };
 
 const query = (pairs: { amountAsset: string; priceAsset: string }[]): string =>
@@ -108,13 +124,14 @@ export const search = (req: SearchRequest): string => {
     .limit(limit);
 
   if (isSearchByAssetRequest(req)) {
-    const {
-      search_by_asset: amountAsset,
-      match_exactly: matchExactly = false,
-    } = req;
+    const { search_by_asset: amountAsset, match_exactly: matchExactly } = req;
     return q
       .with('assets_cte', (qb: knex.QueryBuilder) =>
-        searchAssets(qb, amountAsset, matchExactly)
+        searchAssets(
+          qb,
+          amountAsset,
+          matchExactly ? matchExactly[0] : DEFAULT_MATCH_EXACTLY
+        )
       )
       .innerJoin(
         { amountCte: 'assets_cte' },
@@ -129,12 +146,10 @@ export const search = (req: SearchRequest): string => {
       .toString();
   } else if (isSearchByAssetsRequest(req)) {
     const [amountAsset, priceAsset] = req.search_by_assets;
-    const [amountAssetExactly, priceAssetExaclty] =
-      typeof req.match_exactly === 'undefined'
-        ? [false, false]
-        : req.match_exactly.length > 1
-        ? req.match_exactly
-        : [req.match_exactly[0], req.match_exactly[0]];
+
+    const [amountAssetExactly, priceAssetExaclty] = getMatchExactly(
+      req.match_exactly
+    );
 
     return q
       .with('assets_cte', (qb: knex.QueryBuilder) =>

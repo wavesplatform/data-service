@@ -18,10 +18,10 @@ const inputSearch = Joi.object()
     search_by_asset: Joi.string(),
     search_by_assets: Joi.array()
       .items(Joi.string().required(), Joi.string().required())
-      .min(2)
-      .max(2),
+      .length(2),
     match_exactly: Joi.array()
       .items(Joi.boolean(), Joi.boolean())
+      .min(1)
       .max(2),
     limit: Joi.number()
       .min(1)
