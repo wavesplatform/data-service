@@ -4,7 +4,7 @@ const { parseDate } = require('../../../utils/parseDate');
 const { parseArrayQuery } = require('../../utils/parseArrayQuery');
 
 const dateOrNull = str => parseDate(str).getOrElse(null);
-const trimedQueryOrNull = q =>
+const trimedStringOrNull = q =>
   typeof q === 'undefined' ? null : q.toString().trim();
 
 module.exports = {
@@ -17,5 +17,5 @@ module.exports = {
   sort: defaultTo('desc'),
   after: identity,
   ids: parseArrayQuery,
-  query: trimedQueryOrNull,
+  query: trimedStringOrNull,
 };

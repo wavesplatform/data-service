@@ -3,7 +3,7 @@ const Joi = require('../../utils/validation/joi');
 const inputSearch = Joi.object()
   .keys({
     ticker: Joi.string(),
-    search: Joi.string().required(),
+    search: Joi.string(),
     after: Joi.string().base58(),
     limit: Joi.number()
       .min(0)

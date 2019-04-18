@@ -43,13 +43,13 @@ const pairsMany = createManyMiddleware(
         )(x),
       search_by_asset: query,
       search_by_assets: parseArrayQuery,
-      match_exactly: x =>
+      match_exactly:
         compose(
           m => m.getOrElse(null),
           map(map(parseBool)),
           Maybe.fromNullable,
           parseArrayQuery
-        )(x),
+        ),
       limit,
     },
     mgetFilterName: 'pairs',
