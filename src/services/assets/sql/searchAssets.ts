@@ -34,7 +34,7 @@ const searchByNameInMeta = (qb: knex.QueryBuilder, q: string) =>
         ),
       },
     ])
-    .where('asset_name', 'like', `${q}%`);
+    .where('asset_name', 'ilike', `${q}%`);
 
 const searchByTicker = (qb: knex.QueryBuilder, q: string) =>
   qb
@@ -73,7 +73,8 @@ const searchByName = (qb: knex.QueryBuilder, q: string) =>
       `to_tsvector('simple', t.asset_name) @@ to_tsquery('${q
         .split(' ')
         .join(' & ')}:*')`
-    ).orWhere('t.asset_name', 'like', `${q}%`);
+    )
+    .orWhere('t.asset_name', 'ilike', `${q}%`);
 
 export const searchAssets = (query: string): knex.QueryBuilder =>
   pg
