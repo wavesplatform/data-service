@@ -5,7 +5,9 @@ const inputSearch = Joi.object()
     ticker: Joi.string(),
     search: Joi.string(),
     after: Joi.string().base58(),
-    limit: Joi.number().integer(),
+    limit: Joi.number()
+      .min(0)
+      .max(100),
   })
   .or('ticker', 'search')
   .required();
