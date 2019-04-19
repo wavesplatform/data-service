@@ -21,7 +21,6 @@ const inputSearch = Joi.object()
       .length(2),
     match_exactly: Joi.array()
       .items(Joi.boolean(), Joi.boolean())
-      .min(1)
       .max(2),
     limit: Joi.number()
       .min(1)
