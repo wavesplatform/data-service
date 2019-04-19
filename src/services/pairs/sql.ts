@@ -16,8 +16,6 @@ const COLUMNS = [
   'volume_waves',
 ];
 
-const DEFAULT_MATCH_EXACTLY = false;
-
 type SearchWithLimitRequest = {
   limit: number;
 };
@@ -59,7 +57,9 @@ const isSearchByAssetsRequest = (
   );
 };
 
-const getMatchExactly = (matchExactly: boolean[] | undefined) => {
+const getMatchExactly = (matchExactly: boolean[] | undefined): boolean[] => {
+  const DEFAULT_MATCH_EXACTLY = false;
+
   if (typeof matchExactly === 'undefined') {
     return [DEFAULT_MATCH_EXACTLY, DEFAULT_MATCH_EXACTLY];
   } else {
@@ -127,11 +127,7 @@ export const search = (req: SearchRequest): string => {
     const { search_by_asset: amountAsset, match_exactly: matchExactly } = req;
     return q
       .with('assets_cte', (qb: knex.QueryBuilder) =>
-        searchAssets(
-          qb,
-          amountAsset,
-          matchExactly ? matchExactly[0] : DEFAULT_MATCH_EXACTLY
-        )
+        searchAssets(qb, amountAsset, getMatchExactly(matchExactly)[0])
       )
       .innerJoin(
         { amountCte: 'assets_cte' },
