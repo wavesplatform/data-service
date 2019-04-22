@@ -20,9 +20,17 @@ export type ServerConfig = {
 
 export type BalancesServiceConfig = {
   balancesServiceHost: string;
-}
+};
 
-export type DataServiceConfig = PostgresConfig & ServerConfig & LoggerConfig & BalancesServiceConfig;
+export type DataEntriesServiceConfig = {
+  dataEntriesServiceHost: string;
+};
+
+export type DataServiceConfig = PostgresConfig &
+  ServerConfig &
+  LoggerConfig &
+  BalancesServiceConfig &
+  DataEntriesServiceConfig;
 
 const envVariables = ['PGHOST', 'PGDATABASE', 'PGUSER', 'PGPASSWORD'];
 
@@ -42,6 +50,8 @@ const load = (): DataServiceConfig => {
       : 20,
     logLevel: process.env.LOG_LEVEL || 'info',
     balancesServiceHost: process.env.BALANCES_SERVICE_HOST || 'localhost:3001',
+    dataEntriesServiceHost:
+      process.env.DATA_ENTRIES_SERVICE_HOST || 'localhost:3002',
   };
 };
 

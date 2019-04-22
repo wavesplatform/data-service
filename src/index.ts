@@ -5,6 +5,7 @@ import { loadConfig } from './loadConfig';
 import * as router from './endpoints/';
 import * as injectDb from './middleware/injectDb';
 import injectBalancesService from './middleware/injectBalancesService';
+import injectDataEntriesService from './middleware/injectDataEntriesService';
 import * as injectEventBus from './middleware/injectEventBus';
 import * as accessLogMiddleware from './middleware/accessLog';
 import createEventBus from './eventBus/';
@@ -36,6 +37,7 @@ app
   .use(serializer)
   .use(injectDb(options))
   .use(injectBalancesService(options))
+  .use(injectDataEntriesService(options))
   .use(router.routes())
   .listen(options.port);
 

@@ -46,5 +46,11 @@ export type Balance = Serializable<'balance', BalanceInfo>;
 export const balance = (data: BalanceInfo = null): Balance =>
   toSerializable('balance', data);
 
+// @todo DataEntryInfo
+export type DataEntryInfo = unknown;
+export type DataEntry = Serializable<'dataEntry', DataEntryInfo>;
+export const dataEntry = (data: DataEntryInfo = null): DataEntry =>
+  toSerializable('dataEntry', data);
+
 export { List, list } from './list';
 export { Interval, interval, Unit };
