@@ -1,4 +1,9 @@
 import * as knex from 'knex';
+import { compose } from 'ramda';
+import {
+  forTsQuery as escapeForTsQuery,
+  forLike as escapeForLike,
+} from '../../utils/db/escape';
 
 const pg = knex({ client: 'pg' });
 
@@ -87,7 +92,7 @@ const searchAssets = (
   t: string = 't'
 ) => {
   // will be used on searchable_asset_name search
-  const cleanedQuery = query.replace(/[^\w\s]|_/g, '');
+  const cleanedQuery = escapeForTsQuery(query);
   return qb
     .table({ [t]: 'assets' })
     .column({ asset_id: `${t}.asset_id` })
@@ -95,26 +100,31 @@ const searchAssets = (
     .where(
       `${t}.ticker`,
       'like',
-      `${query.replace('%', '\\%')}${exactly ? '' : '%'}`
+      `${escapeForLike(query)}${exactly ? '' : '%'}`
     )
     .unionAll(q =>
       q
         .from({ [`${t}2`]: 'assets_metadata' })
         .column({ asset_id: `${t}2.asset_id` })
-        .where(`${t}2.asset_name`, 'ilike', query.replace('%', '\\%'))
+        .where(`${t}2.asset_name`, 'ilike', escapeForLike(query))
     )
     .unionAll(q =>
-      q
-        .from({ [`${t}3`]: 'assets_names_map' })
-        .column({ asset_id: `${t}3.asset_id` })
-        .whereRaw(`${t}3.searchable_asset_name @@ to_tsquery(?)`, [
-          `${cleanedQuery}${cleanedQuery.length > 0 ? ':*' : ''}`,
-        ])
-        .orWhere(
-          `${t}3.asset_name`,
-          'ilike',
-          `${query.replace('%', '\\%')}${exactly ? '' : '%'}`
-        )
+      compose((q: knex.QueryBuilder) =>
+        cleanedQuery.length
+          ? q.whereRaw(`${t}3.searchable_asset_name @@ to_tsquery(?)`, [
+              `${cleanedQuery}:*`,
+            ])
+          : q
+      )(
+        q
+          .from({ [`${t}3`]: 'assets_names_map' })
+          .column({ asset_id: `${t}3.asset_id` })
+          .where(
+            `${t}3.asset_name`,
+            'ilike',
+            `${escapeForLike(query)}${exactly ? '' : '%'}`
+          )
+      )
     );
 };
 

@@ -1,4 +1,8 @@
 import * as knex from 'knex';
+import {
+  forTsQuery as escapeForTsQuery,
+  forLike as escapeForLike,
+} from '../../../utils/db/escape';
 import { columns } from './common';
 
 const pg = knex({ client: 'pg' });
@@ -32,7 +36,7 @@ const searchByNameInMeta = (qb: knex.QueryBuilder, q: string) =>
         ),
       },
     ])
-    .where('asset_name', 'ilike', `${q.replace('%', '\\%')}%`);
+    .where('asset_name', 'ilike', `${escapeForLike(q)}%`);
 
 const searchByTicker = (qb: knex.QueryBuilder, q: string): knex.QueryBuilder =>
   qb
@@ -48,10 +52,10 @@ const searchByTicker = (qb: knex.QueryBuilder, q: string): knex.QueryBuilder =>
       ),
     })
     .leftJoin({ t: 'txs_3' }, 'ti.asset_id', 't.asset_id')
-    .where('ticker', 'like', `${q.replace('%', '\\%')}%`);
+    .where('ticker', 'like', `${escapeForLike(q)}%`);
 
 const searchByName = (qb: knex.QueryBuilder, q: string) => {
-  const cleanedQuery = q.replace(/[^\w\s]|_/g, '');
+  const cleanedQuery = escapeForTsQuery(q);
   return qb
     .table({ am: 'assets_names_map' })
     .columns({
@@ -69,7 +73,7 @@ const searchByName = (qb: knex.QueryBuilder, q: string) => {
     .whereRaw('am.searchable_asset_name @@ to_tsquery(?)', [
       `${cleanedQuery}${cleanedQuery.length > 0 ? ':*' : ''}`,
     ])
-    .orWhere('am.asset_name', 'ilike', `${q.replace('%', '\\%')}%`);
+    .orWhere('am.asset_name', 'ilike', `${escapeForLike(q)}%`);
 };
 
 export const searchAssets = (query: string): knex.QueryBuilder =>
