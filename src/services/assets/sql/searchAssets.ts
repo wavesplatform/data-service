@@ -1,8 +1,6 @@
 import * as knex from 'knex';
-import {
-  forTsQuery as escapeForTsQuery,
-  forLike as escapeForLike,
-} from '../../../utils/db/escape';
+import { compose } from 'ramda';
+import { escapeForTsQuery, prepareForLike } from '../../../utils/db';
 import { columns } from './common';
 
 const pg = knex({ client: 'pg' });
@@ -36,7 +34,7 @@ const searchByNameInMeta = (qb: knex.QueryBuilder, q: string) =>
         ),
       },
     ])
-    .where('asset_name', 'ilike', `${escapeForLike(q)}%`);
+    .where('asset_name', 'ilike', prepareForLike(q));
 
 const searchByTicker = (qb: knex.QueryBuilder, q: string): knex.QueryBuilder =>
   qb
@@ -52,28 +50,33 @@ const searchByTicker = (qb: knex.QueryBuilder, q: string): knex.QueryBuilder =>
       ),
     })
     .leftJoin({ t: 'txs_3' }, 'ti.asset_id', 't.asset_id')
-    .where('ticker', 'like', `${escapeForLike(q)}%`);
+    .where('ticker', 'ilike', prepareForLike(q));
 
 const searchByName = (qb: knex.QueryBuilder, q: string) => {
   const cleanedQuery = escapeForTsQuery(q);
-  return qb
-    .table({ am: 'assets_names_map' })
-    .columns({
-      asset_id: 'am.asset_id',
-      asset_name: 'am.asset_name',
-      ticker: 'ti.ticker',
-      height: 't.height',
-      rank: pg.raw(
-        "ts_rank(to_tsvector('simple', am.asset_name), plainto_tsquery(?), 3) * case when ti.ticker is null then 16 else 32 end",
-        [q]
-      ),
-    })
-    .leftJoin({ t: 'txs_3' }, 'am.asset_id', 't.asset_id')
-    .leftJoin({ ti: 'tickers' }, 'am.asset_id', 'ti.asset_id')
-    .whereRaw('am.searchable_asset_name @@ to_tsquery(?)', [
-      `${cleanedQuery}${cleanedQuery.length > 0 ? ':*' : ''}`,
-    ])
-    .orWhere('am.asset_name', 'ilike', `${escapeForLike(q)}%`);
+  return compose((q: knex.QueryBuilder) =>
+    cleanedQuery.length
+      ? q.whereRaw('am.searchable_asset_name @@ to_tsquery(?)', [
+          `${cleanedQuery}:*'`,
+        ])
+      : q
+  )(
+    qb
+      .table({ am: 'assets_names_map' })
+      .columns({
+        asset_id: 'am.asset_id',
+        asset_name: 'am.asset_name',
+        ticker: 'ti.ticker',
+        height: 't.height',
+        rank: pg.raw(
+          "ts_rank(to_tsvector('simple', am.asset_name), plainto_tsquery(?), 3) * case when ti.ticker is null then 16 else 32 end",
+          [q]
+        ),
+      })
+      .leftJoin({ t: 'txs_3' }, 'am.asset_id', 't.asset_id')
+      .leftJoin({ ti: 'tickers' }, 'am.asset_id', 'ti.asset_id')
+      .where('am.asset_name', 'ilike', prepareForLike(q))
+  );
 };
 
 export const searchAssets = (query: string): knex.QueryBuilder =>

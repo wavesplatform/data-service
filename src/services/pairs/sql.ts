@@ -1,9 +1,6 @@
 import * as knex from 'knex';
 import { compose } from 'ramda';
-import {
-  forTsQuery as escapeForTsQuery,
-  forLike as escapeForLike,
-} from '../../utils/db/escape';
+import { escapeForTsQuery, prepareForLike } from '../../utils/db';
 
 const pg = knex({ client: 'pg' });
 
@@ -88,41 +85,46 @@ const query = (pairs: { amountAsset: string; priceAsset: string }[]): string =>
 const searchAssets = (
   qb: knex.QueryBuilder,
   query: string,
-  exactly: boolean,
-  t: string = 't'
+  matchExactly: boolean,
+  tableAlias: string = 't'
 ) => {
   // will be used on searchable_asset_name search
   const cleanedQuery = escapeForTsQuery(query);
   return qb
-    .table({ [t]: 'assets' })
-    .column({ asset_id: `${t}.asset_id` })
-    .where(`${t}.asset_id`, query)
+    .table({ [tableAlias]: 'assets' })
+    .column({ asset_id: `${tableAlias}.asset_id` })
+    .where(`${tableAlias}.asset_id`, query)
     .where(
-      `${t}.ticker`,
+      `${tableAlias}.ticker`,
       'like',
-      `${escapeForLike(query)}${exactly ? '' : '%'}`
+      prepareForLike(query, { matchExactly })
     )
     .unionAll(q =>
       q
-        .from({ [`${t}2`]: 'assets_metadata' })
-        .column({ asset_id: `${t}2.asset_id` })
-        .where(`${t}2.asset_name`, 'ilike', escapeForLike(query))
+        .from({ [`${tableAlias}2`]: 'assets_metadata' })
+        .column({ asset_id: `${tableAlias}2.asset_id` })
+        .where(
+          `${tableAlias}2.asset_name`,
+          'ilike',
+          prepareForLike(query, { matchExactly })
+        )
     )
     .unionAll(q =>
       compose((q: knex.QueryBuilder) =>
         cleanedQuery.length
-          ? q.whereRaw(`${t}3.searchable_asset_name @@ to_tsquery(?)`, [
-              `${cleanedQuery}:*`,
-            ])
+          ? q.whereRaw(
+              `${tableAlias}3.searchable_asset_name @@ to_tsquery(?)`,
+              [`${cleanedQuery}:*`]
+            )
           : q
       )(
         q
-          .from({ [`${t}3`]: 'assets_names_map' })
-          .column({ asset_id: `${t}3.asset_id` })
+          .from({ [`${tableAlias}3`]: 'assets_names_map' })
+          .column({ asset_id: `${tableAlias}3.asset_id` })
           .where(
-            `${t}3.asset_name`,
+            `${tableAlias}3.asset_name`,
             'ilike',
-            `${escapeForLike(query)}${exactly ? '' : '%'}`
+            prepareForLike(query, { matchExactly })
           )
       )
     );
