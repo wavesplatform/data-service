@@ -1,4 +1,6 @@
 import * as knex from 'knex';
+import { compose } from 'ramda';
+import { escapeForTsQuery, prepareForLike } from '../../utils/db';
 
 const pg = knex({ client: 'pg' });
 
@@ -83,27 +85,50 @@ const query = (pairs: { amountAsset: string; priceAsset: string }[]): string =>
 const searchAssets = (
   qb: knex.QueryBuilder,
   query: string,
-  exactly: boolean,
-  t: string = 't'
-) =>
-  qb
-    .table({ [t]: 'assets' })
-    .column({ asset_id: `${t}.asset_id` })
-    .where(`${t}.asset_id`, query)
-    .orWhere(`${t}.asset_name`, 'ilike', `${query}${exactly ? '' : '%'}`)
-    .orWhere(`${t}.ticker`, 'like', `${query}${exactly ? '' : '%'}`)
-    .orWhereRaw(
-      `to_tsvector(${t}.asset_name) @@ to_tsquery('${query
-        .replace(/[()]/g, '')
-        .split(' ')
-        .join(exactly ? ' & ' : ':* & ')}${exactly ? '' : ':*'}')`
+  matchExactly: boolean,
+  tableAlias: string = 't'
+) => {
+  // will be used on searchable_asset_name search
+  const cleanedQuery = escapeForTsQuery(query);
+  return qb
+    .table({ [tableAlias]: 'assets' })
+    .column({ asset_id: `${tableAlias}.asset_id` })
+    .where(`${tableAlias}.asset_id`, query)
+    .where(
+      `${tableAlias}.ticker`,
+      'like',
+      prepareForLike(query, { matchExactly })
     )
     .unionAll(q =>
       q
-        .from({ [`${t}2`]: 'assets_metadata' })
-        .column({ asset_id: `${t}2.asset_id` })
-        .where(`${t}2.asset_name`, 'ilike', `${query}${exactly ? '' : '%'}`)
+        .from({ [`${tableAlias}2`]: 'assets_metadata' })
+        .column({ asset_id: `${tableAlias}2.asset_id` })
+        .where(
+          `${tableAlias}2.asset_name`,
+          'ilike',
+          prepareForLike(query, { matchExactly })
+        )
+    )
+    .unionAll(q =>
+      compose((q: knex.QueryBuilder) =>
+        cleanedQuery.length
+          ? q.whereRaw(
+              `${tableAlias}3.searchable_asset_name @@ to_tsquery(?)`,
+              [`${cleanedQuery}:*`]
+            )
+          : q
+      )(
+        q
+          .from({ [`${tableAlias}3`]: 'assets_names_map' })
+          .column({ asset_id: `${tableAlias}3.asset_id` })
+          .where(
+            `${tableAlias}3.asset_name`,
+            'ilike',
+            prepareForLike(query, { matchExactly })
+          )
+      )
     );
+};
 
 export const get = (pair: {
   amountAsset: string;
