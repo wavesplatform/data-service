@@ -94,9 +94,9 @@ const searchAssets = (
     .table({ [tableAlias]: 'assets' })
     .column({ asset_id: `${tableAlias}.asset_id` })
     .where(`${tableAlias}.asset_id`, query)
-    .where(
+    .orWhere(
       `${tableAlias}.ticker`,
-      'like',
+      'ilike',
       prepareForLike(query, { matchExactly })
     )
     .unionAll(q =>
@@ -112,7 +112,7 @@ const searchAssets = (
     .unionAll(q =>
       compose((q: knex.QueryBuilder) =>
         cleanedQuery.length
-          ? q.whereRaw(
+          ? q.orWhereRaw(
               `${tableAlias}3.searchable_asset_name @@ to_tsquery(?)`,
               [`${cleanedQuery}:*`]
             )
