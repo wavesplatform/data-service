@@ -17,7 +17,7 @@ const searchById = (q: string) =>
         [q]
       ),
     })
-    .where('t.asset_id', q);
+    .where('t.asset_id', 'ilike', q); // ilike - hack for searching for waves in different cases
 
 const searchByNameInMeta = (qb: knex.QueryBuilder, q: string) =>
   qb
@@ -38,19 +38,15 @@ const searchByNameInMeta = (qb: knex.QueryBuilder, q: string) =>
 
 const searchByTicker = (qb: knex.QueryBuilder, q: string): knex.QueryBuilder =>
   qb
-    .table({ ti: 'tickers' })
+    .table({ a: 'assets' })
     .columns({
-      asset_id: 'ti.asset_id',
-      asset_name: 't.asset_name',
-      ticker: 'ti.ticker',
-      height: 't.height',
-      rank: pg.raw(
-        "ts_rank(to_tsvector('simple', ti.ticker), plainto_tsquery(?), 3) * 32",
-        [q]
-      ),
+      asset_id: 'a.asset_id',
+      asset_name: 'a.asset_name',
+      ticker: 'a.ticker',
+      height: 'a.issue_height',
+      rank: pg.raw('32'),
     })
-    .leftJoin({ t: 'txs_3' }, 'ti.asset_id', 't.asset_id')
-    .where('ticker', 'ilike', prepareForLike(q));
+    .where('a.ticker', 'ilike', prepareForLike(q));
 
 const searchByName = (qb: knex.QueryBuilder, q: string) => {
   const cleanedQuery = escapeForTsQuery(q);
