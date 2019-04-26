@@ -17,7 +17,7 @@ const searchById = (q: string) =>
         [q]
       ),
     })
-    .where('t.asset_id', 'ilike', q); // ilike - hack for searching for waves in different cases
+    .where('t.asset_id', 'ilike', prepareForLike(q, { matchExactly: true })); // ilike - hack for searching for waves in different cases
 
 const searchByNameInMeta = (qb: knex.QueryBuilder, q: string) =>
   qb
