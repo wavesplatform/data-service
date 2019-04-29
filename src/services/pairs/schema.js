@@ -13,11 +13,20 @@ const inputGet = Joi.object().keys({
 
 const inputMget = Joi.array().items(inputGet);
 
-const inputSearch = Joi.object().keys({
-  limit: Joi.number()
-    .min(1)
-    .max(limitMaximum),
-});
+const inputSearch = Joi.object()
+  .keys({
+    search_by_asset: Joi.string(),
+    search_by_assets: Joi.array()
+      .items(Joi.string(), Joi.string())
+      .length(2),
+    match_exactly: Joi.array()
+      .items(Joi.boolean(), Joi.boolean())
+      .max(2),
+    limit: Joi.number()
+      .min(1)
+      .max(limitMaximum),
+  })
+  .nand('search_by_asset', 'search_by_assets');
 
 const result = Joi.object().keys({
   amount_asset_id: Joi.string()

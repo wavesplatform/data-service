@@ -15,7 +15,7 @@ const candlesSearch = async ctx => {
 
   const { fromParams } = select(ctx);
   const [amountAsset, priceAsset] = fromParams(['amountAsset', 'priceAsset']);
-  
+
   const { query } = select(ctx);
 
   const fValues = parseFilterValues({

@@ -1,7 +1,7 @@
-const getById = require('../presets/pg/getById');
-const mgetByIds = require('../presets/pg/mgetByIds');
-const search = require('../presets/pg/search');
-const { Pair } = require('../../types');
+const { getByIdPreset } = require('../presets/pg/getById');
+const { mgetByIdsPreset } = require('../presets/pg/mgetByIds');
+const { searchPreset } = require('../presets/pg/search');
+const { pair } = require('../../types');
 
 const {
   inputGet,
@@ -15,24 +15,24 @@ const matchRequestResult = require('./matchRequestResult');
 
 module.exports = ({ drivers, emitEvent }) => {
   return {
-    get: getById({
+    get: getByIdPreset({
       name: 'pairs.get',
       sql: sql.get,
       inputSchema: inputGet,
       resultSchema,
       transformResult: transformResult,
-      resultTypeFactory: Pair,
+      resultTypeFactory: pair,
     })({ pg: drivers.pg, emitEvent }),
-    mget: mgetByIds({
+    mget: mgetByIdsPreset({
       name: 'pairs.mget',
       sql: sql.mget,
       inputSchema: inputMget,
       resultSchema,
       transformResult: transformResult,
       matchRequestResult: matchRequestResult,
-      resultTypeFactory: Pair,
+      resultTypeFactory: pair,
     })({ pg: drivers.pg, emitEvent }),
-    search: search({
+    search: searchPreset({
       name: 'pairs.search',
       sql: sql.search,
       inputSchema: inputSearch,

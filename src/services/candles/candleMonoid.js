@@ -1,52 +1,49 @@
-const Monoid = require('../../types/Monoid');
 const { BigNumber } = require('@waves/data-entities');
 
 // common
-const leftNotNullMonoid = new Monoid({
+const leftNotNullMonoid = {
   concat: (a, b) => a || b,
   empty: null,
-});
+};
 
-const rightNotNullMonoid = new Monoid({
+const rightNotNullMonoid = {
   concat: (a, b) => b || a,
   empty: null,
-});
+};
 
-const sumMonoid = new Monoid({
+const sumMonoid = {
   concat: (a, b) => a + b,
   empty: 0,
-});
+};
 
-const bigNumberPlusMonoid = new Monoid({
+const bigNumberPlusMonoid = {
   concat: (a, b) => a.plus(b),
   empty: BigNumber(0),
-});
+};
 
-const maxMonoid = new Monoid({
+const maxMonoid = {
   concat: (a, b) => Math.max(a, b),
   empty: 0,
-});
+};
 
-const bigNumberLowestMonoid = new Monoid({
+const bigNumberLowestMonoid = {
   concat: (a, b) => (a.comparedTo(b) === 1 ? b : a),
   empty: BigNumber(+Infinity),
-});
+};
 
-const bigNumberHighestMonoid = new Monoid({
+const bigNumberHighestMonoid = {
   concat: (a, b) => (a.comparedTo(b) === 1 ? a : b),
   empty: BigNumber(-Infinity),
-});
+};
 
 // individual
-const weightedAveragePriceMonoid = new Monoid({
+const weightedAveragePriceMonoid = {
   concat: (a, b) =>
-    a.quote_volume
-      .plus(b.quote_volume)
-      .dividedBy(a.volume.plus(b.volume)),
+    a.quote_volume.plus(b.quote_volume).dividedBy(a.volume.plus(b.volume)),
   empty: BigNumber(0),
-});
+};
 
-const candleMonoid = new Monoid({
+const candleMonoid = {
   concat: (a, b) => ({
     time_start: leftNotNullMonoid.concat(a.time_start, b.time_start),
     open: leftNotNullMonoid.concat(a.open, b.open),
@@ -59,7 +56,7 @@ const candleMonoid = new Monoid({
     max_height: maxMonoid.concat(a.max_height, b.max_height),
     txs_count: sumMonoid.concat(a.txs_count, b.txs_count),
     a_dec: maxMonoid.concat(a.a_dec, b.a_dec),
-    p_dec: maxMonoid.concat(a.p_dec, b.p_dec)
+    p_dec: maxMonoid.concat(a.p_dec, b.p_dec),
   }),
   empty: {
     time_start: leftNotNullMonoid.empty,
@@ -73,9 +70,9 @@ const candleMonoid = new Monoid({
     max_height: maxMonoid.empty,
     txs_count: sumMonoid.empty,
     a_dec: rightNotNullMonoid.empty,
-    p_dec: rightNotNullMonoid.empty
+    p_dec: rightNotNullMonoid.empty,
   },
-});
+};
 
 module.exports = {
   leftNotNullMonoid,

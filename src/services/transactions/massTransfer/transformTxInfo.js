@@ -24,11 +24,11 @@ const addZippedTransfers = tx =>
   )(tx);
 
 module.exports = compose(
+  transformTxInfo,
   renameKeys({
     asset_id: 'assetId',
     fee_asset: 'feeAsset',
   }),
   omit(['amounts', 'recipients']),
   addZippedTransfers,
-  transformTxInfo
 );

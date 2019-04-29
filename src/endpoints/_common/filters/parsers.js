@@ -1,16 +1,11 @@
-const {
-  isNil,
-  identity,
-  always,
-  ifElse,
-  defaultTo,
-  compose,
-} = require('ramda');
+const { identity, defaultTo, compose } = require('ramda');
 
 const { parseDate } = require('../../../utils/parseDate');
 const { parseArrayQuery } = require('../../utils/parseArrayQuery');
 
-const dateOrNull = ifElse(isNil, always(null), parseDate);
+const dateOrNull = str => parseDate(str).getOrElse(null);
+const trimedStringOrNull = q =>
+  typeof q === 'undefined' ? undefined : q.toString().trim();
 
 module.exports = {
   timeStart: dateOrNull,
@@ -22,4 +17,5 @@ module.exports = {
   sort: defaultTo('desc'),
   after: identity,
   ids: parseArrayQuery,
+  query: trimedStringOrNull,
 };

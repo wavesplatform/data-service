@@ -1,6 +1,6 @@
 const { compose, pick, map } = require('ramda');
 const { renameKeys } = require('ramda-adjunct');
-const { List, Pair } = require('../../types');
+const { list, pair } = require('../../types');
 
 /** pickPairFields :: Object -> Object */
 const pickPairFields = pick([
@@ -12,7 +12,7 @@ const pickPairFields = pick([
   'volume',
   'quoteVolume',
   'volumeWaves',
-  'txsCount'
+  'txsCount',
 ]);
 
 /** renamePairFields :: Object -> Object */
@@ -33,18 +33,18 @@ const transformResult = compose(
 
 /** transformResultSearch :: Array -> Object */
 const transformResultSearch = compose(
-  List,
-  map(pair =>
+  list,
+  map(p =>
     compose(
       pairObject => ({
         ...pairObject,
-        amountAsset: pair.amount_asset_id,
-        priceAsset: pair.price_asset_id,
+        amountAsset: p.amount_asset_id,
+        priceAsset: p.price_asset_id,
       }),
-      Pair,
+      pair,
       pickPairFields,
       renamePairFields
-    )(pair)
+    )(p)
   )
 );
 

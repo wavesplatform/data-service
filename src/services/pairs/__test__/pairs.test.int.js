@@ -1,6 +1,6 @@
 const pg = require('knex')({ client: 'pg' });
 const { createPgDriver } = require('../../../db');
-const loadConfig = require('../../../loadConfig');
+const { loadConfig } = require('../../../loadConfig');
 const options = loadConfig();
 const pgDriver = createPgDriver(options);
 const create = require('../index');
@@ -27,13 +27,13 @@ describe('Pairs', () => {
 
   describe('get one pair', () => {
     it('should return Pair for one correctly', async () => {
-      const result = await service
+      const result = (await service
         .get({
           amountAsset: pair.amount_asset_id,
           priceAsset: pair.price_asset_id,
         })
         .run()
-        .promise();
+        .promise()).unsafeGet();
 
       expect(result.data).toHaveProperty('firstPrice', pair.first_price);
       expect(result.data).toHaveProperty('lastPrice', pair.last_price);
@@ -42,7 +42,10 @@ describe('Pairs', () => {
       expect(result.data).toHaveProperty('volume', pair.volume);
       expect(result.data).toHaveProperty('quoteVolume', pair.quote_volume);
       expect(result.data).toHaveProperty('volumeWaves', pair.volume_waves);
-      expect(result.data).toHaveProperty('weightedAveragePrice', pair.weighted_average_price);
+      expect(result.data).toHaveProperty(
+        'weightedAveragePrice',
+        pair.weighted_average_price
+      );
       expect(result.data).toHaveProperty('txsCount', pair.txs_count);
     });
 
@@ -54,10 +57,11 @@ describe('Pairs', () => {
         })
         .run()
         .listen({
-          onResolved: nullable => {
-            expect(nullable).toEqual(null);
+          onResolved: pair => {
+            expect(pair).toBeNothing();
             done();
           },
+          onRejected: done.fail,
         });
     });
   });
@@ -99,7 +103,7 @@ describe('Pairs', () => {
         .listen({
           onResolved: pairs => {
             expect(pairs.__type).toEqual('list');
-            expect(pairs.data).toEqual([null]);
+            expect(pairs.data).toEqual([{ __type: 'pair', data: null }]);
             done();
           },
         });
@@ -110,7 +114,8 @@ describe('Pairs', () => {
     it('should return Pairs correctly', async () => {
       const result = await service
         .search({
-          limit: 2
+          search_by_assets: ['WAVES', 'BTC'],
+          limit: 2,
         })
         .run()
         .promise();
