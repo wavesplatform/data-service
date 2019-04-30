@@ -3,8 +3,7 @@ FROM node:10-alpine
 # enable node_modules caching layer
 RUN apk add --no-cache tini git
 ADD package.json /tmp/package.json
-ADD yarn.lock /tmp/yarn.lock
-RUN cd /tmp && yarn install
+RUN cd /tmp && npm install
 RUN mkdir -p /opt/dataservice-pairs && cp -a /tmp/node_modules /opt/dataservice-pairs
 
 # set work dir
