@@ -88,9 +88,13 @@ const selectExchanges = pg({ t: 'txs_7' }).column(
   `price`
 );
 
-/** selectExchangesAfterBlock :: Number -> QueryBuilder */
-const selectExchangesAfterBlock = startBlock =>
-  selectExchanges.clone().where('t.height', '>=', startBlock);
+/** selectExchangesAfterTimestamp :: Number -> QueryBuilder */
+const selectExchangesAfterTimestamp = fromTimestamp =>
+  selectExchanges
+    .clone()
+    .whereRaw(
+      `t.time_stamp >= date_trunc('minute', '${fromTimestamp.toISOString()}'::timestamp)`
+    );
 
 /** selectLastCandle :: String -> String query */
 const selectLastCandle = tableName =>
@@ -108,6 +112,13 @@ const selectLastExchangeTx = () =>
     .orderBy('height', 'desc')
     .toString();
 
+/** selectLastExchangeTx :: String query */
+const selectMinTimestampFromHeight = height =>
+  pg({ t: 'txs_7' })
+    .select({ time_stamp: pg.min('time_stamp') })
+    .where('height', '>=', height)
+    .toString();
+
 /** for make complex query with "on conflict (...) update ... without set concrete values" See insertOrUpdateCandles or insertOrUpdateCandlesFromShortInterval */
 const updatedFieldsExcluded = [
   'open',
@@ -119,7 +130,6 @@ const updatedFieldsExcluded = [
   'txs_count',
   'volume',
   'weighted_average_price',
-  'interval_in_secs',
 ]
   .map(field => field + '=EXCLUDED.' + field)
   .join(', ');
@@ -194,12 +204,12 @@ const insertAllCandles = (tableName, shortInterval, longerInterval) =>
   }).toString();
 
 /** selectCandlesByMinute :: Number -> String query */
-const selectCandlesByMinute = startHeight =>
+const selectCandlesByMinute = fromTimetamp =>
   pg({ t: 'txs_7' })
     .columns(candleSelectColumns)
     .select()
     .from(
-      selectExchangesAfterBlock(startHeight)
+      selectExchangesAfterTimestamp(fromTimetamp)
         .clone()
         .as('e')
     )
@@ -218,4 +228,5 @@ module.exports = {
   selectLastCandle,
   selectLastExchangeTx,
   insertOrUpdateCandlesFromShortInterval,
+  selectMinTimestampFromHeight,
 };
