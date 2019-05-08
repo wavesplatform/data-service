@@ -53,7 +53,7 @@ const searchByName = (qb: knex.QueryBuilder, q: string) => {
   return compose((q: knex.QueryBuilder) =>
     cleanedQuery.length
       ? q.whereRaw('am.searchable_asset_name @@ to_tsquery(?)', [
-          `${cleanedQuery}:*'`,
+          `${cleanedQuery}:*`,
         ])
       : q
   )(
