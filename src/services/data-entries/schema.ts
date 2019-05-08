@@ -21,10 +21,14 @@ export const inputSearch = Joi.object()
   .required();
 
 export const output = Joi.object().keys({
-  key: Joi.string().required(),
-  type: Joi.number().valid([1, 2, 3, 4]),
-  binaryValue: Joi.string().allow(''),
-  boolValue: Joi.boolean(),
-  intValue: Joi.number(),
-  stringValue: Joi.string().allow(''),
+  address: Joi.binary(),
+  entry: Joi.object()
+    .keys({
+      key: Joi.string().required(),
+      binaryValue: Joi.binary().allow(''),
+      boolValue: Joi.boolean(),
+      intValue: Joi.object().long().int64().allow(null),
+      stringValue: Joi.string().allow(''),
+    })
+    .required(),
 });

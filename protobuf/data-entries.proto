@@ -1,25 +1,46 @@
 syntax = "proto3";
+import "transaction.proto";
 
-message GetDataEntriesRequest {
-  bytes transaction_id = 1;
-  int32 height = 2;
-  int64 timestamp = 3;
-  bytes address = 4;
+message ByTransactionRequest { bytes transaction_id = 1; }
 
-  DataEntry entry = 5; // full match
+message ByAddressRequest {
+  int32 height = 1;
+  int64 timestamp = 2;
+  bytes address = 3;
+  int32 limit = 4;
+  bytes after = 5;
+  string key = 6;
+  int32 type = 7;
+  oneof value {
+    int64 int_value = 10;
+    bool bool_value = 11;
+    bytes binary_value = 12;
+    string string_value = 13;
+  };
 }
 
-message DataEntry {
-  string key = 1;
-  int32 type = 2;
+message SearchRequest {
+  int32 height = 1;
+  int64 timestamp = 2;
+  int32 limit = 3;
+  bytes after = 4;
+  string key = 5;
+  int32 type = 6;
   oneof value {
-      int64 int_value = 10;
-      bool bool_value = 11;
-      bytes binary_value = 12;
-      string string_value = 13;
+    int64 int_value = 10;
+    bool bool_value = 11;
+    bytes binary_value = 12;
+    string string_value = 13;
   };
-};
+}
+
+message DataEntryResponse {
+  bytes address = 1;
+  DataTransactionData.DataEntry entry = 2;
+}
 
 service DataEntries {
-  rpc GetDataEntries(GetDataEntriesRequest) returns (stream DataEntry);
+  rpc ByTransaction(ByTransactionRequest) returns (stream DataEntryResponse);
+  rpc ByAddress(ByAddressRequest) returns (stream DataEntryResponse);
+  rpc Search(SearchRequest) returns (stream DataEntryResponse);
 }

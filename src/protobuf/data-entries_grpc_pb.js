@@ -3,41 +3,86 @@
 'use strict';
 var grpc = require('grpc');
 var data$entries_pb = require('./data-entries_pb.js');
+var transaction_pb = require('./transaction_pb.js');
 
-function serialize_DataEntry(arg) {
-  if (!(arg instanceof data$entries_pb.DataEntry)) {
-    throw new Error('Expected argument of type DataEntry');
+function serialize_ByAddressRequest(arg) {
+  if (!(arg instanceof data$entries_pb.ByAddressRequest)) {
+    throw new Error('Expected argument of type ByAddressRequest');
   }
   return Buffer.from(arg.serializeBinary());
 }
 
-function deserialize_DataEntry(buffer_arg) {
-  return data$entries_pb.DataEntry.deserializeBinary(new Uint8Array(buffer_arg));
+function deserialize_ByAddressRequest(buffer_arg) {
+  return data$entries_pb.ByAddressRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_GetDataEntriesRequest(arg) {
-  if (!(arg instanceof data$entries_pb.GetDataEntriesRequest)) {
-    throw new Error('Expected argument of type GetDataEntriesRequest');
+function serialize_ByTransactionRequest(arg) {
+  if (!(arg instanceof data$entries_pb.ByTransactionRequest)) {
+    throw new Error('Expected argument of type ByTransactionRequest');
   }
   return Buffer.from(arg.serializeBinary());
 }
 
-function deserialize_GetDataEntriesRequest(buffer_arg) {
-  return data$entries_pb.GetDataEntriesRequest.deserializeBinary(new Uint8Array(buffer_arg));
+function deserialize_ByTransactionRequest(buffer_arg) {
+  return data$entries_pb.ByTransactionRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_DataEntryResponse(arg) {
+  if (!(arg instanceof data$entries_pb.DataEntryResponse)) {
+    throw new Error('Expected argument of type DataEntryResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_DataEntryResponse(buffer_arg) {
+  return data$entries_pb.DataEntryResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_SearchRequest(arg) {
+  if (!(arg instanceof data$entries_pb.SearchRequest)) {
+    throw new Error('Expected argument of type SearchRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_SearchRequest(buffer_arg) {
+  return data$entries_pb.SearchRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 
 var DataEntriesService = exports.DataEntriesService = {
-  getDataEntries: {
-    path: '/DataEntries/GetDataEntries',
+  byTransaction: {
+    path: '/DataEntries/ByTransaction',
     requestStream: false,
     responseStream: true,
-    requestType: data$entries_pb.GetDataEntriesRequest,
-    responseType: data$entries_pb.DataEntry,
-    requestSerialize: serialize_GetDataEntriesRequest,
-    requestDeserialize: deserialize_GetDataEntriesRequest,
-    responseSerialize: serialize_DataEntry,
-    responseDeserialize: deserialize_DataEntry,
+    requestType: data$entries_pb.ByTransactionRequest,
+    responseType: data$entries_pb.DataEntryResponse,
+    requestSerialize: serialize_ByTransactionRequest,
+    requestDeserialize: deserialize_ByTransactionRequest,
+    responseSerialize: serialize_DataEntryResponse,
+    responseDeserialize: deserialize_DataEntryResponse,
+  },
+  byAddress: {
+    path: '/DataEntries/ByAddress',
+    requestStream: false,
+    responseStream: true,
+    requestType: data$entries_pb.ByAddressRequest,
+    responseType: data$entries_pb.DataEntryResponse,
+    requestSerialize: serialize_ByAddressRequest,
+    requestDeserialize: deserialize_ByAddressRequest,
+    responseSerialize: serialize_DataEntryResponse,
+    responseDeserialize: deserialize_DataEntryResponse,
+  },
+  search: {
+    path: '/DataEntries/Search',
+    requestStream: false,
+    responseStream: true,
+    requestType: data$entries_pb.SearchRequest,
+    responseType: data$entries_pb.DataEntryResponse,
+    requestSerialize: serialize_SearchRequest,
+    requestDeserialize: deserialize_SearchRequest,
+    responseSerialize: serialize_DataEntryResponse,
+    responseDeserialize: deserialize_DataEntryResponse,
   },
 };
 

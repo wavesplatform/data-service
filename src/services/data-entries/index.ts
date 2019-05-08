@@ -1,11 +1,12 @@
 import { compose } from 'ramda';
-import { list, DataEntry, dataEntry } from '../../types';
-import { DataEntry as PBDataEntry } from '../../protobuf/data-entries_pb';
+import { list, DataEntryInfo, DataEntry, dataEntry } from '../../types';
+import { DataEntryResponse } from '../../protobuf/data-entries';
 import { EmitEvent } from '../_common/createResolver/types';
 import { searchPreset } from '../presets/common/search';
 import { getDataEntries } from './data';
 
 import { inputSearch, output } from './schema';
+import { transformResult } from './transformResult';
 
 export default ({
   drivers,
@@ -20,10 +21,11 @@ export default ({
       getData: getDataEntries,
       inputSchema: inputSearch,
       resultSchema: output,
-      transformResult: res =>
+      transformResult: (res: DataEntryResponse[]) =>
         compose(
           l => list<DataEntry>(l),
-          (l: PBDataEntry.AsObject[]) => l.map(d => dataEntry(d))
+          (l: DataEntryInfo[]) => l.map(d => dataEntry(d)),
+          (l: DataEntryResponse[]) => l.map(d => transformResult(d))
         )(res),
     })({ db: drivers.dataEntries, emitEvent: emitEvent }),
   };

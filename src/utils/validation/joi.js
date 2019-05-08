@@ -1,6 +1,7 @@
 const rawJoi = require('joi');
 
 const { BigNumber } = require('@waves/data-entities');
+const Long = require('long');
 const { decode } = require('../../services/_common/pagination/cursor');
 const { base58: base58Regex, interval: intervalRegex } = require('../regex');
 const { interval } = require('../../types');
@@ -239,6 +240,7 @@ module.exports = rawJoi
     base: joi.object(),
     name: 'object',
     language: {
+      int64: 'The number {{value}} is neither instance of BigNumber nor Long.',
       bignumber: {
         int64: 'The number {{value}} is outside int64 range',
       },
@@ -259,17 +261,40 @@ module.exports = rawJoi
         },
       },
       {
+        name: 'long',
+        validate(_, value, state, options) {
+          if (!(value instanceof Long)) {
+            return this.createError(
+              'object.type',
+              { type: Long },
+              state,
+              options
+            );
+          }
+          return value;
+        },
+      },
+      {
         name: 'int64',
         validate(_, value, state, options) {
+          if (!(value instanceof BigNumber) && !(value instanceof Long)) {
+            return this.createError(
+              'object.int64',
+              { value: value.toString() },
+              state,
+              options
+            );
+          }
+
           const BOUNDS = {
             LOWER: new BigNumber('-9223372036854775808'),
             UPPER: new BigNumber('9223372036854775807'),
           };
 
           if (
-            !(value instanceof BigNumber) ||
-            value.isLessThan(BOUNDS.LOWER) ||
-            value.isGreaterThan(BOUNDS.UPPER)
+            value instanceof BigNumber &&
+            (value.isLessThan(BOUNDS.LOWER) ||
+              value.isGreaterThan(BOUNDS.UPPER))
           ) {
             return this.createError(
               'object.bignumber.int64',

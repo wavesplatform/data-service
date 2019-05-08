@@ -1,9 +1,11 @@
 import * as grpc from 'grpc';
-import { DataEntriesClient } from '../../protobuf/data-entries_grpc_pb';
+import * as Long from 'long';
 import {
-  GetDataEntriesRequest,
-  DataEntry,
-} from '../../protobuf/data-entries_pb';
+  DataEntryResponse,
+  ByTransactionRequest,
+  ByAddressRequest,
+  SearchRequest,
+} from '../../protobuf/data-entries';
 
 import { Task, task } from 'folktale/concurrency/task';
 import { DbError, toDbError } from '../../errorHandling';
@@ -22,61 +24,84 @@ type DataEntriesRequest = {
   string_value?: string;
 };
 
-export const getDataEntries = (db: DataEntriesClient) => (
+export const getDataEntries = (db: grpc.Client) => (
   req: DataEntriesRequest
-): Task<DbError, DataEntry.AsObject[]> => {
+): Task<DbError, DataEntryResponse[]> => {
   return task(resolver => {
-    const request = new GetDataEntriesRequest();
-    if (req.address) {
-      request.setAddress(base58.decode(req.address));
-    }
-    if (req.height) {
-      request.setHeight(req.height);
-    }
-    if (req.timestamp) {
-      request.setTimestamp(req.timestamp.getTime());
-    }
+    let request, path;
+
+    const reqSerializer = (
+      req: ByTransactionRequest | ByAddressRequest | SearchRequest
+    ): Buffer => {
+      if (req instanceof ByTransactionRequest) {
+        return Buffer.from(ByTransactionRequest.encode(req).finish());
+      } else if (req instanceof ByAddressRequest) {
+        return Buffer.from(ByAddressRequest.encode(req).finish());
+      } else {
+        return Buffer.from(SearchRequest.encode(req).finish());
+      }
+    };
+
     if (req.transaction_id) {
-      request.setTransactionId(
-        Buffer.from(req.transaction_id).toString('base64')
-      );
-    }
-    const entry = new DataEntry();
-    if (req.key) {
-      entry.setKey(req.key);
-    }
-    if (req.type) {
-      entry.setType(req.type);
-    }
-    if (req.binary_value) {
-      entry.setBinaryValue(req.binary_value);
-    }
-    if (req.bool_value) {
-      entry.setBoolValue(req.bool_value);
-    }
-    if (req.int_value) {
-      entry.setIntValue(req.int_value);
-    }
-    if (req.string_value) {
-      entry.setStringValue(req.string_value);
-    }
-    request.setEntry(entry);
+      request = new ByTransactionRequest({
+        transactionId: base58.decode(req.transaction_id),
+      });
+      path = '/DataEntries/ByTransaction';
+    } else {
+      if (req.address) {
+        request = new ByAddressRequest({
+          address: base58.decode(req.address),
+        });
+        path = '/DataEntries/ByAddress';
+      } else {
+        request = new SearchRequest();
+        path = '/DataEntries/Search';
+      }
 
-    const stream: grpc.ClientReadableStream<DataEntry> = db.getDataEntries(
-      request
-    );
+      if (req.height) {
+        request.height = req.height;
+      }
+      if (req.timestamp) {
+        request.timestamp = Long.fromNumber(req.timestamp.getTime());
+      }
+      if (req.key) {
+        request.key = req.key;
+      }
+      if (req.type) {
+        request.type = req.type;
+      }
+      if (req.binary_value) {
+        request.binaryValue = Buffer.from(
+          req.binary_value.toString(),
+          'base64'
+        );
+      }
+      if (req.bool_value) {
+        request.boolValue = req.bool_value;
+      }
+      if (req.int_value) {
+        request.intValue = Long.fromNumber(req.int_value);
+      }
+      if (req.string_value) {
+        request.stringValue = req.string_value;
+      }
+    }
 
-    const response: DataEntry.AsObject[] = [];
+    const response: DataEntryResponse[] = [];
+    const stream = db.makeServerStreamRequest<
+      ByTransactionRequest | ByAddressRequest | SearchRequest,
+      DataEntryResponse
+    >(path, reqSerializer, DataEntryResponse.decode, request);
 
-    stream.on('data', (data: DataEntry) => {
-      response.push(data.toObject());
+    stream.on('data', (data: DataEntryResponse) => {
+      response.push(data);
     });
 
     stream.on('end', () => {
       resolver.resolve(response);
     });
 
-    stream.on('error', e => {
+    stream.on('error', (e: Error) => {
       resolver.reject(toDbError({}, e));
     });
   });
