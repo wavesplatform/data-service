@@ -1,5 +1,4 @@
-import { assoc } from 'ramda';
-
+import { toDbError } from '../../../../errorHandling';
 import { PgDriver } from '../../../../db/driver';
 
 export const getData = <Request, ResponseRaw>({
@@ -11,4 +10,4 @@ export const getData = <Request, ResponseRaw>({
 }) => (pg: PgDriver) => (request: Request) =>
   pg
     .any<ResponseRaw>(sql(request))
-    .mapRejected(assoc('meta', { request: name, params: request }));
+    .mapRejected(e => toDbError({ request: name, params: request }, e.error));
