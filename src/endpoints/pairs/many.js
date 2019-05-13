@@ -5,7 +5,7 @@ const createManyMiddleware = require('../_common/many');
 
 const { parseArrayQuery } = require('../utils/parseArrayQuery');
 const { parseBool } = require('../utils/parseBool');
-const { limit } = require('../_common/filters');
+const { limit, query } = require('../_common/filters');
 
 const { map, split, zipObj, compose } = require('ramda');
 
@@ -34,20 +34,20 @@ const parsePairs = map(
 const pairsMany = createManyMiddleware(
   {
     filterParsers: {
-      pairs: x =>
-        compose(
-          m => m.getOrElse(null),
-          map(parsePairs),
-          Maybe.fromNullable,
-          parseArrayQuery
-        )(x),
-      search_by_asset: x => x,
+      pairs: compose(
+        m => m.getOrElse(null),
+        map(parsePairs),
+        Maybe.fromNullable,
+        parseArrayQuery
+      ),
+      search_by_asset: query,
       search_by_assets: parseArrayQuery,
-      match_exactly: x =>
-        compose(
-          map(parseBool),
-          parseArrayQuery
-        )(x),
+      match_exactly: compose(
+        m => m.getOrElse(undefined),
+        map(map(parseBool)),
+        Maybe.fromNullable,
+        parseArrayQuery
+      ),
       limit,
     },
     mgetFilterName: 'pairs',

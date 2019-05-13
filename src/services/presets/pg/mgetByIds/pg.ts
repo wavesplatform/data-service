@@ -1,7 +1,6 @@
-import { assoc } from 'ramda';
-
 import { PgDriver } from '../../../../db/driver';
 import { matchRequestsResults } from '../../../../utils/db';
+import { toDbError } from '../../../../errorHandling';
 
 export const getData = <ResponseRaw, Id = string>({
   matchRequestResult,
@@ -15,4 +14,4 @@ export const getData = <ResponseRaw, Id = string>({
   pg
     .any<ResponseRaw>(sql(req))
     .map(responses => matchRequestsResults(matchRequestResult, req, responses))
-    .mapRejected(assoc('meta', { request: name, params: req }));
+    .mapRejected(e => toDbError({ request: name, params: req }, e.error));

@@ -44,8 +44,7 @@ export const search = ({
       (q: knex.QueryBuilder) => q.toString(),
       (q: knex.QueryBuilder) => (limit ? q.clone().limit(limit) : q),
       (q: knex.QueryBuilder) =>
-        after ? q.clone().where('rn', '>', getAssetIndex(after)) : q,
-      searchAssets
-    )(search);
+        after ? q.clone().where('rn', '>', getAssetIndex(after)) : q
+    )(searchAssets(search));
   }
 };

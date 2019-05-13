@@ -15,19 +15,18 @@ const inputMget = Joi.array().items(inputGet);
 
 const inputSearch = Joi.object()
   .keys({
-    search_by_asset: Joi.string().optional(),
+    search_by_asset: Joi.string(),
     search_by_assets: Joi.array()
-      .items(Joi.string().required(), Joi.string().required())
-      .optional(),
+      .items(Joi.string(), Joi.string())
+      .length(2),
     match_exactly: Joi.array()
       .items(Joi.boolean(), Joi.boolean())
-      .optional(),
+      .max(2),
     limit: Joi.number()
       .min(1)
       .max(limitMaximum),
   })
-  .or('search_by_asset', 'search_by_assets')
-  .required();
+  .nand('search_by_asset', 'search_by_assets');
 
 const result = Joi.object().keys({
   amount_asset_id: Joi.string()
