@@ -20,6 +20,7 @@ export type ServerConfig = {
 
 export type BalancesServiceConfig = {
   balancesServiceHost: string;
+  balancesServicePort: number;
 };
 
 export type DataEntriesServiceConfig = {
@@ -50,7 +51,10 @@ const load = (): DataServiceConfig => {
       ? parseInt(process.env.PGPOOLSIZE)
       : 20,
     logLevel: process.env.LOG_LEVEL || 'info',
-    balancesServiceHost: process.env.BALANCES_SERVICE_HOST || 'localhost:3001',
+    balancesServiceHost: process.env.BALANCES_SERVICE_HOST || 'localhost',
+    balancesServicePort: process.env.BALANCES_SERVICE_PORT
+      ? parseInt(process.env.BALANCES_SERVICE_PORT)
+      : 3001,
     dataEntriesServiceHost:
       process.env.DATA_ENTRIES_SERVICE_HOST || 'localhost',
     dataEntriesServicePort: process.env.DATA_ENTRIES_SERVICE_PORT
