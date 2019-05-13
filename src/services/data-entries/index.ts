@@ -3,21 +3,17 @@ import { list, DataEntryInfo, DataEntry, dataEntry } from '../../types';
 import { DataEntryResponse } from '../../protobuf/data-entries';
 import { EmitEvent } from '../_common/createResolver/types';
 import { searchPreset } from '../presets/common/search';
+import { ServicePresetInitOptions } from '../presets/types';
 import { getDataEntries } from './data';
 
 import { inputSearch, output } from './schema';
 import { transformResult } from './transformResult';
-import * as grpc from 'grpc';
-
-type DataServiceDriver = {
-  dataEntries: grpc.Client;
-};
 
 export default ({
   drivers,
   emitEvent,
 }: {
-  drivers: DataServiceDriver;
+  drivers: ServicePresetInitOptions;
   emitEvent: EmitEvent;
 }) => {
   return {

@@ -7,7 +7,6 @@ import {
   ByTransactionRequest,
   ByAddressRequest,
   SearchRequest,
-  Balance,
 } from '../protobuf/data-entries';
 
 const service = {
@@ -18,8 +17,8 @@ const service = {
     requestSerialize: (req: ByTransactionRequest) =>
       Buffer.from(ByTransactionRequest.encode(req).finish()),
     requestDeserialize: ByTransactionRequest.decode,
-    responseSerialize: (res: Balance) =>
-      Buffer.from(Balance.encode(res).finish()),
+    responseSerialize: (res: DataEntryResponse) =>
+      Buffer.from(DataEntryResponse.encode(res).finish()),
     responseDeserialize: DataEntryResponse.decode,
   },
   byAddress: {
@@ -29,8 +28,8 @@ const service = {
     requestSerialize: (req: ByAddressRequest) =>
       Buffer.from(ByAddressRequest.encode(req).finish()),
     requestDeserialize: ByAddressRequest.decode,
-    responseSerialize: (res: Balance) =>
-      Buffer.from(Balance.encode(res).finish()),
+    responseSerialize: (res: DataEntryResponse) =>
+      Buffer.from(DataEntryResponse.encode(res).finish()),
     responseDeserialize: DataEntryResponse.decode,
   },
   search: {
@@ -40,8 +39,8 @@ const service = {
     requestSerialize: (req: SearchRequest) =>
       Buffer.from(SearchRequest.encode(req).finish()),
     requestDeserialize: ByAddressRequest.decode,
-    responseSerialize: (res: Balance) =>
-      Buffer.from(Balance.encode(res).finish()),
+    responseSerialize: (res: DataEntryResponse) =>
+      Buffer.from(DataEntryResponse.encode(res).finish()),
     responseDeserialize: DataEntryResponse.decode,
   },
 };

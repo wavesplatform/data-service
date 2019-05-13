@@ -35,19 +35,21 @@ const commonConfig = {
   transformInput: identity,
   transformResult: (rs: Maybe<string>[]): (string | null)[] =>
     rs.map(m => m.getOrElse(null)),
-  dbQuery: (driver: PgDriver) => (ids: string[]) =>
-    driver.many<string>(ids.join('::')).map(results => results.map(maybeOf)),
+  getData: (ids: string[]) =>
+    mockPgDriver
+      .many<string>(ids.join('::'))
+      .map(results => results.map(maybeOf)),
 };
 
 const createMockResolver = (
   validateInput: Validate<ValidationError, string[]>,
   validateResult: Validate<ResolverError, string>
 ) =>
-  mget<PgDriver, string[], string[], string, (string | null)[]>({
+  mget<string[], string[], string, (string | null)[]>({
     ...commonConfig,
     validateInput,
     validateResult,
-  })({ db: mockPgDriver });
+  })({});
 
 afterEach(() => jest.clearAllMocks());
 
@@ -71,7 +73,7 @@ describe('Resolver', () => {
       ...commonConfig,
       validateInput: inputOk,
       validateResult: resultOk,
-    })({ db: mockPgDriver });
+    })({});
 
     goodResolver(ids)
       .run()
@@ -102,7 +104,7 @@ describe('Resolver', () => {
       ...commonConfig,
       validateInput: inputError,
       validateResult: resultOk,
-    })({ db: mockPgDriver });
+    })({});
 
     badInputResolver(ids)
       .run()

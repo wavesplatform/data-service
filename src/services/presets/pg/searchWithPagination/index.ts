@@ -8,7 +8,6 @@ import { Serializable, List } from '../../../../types';
 import { getData } from './pg';
 import { ServicePresetInitOptions } from '../../../presets/types';
 import { Cursor, SortOrder } from 'services/_common/pagination/cursor';
-import { PgDriver } from '../../../../db/driver';
 
 export type WithSortOrder = {
   sort: SortOrder;
@@ -48,7 +47,6 @@ export const searchWithPaginationPreset = <
   ) => ResponseTransformed;
 }) => ({ pg, emitEvent }: ServicePresetInitOptions) =>
   search<
-    PgDriver,
     RequestWithCursor<Request, string>,
     RequestWithCursor<Request, Cursor>,
     ResponseRaw,
@@ -58,8 +56,8 @@ export const searchWithPaginationPreset = <
     transformResult: transformResults(transformResult),
     validateInput: validateInput(inputSchema, name),
     validateResult: validateResult(resultSchema, name),
-    dbQuery: getData<RequestWithCursor<Request, Cursor>, ResponseRaw>({
+    getData: getData<RequestWithCursor<Request, Cursor>, ResponseRaw>({
       name,
       sql,
-    }),
-  })({ db: pg, emitEvent });
+    })(pg),
+  })({ emitEvent });

@@ -11,6 +11,7 @@ import {
 } from '../../../../../types/serialization';
 import { PgDriver } from '../../../../../db/driver';
 import { SortOrder } from '../../../../_common/pagination/cursor';
+import * as grpc from 'grpc';
 
 const mockTxs: ResponseRaw[] = [
   { id: 'q', timestamp: new Date() },
@@ -41,6 +42,7 @@ const service = searchWithPaginationPreset<
     toSerializable<'tx', ResponseRaw>('tx', response),
 })({
   pg: { any: filters => task(mockTxs) } as PgDriver,
+  dataEntries: new grpc.Client('', grpc.credentials.createInsecure()),
   emitEvent: always(identity),
 });
 

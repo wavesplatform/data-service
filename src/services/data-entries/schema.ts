@@ -17,7 +17,7 @@ export const inputSearch = Joi.object()
   .with('bool_value', 'type')
   .with('int_value', 'type')
   .with('string_value', 'type')
-  .xor('address', 'height', 'timestamp', 'transaction_id', 'key', 'type')
+  .oxor('transaction_id', 'address')  // byTransaction/byAddress/Search request
   .required();
 
 export const output = Joi.object().keys({
@@ -27,7 +27,10 @@ export const output = Joi.object().keys({
       key: Joi.string().required(),
       binaryValue: Joi.binary().allow(''),
       boolValue: Joi.boolean(),
-      intValue: Joi.object().long().int64().allow(null),
+      intValue: Joi.object()
+        .long()
+        .int64()
+        .allow(null),
       stringValue: Joi.string().allow(''),
     })
     .required(),

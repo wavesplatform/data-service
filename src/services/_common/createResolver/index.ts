@@ -152,10 +152,6 @@ const searchResolver = <
     request
   );
 
-// @todo remove
-export const one = getResolver;
-export const many = mgetResolver;
-
 export const get = getResolver;
 export const mget = mgetResolver;
 export const search = searchResolver;

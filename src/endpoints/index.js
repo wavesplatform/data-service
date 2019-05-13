@@ -8,7 +8,6 @@ const pairs = require('./pairs');
 const transactions = require('./transactions');
 const aliases = require('./aliases');
 const candles = require('./candles');
-const balances = require('./balances');
 const dataEntries = require('./data-entries');
 
 router.use(assets.routes());
@@ -16,7 +15,6 @@ router.use(pairs.routes());
 router.use(transactions.routes());
 router.use(aliases.routes());
 router.use(candles.routes());
-router.use(balances.routes());
 router.use(dataEntries.routes());
 
 router.get('/version', version);

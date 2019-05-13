@@ -1,7 +1,6 @@
 import { identity } from 'ramda';
 import { SchemaLike } from 'joi';
 
-import { PgDriver } from '../../../../db/driver';
 import { get } from '../../../_common/createResolver';
 import { validateInput, validateResult } from '../../validation';
 import { transformResults as transformResultFn } from './transformResult';
@@ -40,5 +39,5 @@ export const getByIdPreset = <
     )(transformResult),
     validateInput: validateInput(inputSchema, name),
     validateResult: validateResult(resultSchema, name),
-    getData: getData({ name, sql })(pg),
-  })({ pg, emitEvent });
+    getData: getData<ResponseRaw, Id>({ name, sql })(pg),
+  })({ emitEvent });

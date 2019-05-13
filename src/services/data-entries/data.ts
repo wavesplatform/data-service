@@ -102,7 +102,7 @@ export const getDataEntries = (client: grpc.Client) => (
       DataEntryResponse
     >(path, reqSerializer, DataEntryResponse.decode, request);
 
-    stream.on('data', response.push);
+    stream.on('data', data => response.push(data));
 
     stream.on('end', () => resolver.resolve(response));
 

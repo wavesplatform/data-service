@@ -8,9 +8,6 @@ import {
   AppError,
 } from '../../../errorHandling/';
 
-import { PgDriver } from '../../../db/driver';
-import { BalancesClient } from '../../../protobuf/balances_grpc_pb';
-
 export type EmitEvent = {
   (name: string): <A>(object: A) => void;
 };

@@ -9,6 +9,7 @@ import {
   toSerializable,
 } from '../../../../../types/serialization';
 import { PgDriver } from '../../../../../db/driver';
+import * as grpc from 'grpc';
 
 type TestTransaction = {
   id: string;
@@ -38,6 +39,7 @@ const service = searchPreset<
     list(res.map(tx => toSerializable<'tx', TestTransaction>('tx', tx))),
 })({
   pg: { any: filters => task(mockTxs) } as PgDriver,
+  dataEntries: new grpc.Client('', grpc.credentials.createInsecure()),
   emitEvent: always(identity),
 });
 
