@@ -1,5 +1,5 @@
-import { assoc } from 'ramda';
 import { fromNullable } from 'folktale/maybe';
+import { toDbError } from '../../../../errorHandling';
 
 import { PgDriver } from '../../../../db/driver';
 
@@ -13,4 +13,4 @@ export const getData = <ResponseRaw, Id = string>({
   pg
     .oneOrNone<ResponseRaw>(sql(id))
     .map(fromNullable)
-    .mapRejected(assoc('meta', { request: name, params: id }));
+    .mapRejected(e => toDbError({ request: name, params: { id } }, e.error));
