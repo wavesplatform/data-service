@@ -9,6 +9,8 @@ import {
   SearchRequest,
 } from '../protobuf/data-entries';
 
+const inject = require('./inject');
+
 const service = {
   byTransaction: {
     path: '/DataEntries/ByTransaction',
@@ -46,13 +48,11 @@ const service = {
 };
 const client = grpc.makeGenericClientConstructor(service, 'DataEntries', {});
 
-const inject = require('./inject');
-
 export default (
   options: DataServiceConfig
 ): compose.ComposedMiddleware<any> => {
   const cl = new client(
-    `${options.dataEntriesServiceHost}:${options.dataEntriesServicePort}`,
+    `${options.dataEntriesService.host}:${options.dataEntriesService.port}`,
     grpc.credentials.createInsecure()
   );
 

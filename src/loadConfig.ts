@@ -18,15 +18,14 @@ export type ServerConfig = {
   port: number;
 };
 
-export type BalancesServiceConfig = {
-  balancesServiceHost: string;
-  balancesServicePort: number;
+type ServiceConfig = {
+  host: string;
+  port: number;
 };
 
-export type DataEntriesServiceConfig = {
-  dataEntriesServiceHost: string;
-  dataEntriesServicePort: number;
-};
+export type BalancesServiceConfig = { balancesService: ServiceConfig };
+
+export type DataEntriesServiceConfig = { dataEntriesService: ServiceConfig };
 
 export type DataServiceConfig = PostgresConfig &
   ServerConfig &
@@ -51,15 +50,18 @@ const load = (): DataServiceConfig => {
       ? parseInt(process.env.PGPOOLSIZE)
       : 20,
     logLevel: process.env.LOG_LEVEL || 'info',
-    balancesServiceHost: process.env.BALANCES_SERVICE_HOST || 'localhost',
-    balancesServicePort: process.env.BALANCES_SERVICE_PORT
-      ? parseInt(process.env.BALANCES_SERVICE_PORT)
-      : 3001,
-    dataEntriesServiceHost:
-      process.env.DATA_ENTRIES_SERVICE_HOST || 'localhost',
-    dataEntriesServicePort: process.env.DATA_ENTRIES_SERVICE_PORT
-      ? parseInt(process.env.DATA_ENTRIES_SERVICE_PORT)
-      : 3002,
+    balancesService: {
+      host: process.env.BALANCES_SERVICE_HOST || 'localhost',
+      port: process.env.BALANCES_SERVICE_PORT
+        ? parseInt(process.env.BALANCES_SERVICE_PORT)
+        : 3001,
+    },
+    dataEntriesService: {
+      host: process.env.DATA_ENTRIES_SERVICE_HOST || 'localhost',
+      port: process.env.DATA_ENTRIES_SERVICE_PORT
+        ? parseInt(process.env.DATA_ENTRIES_SERVICE_PORT)
+        : 3002,
+    },
   };
 };
 

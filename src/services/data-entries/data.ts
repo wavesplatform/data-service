@@ -43,24 +43,29 @@ export const getDataEntries = (client: grpc.Client) => (
       }
     };
 
-    const requestBuilder = (
-      req: DataEntriesRequest
-    ): [GrpcDataEntriesRequest, string] => {
-      let request, path;
+    const getPathByReq = (req: DataEntriesRequest) => {
+      if (req.transaction_id) {
+        return '/DataEntries/ByTransaction';
+      } else if (req.address) {
+        return '/DataEntries/ByAddress';
+      } else {
+        return '/DataEntries/Search';
+      }
+    };
+
+    const buildRequest = (req: DataEntriesRequest): GrpcDataEntriesRequest => {
+      let request;
       if (req.transaction_id) {
         request = new ByTransactionRequest({
           transactionId: base58.decode(req.transaction_id),
         });
-        path = '/DataEntries/ByTransaction';
       } else {
         if (req.address) {
           request = new ByAddressRequest({
             address: base58.decode(req.address),
           });
-          path = '/DataEntries/ByAddress';
         } else {
           request = new SearchRequest();
-          path = '/DataEntries/Search';
         }
 
         if (req.height) {
@@ -91,10 +96,11 @@ export const getDataEntries = (client: grpc.Client) => (
           request.stringValue = req.string_value;
         }
       }
-      return [request, path];
+      return request;
     };
 
-    const [request, path] = requestBuilder(req);
+    const path = getPathByReq(req);
+    const request = buildRequest(req);
 
     const response: DataEntryResponse[] = [];
     const stream = client.makeServerStreamRequest<
