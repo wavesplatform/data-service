@@ -24,6 +24,7 @@ export type BalancesServiceConfig = {
 
 export type DataEntriesServiceConfig = {
   dataEntriesServiceHost: string;
+  dataEntriesServicePort: number;
 };
 
 export type DataServiceConfig = PostgresConfig &
@@ -51,7 +52,10 @@ const load = (): DataServiceConfig => {
     logLevel: process.env.LOG_LEVEL || 'info',
     balancesServiceHost: process.env.BALANCES_SERVICE_HOST || 'localhost:3001',
     dataEntriesServiceHost:
-      process.env.DATA_ENTRIES_SERVICE_HOST || 'localhost:3002',
+      process.env.DATA_ENTRIES_SERVICE_HOST || 'localhost',
+    dataEntriesServicePort: process.env.DATA_ENTRIES_SERVICE_PORT
+      ? parseInt(process.env.DATA_ENTRIES_SERVICE_PORT)
+      : 3002,
   };
 };
 

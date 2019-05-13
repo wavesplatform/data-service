@@ -59,23 +59,20 @@ const createResolver = <
     .map(tap(emitEvent('TRANSFORM_RESULT_OK')));
 
 const getResolver = <
-  DbDriver,
   RequestRaw,
   RequestTransformed,
   ResponseRaw,
   ResponseTransformed
 >(
   dependencies: GetResolverDependencies<
-    DbDriver,
     RequestRaw,
     RequestTransformed,
     ResponseRaw,
     ResponseTransformed
   >
-) => ({
-  db,
-  emitEvent = () => () => {},
-}: RuntimeResolverDependenties<DbDriver>) => (request: RequestRaw) =>
+) => ({ emitEvent = () => () => {} }: RuntimeResolverDependenties) => (
+  request: RequestRaw
+) =>
   createResolver<
     RequestRaw,
     RequestTransformed,
@@ -84,7 +81,7 @@ const getResolver = <
   >(
     dependencies.validateInput,
     dependencies.transformInput,
-    dependencies.dbQuery(db),
+    dependencies.getData,
     applyValidation.get(dependencies.validateResult),
     result => dependencies.transformResult(result, request),
     emitEvent,
@@ -92,23 +89,20 @@ const getResolver = <
   );
 
 const mgetResolver = <
-  DbDriver,
   RequestRaw,
   RequestTransformed,
   ResponseRaw,
   ResponseTransformed
 >(
   dependencies: MgetResolverDependencies<
-    DbDriver,
     RequestRaw,
     RequestTransformed,
     ResponseRaw,
     ResponseTransformed
   >
-) => ({
-  db,
-  emitEvent = () => () => {},
-}: RuntimeResolverDependenties<DbDriver>) => (request: RequestRaw) =>
+) => ({ emitEvent = () => () => {} }: RuntimeResolverDependenties) => (
+  request: RequestRaw
+) =>
   createResolver<
     RequestRaw,
     RequestTransformed,
@@ -117,7 +111,7 @@ const mgetResolver = <
   >(
     dependencies.validateInput,
     dependencies.transformInput,
-    dependencies.dbQuery(db),
+    dependencies.getData,
     applyValidation.mget(dependencies.validateResult),
     result => dependencies.transformResult(result, request),
     emitEvent,
@@ -125,23 +119,20 @@ const mgetResolver = <
   );
 
 const searchResolver = <
-  DbDriver,
   RequestRaw,
   RequestTransformed,
   ResponseRaw,
   ResponseTransformed
 >(
   dependencies: SearchResolverDependencies<
-    DbDriver,
     RequestRaw,
     RequestTransformed,
     ResponseRaw,
     ResponseTransformed
   >
-) => ({
-  db,
-  emitEvent = () => () => {},
-}: RuntimeResolverDependenties<DbDriver>) => (request: RequestRaw) =>
+) => ({ emitEvent = () => () => {} }: RuntimeResolverDependenties) => (
+  request: RequestRaw
+) =>
   createResolver<
     RequestRaw,
     RequestTransformed,
@@ -150,7 +141,7 @@ const searchResolver = <
   >(
     dependencies.validateInput,
     dependencies.transformInput,
-    dependencies.dbQuery(db),
+    dependencies.getData,
     applyValidation.search(dependencies.validateResult),
     result =>
       dependencies.transformResult(

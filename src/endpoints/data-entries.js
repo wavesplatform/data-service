@@ -2,21 +2,21 @@ const Router = require('koa-router');
 const { identity } = require('ramda');
 
 const createEndpoint = require('./_common');
-const { timeStart } = require('./_common/filters');
+const { timeStart, intOrNull } = require('./_common/filters');
 const { parseBool } = require('./utils/parseBool');
 const createService = require('../services/data-entries').default;
 
 module.exports = createEndpoint('/data-entries', createService, {
   filterParsers: {
     address: identity,
-    height: x => parseInt(x) || undefined,
+    height: intOrNull,
     timestamp: timeStart,
     transaction_id: identity,
     key: identity,
-    type: x => parseInt(x) || undefined,
+    type: intOrNull,
     binary_value: identity,
-    bool_value: x => (x ? parseBool(x) : undefined),
-    int_value: x => parseInt(x) || undefined,
+    bool_value: x => (typeof x !== 'undefined' ? parseBool(x) : undefined),
+    int_value: intOrNull,
     string_value: identity,
   },
 })(new Router());

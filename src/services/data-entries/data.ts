@@ -24,82 +24,87 @@ type DataEntriesRequest = {
   string_value?: string;
 };
 
-export const getDataEntries = (db: grpc.Client) => (
+type GrpcDataEntriesRequest =
+  | ByTransactionRequest
+  | ByAddressRequest
+  | SearchRequest;
+
+export const getDataEntries = (client: grpc.Client) => (
   req: DataEntriesRequest
 ): Task<DbError, DataEntryResponse[]> => {
   return task(resolver => {
-    let request, path;
-
-    const reqSerializer = (
-      req: ByTransactionRequest | ByAddressRequest | SearchRequest
-    ): Buffer => {
-      if (req instanceof ByTransactionRequest) {
-        return Buffer.from(ByTransactionRequest.encode(req).finish());
-      } else if (req instanceof ByAddressRequest) {
-        return Buffer.from(ByAddressRequest.encode(req).finish());
+    const reqSerializer = (request: GrpcDataEntriesRequest): Buffer => {
+      if (request instanceof ByTransactionRequest) {
+        return Buffer.from(ByTransactionRequest.encode(request).finish());
+      } else if (request instanceof ByAddressRequest) {
+        return Buffer.from(ByAddressRequest.encode(request).finish());
       } else {
-        return Buffer.from(SearchRequest.encode(req).finish());
+        return Buffer.from(SearchRequest.encode(request).finish());
       }
     };
 
-    if (req.transaction_id) {
-      request = new ByTransactionRequest({
-        transactionId: base58.decode(req.transaction_id),
-      });
-      path = '/DataEntries/ByTransaction';
-    } else {
-      if (req.address) {
-        request = new ByAddressRequest({
-          address: base58.decode(req.address),
+    const requestBuilder = (
+      req: DataEntriesRequest
+    ): [GrpcDataEntriesRequest, string] => {
+      let request, path;
+      if (req.transaction_id) {
+        request = new ByTransactionRequest({
+          transactionId: base58.decode(req.transaction_id),
         });
-        path = '/DataEntries/ByAddress';
+        path = '/DataEntries/ByTransaction';
       } else {
-        request = new SearchRequest();
-        path = '/DataEntries/Search';
-      }
+        if (req.address) {
+          request = new ByAddressRequest({
+            address: base58.decode(req.address),
+          });
+          path = '/DataEntries/ByAddress';
+        } else {
+          request = new SearchRequest();
+          path = '/DataEntries/Search';
+        }
 
-      if (req.height) {
-        request.height = req.height;
+        if (req.height) {
+          request.height = req.height;
+        }
+        if (req.timestamp) {
+          request.timestamp = Long.fromNumber(req.timestamp.getTime());
+        }
+        if (req.key) {
+          request.key = req.key;
+        }
+        if (req.type) {
+          request.type = req.type;
+        }
+        if (req.binary_value) {
+          request.binaryValue = Buffer.from(
+            req.binary_value.toString(),
+            'base64'
+          );
+        }
+        if (req.bool_value) {
+          request.boolValue = req.bool_value;
+        }
+        if (req.int_value) {
+          request.intValue = Long.fromNumber(req.int_value);
+        }
+        if (req.string_value) {
+          request.stringValue = req.string_value;
+        }
       }
-      if (req.timestamp) {
-        request.timestamp = Long.fromNumber(req.timestamp.getTime());
-      }
-      if (req.key) {
-        request.key = req.key;
-      }
-      if (req.type) {
-        request.type = req.type;
-      }
-      if (req.binary_value) {
-        request.binaryValue = Buffer.from(
-          req.binary_value.toString(),
-          'base64'
-        );
-      }
-      if (req.bool_value) {
-        request.boolValue = req.bool_value;
-      }
-      if (req.int_value) {
-        request.intValue = Long.fromNumber(req.int_value);
-      }
-      if (req.string_value) {
-        request.stringValue = req.string_value;
-      }
-    }
+      return [request, path];
+    };
+
+    const [request, path] = requestBuilder(req);
 
     const response: DataEntryResponse[] = [];
-    const stream = db.makeServerStreamRequest<
-      ByTransactionRequest | ByAddressRequest | SearchRequest,
+    const stream = client.makeServerStreamRequest<
+      GrpcDataEntriesRequest,
       DataEntryResponse
     >(path, reqSerializer, DataEntryResponse.decode, request);
 
-    stream.on('data', (data: DataEntryResponse) => {
-      response.push(data);
-    });
+    stream.on('data', response.push);
 
-    stream.on('end', () => {
-      resolver.resolve(response);
-    });
+    stream.on('end', () => resolver.resolve(response));
 
     stream.on('error', (e: Error) => {
       resolver.reject(toDbError({}, e));

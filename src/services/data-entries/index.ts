@@ -7,18 +7,23 @@ import { getDataEntries } from './data';
 
 import { inputSearch, output } from './schema';
 import { transformResult } from './transformResult';
+import * as grpc from 'grpc';
+
+type DataServiceDriver = {
+  dataEntries: grpc.Client;
+};
 
 export default ({
   drivers,
   emitEvent,
 }: {
-  drivers: any;
+  drivers: DataServiceDriver;
   emitEvent: EmitEvent;
 }) => {
   return {
     search: searchPreset({
       name: 'dataEntries.search',
-      getData: getDataEntries,
+      getData: getDataEntries(drivers.dataEntries),
       inputSchema: inputSearch,
       resultSchema: output,
       transformResult: (res: DataEntryResponse[]) =>
@@ -27,6 +32,6 @@ export default ({
           (l: DataEntryInfo[]) => l.map(d => dataEntry(d)),
           (l: DataEntryResponse[]) => l.map(d => transformResult(d))
         )(res),
-    })({ db: drivers.dataEntries, emitEvent: emitEvent }),
+    })({ emitEvent: emitEvent }),
   };
 };

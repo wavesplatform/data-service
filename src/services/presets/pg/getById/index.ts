@@ -33,12 +33,12 @@ export const getByIdPreset = <
   ) => FromSerializable<ResponseTransformed>;
   sql: (r: Id) => string;
 }) => ({ pg, emitEvent }: ServicePresetInitOptions) =>
-  get<PgDriver, Id, Id, ResponseRaw, ResponseTransformed>({
+  get<Id, Id, ResponseRaw, ResponseTransformed>({
     transformInput: identity,
     transformResult: transformResultFn<Id, ResponseRaw, ResponseTransformed>(
       resultTypeFactory
     )(transformResult),
     validateInput: validateInput(inputSchema, name),
     validateResult: validateResult(resultSchema, name),
-    dbQuery: getData({ name, sql }),
-  })({ db: pg, emitEvent });
+    getData: getData({ name, sql })(pg),
+  })({ pg, emitEvent });

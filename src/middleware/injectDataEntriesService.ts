@@ -7,6 +7,7 @@ import {
   ByTransactionRequest,
   ByAddressRequest,
   SearchRequest,
+  Balance,
 } from '../protobuf/data-entries';
 
 const service = {
@@ -15,9 +16,10 @@ const service = {
     requestStream: false,
     responseStream: true,
     requestSerialize: (req: ByTransactionRequest) =>
-      Buffer.from(req.toString(), 'base64'),
+      Buffer.from(ByTransactionRequest.encode(req).finish()),
     requestDeserialize: ByTransactionRequest.decode,
-    responseSerialize: (res: any) => Buffer.from(res.toString(), 'base64'),
+    responseSerialize: (res: Balance) =>
+      Buffer.from(Balance.encode(res).finish()),
     responseDeserialize: DataEntryResponse.decode,
   },
   byAddress: {
@@ -25,9 +27,10 @@ const service = {
     requestStream: false,
     responseStream: true,
     requestSerialize: (req: ByAddressRequest) =>
-      Buffer.from(req.toString(), 'base64'),
+      Buffer.from(ByAddressRequest.encode(req).finish()),
     requestDeserialize: ByAddressRequest.decode,
-    responseSerialize: (res: any) => Buffer.from(res.toString(), 'base64'),
+    responseSerialize: (res: Balance) =>
+      Buffer.from(Balance.encode(res).finish()),
     responseDeserialize: DataEntryResponse.decode,
   },
   search: {
@@ -35,9 +38,10 @@ const service = {
     requestStream: false,
     responseStream: true,
     requestSerialize: (req: SearchRequest) =>
-      Buffer.from(req.toString(), 'base64'),
+      Buffer.from(SearchRequest.encode(req).finish()),
     requestDeserialize: ByAddressRequest.decode,
-    responseSerialize: (res: any) => Buffer.from(res.toString(), 'base64'),
+    responseSerialize: (res: Balance) =>
+      Buffer.from(Balance.encode(res).finish()),
     responseDeserialize: DataEntryResponse.decode,
   },
 };
@@ -45,9 +49,11 @@ const client = grpc.makeGenericClientConstructor(service, 'DataEntries', {});
 
 const inject = require('./inject');
 
-export default (options: DataServiceConfig) => {
+export default (
+  options: DataServiceConfig
+): compose.ComposedMiddleware<any> => {
   const cl = new client(
-    options.dataEntriesServiceHost,
+    `${options.dataEntriesServiceHost}:${options.dataEntriesServicePort}`,
     grpc.credentials.createInsecure()
   );
 

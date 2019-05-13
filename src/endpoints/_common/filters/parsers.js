@@ -5,6 +5,11 @@ const { parseArrayQuery } = require('../../utils/parseArrayQuery');
 
 const dateOrNull = str => parseDate(str).getOrElse(null);
 
+const intOrNull = x => {
+  const y = parseInt(x);
+  return isNaN(y) ? null : y;
+};
+
 module.exports = {
   timeStart: dateOrNull,
   timeEnd: dateOrNull,
@@ -15,4 +20,5 @@ module.exports = {
   sort: defaultTo('desc'),
   after: identity,
   ids: parseArrayQuery,
+  intOrNull,
 };
