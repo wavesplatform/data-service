@@ -12,12 +12,14 @@ export const inputSearch = Joi.object()
     bool_value: Joi.boolean(),
     int_value: Joi.number(),
     string_value: Joi.string(),
+    limit: Joi.number().max(100),
+    after: Joi.string(),
   })
   .with('binary_value', 'type')
   .with('bool_value', 'type')
   .with('int_value', 'type')
   .with('string_value', 'type')
-  .oxor('transaction_id', 'address')  // byTransaction/byAddress/Search request
+  .oxor('transaction_id', 'address') // byTransaction/byAddress/Search request
   .required();
 
 export const output = Joi.object().keys({

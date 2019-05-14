@@ -1,13 +1,23 @@
 syntax = "proto3";
-
 import "transaction.proto";
 
-message GetBalancesRequest {
-  bytes transaction_id = 1;
-  int32 height = 2;
-  int64 timestamp = 3;
-  bytes address = 4;
-  bytes asset_id = 5;
+message BalancesByTransactionRequest { bytes transaction_id = 1; }
+
+message BalancesByAddressRequest {
+  int32 height = 1;
+  int64 timestamp = 2;
+  bytes address = 3;
+  bytes asset = 4;
+  int32 limit = 5;
+  bytes after = 6;
+}
+
+message BalancesByAssetRequest {
+  int32 height = 1;
+  int64 timestamp = 2;
+  bytes asset = 3;
+  int32 limit = 4;
+  bytes after = 5;
 }
 
 message Balance {
@@ -16,5 +26,8 @@ message Balance {
 }
 
 service Balances {
-  rpc GetBalances(GetBalancesRequest) returns (stream Balance);
+  rpc ByTransaction(BalancesByTransactionRequest) returns (stream Balance);
+  rpc ByAddress(BalancesByAddressRequest) returns (stream Balance);
+  rpc ByAsset(BalancesByAssetRequest) returns (stream Balance);
+  rpc ByTest(BalancesByAssetRequest) returns (stream Balance);
 }

@@ -9,24 +9,24 @@ var $Reader = $protobuf.Reader, $Writer = $protobuf.Writer, $util = $protobuf.ut
 // Exported root namespace
 var $root = $protobuf.roots["default"] || ($protobuf.roots["default"] = {});
 
-$root.DataEntriesByTransactionRequest = (function() {
+$root.BalancesByTransactionRequest = (function() {
 
     /**
-     * Properties of a DataEntriesByTransactionRequest.
-     * @exports IDataEntriesByTransactionRequest
-     * @interface IDataEntriesByTransactionRequest
-     * @property {Uint8Array|null} [transactionId] DataEntriesByTransactionRequest transactionId
+     * Properties of a BalancesByTransactionRequest.
+     * @exports IBalancesByTransactionRequest
+     * @interface IBalancesByTransactionRequest
+     * @property {Uint8Array|null} [transactionId] BalancesByTransactionRequest transactionId
      */
 
     /**
-     * Constructs a new DataEntriesByTransactionRequest.
-     * @exports DataEntriesByTransactionRequest
-     * @classdesc Represents a DataEntriesByTransactionRequest.
-     * @implements IDataEntriesByTransactionRequest
+     * Constructs a new BalancesByTransactionRequest.
+     * @exports BalancesByTransactionRequest
+     * @classdesc Represents a BalancesByTransactionRequest.
+     * @implements IBalancesByTransactionRequest
      * @constructor
-     * @param {IDataEntriesByTransactionRequest=} [properties] Properties to set
+     * @param {IBalancesByTransactionRequest=} [properties] Properties to set
      */
-    function DataEntriesByTransactionRequest(properties) {
+    function BalancesByTransactionRequest(properties) {
         if (properties)
             for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                 if (properties[keys[i]] != null)
@@ -34,35 +34,35 @@ $root.DataEntriesByTransactionRequest = (function() {
     }
 
     /**
-     * DataEntriesByTransactionRequest transactionId.
+     * BalancesByTransactionRequest transactionId.
      * @member {Uint8Array} transactionId
-     * @memberof DataEntriesByTransactionRequest
+     * @memberof BalancesByTransactionRequest
      * @instance
      */
-    DataEntriesByTransactionRequest.prototype.transactionId = $util.newBuffer([]);
+    BalancesByTransactionRequest.prototype.transactionId = $util.newBuffer([]);
 
     /**
-     * Creates a new DataEntriesByTransactionRequest instance using the specified properties.
+     * Creates a new BalancesByTransactionRequest instance using the specified properties.
      * @function create
-     * @memberof DataEntriesByTransactionRequest
+     * @memberof BalancesByTransactionRequest
      * @static
-     * @param {IDataEntriesByTransactionRequest=} [properties] Properties to set
-     * @returns {DataEntriesByTransactionRequest} DataEntriesByTransactionRequest instance
+     * @param {IBalancesByTransactionRequest=} [properties] Properties to set
+     * @returns {BalancesByTransactionRequest} BalancesByTransactionRequest instance
      */
-    DataEntriesByTransactionRequest.create = function create(properties) {
-        return new DataEntriesByTransactionRequest(properties);
+    BalancesByTransactionRequest.create = function create(properties) {
+        return new BalancesByTransactionRequest(properties);
     };
 
     /**
-     * Encodes the specified DataEntriesByTransactionRequest message. Does not implicitly {@link DataEntriesByTransactionRequest.verify|verify} messages.
+     * Encodes the specified BalancesByTransactionRequest message. Does not implicitly {@link BalancesByTransactionRequest.verify|verify} messages.
      * @function encode
-     * @memberof DataEntriesByTransactionRequest
+     * @memberof BalancesByTransactionRequest
      * @static
-     * @param {IDataEntriesByTransactionRequest} message DataEntriesByTransactionRequest message or plain object to encode
+     * @param {IBalancesByTransactionRequest} message BalancesByTransactionRequest message or plain object to encode
      * @param {$protobuf.Writer} [writer] Writer to encode to
      * @returns {$protobuf.Writer} Writer
      */
-    DataEntriesByTransactionRequest.encode = function encode(message, writer) {
+    BalancesByTransactionRequest.encode = function encode(message, writer) {
         if (!writer)
             writer = $Writer.create();
         if (message.transactionId != null && message.hasOwnProperty("transactionId"))
@@ -71,33 +71,33 @@ $root.DataEntriesByTransactionRequest = (function() {
     };
 
     /**
-     * Encodes the specified DataEntriesByTransactionRequest message, length delimited. Does not implicitly {@link DataEntriesByTransactionRequest.verify|verify} messages.
+     * Encodes the specified BalancesByTransactionRequest message, length delimited. Does not implicitly {@link BalancesByTransactionRequest.verify|verify} messages.
      * @function encodeDelimited
-     * @memberof DataEntriesByTransactionRequest
+     * @memberof BalancesByTransactionRequest
      * @static
-     * @param {IDataEntriesByTransactionRequest} message DataEntriesByTransactionRequest message or plain object to encode
+     * @param {IBalancesByTransactionRequest} message BalancesByTransactionRequest message or plain object to encode
      * @param {$protobuf.Writer} [writer] Writer to encode to
      * @returns {$protobuf.Writer} Writer
      */
-    DataEntriesByTransactionRequest.encodeDelimited = function encodeDelimited(message, writer) {
+    BalancesByTransactionRequest.encodeDelimited = function encodeDelimited(message, writer) {
         return this.encode(message, writer).ldelim();
     };
 
     /**
-     * Decodes a DataEntriesByTransactionRequest message from the specified reader or buffer.
+     * Decodes a BalancesByTransactionRequest message from the specified reader or buffer.
      * @function decode
-     * @memberof DataEntriesByTransactionRequest
+     * @memberof BalancesByTransactionRequest
      * @static
      * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
      * @param {number} [length] Message length if known beforehand
-     * @returns {DataEntriesByTransactionRequest} DataEntriesByTransactionRequest
+     * @returns {BalancesByTransactionRequest} BalancesByTransactionRequest
      * @throws {Error} If the payload is not a reader or valid buffer
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
-    DataEntriesByTransactionRequest.decode = function decode(reader, length) {
+    BalancesByTransactionRequest.decode = function decode(reader, length) {
         if (!(reader instanceof $Reader))
             reader = $Reader.create(reader);
-        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.DataEntriesByTransactionRequest();
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.BalancesByTransactionRequest();
         while (reader.pos < end) {
             var tag = reader.uint32();
             switch (tag >>> 3) {
@@ -113,30 +113,30 @@ $root.DataEntriesByTransactionRequest = (function() {
     };
 
     /**
-     * Decodes a DataEntriesByTransactionRequest message from the specified reader or buffer, length delimited.
+     * Decodes a BalancesByTransactionRequest message from the specified reader or buffer, length delimited.
      * @function decodeDelimited
-     * @memberof DataEntriesByTransactionRequest
+     * @memberof BalancesByTransactionRequest
      * @static
      * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @returns {DataEntriesByTransactionRequest} DataEntriesByTransactionRequest
+     * @returns {BalancesByTransactionRequest} BalancesByTransactionRequest
      * @throws {Error} If the payload is not a reader or valid buffer
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
-    DataEntriesByTransactionRequest.decodeDelimited = function decodeDelimited(reader) {
+    BalancesByTransactionRequest.decodeDelimited = function decodeDelimited(reader) {
         if (!(reader instanceof $Reader))
             reader = new $Reader(reader);
         return this.decode(reader, reader.uint32());
     };
 
     /**
-     * Verifies a DataEntriesByTransactionRequest message.
+     * Verifies a BalancesByTransactionRequest message.
      * @function verify
-     * @memberof DataEntriesByTransactionRequest
+     * @memberof BalancesByTransactionRequest
      * @static
      * @param {Object.<string,*>} message Plain object to verify
      * @returns {string|null} `null` if valid, otherwise the reason why it is not
      */
-    DataEntriesByTransactionRequest.verify = function verify(message) {
+    BalancesByTransactionRequest.verify = function verify(message) {
         if (typeof message !== "object" || message === null)
             return "object expected";
         if (message.transactionId != null && message.hasOwnProperty("transactionId"))
@@ -146,17 +146,17 @@ $root.DataEntriesByTransactionRequest = (function() {
     };
 
     /**
-     * Creates a DataEntriesByTransactionRequest message from a plain object. Also converts values to their respective internal types.
+     * Creates a BalancesByTransactionRequest message from a plain object. Also converts values to their respective internal types.
      * @function fromObject
-     * @memberof DataEntriesByTransactionRequest
+     * @memberof BalancesByTransactionRequest
      * @static
      * @param {Object.<string,*>} object Plain object
-     * @returns {DataEntriesByTransactionRequest} DataEntriesByTransactionRequest
+     * @returns {BalancesByTransactionRequest} BalancesByTransactionRequest
      */
-    DataEntriesByTransactionRequest.fromObject = function fromObject(object) {
-        if (object instanceof $root.DataEntriesByTransactionRequest)
+    BalancesByTransactionRequest.fromObject = function fromObject(object) {
+        if (object instanceof $root.BalancesByTransactionRequest)
             return object;
-        var message = new $root.DataEntriesByTransactionRequest();
+        var message = new $root.BalancesByTransactionRequest();
         if (object.transactionId != null)
             if (typeof object.transactionId === "string")
                 $util.base64.decode(object.transactionId, message.transactionId = $util.newBuffer($util.base64.length(object.transactionId)), 0);
@@ -166,15 +166,15 @@ $root.DataEntriesByTransactionRequest = (function() {
     };
 
     /**
-     * Creates a plain object from a DataEntriesByTransactionRequest message. Also converts values to other types if specified.
+     * Creates a plain object from a BalancesByTransactionRequest message. Also converts values to other types if specified.
      * @function toObject
-     * @memberof DataEntriesByTransactionRequest
+     * @memberof BalancesByTransactionRequest
      * @static
-     * @param {DataEntriesByTransactionRequest} message DataEntriesByTransactionRequest
+     * @param {BalancesByTransactionRequest} message BalancesByTransactionRequest
      * @param {$protobuf.IConversionOptions} [options] Conversion options
      * @returns {Object.<string,*>} Plain object
      */
-    DataEntriesByTransactionRequest.toObject = function toObject(message, options) {
+    BalancesByTransactionRequest.toObject = function toObject(message, options) {
         if (!options)
             options = {};
         var object = {};
@@ -192,47 +192,42 @@ $root.DataEntriesByTransactionRequest = (function() {
     };
 
     /**
-     * Converts this DataEntriesByTransactionRequest to JSON.
+     * Converts this BalancesByTransactionRequest to JSON.
      * @function toJSON
-     * @memberof DataEntriesByTransactionRequest
+     * @memberof BalancesByTransactionRequest
      * @instance
      * @returns {Object.<string,*>} JSON object
      */
-    DataEntriesByTransactionRequest.prototype.toJSON = function toJSON() {
+    BalancesByTransactionRequest.prototype.toJSON = function toJSON() {
         return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
     };
 
-    return DataEntriesByTransactionRequest;
+    return BalancesByTransactionRequest;
 })();
 
-$root.DataEntriesByAddressRequest = (function() {
+$root.BalancesByAddressRequest = (function() {
 
     /**
-     * Properties of a DataEntriesByAddressRequest.
-     * @exports IDataEntriesByAddressRequest
-     * @interface IDataEntriesByAddressRequest
-     * @property {number|null} [height] DataEntriesByAddressRequest height
-     * @property {Long|null} [timestamp] DataEntriesByAddressRequest timestamp
-     * @property {Uint8Array|null} [address] DataEntriesByAddressRequest address
-     * @property {number|null} [limit] DataEntriesByAddressRequest limit
-     * @property {Uint8Array|null} [after] DataEntriesByAddressRequest after
-     * @property {string|null} [key] DataEntriesByAddressRequest key
-     * @property {number|null} [type] DataEntriesByAddressRequest type
-     * @property {Long|null} [intValue] DataEntriesByAddressRequest intValue
-     * @property {boolean|null} [boolValue] DataEntriesByAddressRequest boolValue
-     * @property {Uint8Array|null} [binaryValue] DataEntriesByAddressRequest binaryValue
-     * @property {string|null} [stringValue] DataEntriesByAddressRequest stringValue
+     * Properties of a BalancesByAddressRequest.
+     * @exports IBalancesByAddressRequest
+     * @interface IBalancesByAddressRequest
+     * @property {number|null} [height] BalancesByAddressRequest height
+     * @property {Long|null} [timestamp] BalancesByAddressRequest timestamp
+     * @property {Uint8Array|null} [address] BalancesByAddressRequest address
+     * @property {Uint8Array|null} [asset] BalancesByAddressRequest asset
+     * @property {number|null} [limit] BalancesByAddressRequest limit
+     * @property {Uint8Array|null} [after] BalancesByAddressRequest after
      */
 
     /**
-     * Constructs a new DataEntriesByAddressRequest.
-     * @exports DataEntriesByAddressRequest
-     * @classdesc Represents a DataEntriesByAddressRequest.
-     * @implements IDataEntriesByAddressRequest
+     * Constructs a new BalancesByAddressRequest.
+     * @exports BalancesByAddressRequest
+     * @classdesc Represents a BalancesByAddressRequest.
+     * @implements IBalancesByAddressRequest
      * @constructor
-     * @param {IDataEntriesByAddressRequest=} [properties] Properties to set
+     * @param {IBalancesByAddressRequest=} [properties] Properties to set
      */
-    function DataEntriesByAddressRequest(properties) {
+    function BalancesByAddressRequest(properties) {
         if (properties)
             for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                 if (properties[keys[i]] != null)
@@ -240,129 +235,75 @@ $root.DataEntriesByAddressRequest = (function() {
     }
 
     /**
-     * DataEntriesByAddressRequest height.
+     * BalancesByAddressRequest height.
      * @member {number} height
-     * @memberof DataEntriesByAddressRequest
+     * @memberof BalancesByAddressRequest
      * @instance
      */
-    DataEntriesByAddressRequest.prototype.height = 0;
+    BalancesByAddressRequest.prototype.height = 0;
 
     /**
-     * DataEntriesByAddressRequest timestamp.
+     * BalancesByAddressRequest timestamp.
      * @member {Long} timestamp
-     * @memberof DataEntriesByAddressRequest
+     * @memberof BalancesByAddressRequest
      * @instance
      */
-    DataEntriesByAddressRequest.prototype.timestamp = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+    BalancesByAddressRequest.prototype.timestamp = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
 
     /**
-     * DataEntriesByAddressRequest address.
+     * BalancesByAddressRequest address.
      * @member {Uint8Array} address
-     * @memberof DataEntriesByAddressRequest
+     * @memberof BalancesByAddressRequest
      * @instance
      */
-    DataEntriesByAddressRequest.prototype.address = $util.newBuffer([]);
+    BalancesByAddressRequest.prototype.address = $util.newBuffer([]);
 
     /**
-     * DataEntriesByAddressRequest limit.
+     * BalancesByAddressRequest asset.
+     * @member {Uint8Array} asset
+     * @memberof BalancesByAddressRequest
+     * @instance
+     */
+    BalancesByAddressRequest.prototype.asset = $util.newBuffer([]);
+
+    /**
+     * BalancesByAddressRequest limit.
      * @member {number} limit
-     * @memberof DataEntriesByAddressRequest
+     * @memberof BalancesByAddressRequest
      * @instance
      */
-    DataEntriesByAddressRequest.prototype.limit = 0;
+    BalancesByAddressRequest.prototype.limit = 0;
 
     /**
-     * DataEntriesByAddressRequest after.
+     * BalancesByAddressRequest after.
      * @member {Uint8Array} after
-     * @memberof DataEntriesByAddressRequest
+     * @memberof BalancesByAddressRequest
      * @instance
      */
-    DataEntriesByAddressRequest.prototype.after = $util.newBuffer([]);
+    BalancesByAddressRequest.prototype.after = $util.newBuffer([]);
 
     /**
-     * DataEntriesByAddressRequest key.
-     * @member {string} key
-     * @memberof DataEntriesByAddressRequest
-     * @instance
-     */
-    DataEntriesByAddressRequest.prototype.key = "";
-
-    /**
-     * DataEntriesByAddressRequest type.
-     * @member {number} type
-     * @memberof DataEntriesByAddressRequest
-     * @instance
-     */
-    DataEntriesByAddressRequest.prototype.type = 0;
-
-    /**
-     * DataEntriesByAddressRequest intValue.
-     * @member {Long} intValue
-     * @memberof DataEntriesByAddressRequest
-     * @instance
-     */
-    DataEntriesByAddressRequest.prototype.intValue = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
-
-    /**
-     * DataEntriesByAddressRequest boolValue.
-     * @member {boolean} boolValue
-     * @memberof DataEntriesByAddressRequest
-     * @instance
-     */
-    DataEntriesByAddressRequest.prototype.boolValue = false;
-
-    /**
-     * DataEntriesByAddressRequest binaryValue.
-     * @member {Uint8Array} binaryValue
-     * @memberof DataEntriesByAddressRequest
-     * @instance
-     */
-    DataEntriesByAddressRequest.prototype.binaryValue = $util.newBuffer([]);
-
-    /**
-     * DataEntriesByAddressRequest stringValue.
-     * @member {string} stringValue
-     * @memberof DataEntriesByAddressRequest
-     * @instance
-     */
-    DataEntriesByAddressRequest.prototype.stringValue = "";
-
-    // OneOf field names bound to virtual getters and setters
-    var $oneOfFields;
-
-    /**
-     * DataEntriesByAddressRequest value.
-     * @member {"intValue"|"boolValue"|"binaryValue"|"stringValue"|undefined} value
-     * @memberof DataEntriesByAddressRequest
-     * @instance
-     */
-    Object.defineProperty(DataEntriesByAddressRequest.prototype, "value", {
-        get: $util.oneOfGetter($oneOfFields = ["intValue", "boolValue", "binaryValue", "stringValue"]),
-        set: $util.oneOfSetter($oneOfFields)
-    });
-
-    /**
-     * Creates a new DataEntriesByAddressRequest instance using the specified properties.
+     * Creates a new BalancesByAddressRequest instance using the specified properties.
      * @function create
-     * @memberof DataEntriesByAddressRequest
+     * @memberof BalancesByAddressRequest
      * @static
-     * @param {IDataEntriesByAddressRequest=} [properties] Properties to set
-     * @returns {DataEntriesByAddressRequest} DataEntriesByAddressRequest instance
+     * @param {IBalancesByAddressRequest=} [properties] Properties to set
+     * @returns {BalancesByAddressRequest} BalancesByAddressRequest instance
      */
-    DataEntriesByAddressRequest.create = function create(properties) {
-        return new DataEntriesByAddressRequest(properties);
+    BalancesByAddressRequest.create = function create(properties) {
+        return new BalancesByAddressRequest(properties);
     };
 
     /**
-     * Encodes the specified DataEntriesByAddressRequest message. Does not implicitly {@link DataEntriesByAddressRequest.verify|verify} messages.
+     * Encodes the specified BalancesByAddressRequest message. Does not implicitly {@link BalancesByAddressRequest.verify|verify} messages.
      * @function encode
-     * @memberof DataEntriesByAddressRequest
+     * @memberof BalancesByAddressRequest
      * @static
-     * @param {IDataEntriesByAddressRequest} message DataEntriesByAddressRequest message or plain object to encode
+     * @param {IBalancesByAddressRequest} message BalancesByAddressRequest message or plain object to encode
      * @param {$protobuf.Writer} [writer] Writer to encode to
      * @returns {$protobuf.Writer} Writer
      */
-    DataEntriesByAddressRequest.encode = function encode(message, writer) {
+    BalancesByAddressRequest.encode = function encode(message, writer) {
         if (!writer)
             writer = $Writer.create();
         if (message.height != null && message.hasOwnProperty("height"))
@@ -371,53 +312,43 @@ $root.DataEntriesByAddressRequest = (function() {
             writer.uint32(/* id 2, wireType 0 =*/16).int64(message.timestamp);
         if (message.address != null && message.hasOwnProperty("address"))
             writer.uint32(/* id 3, wireType 2 =*/26).bytes(message.address);
+        if (message.asset != null && message.hasOwnProperty("asset"))
+            writer.uint32(/* id 4, wireType 2 =*/34).bytes(message.asset);
         if (message.limit != null && message.hasOwnProperty("limit"))
-            writer.uint32(/* id 4, wireType 0 =*/32).int32(message.limit);
+            writer.uint32(/* id 5, wireType 0 =*/40).int32(message.limit);
         if (message.after != null && message.hasOwnProperty("after"))
-            writer.uint32(/* id 5, wireType 2 =*/42).bytes(message.after);
-        if (message.key != null && message.hasOwnProperty("key"))
-            writer.uint32(/* id 6, wireType 2 =*/50).string(message.key);
-        if (message.type != null && message.hasOwnProperty("type"))
-            writer.uint32(/* id 7, wireType 0 =*/56).int32(message.type);
-        if (message.intValue != null && message.hasOwnProperty("intValue"))
-            writer.uint32(/* id 10, wireType 0 =*/80).int64(message.intValue);
-        if (message.boolValue != null && message.hasOwnProperty("boolValue"))
-            writer.uint32(/* id 11, wireType 0 =*/88).bool(message.boolValue);
-        if (message.binaryValue != null && message.hasOwnProperty("binaryValue"))
-            writer.uint32(/* id 12, wireType 2 =*/98).bytes(message.binaryValue);
-        if (message.stringValue != null && message.hasOwnProperty("stringValue"))
-            writer.uint32(/* id 13, wireType 2 =*/106).string(message.stringValue);
+            writer.uint32(/* id 6, wireType 2 =*/50).bytes(message.after);
         return writer;
     };
 
     /**
-     * Encodes the specified DataEntriesByAddressRequest message, length delimited. Does not implicitly {@link DataEntriesByAddressRequest.verify|verify} messages.
+     * Encodes the specified BalancesByAddressRequest message, length delimited. Does not implicitly {@link BalancesByAddressRequest.verify|verify} messages.
      * @function encodeDelimited
-     * @memberof DataEntriesByAddressRequest
+     * @memberof BalancesByAddressRequest
      * @static
-     * @param {IDataEntriesByAddressRequest} message DataEntriesByAddressRequest message or plain object to encode
+     * @param {IBalancesByAddressRequest} message BalancesByAddressRequest message or plain object to encode
      * @param {$protobuf.Writer} [writer] Writer to encode to
      * @returns {$protobuf.Writer} Writer
      */
-    DataEntriesByAddressRequest.encodeDelimited = function encodeDelimited(message, writer) {
+    BalancesByAddressRequest.encodeDelimited = function encodeDelimited(message, writer) {
         return this.encode(message, writer).ldelim();
     };
 
     /**
-     * Decodes a DataEntriesByAddressRequest message from the specified reader or buffer.
+     * Decodes a BalancesByAddressRequest message from the specified reader or buffer.
      * @function decode
-     * @memberof DataEntriesByAddressRequest
+     * @memberof BalancesByAddressRequest
      * @static
      * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
      * @param {number} [length] Message length if known beforehand
-     * @returns {DataEntriesByAddressRequest} DataEntriesByAddressRequest
+     * @returns {BalancesByAddressRequest} BalancesByAddressRequest
      * @throws {Error} If the payload is not a reader or valid buffer
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
-    DataEntriesByAddressRequest.decode = function decode(reader, length) {
+    BalancesByAddressRequest.decode = function decode(reader, length) {
         if (!(reader instanceof $Reader))
             reader = $Reader.create(reader);
-        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.DataEntriesByAddressRequest();
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.BalancesByAddressRequest();
         while (reader.pos < end) {
             var tag = reader.uint32();
             switch (tag >>> 3) {
@@ -431,28 +362,13 @@ $root.DataEntriesByAddressRequest = (function() {
                 message.address = reader.bytes();
                 break;
             case 4:
-                message.limit = reader.int32();
+                message.asset = reader.bytes();
                 break;
             case 5:
-                message.after = reader.bytes();
+                message.limit = reader.int32();
                 break;
             case 6:
-                message.key = reader.string();
-                break;
-            case 7:
-                message.type = reader.int32();
-                break;
-            case 10:
-                message.intValue = reader.int64();
-                break;
-            case 11:
-                message.boolValue = reader.bool();
-                break;
-            case 12:
-                message.binaryValue = reader.bytes();
-                break;
-            case 13:
-                message.stringValue = reader.string();
+                message.after = reader.bytes();
                 break;
             default:
                 reader.skipType(tag & 7);
@@ -463,33 +379,32 @@ $root.DataEntriesByAddressRequest = (function() {
     };
 
     /**
-     * Decodes a DataEntriesByAddressRequest message from the specified reader or buffer, length delimited.
+     * Decodes a BalancesByAddressRequest message from the specified reader or buffer, length delimited.
      * @function decodeDelimited
-     * @memberof DataEntriesByAddressRequest
+     * @memberof BalancesByAddressRequest
      * @static
      * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @returns {DataEntriesByAddressRequest} DataEntriesByAddressRequest
+     * @returns {BalancesByAddressRequest} BalancesByAddressRequest
      * @throws {Error} If the payload is not a reader or valid buffer
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
-    DataEntriesByAddressRequest.decodeDelimited = function decodeDelimited(reader) {
+    BalancesByAddressRequest.decodeDelimited = function decodeDelimited(reader) {
         if (!(reader instanceof $Reader))
             reader = new $Reader(reader);
         return this.decode(reader, reader.uint32());
     };
 
     /**
-     * Verifies a DataEntriesByAddressRequest message.
+     * Verifies a BalancesByAddressRequest message.
      * @function verify
-     * @memberof DataEntriesByAddressRequest
+     * @memberof BalancesByAddressRequest
      * @static
      * @param {Object.<string,*>} message Plain object to verify
      * @returns {string|null} `null` if valid, otherwise the reason why it is not
      */
-    DataEntriesByAddressRequest.verify = function verify(message) {
+    BalancesByAddressRequest.verify = function verify(message) {
         if (typeof message !== "object" || message === null)
             return "object expected";
-        var properties = {};
         if (message.height != null && message.hasOwnProperty("height"))
             if (!$util.isInteger(message.height))
                 return "height: integer expected";
@@ -499,59 +414,30 @@ $root.DataEntriesByAddressRequest = (function() {
         if (message.address != null && message.hasOwnProperty("address"))
             if (!(message.address && typeof message.address.length === "number" || $util.isString(message.address)))
                 return "address: buffer expected";
+        if (message.asset != null && message.hasOwnProperty("asset"))
+            if (!(message.asset && typeof message.asset.length === "number" || $util.isString(message.asset)))
+                return "asset: buffer expected";
         if (message.limit != null && message.hasOwnProperty("limit"))
             if (!$util.isInteger(message.limit))
                 return "limit: integer expected";
         if (message.after != null && message.hasOwnProperty("after"))
             if (!(message.after && typeof message.after.length === "number" || $util.isString(message.after)))
                 return "after: buffer expected";
-        if (message.key != null && message.hasOwnProperty("key"))
-            if (!$util.isString(message.key))
-                return "key: string expected";
-        if (message.type != null && message.hasOwnProperty("type"))
-            if (!$util.isInteger(message.type))
-                return "type: integer expected";
-        if (message.intValue != null && message.hasOwnProperty("intValue")) {
-            properties.value = 1;
-            if (!$util.isInteger(message.intValue) && !(message.intValue && $util.isInteger(message.intValue.low) && $util.isInteger(message.intValue.high)))
-                return "intValue: integer|Long expected";
-        }
-        if (message.boolValue != null && message.hasOwnProperty("boolValue")) {
-            if (properties.value === 1)
-                return "value: multiple values";
-            properties.value = 1;
-            if (typeof message.boolValue !== "boolean")
-                return "boolValue: boolean expected";
-        }
-        if (message.binaryValue != null && message.hasOwnProperty("binaryValue")) {
-            if (properties.value === 1)
-                return "value: multiple values";
-            properties.value = 1;
-            if (!(message.binaryValue && typeof message.binaryValue.length === "number" || $util.isString(message.binaryValue)))
-                return "binaryValue: buffer expected";
-        }
-        if (message.stringValue != null && message.hasOwnProperty("stringValue")) {
-            if (properties.value === 1)
-                return "value: multiple values";
-            properties.value = 1;
-            if (!$util.isString(message.stringValue))
-                return "stringValue: string expected";
-        }
         return null;
     };
 
     /**
-     * Creates a DataEntriesByAddressRequest message from a plain object. Also converts values to their respective internal types.
+     * Creates a BalancesByAddressRequest message from a plain object. Also converts values to their respective internal types.
      * @function fromObject
-     * @memberof DataEntriesByAddressRequest
+     * @memberof BalancesByAddressRequest
      * @static
      * @param {Object.<string,*>} object Plain object
-     * @returns {DataEntriesByAddressRequest} DataEntriesByAddressRequest
+     * @returns {BalancesByAddressRequest} BalancesByAddressRequest
      */
-    DataEntriesByAddressRequest.fromObject = function fromObject(object) {
-        if (object instanceof $root.DataEntriesByAddressRequest)
+    BalancesByAddressRequest.fromObject = function fromObject(object) {
+        if (object instanceof $root.BalancesByAddressRequest)
             return object;
-        var message = new $root.DataEntriesByAddressRequest();
+        var message = new $root.BalancesByAddressRequest();
         if (object.height != null)
             message.height = object.height | 0;
         if (object.timestamp != null)
@@ -568,6 +454,11 @@ $root.DataEntriesByAddressRequest = (function() {
                 $util.base64.decode(object.address, message.address = $util.newBuffer($util.base64.length(object.address)), 0);
             else if (object.address.length)
                 message.address = object.address;
+        if (object.asset != null)
+            if (typeof object.asset === "string")
+                $util.base64.decode(object.asset, message.asset = $util.newBuffer($util.base64.length(object.asset)), 0);
+            else if (object.asset.length)
+                message.asset = object.asset;
         if (object.limit != null)
             message.limit = object.limit | 0;
         if (object.after != null)
@@ -575,41 +466,19 @@ $root.DataEntriesByAddressRequest = (function() {
                 $util.base64.decode(object.after, message.after = $util.newBuffer($util.base64.length(object.after)), 0);
             else if (object.after.length)
                 message.after = object.after;
-        if (object.key != null)
-            message.key = String(object.key);
-        if (object.type != null)
-            message.type = object.type | 0;
-        if (object.intValue != null)
-            if ($util.Long)
-                (message.intValue = $util.Long.fromValue(object.intValue)).unsigned = false;
-            else if (typeof object.intValue === "string")
-                message.intValue = parseInt(object.intValue, 10);
-            else if (typeof object.intValue === "number")
-                message.intValue = object.intValue;
-            else if (typeof object.intValue === "object")
-                message.intValue = new $util.LongBits(object.intValue.low >>> 0, object.intValue.high >>> 0).toNumber();
-        if (object.boolValue != null)
-            message.boolValue = Boolean(object.boolValue);
-        if (object.binaryValue != null)
-            if (typeof object.binaryValue === "string")
-                $util.base64.decode(object.binaryValue, message.binaryValue = $util.newBuffer($util.base64.length(object.binaryValue)), 0);
-            else if (object.binaryValue.length)
-                message.binaryValue = object.binaryValue;
-        if (object.stringValue != null)
-            message.stringValue = String(object.stringValue);
         return message;
     };
 
     /**
-     * Creates a plain object from a DataEntriesByAddressRequest message. Also converts values to other types if specified.
+     * Creates a plain object from a BalancesByAddressRequest message. Also converts values to other types if specified.
      * @function toObject
-     * @memberof DataEntriesByAddressRequest
+     * @memberof BalancesByAddressRequest
      * @static
-     * @param {DataEntriesByAddressRequest} message DataEntriesByAddressRequest
+     * @param {BalancesByAddressRequest} message BalancesByAddressRequest
      * @param {$protobuf.IConversionOptions} [options] Conversion options
      * @returns {Object.<string,*>} Plain object
      */
-    DataEntriesByAddressRequest.toObject = function toObject(message, options) {
+    BalancesByAddressRequest.toObject = function toObject(message, options) {
         if (!options)
             options = {};
         var object = {};
@@ -627,6 +496,13 @@ $root.DataEntriesByAddressRequest = (function() {
                 if (options.bytes !== Array)
                     object.address = $util.newBuffer(object.address);
             }
+            if (options.bytes === String)
+                object.asset = "";
+            else {
+                object.asset = [];
+                if (options.bytes !== Array)
+                    object.asset = $util.newBuffer(object.asset);
+            }
             object.limit = 0;
             if (options.bytes === String)
                 object.after = "";
@@ -635,8 +511,6 @@ $root.DataEntriesByAddressRequest = (function() {
                 if (options.bytes !== Array)
                     object.after = $util.newBuffer(object.after);
             }
-            object.key = "";
-            object.type = 0;
         }
         if (message.height != null && message.hasOwnProperty("height"))
             object.height = message.height;
@@ -647,81 +521,51 @@ $root.DataEntriesByAddressRequest = (function() {
                 object.timestamp = options.longs === String ? $util.Long.prototype.toString.call(message.timestamp) : options.longs === Number ? new $util.LongBits(message.timestamp.low >>> 0, message.timestamp.high >>> 0).toNumber() : message.timestamp;
         if (message.address != null && message.hasOwnProperty("address"))
             object.address = options.bytes === String ? $util.base64.encode(message.address, 0, message.address.length) : options.bytes === Array ? Array.prototype.slice.call(message.address) : message.address;
+        if (message.asset != null && message.hasOwnProperty("asset"))
+            object.asset = options.bytes === String ? $util.base64.encode(message.asset, 0, message.asset.length) : options.bytes === Array ? Array.prototype.slice.call(message.asset) : message.asset;
         if (message.limit != null && message.hasOwnProperty("limit"))
             object.limit = message.limit;
         if (message.after != null && message.hasOwnProperty("after"))
             object.after = options.bytes === String ? $util.base64.encode(message.after, 0, message.after.length) : options.bytes === Array ? Array.prototype.slice.call(message.after) : message.after;
-        if (message.key != null && message.hasOwnProperty("key"))
-            object.key = message.key;
-        if (message.type != null && message.hasOwnProperty("type"))
-            object.type = message.type;
-        if (message.intValue != null && message.hasOwnProperty("intValue")) {
-            if (typeof message.intValue === "number")
-                object.intValue = options.longs === String ? String(message.intValue) : message.intValue;
-            else
-                object.intValue = options.longs === String ? $util.Long.prototype.toString.call(message.intValue) : options.longs === Number ? new $util.LongBits(message.intValue.low >>> 0, message.intValue.high >>> 0).toNumber() : message.intValue;
-            if (options.oneofs)
-                object.value = "intValue";
-        }
-        if (message.boolValue != null && message.hasOwnProperty("boolValue")) {
-            object.boolValue = message.boolValue;
-            if (options.oneofs)
-                object.value = "boolValue";
-        }
-        if (message.binaryValue != null && message.hasOwnProperty("binaryValue")) {
-            object.binaryValue = options.bytes === String ? $util.base64.encode(message.binaryValue, 0, message.binaryValue.length) : options.bytes === Array ? Array.prototype.slice.call(message.binaryValue) : message.binaryValue;
-            if (options.oneofs)
-                object.value = "binaryValue";
-        }
-        if (message.stringValue != null && message.hasOwnProperty("stringValue")) {
-            object.stringValue = message.stringValue;
-            if (options.oneofs)
-                object.value = "stringValue";
-        }
         return object;
     };
 
     /**
-     * Converts this DataEntriesByAddressRequest to JSON.
+     * Converts this BalancesByAddressRequest to JSON.
      * @function toJSON
-     * @memberof DataEntriesByAddressRequest
+     * @memberof BalancesByAddressRequest
      * @instance
      * @returns {Object.<string,*>} JSON object
      */
-    DataEntriesByAddressRequest.prototype.toJSON = function toJSON() {
+    BalancesByAddressRequest.prototype.toJSON = function toJSON() {
         return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
     };
 
-    return DataEntriesByAddressRequest;
+    return BalancesByAddressRequest;
 })();
 
-$root.DataEntriesSearchRequest = (function() {
+$root.BalancesByAssetRequest = (function() {
 
     /**
-     * Properties of a DataEntriesSearchRequest.
-     * @exports IDataEntriesSearchRequest
-     * @interface IDataEntriesSearchRequest
-     * @property {number|null} [height] DataEntriesSearchRequest height
-     * @property {Long|null} [timestamp] DataEntriesSearchRequest timestamp
-     * @property {number|null} [limit] DataEntriesSearchRequest limit
-     * @property {Uint8Array|null} [after] DataEntriesSearchRequest after
-     * @property {string|null} [key] DataEntriesSearchRequest key
-     * @property {number|null} [type] DataEntriesSearchRequest type
-     * @property {Long|null} [intValue] DataEntriesSearchRequest intValue
-     * @property {boolean|null} [boolValue] DataEntriesSearchRequest boolValue
-     * @property {Uint8Array|null} [binaryValue] DataEntriesSearchRequest binaryValue
-     * @property {string|null} [stringValue] DataEntriesSearchRequest stringValue
+     * Properties of a BalancesByAssetRequest.
+     * @exports IBalancesByAssetRequest
+     * @interface IBalancesByAssetRequest
+     * @property {number|null} [height] BalancesByAssetRequest height
+     * @property {Long|null} [timestamp] BalancesByAssetRequest timestamp
+     * @property {Uint8Array|null} [asset] BalancesByAssetRequest asset
+     * @property {number|null} [limit] BalancesByAssetRequest limit
+     * @property {Uint8Array|null} [after] BalancesByAssetRequest after
      */
 
     /**
-     * Constructs a new DataEntriesSearchRequest.
-     * @exports DataEntriesSearchRequest
-     * @classdesc Represents a DataEntriesSearchRequest.
-     * @implements IDataEntriesSearchRequest
+     * Constructs a new BalancesByAssetRequest.
+     * @exports BalancesByAssetRequest
+     * @classdesc Represents a BalancesByAssetRequest.
+     * @implements IBalancesByAssetRequest
      * @constructor
-     * @param {IDataEntriesSearchRequest=} [properties] Properties to set
+     * @param {IBalancesByAssetRequest=} [properties] Properties to set
      */
-    function DataEntriesSearchRequest(properties) {
+    function BalancesByAssetRequest(properties) {
         if (properties)
             for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                 if (properties[keys[i]] != null)
@@ -729,174 +573,110 @@ $root.DataEntriesSearchRequest = (function() {
     }
 
     /**
-     * DataEntriesSearchRequest height.
+     * BalancesByAssetRequest height.
      * @member {number} height
-     * @memberof DataEntriesSearchRequest
+     * @memberof BalancesByAssetRequest
      * @instance
      */
-    DataEntriesSearchRequest.prototype.height = 0;
+    BalancesByAssetRequest.prototype.height = 0;
 
     /**
-     * DataEntriesSearchRequest timestamp.
+     * BalancesByAssetRequest timestamp.
      * @member {Long} timestamp
-     * @memberof DataEntriesSearchRequest
+     * @memberof BalancesByAssetRequest
      * @instance
      */
-    DataEntriesSearchRequest.prototype.timestamp = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+    BalancesByAssetRequest.prototype.timestamp = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
 
     /**
-     * DataEntriesSearchRequest limit.
+     * BalancesByAssetRequest asset.
+     * @member {Uint8Array} asset
+     * @memberof BalancesByAssetRequest
+     * @instance
+     */
+    BalancesByAssetRequest.prototype.asset = $util.newBuffer([]);
+
+    /**
+     * BalancesByAssetRequest limit.
      * @member {number} limit
-     * @memberof DataEntriesSearchRequest
+     * @memberof BalancesByAssetRequest
      * @instance
      */
-    DataEntriesSearchRequest.prototype.limit = 0;
+    BalancesByAssetRequest.prototype.limit = 0;
 
     /**
-     * DataEntriesSearchRequest after.
+     * BalancesByAssetRequest after.
      * @member {Uint8Array} after
-     * @memberof DataEntriesSearchRequest
+     * @memberof BalancesByAssetRequest
      * @instance
      */
-    DataEntriesSearchRequest.prototype.after = $util.newBuffer([]);
+    BalancesByAssetRequest.prototype.after = $util.newBuffer([]);
 
     /**
-     * DataEntriesSearchRequest key.
-     * @member {string} key
-     * @memberof DataEntriesSearchRequest
-     * @instance
-     */
-    DataEntriesSearchRequest.prototype.key = "";
-
-    /**
-     * DataEntriesSearchRequest type.
-     * @member {number} type
-     * @memberof DataEntriesSearchRequest
-     * @instance
-     */
-    DataEntriesSearchRequest.prototype.type = 0;
-
-    /**
-     * DataEntriesSearchRequest intValue.
-     * @member {Long} intValue
-     * @memberof DataEntriesSearchRequest
-     * @instance
-     */
-    DataEntriesSearchRequest.prototype.intValue = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
-
-    /**
-     * DataEntriesSearchRequest boolValue.
-     * @member {boolean} boolValue
-     * @memberof DataEntriesSearchRequest
-     * @instance
-     */
-    DataEntriesSearchRequest.prototype.boolValue = false;
-
-    /**
-     * DataEntriesSearchRequest binaryValue.
-     * @member {Uint8Array} binaryValue
-     * @memberof DataEntriesSearchRequest
-     * @instance
-     */
-    DataEntriesSearchRequest.prototype.binaryValue = $util.newBuffer([]);
-
-    /**
-     * DataEntriesSearchRequest stringValue.
-     * @member {string} stringValue
-     * @memberof DataEntriesSearchRequest
-     * @instance
-     */
-    DataEntriesSearchRequest.prototype.stringValue = "";
-
-    // OneOf field names bound to virtual getters and setters
-    var $oneOfFields;
-
-    /**
-     * DataEntriesSearchRequest value.
-     * @member {"intValue"|"boolValue"|"binaryValue"|"stringValue"|undefined} value
-     * @memberof DataEntriesSearchRequest
-     * @instance
-     */
-    Object.defineProperty(DataEntriesSearchRequest.prototype, "value", {
-        get: $util.oneOfGetter($oneOfFields = ["intValue", "boolValue", "binaryValue", "stringValue"]),
-        set: $util.oneOfSetter($oneOfFields)
-    });
-
-    /**
-     * Creates a new DataEntriesSearchRequest instance using the specified properties.
+     * Creates a new BalancesByAssetRequest instance using the specified properties.
      * @function create
-     * @memberof DataEntriesSearchRequest
+     * @memberof BalancesByAssetRequest
      * @static
-     * @param {IDataEntriesSearchRequest=} [properties] Properties to set
-     * @returns {DataEntriesSearchRequest} DataEntriesSearchRequest instance
+     * @param {IBalancesByAssetRequest=} [properties] Properties to set
+     * @returns {BalancesByAssetRequest} BalancesByAssetRequest instance
      */
-    DataEntriesSearchRequest.create = function create(properties) {
-        return new DataEntriesSearchRequest(properties);
+    BalancesByAssetRequest.create = function create(properties) {
+        return new BalancesByAssetRequest(properties);
     };
 
     /**
-     * Encodes the specified DataEntriesSearchRequest message. Does not implicitly {@link DataEntriesSearchRequest.verify|verify} messages.
+     * Encodes the specified BalancesByAssetRequest message. Does not implicitly {@link BalancesByAssetRequest.verify|verify} messages.
      * @function encode
-     * @memberof DataEntriesSearchRequest
+     * @memberof BalancesByAssetRequest
      * @static
-     * @param {IDataEntriesSearchRequest} message DataEntriesSearchRequest message or plain object to encode
+     * @param {IBalancesByAssetRequest} message BalancesByAssetRequest message or plain object to encode
      * @param {$protobuf.Writer} [writer] Writer to encode to
      * @returns {$protobuf.Writer} Writer
      */
-    DataEntriesSearchRequest.encode = function encode(message, writer) {
+    BalancesByAssetRequest.encode = function encode(message, writer) {
         if (!writer)
             writer = $Writer.create();
         if (message.height != null && message.hasOwnProperty("height"))
             writer.uint32(/* id 1, wireType 0 =*/8).int32(message.height);
         if (message.timestamp != null && message.hasOwnProperty("timestamp"))
             writer.uint32(/* id 2, wireType 0 =*/16).int64(message.timestamp);
+        if (message.asset != null && message.hasOwnProperty("asset"))
+            writer.uint32(/* id 3, wireType 2 =*/26).bytes(message.asset);
         if (message.limit != null && message.hasOwnProperty("limit"))
-            writer.uint32(/* id 3, wireType 0 =*/24).int32(message.limit);
+            writer.uint32(/* id 4, wireType 0 =*/32).int32(message.limit);
         if (message.after != null && message.hasOwnProperty("after"))
-            writer.uint32(/* id 4, wireType 2 =*/34).bytes(message.after);
-        if (message.key != null && message.hasOwnProperty("key"))
-            writer.uint32(/* id 5, wireType 2 =*/42).string(message.key);
-        if (message.type != null && message.hasOwnProperty("type"))
-            writer.uint32(/* id 6, wireType 0 =*/48).int32(message.type);
-        if (message.intValue != null && message.hasOwnProperty("intValue"))
-            writer.uint32(/* id 10, wireType 0 =*/80).int64(message.intValue);
-        if (message.boolValue != null && message.hasOwnProperty("boolValue"))
-            writer.uint32(/* id 11, wireType 0 =*/88).bool(message.boolValue);
-        if (message.binaryValue != null && message.hasOwnProperty("binaryValue"))
-            writer.uint32(/* id 12, wireType 2 =*/98).bytes(message.binaryValue);
-        if (message.stringValue != null && message.hasOwnProperty("stringValue"))
-            writer.uint32(/* id 13, wireType 2 =*/106).string(message.stringValue);
+            writer.uint32(/* id 5, wireType 2 =*/42).bytes(message.after);
         return writer;
     };
 
     /**
-     * Encodes the specified DataEntriesSearchRequest message, length delimited. Does not implicitly {@link DataEntriesSearchRequest.verify|verify} messages.
+     * Encodes the specified BalancesByAssetRequest message, length delimited. Does not implicitly {@link BalancesByAssetRequest.verify|verify} messages.
      * @function encodeDelimited
-     * @memberof DataEntriesSearchRequest
+     * @memberof BalancesByAssetRequest
      * @static
-     * @param {IDataEntriesSearchRequest} message DataEntriesSearchRequest message or plain object to encode
+     * @param {IBalancesByAssetRequest} message BalancesByAssetRequest message or plain object to encode
      * @param {$protobuf.Writer} [writer] Writer to encode to
      * @returns {$protobuf.Writer} Writer
      */
-    DataEntriesSearchRequest.encodeDelimited = function encodeDelimited(message, writer) {
+    BalancesByAssetRequest.encodeDelimited = function encodeDelimited(message, writer) {
         return this.encode(message, writer).ldelim();
     };
 
     /**
-     * Decodes a DataEntriesSearchRequest message from the specified reader or buffer.
+     * Decodes a BalancesByAssetRequest message from the specified reader or buffer.
      * @function decode
-     * @memberof DataEntriesSearchRequest
+     * @memberof BalancesByAssetRequest
      * @static
      * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
      * @param {number} [length] Message length if known beforehand
-     * @returns {DataEntriesSearchRequest} DataEntriesSearchRequest
+     * @returns {BalancesByAssetRequest} BalancesByAssetRequest
      * @throws {Error} If the payload is not a reader or valid buffer
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
-    DataEntriesSearchRequest.decode = function decode(reader, length) {
+    BalancesByAssetRequest.decode = function decode(reader, length) {
         if (!(reader instanceof $Reader))
             reader = $Reader.create(reader);
-        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.DataEntriesSearchRequest();
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.BalancesByAssetRequest();
         while (reader.pos < end) {
             var tag = reader.uint32();
             switch (tag >>> 3) {
@@ -907,28 +687,13 @@ $root.DataEntriesSearchRequest = (function() {
                 message.timestamp = reader.int64();
                 break;
             case 3:
-                message.limit = reader.int32();
+                message.asset = reader.bytes();
                 break;
             case 4:
-                message.after = reader.bytes();
+                message.limit = reader.int32();
                 break;
             case 5:
-                message.key = reader.string();
-                break;
-            case 6:
-                message.type = reader.int32();
-                break;
-            case 10:
-                message.intValue = reader.int64();
-                break;
-            case 11:
-                message.boolValue = reader.bool();
-                break;
-            case 12:
-                message.binaryValue = reader.bytes();
-                break;
-            case 13:
-                message.stringValue = reader.string();
+                message.after = reader.bytes();
                 break;
             default:
                 reader.skipType(tag & 7);
@@ -939,92 +704,62 @@ $root.DataEntriesSearchRequest = (function() {
     };
 
     /**
-     * Decodes a DataEntriesSearchRequest message from the specified reader or buffer, length delimited.
+     * Decodes a BalancesByAssetRequest message from the specified reader or buffer, length delimited.
      * @function decodeDelimited
-     * @memberof DataEntriesSearchRequest
+     * @memberof BalancesByAssetRequest
      * @static
      * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @returns {DataEntriesSearchRequest} DataEntriesSearchRequest
+     * @returns {BalancesByAssetRequest} BalancesByAssetRequest
      * @throws {Error} If the payload is not a reader or valid buffer
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
-    DataEntriesSearchRequest.decodeDelimited = function decodeDelimited(reader) {
+    BalancesByAssetRequest.decodeDelimited = function decodeDelimited(reader) {
         if (!(reader instanceof $Reader))
             reader = new $Reader(reader);
         return this.decode(reader, reader.uint32());
     };
 
     /**
-     * Verifies a DataEntriesSearchRequest message.
+     * Verifies a BalancesByAssetRequest message.
      * @function verify
-     * @memberof DataEntriesSearchRequest
+     * @memberof BalancesByAssetRequest
      * @static
      * @param {Object.<string,*>} message Plain object to verify
      * @returns {string|null} `null` if valid, otherwise the reason why it is not
      */
-    DataEntriesSearchRequest.verify = function verify(message) {
+    BalancesByAssetRequest.verify = function verify(message) {
         if (typeof message !== "object" || message === null)
             return "object expected";
-        var properties = {};
         if (message.height != null && message.hasOwnProperty("height"))
             if (!$util.isInteger(message.height))
                 return "height: integer expected";
         if (message.timestamp != null && message.hasOwnProperty("timestamp"))
             if (!$util.isInteger(message.timestamp) && !(message.timestamp && $util.isInteger(message.timestamp.low) && $util.isInteger(message.timestamp.high)))
                 return "timestamp: integer|Long expected";
+        if (message.asset != null && message.hasOwnProperty("asset"))
+            if (!(message.asset && typeof message.asset.length === "number" || $util.isString(message.asset)))
+                return "asset: buffer expected";
         if (message.limit != null && message.hasOwnProperty("limit"))
             if (!$util.isInteger(message.limit))
                 return "limit: integer expected";
         if (message.after != null && message.hasOwnProperty("after"))
             if (!(message.after && typeof message.after.length === "number" || $util.isString(message.after)))
                 return "after: buffer expected";
-        if (message.key != null && message.hasOwnProperty("key"))
-            if (!$util.isString(message.key))
-                return "key: string expected";
-        if (message.type != null && message.hasOwnProperty("type"))
-            if (!$util.isInteger(message.type))
-                return "type: integer expected";
-        if (message.intValue != null && message.hasOwnProperty("intValue")) {
-            properties.value = 1;
-            if (!$util.isInteger(message.intValue) && !(message.intValue && $util.isInteger(message.intValue.low) && $util.isInteger(message.intValue.high)))
-                return "intValue: integer|Long expected";
-        }
-        if (message.boolValue != null && message.hasOwnProperty("boolValue")) {
-            if (properties.value === 1)
-                return "value: multiple values";
-            properties.value = 1;
-            if (typeof message.boolValue !== "boolean")
-                return "boolValue: boolean expected";
-        }
-        if (message.binaryValue != null && message.hasOwnProperty("binaryValue")) {
-            if (properties.value === 1)
-                return "value: multiple values";
-            properties.value = 1;
-            if (!(message.binaryValue && typeof message.binaryValue.length === "number" || $util.isString(message.binaryValue)))
-                return "binaryValue: buffer expected";
-        }
-        if (message.stringValue != null && message.hasOwnProperty("stringValue")) {
-            if (properties.value === 1)
-                return "value: multiple values";
-            properties.value = 1;
-            if (!$util.isString(message.stringValue))
-                return "stringValue: string expected";
-        }
         return null;
     };
 
     /**
-     * Creates a DataEntriesSearchRequest message from a plain object. Also converts values to their respective internal types.
+     * Creates a BalancesByAssetRequest message from a plain object. Also converts values to their respective internal types.
      * @function fromObject
-     * @memberof DataEntriesSearchRequest
+     * @memberof BalancesByAssetRequest
      * @static
      * @param {Object.<string,*>} object Plain object
-     * @returns {DataEntriesSearchRequest} DataEntriesSearchRequest
+     * @returns {BalancesByAssetRequest} BalancesByAssetRequest
      */
-    DataEntriesSearchRequest.fromObject = function fromObject(object) {
-        if (object instanceof $root.DataEntriesSearchRequest)
+    BalancesByAssetRequest.fromObject = function fromObject(object) {
+        if (object instanceof $root.BalancesByAssetRequest)
             return object;
-        var message = new $root.DataEntriesSearchRequest();
+        var message = new $root.BalancesByAssetRequest();
         if (object.height != null)
             message.height = object.height | 0;
         if (object.timestamp != null)
@@ -1036,6 +771,11 @@ $root.DataEntriesSearchRequest = (function() {
                 message.timestamp = object.timestamp;
             else if (typeof object.timestamp === "object")
                 message.timestamp = new $util.LongBits(object.timestamp.low >>> 0, object.timestamp.high >>> 0).toNumber();
+        if (object.asset != null)
+            if (typeof object.asset === "string")
+                $util.base64.decode(object.asset, message.asset = $util.newBuffer($util.base64.length(object.asset)), 0);
+            else if (object.asset.length)
+                message.asset = object.asset;
         if (object.limit != null)
             message.limit = object.limit | 0;
         if (object.after != null)
@@ -1043,41 +783,19 @@ $root.DataEntriesSearchRequest = (function() {
                 $util.base64.decode(object.after, message.after = $util.newBuffer($util.base64.length(object.after)), 0);
             else if (object.after.length)
                 message.after = object.after;
-        if (object.key != null)
-            message.key = String(object.key);
-        if (object.type != null)
-            message.type = object.type | 0;
-        if (object.intValue != null)
-            if ($util.Long)
-                (message.intValue = $util.Long.fromValue(object.intValue)).unsigned = false;
-            else if (typeof object.intValue === "string")
-                message.intValue = parseInt(object.intValue, 10);
-            else if (typeof object.intValue === "number")
-                message.intValue = object.intValue;
-            else if (typeof object.intValue === "object")
-                message.intValue = new $util.LongBits(object.intValue.low >>> 0, object.intValue.high >>> 0).toNumber();
-        if (object.boolValue != null)
-            message.boolValue = Boolean(object.boolValue);
-        if (object.binaryValue != null)
-            if (typeof object.binaryValue === "string")
-                $util.base64.decode(object.binaryValue, message.binaryValue = $util.newBuffer($util.base64.length(object.binaryValue)), 0);
-            else if (object.binaryValue.length)
-                message.binaryValue = object.binaryValue;
-        if (object.stringValue != null)
-            message.stringValue = String(object.stringValue);
         return message;
     };
 
     /**
-     * Creates a plain object from a DataEntriesSearchRequest message. Also converts values to other types if specified.
+     * Creates a plain object from a BalancesByAssetRequest message. Also converts values to other types if specified.
      * @function toObject
-     * @memberof DataEntriesSearchRequest
+     * @memberof BalancesByAssetRequest
      * @static
-     * @param {DataEntriesSearchRequest} message DataEntriesSearchRequest
+     * @param {BalancesByAssetRequest} message BalancesByAssetRequest
      * @param {$protobuf.IConversionOptions} [options] Conversion options
      * @returns {Object.<string,*>} Plain object
      */
-    DataEntriesSearchRequest.toObject = function toObject(message, options) {
+    BalancesByAssetRequest.toObject = function toObject(message, options) {
         if (!options)
             options = {};
         var object = {};
@@ -1088,6 +806,13 @@ $root.DataEntriesSearchRequest = (function() {
                 object.timestamp = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
             } else
                 object.timestamp = options.longs === String ? "0" : 0;
+            if (options.bytes === String)
+                object.asset = "";
+            else {
+                object.asset = [];
+                if (options.bytes !== Array)
+                    object.asset = $util.newBuffer(object.asset);
+            }
             object.limit = 0;
             if (options.bytes === String)
                 object.after = "";
@@ -1096,8 +821,6 @@ $root.DataEntriesSearchRequest = (function() {
                 if (options.bytes !== Array)
                     object.after = $util.newBuffer(object.after);
             }
-            object.key = "";
-            object.type = 0;
         }
         if (message.height != null && message.hasOwnProperty("height"))
             object.height = message.height;
@@ -1106,73 +829,48 @@ $root.DataEntriesSearchRequest = (function() {
                 object.timestamp = options.longs === String ? String(message.timestamp) : message.timestamp;
             else
                 object.timestamp = options.longs === String ? $util.Long.prototype.toString.call(message.timestamp) : options.longs === Number ? new $util.LongBits(message.timestamp.low >>> 0, message.timestamp.high >>> 0).toNumber() : message.timestamp;
+        if (message.asset != null && message.hasOwnProperty("asset"))
+            object.asset = options.bytes === String ? $util.base64.encode(message.asset, 0, message.asset.length) : options.bytes === Array ? Array.prototype.slice.call(message.asset) : message.asset;
         if (message.limit != null && message.hasOwnProperty("limit"))
             object.limit = message.limit;
         if (message.after != null && message.hasOwnProperty("after"))
             object.after = options.bytes === String ? $util.base64.encode(message.after, 0, message.after.length) : options.bytes === Array ? Array.prototype.slice.call(message.after) : message.after;
-        if (message.key != null && message.hasOwnProperty("key"))
-            object.key = message.key;
-        if (message.type != null && message.hasOwnProperty("type"))
-            object.type = message.type;
-        if (message.intValue != null && message.hasOwnProperty("intValue")) {
-            if (typeof message.intValue === "number")
-                object.intValue = options.longs === String ? String(message.intValue) : message.intValue;
-            else
-                object.intValue = options.longs === String ? $util.Long.prototype.toString.call(message.intValue) : options.longs === Number ? new $util.LongBits(message.intValue.low >>> 0, message.intValue.high >>> 0).toNumber() : message.intValue;
-            if (options.oneofs)
-                object.value = "intValue";
-        }
-        if (message.boolValue != null && message.hasOwnProperty("boolValue")) {
-            object.boolValue = message.boolValue;
-            if (options.oneofs)
-                object.value = "boolValue";
-        }
-        if (message.binaryValue != null && message.hasOwnProperty("binaryValue")) {
-            object.binaryValue = options.bytes === String ? $util.base64.encode(message.binaryValue, 0, message.binaryValue.length) : options.bytes === Array ? Array.prototype.slice.call(message.binaryValue) : message.binaryValue;
-            if (options.oneofs)
-                object.value = "binaryValue";
-        }
-        if (message.stringValue != null && message.hasOwnProperty("stringValue")) {
-            object.stringValue = message.stringValue;
-            if (options.oneofs)
-                object.value = "stringValue";
-        }
         return object;
     };
 
     /**
-     * Converts this DataEntriesSearchRequest to JSON.
+     * Converts this BalancesByAssetRequest to JSON.
      * @function toJSON
-     * @memberof DataEntriesSearchRequest
+     * @memberof BalancesByAssetRequest
      * @instance
      * @returns {Object.<string,*>} JSON object
      */
-    DataEntriesSearchRequest.prototype.toJSON = function toJSON() {
+    BalancesByAssetRequest.prototype.toJSON = function toJSON() {
         return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
     };
 
-    return DataEntriesSearchRequest;
+    return BalancesByAssetRequest;
 })();
 
-$root.DataEntryResponse = (function() {
+$root.Balance = (function() {
 
     /**
-     * Properties of a DataEntryResponse.
-     * @exports IDataEntryResponse
-     * @interface IDataEntryResponse
-     * @property {Uint8Array|null} [address] DataEntryResponse address
-     * @property {DataTransactionData.IDataEntry|null} [entry] DataEntryResponse entry
+     * Properties of a Balance.
+     * @exports IBalance
+     * @interface IBalance
+     * @property {Uint8Array|null} [address] Balance address
+     * @property {IAmount|null} [amount] Balance amount
      */
 
     /**
-     * Constructs a new DataEntryResponse.
-     * @exports DataEntryResponse
-     * @classdesc Represents a DataEntryResponse.
-     * @implements IDataEntryResponse
+     * Constructs a new Balance.
+     * @exports Balance
+     * @classdesc Represents a Balance.
+     * @implements IBalance
      * @constructor
-     * @param {IDataEntryResponse=} [properties] Properties to set
+     * @param {IBalance=} [properties] Properties to set
      */
-    function DataEntryResponse(properties) {
+    function Balance(properties) {
         if (properties)
             for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                 if (properties[keys[i]] != null)
@@ -1180,80 +878,80 @@ $root.DataEntryResponse = (function() {
     }
 
     /**
-     * DataEntryResponse address.
+     * Balance address.
      * @member {Uint8Array} address
-     * @memberof DataEntryResponse
+     * @memberof Balance
      * @instance
      */
-    DataEntryResponse.prototype.address = $util.newBuffer([]);
+    Balance.prototype.address = $util.newBuffer([]);
 
     /**
-     * DataEntryResponse entry.
-     * @member {DataTransactionData.IDataEntry|null|undefined} entry
-     * @memberof DataEntryResponse
+     * Balance amount.
+     * @member {IAmount|null|undefined} amount
+     * @memberof Balance
      * @instance
      */
-    DataEntryResponse.prototype.entry = null;
+    Balance.prototype.amount = null;
 
     /**
-     * Creates a new DataEntryResponse instance using the specified properties.
+     * Creates a new Balance instance using the specified properties.
      * @function create
-     * @memberof DataEntryResponse
+     * @memberof Balance
      * @static
-     * @param {IDataEntryResponse=} [properties] Properties to set
-     * @returns {DataEntryResponse} DataEntryResponse instance
+     * @param {IBalance=} [properties] Properties to set
+     * @returns {Balance} Balance instance
      */
-    DataEntryResponse.create = function create(properties) {
-        return new DataEntryResponse(properties);
+    Balance.create = function create(properties) {
+        return new Balance(properties);
     };
 
     /**
-     * Encodes the specified DataEntryResponse message. Does not implicitly {@link DataEntryResponse.verify|verify} messages.
+     * Encodes the specified Balance message. Does not implicitly {@link Balance.verify|verify} messages.
      * @function encode
-     * @memberof DataEntryResponse
+     * @memberof Balance
      * @static
-     * @param {IDataEntryResponse} message DataEntryResponse message or plain object to encode
+     * @param {IBalance} message Balance message or plain object to encode
      * @param {$protobuf.Writer} [writer] Writer to encode to
      * @returns {$protobuf.Writer} Writer
      */
-    DataEntryResponse.encode = function encode(message, writer) {
+    Balance.encode = function encode(message, writer) {
         if (!writer)
             writer = $Writer.create();
         if (message.address != null && message.hasOwnProperty("address"))
             writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.address);
-        if (message.entry != null && message.hasOwnProperty("entry"))
-            $root.DataTransactionData.DataEntry.encode(message.entry, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+        if (message.amount != null && message.hasOwnProperty("amount"))
+            $root.Amount.encode(message.amount, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
         return writer;
     };
 
     /**
-     * Encodes the specified DataEntryResponse message, length delimited. Does not implicitly {@link DataEntryResponse.verify|verify} messages.
+     * Encodes the specified Balance message, length delimited. Does not implicitly {@link Balance.verify|verify} messages.
      * @function encodeDelimited
-     * @memberof DataEntryResponse
+     * @memberof Balance
      * @static
-     * @param {IDataEntryResponse} message DataEntryResponse message or plain object to encode
+     * @param {IBalance} message Balance message or plain object to encode
      * @param {$protobuf.Writer} [writer] Writer to encode to
      * @returns {$protobuf.Writer} Writer
      */
-    DataEntryResponse.encodeDelimited = function encodeDelimited(message, writer) {
+    Balance.encodeDelimited = function encodeDelimited(message, writer) {
         return this.encode(message, writer).ldelim();
     };
 
     /**
-     * Decodes a DataEntryResponse message from the specified reader or buffer.
+     * Decodes a Balance message from the specified reader or buffer.
      * @function decode
-     * @memberof DataEntryResponse
+     * @memberof Balance
      * @static
      * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
      * @param {number} [length] Message length if known beforehand
-     * @returns {DataEntryResponse} DataEntryResponse
+     * @returns {Balance} Balance
      * @throws {Error} If the payload is not a reader or valid buffer
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
-    DataEntryResponse.decode = function decode(reader, length) {
+    Balance.decode = function decode(reader, length) {
         if (!(reader instanceof $Reader))
             reader = $Reader.create(reader);
-        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.DataEntryResponse();
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Balance();
         while (reader.pos < end) {
             var tag = reader.uint32();
             switch (tag >>> 3) {
@@ -1261,7 +959,7 @@ $root.DataEntryResponse = (function() {
                 message.address = reader.bytes();
                 break;
             case 2:
-                message.entry = $root.DataTransactionData.DataEntry.decode(reader, reader.uint32());
+                message.amount = $root.Amount.decode(reader, reader.uint32());
                 break;
             default:
                 reader.skipType(tag & 7);
@@ -1272,78 +970,78 @@ $root.DataEntryResponse = (function() {
     };
 
     /**
-     * Decodes a DataEntryResponse message from the specified reader or buffer, length delimited.
+     * Decodes a Balance message from the specified reader or buffer, length delimited.
      * @function decodeDelimited
-     * @memberof DataEntryResponse
+     * @memberof Balance
      * @static
      * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @returns {DataEntryResponse} DataEntryResponse
+     * @returns {Balance} Balance
      * @throws {Error} If the payload is not a reader or valid buffer
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
-    DataEntryResponse.decodeDelimited = function decodeDelimited(reader) {
+    Balance.decodeDelimited = function decodeDelimited(reader) {
         if (!(reader instanceof $Reader))
             reader = new $Reader(reader);
         return this.decode(reader, reader.uint32());
     };
 
     /**
-     * Verifies a DataEntryResponse message.
+     * Verifies a Balance message.
      * @function verify
-     * @memberof DataEntryResponse
+     * @memberof Balance
      * @static
      * @param {Object.<string,*>} message Plain object to verify
      * @returns {string|null} `null` if valid, otherwise the reason why it is not
      */
-    DataEntryResponse.verify = function verify(message) {
+    Balance.verify = function verify(message) {
         if (typeof message !== "object" || message === null)
             return "object expected";
         if (message.address != null && message.hasOwnProperty("address"))
             if (!(message.address && typeof message.address.length === "number" || $util.isString(message.address)))
                 return "address: buffer expected";
-        if (message.entry != null && message.hasOwnProperty("entry")) {
-            var error = $root.DataTransactionData.DataEntry.verify(message.entry);
+        if (message.amount != null && message.hasOwnProperty("amount")) {
+            var error = $root.Amount.verify(message.amount);
             if (error)
-                return "entry." + error;
+                return "amount." + error;
         }
         return null;
     };
 
     /**
-     * Creates a DataEntryResponse message from a plain object. Also converts values to their respective internal types.
+     * Creates a Balance message from a plain object. Also converts values to their respective internal types.
      * @function fromObject
-     * @memberof DataEntryResponse
+     * @memberof Balance
      * @static
      * @param {Object.<string,*>} object Plain object
-     * @returns {DataEntryResponse} DataEntryResponse
+     * @returns {Balance} Balance
      */
-    DataEntryResponse.fromObject = function fromObject(object) {
-        if (object instanceof $root.DataEntryResponse)
+    Balance.fromObject = function fromObject(object) {
+        if (object instanceof $root.Balance)
             return object;
-        var message = new $root.DataEntryResponse();
+        var message = new $root.Balance();
         if (object.address != null)
             if (typeof object.address === "string")
                 $util.base64.decode(object.address, message.address = $util.newBuffer($util.base64.length(object.address)), 0);
             else if (object.address.length)
                 message.address = object.address;
-        if (object.entry != null) {
-            if (typeof object.entry !== "object")
-                throw TypeError(".DataEntryResponse.entry: object expected");
-            message.entry = $root.DataTransactionData.DataEntry.fromObject(object.entry);
+        if (object.amount != null) {
+            if (typeof object.amount !== "object")
+                throw TypeError(".Balance.amount: object expected");
+            message.amount = $root.Amount.fromObject(object.amount);
         }
         return message;
     };
 
     /**
-     * Creates a plain object from a DataEntryResponse message. Also converts values to other types if specified.
+     * Creates a plain object from a Balance message. Also converts values to other types if specified.
      * @function toObject
-     * @memberof DataEntryResponse
+     * @memberof Balance
      * @static
-     * @param {DataEntryResponse} message DataEntryResponse
+     * @param {Balance} message Balance
      * @param {$protobuf.IConversionOptions} [options] Conversion options
      * @returns {Object.<string,*>} Plain object
      */
-    DataEntryResponse.toObject = function toObject(message, options) {
+    Balance.toObject = function toObject(message, options) {
         if (!options)
             options = {};
         var object = {};
@@ -1355,161 +1053,194 @@ $root.DataEntryResponse = (function() {
                 if (options.bytes !== Array)
                     object.address = $util.newBuffer(object.address);
             }
-            object.entry = null;
+            object.amount = null;
         }
         if (message.address != null && message.hasOwnProperty("address"))
             object.address = options.bytes === String ? $util.base64.encode(message.address, 0, message.address.length) : options.bytes === Array ? Array.prototype.slice.call(message.address) : message.address;
-        if (message.entry != null && message.hasOwnProperty("entry"))
-            object.entry = $root.DataTransactionData.DataEntry.toObject(message.entry, options);
+        if (message.amount != null && message.hasOwnProperty("amount"))
+            object.amount = $root.Amount.toObject(message.amount, options);
         return object;
     };
 
     /**
-     * Converts this DataEntryResponse to JSON.
+     * Converts this Balance to JSON.
      * @function toJSON
-     * @memberof DataEntryResponse
+     * @memberof Balance
      * @instance
      * @returns {Object.<string,*>} JSON object
      */
-    DataEntryResponse.prototype.toJSON = function toJSON() {
+    Balance.prototype.toJSON = function toJSON() {
         return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
     };
 
-    return DataEntryResponse;
+    return Balance;
 })();
 
-$root.DataEntries = (function() {
+$root.Balances = (function() {
 
     /**
-     * Constructs a new DataEntries service.
-     * @exports DataEntries
-     * @classdesc Represents a DataEntries
+     * Constructs a new Balances service.
+     * @exports Balances
+     * @classdesc Represents a Balances
      * @extends $protobuf.rpc.Service
      * @constructor
      * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
      * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
      * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
      */
-    function DataEntries(rpcImpl, requestDelimited, responseDelimited) {
+    function Balances(rpcImpl, requestDelimited, responseDelimited) {
         $protobuf.rpc.Service.call(this, rpcImpl, requestDelimited, responseDelimited);
     }
 
-    (DataEntries.prototype = Object.create($protobuf.rpc.Service.prototype)).constructor = DataEntries;
+    (Balances.prototype = Object.create($protobuf.rpc.Service.prototype)).constructor = Balances;
 
     /**
-     * Creates new DataEntries service using the specified rpc implementation.
+     * Creates new Balances service using the specified rpc implementation.
      * @function create
-     * @memberof DataEntries
+     * @memberof Balances
      * @static
      * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
      * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
      * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
-     * @returns {DataEntries} RPC service. Useful where requests and/or responses are streamed.
+     * @returns {Balances} RPC service. Useful where requests and/or responses are streamed.
      */
-    DataEntries.create = function create(rpcImpl, requestDelimited, responseDelimited) {
+    Balances.create = function create(rpcImpl, requestDelimited, responseDelimited) {
         return new this(rpcImpl, requestDelimited, responseDelimited);
     };
 
     /**
-     * Callback as used by {@link DataEntries#byTransaction}.
-     * @memberof DataEntries
+     * Callback as used by {@link Balances#byTransaction}.
+     * @memberof Balances
      * @typedef ByTransactionCallback
      * @type {function}
      * @param {Error|null} error Error, if any
-     * @param {DataEntryResponse} [response] DataEntryResponse
+     * @param {Balance} [response] Balance
      */
 
     /**
      * Calls ByTransaction.
      * @function byTransaction
-     * @memberof DataEntries
+     * @memberof Balances
      * @instance
-     * @param {IDataEntriesByTransactionRequest} request DataEntriesByTransactionRequest message or plain object
-     * @param {DataEntries.ByTransactionCallback} callback Node-style callback called with the error, if any, and DataEntryResponse
+     * @param {IBalancesByTransactionRequest} request BalancesByTransactionRequest message or plain object
+     * @param {Balances.ByTransactionCallback} callback Node-style callback called with the error, if any, and Balance
      * @returns {undefined}
      * @variation 1
      */
-    Object.defineProperty(DataEntries.prototype.byTransaction = function byTransaction(request, callback) {
-        return this.rpcCall(byTransaction, $root.DataEntriesByTransactionRequest, $root.DataEntryResponse, request, callback);
+    Object.defineProperty(Balances.prototype.byTransaction = function byTransaction(request, callback) {
+        return this.rpcCall(byTransaction, $root.BalancesByTransactionRequest, $root.Balance, request, callback);
     }, "name", { value: "ByTransaction" });
 
     /**
      * Calls ByTransaction.
      * @function byTransaction
-     * @memberof DataEntries
+     * @memberof Balances
      * @instance
-     * @param {IDataEntriesByTransactionRequest} request DataEntriesByTransactionRequest message or plain object
-     * @returns {Promise<DataEntryResponse>} Promise
+     * @param {IBalancesByTransactionRequest} request BalancesByTransactionRequest message or plain object
+     * @returns {Promise<Balance>} Promise
      * @variation 2
      */
 
     /**
-     * Callback as used by {@link DataEntries#byAddress}.
-     * @memberof DataEntries
+     * Callback as used by {@link Balances#byAddress}.
+     * @memberof Balances
      * @typedef ByAddressCallback
      * @type {function}
      * @param {Error|null} error Error, if any
-     * @param {DataEntryResponse} [response] DataEntryResponse
+     * @param {Balance} [response] Balance
      */
 
     /**
      * Calls ByAddress.
      * @function byAddress
-     * @memberof DataEntries
+     * @memberof Balances
      * @instance
-     * @param {IDataEntriesByAddressRequest} request DataEntriesByAddressRequest message or plain object
-     * @param {DataEntries.ByAddressCallback} callback Node-style callback called with the error, if any, and DataEntryResponse
+     * @param {IBalancesByAddressRequest} request BalancesByAddressRequest message or plain object
+     * @param {Balances.ByAddressCallback} callback Node-style callback called with the error, if any, and Balance
      * @returns {undefined}
      * @variation 1
      */
-    Object.defineProperty(DataEntries.prototype.byAddress = function byAddress(request, callback) {
-        return this.rpcCall(byAddress, $root.DataEntriesByAddressRequest, $root.DataEntryResponse, request, callback);
+    Object.defineProperty(Balances.prototype.byAddress = function byAddress(request, callback) {
+        return this.rpcCall(byAddress, $root.BalancesByAddressRequest, $root.Balance, request, callback);
     }, "name", { value: "ByAddress" });
 
     /**
      * Calls ByAddress.
      * @function byAddress
-     * @memberof DataEntries
+     * @memberof Balances
      * @instance
-     * @param {IDataEntriesByAddressRequest} request DataEntriesByAddressRequest message or plain object
-     * @returns {Promise<DataEntryResponse>} Promise
+     * @param {IBalancesByAddressRequest} request BalancesByAddressRequest message or plain object
+     * @returns {Promise<Balance>} Promise
      * @variation 2
      */
 
     /**
-     * Callback as used by {@link DataEntries#search}.
-     * @memberof DataEntries
-     * @typedef SearchCallback
+     * Callback as used by {@link Balances#byAsset}.
+     * @memberof Balances
+     * @typedef ByAssetCallback
      * @type {function}
      * @param {Error|null} error Error, if any
-     * @param {DataEntryResponse} [response] DataEntryResponse
+     * @param {Balance} [response] Balance
      */
 
     /**
-     * Calls Search.
-     * @function search
-     * @memberof DataEntries
+     * Calls ByAsset.
+     * @function byAsset
+     * @memberof Balances
      * @instance
-     * @param {IDataEntriesSearchRequest} request DataEntriesSearchRequest message or plain object
-     * @param {DataEntries.SearchCallback} callback Node-style callback called with the error, if any, and DataEntryResponse
+     * @param {IBalancesByAssetRequest} request BalancesByAssetRequest message or plain object
+     * @param {Balances.ByAssetCallback} callback Node-style callback called with the error, if any, and Balance
      * @returns {undefined}
      * @variation 1
      */
-    Object.defineProperty(DataEntries.prototype.search = function search(request, callback) {
-        return this.rpcCall(search, $root.DataEntriesSearchRequest, $root.DataEntryResponse, request, callback);
-    }, "name", { value: "Search" });
+    Object.defineProperty(Balances.prototype.byAsset = function byAsset(request, callback) {
+        return this.rpcCall(byAsset, $root.BalancesByAssetRequest, $root.Balance, request, callback);
+    }, "name", { value: "ByAsset" });
 
     /**
-     * Calls Search.
-     * @function search
-     * @memberof DataEntries
+     * Calls ByAsset.
+     * @function byAsset
+     * @memberof Balances
      * @instance
-     * @param {IDataEntriesSearchRequest} request DataEntriesSearchRequest message or plain object
-     * @returns {Promise<DataEntryResponse>} Promise
+     * @param {IBalancesByAssetRequest} request BalancesByAssetRequest message or plain object
+     * @returns {Promise<Balance>} Promise
      * @variation 2
      */
 
-    return DataEntries;
+    /**
+     * Callback as used by {@link Balances#byTest}.
+     * @memberof Balances
+     * @typedef ByTestCallback
+     * @type {function}
+     * @param {Error|null} error Error, if any
+     * @param {Balance} [response] Balance
+     */
+
+    /**
+     * Calls ByTest.
+     * @function byTest
+     * @memberof Balances
+     * @instance
+     * @param {IBalancesByAssetRequest} request BalancesByAssetRequest message or plain object
+     * @param {Balances.ByTestCallback} callback Node-style callback called with the error, if any, and Balance
+     * @returns {undefined}
+     * @variation 1
+     */
+    Object.defineProperty(Balances.prototype.byTest = function byTest(request, callback) {
+        return this.rpcCall(byTest, $root.BalancesByAssetRequest, $root.Balance, request, callback);
+    }, "name", { value: "ByTest" });
+
+    /**
+     * Calls ByTest.
+     * @function byTest
+     * @memberof Balances
+     * @instance
+     * @param {IBalancesByAssetRequest} request BalancesByAssetRequest message or plain object
+     * @returns {Promise<Balance>} Promise
+     * @variation 2
+     */
+
+    return Balances;
 })();
 
 $root.AssetAmount = (function() {

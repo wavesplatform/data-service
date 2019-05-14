@@ -2,9 +2,9 @@ import * as grpc from 'grpc';
 import * as Long from 'long';
 import {
   DataEntryResponse,
-  ByTransactionRequest,
-  ByAddressRequest,
-  SearchRequest,
+  DataEntriesByTransactionRequest,
+  DataEntriesByAddressRequest,
+  DataEntriesSearchRequest,
 } from '../../protobuf/data-entries';
 
 import { Task, task } from 'folktale/concurrency/task';
@@ -22,24 +22,30 @@ type DataEntriesRequest = {
   bool_value?: boolean;
   int_value?: number;
   string_value?: string;
+  limit: number;
+  after?: string;
 };
 
 type GrpcDataEntriesRequest =
-  | ByTransactionRequest
-  | ByAddressRequest
-  | SearchRequest;
+  | DataEntriesByTransactionRequest
+  | DataEntriesByAddressRequest
+  | DataEntriesSearchRequest;
 
 export const getDataEntries = (client: grpc.Client) => (
   req: DataEntriesRequest
 ): Task<DbError, DataEntryResponse[]> => {
   return task(resolver => {
     const reqSerializer = (request: GrpcDataEntriesRequest): Buffer => {
-      if (request instanceof ByTransactionRequest) {
-        return Buffer.from(ByTransactionRequest.encode(request).finish());
-      } else if (request instanceof ByAddressRequest) {
-        return Buffer.from(ByAddressRequest.encode(request).finish());
+      if (request instanceof DataEntriesByTransactionRequest) {
+        return Buffer.from(
+          DataEntriesByTransactionRequest.encode(request).finish()
+        );
+      } else if (request instanceof DataEntriesByAddressRequest) {
+        return Buffer.from(
+          DataEntriesByAddressRequest.encode(request).finish()
+        );
       } else {
-        return Buffer.from(SearchRequest.encode(request).finish());
+        return Buffer.from(DataEntriesSearchRequest.encode(request).finish());
       }
     };
 
@@ -56,16 +62,16 @@ export const getDataEntries = (client: grpc.Client) => (
     const buildRequest = (req: DataEntriesRequest): GrpcDataEntriesRequest => {
       let request;
       if (req.transaction_id) {
-        request = new ByTransactionRequest({
+        request = new DataEntriesByTransactionRequest({
           transactionId: base58.decode(req.transaction_id),
         });
       } else {
         if (req.address) {
-          request = new ByAddressRequest({
+          request = new DataEntriesByAddressRequest({
             address: base58.decode(req.address),
           });
         } else {
-          request = new SearchRequest();
+          request = new DataEntriesSearchRequest();
         }
 
         if (req.height) {
@@ -95,6 +101,10 @@ export const getDataEntries = (client: grpc.Client) => (
         if (req.string_value) {
           request.stringValue = req.string_value;
         }
+        if (req.after) {
+          request.after = Buffer.from(req.after);
+        }
+        request.limit = req.limit;
       }
       return request;
     };

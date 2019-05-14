@@ -1,9 +1,9 @@
 syntax = "proto3";
 import "transaction.proto";
 
-message ByTransactionRequest { bytes transaction_id = 1; }
+message DataEntriesByTransactionRequest { bytes transaction_id = 1; }
 
-message ByAddressRequest {
+message DataEntriesByAddressRequest {
   int32 height = 1;
   int64 timestamp = 2;
   bytes address = 3;
@@ -19,7 +19,7 @@ message ByAddressRequest {
   };
 }
 
-message SearchRequest {
+message DataEntriesSearchRequest {
   int32 height = 1;
   int64 timestamp = 2;
   int32 limit = 3;
@@ -40,7 +40,8 @@ message DataEntryResponse {
 }
 
 service DataEntries {
-  rpc ByTransaction(ByTransactionRequest) returns (stream DataEntryResponse);
-  rpc ByAddress(ByAddressRequest) returns (stream DataEntryResponse);
-  rpc Search(SearchRequest) returns (stream DataEntryResponse);
+  rpc ByTransaction(DataEntriesByTransactionRequest)
+      returns (stream DataEntryResponse);
+  rpc ByAddress(DataEntriesByAddressRequest) returns (stream DataEntryResponse);
+  rpc Search(DataEntriesSearchRequest) returns (stream DataEntryResponse);
 }

@@ -5,26 +5,37 @@ var grpc = require('grpc');
 var data$entries_pb = require('./data-entries_pb.js');
 var transaction_pb = require('./transaction_pb.js');
 
-function serialize_ByAddressRequest(arg) {
-  if (!(arg instanceof data$entries_pb.ByAddressRequest)) {
-    throw new Error('Expected argument of type ByAddressRequest');
+function serialize_DataEntriesByAddressRequest(arg) {
+  if (!(arg instanceof data$entries_pb.DataEntriesByAddressRequest)) {
+    throw new Error('Expected argument of type DataEntriesByAddressRequest');
   }
   return Buffer.from(arg.serializeBinary());
 }
 
-function deserialize_ByAddressRequest(buffer_arg) {
-  return data$entries_pb.ByAddressRequest.deserializeBinary(new Uint8Array(buffer_arg));
+function deserialize_DataEntriesByAddressRequest(buffer_arg) {
+  return data$entries_pb.DataEntriesByAddressRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_ByTransactionRequest(arg) {
-  if (!(arg instanceof data$entries_pb.ByTransactionRequest)) {
-    throw new Error('Expected argument of type ByTransactionRequest');
+function serialize_DataEntriesByTransactionRequest(arg) {
+  if (!(arg instanceof data$entries_pb.DataEntriesByTransactionRequest)) {
+    throw new Error('Expected argument of type DataEntriesByTransactionRequest');
   }
   return Buffer.from(arg.serializeBinary());
 }
 
-function deserialize_ByTransactionRequest(buffer_arg) {
-  return data$entries_pb.ByTransactionRequest.deserializeBinary(new Uint8Array(buffer_arg));
+function deserialize_DataEntriesByTransactionRequest(buffer_arg) {
+  return data$entries_pb.DataEntriesByTransactionRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_DataEntriesSearchRequest(arg) {
+  if (!(arg instanceof data$entries_pb.DataEntriesSearchRequest)) {
+    throw new Error('Expected argument of type DataEntriesSearchRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_DataEntriesSearchRequest(buffer_arg) {
+  return data$entries_pb.DataEntriesSearchRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_DataEntryResponse(arg) {
@@ -38,27 +49,16 @@ function deserialize_DataEntryResponse(buffer_arg) {
   return data$entries_pb.DataEntryResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_SearchRequest(arg) {
-  if (!(arg instanceof data$entries_pb.SearchRequest)) {
-    throw new Error('Expected argument of type SearchRequest');
-  }
-  return Buffer.from(arg.serializeBinary());
-}
-
-function deserialize_SearchRequest(buffer_arg) {
-  return data$entries_pb.SearchRequest.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
 
 var DataEntriesService = exports.DataEntriesService = {
   byTransaction: {
     path: '/DataEntries/ByTransaction',
     requestStream: false,
     responseStream: true,
-    requestType: data$entries_pb.ByTransactionRequest,
+    requestType: data$entries_pb.DataEntriesByTransactionRequest,
     responseType: data$entries_pb.DataEntryResponse,
-    requestSerialize: serialize_ByTransactionRequest,
-    requestDeserialize: deserialize_ByTransactionRequest,
+    requestSerialize: serialize_DataEntriesByTransactionRequest,
+    requestDeserialize: deserialize_DataEntriesByTransactionRequest,
     responseSerialize: serialize_DataEntryResponse,
     responseDeserialize: deserialize_DataEntryResponse,
   },
@@ -66,10 +66,10 @@ var DataEntriesService = exports.DataEntriesService = {
     path: '/DataEntries/ByAddress',
     requestStream: false,
     responseStream: true,
-    requestType: data$entries_pb.ByAddressRequest,
+    requestType: data$entries_pb.DataEntriesByAddressRequest,
     responseType: data$entries_pb.DataEntryResponse,
-    requestSerialize: serialize_ByAddressRequest,
-    requestDeserialize: deserialize_ByAddressRequest,
+    requestSerialize: serialize_DataEntriesByAddressRequest,
+    requestDeserialize: deserialize_DataEntriesByAddressRequest,
     responseSerialize: serialize_DataEntryResponse,
     responseDeserialize: deserialize_DataEntryResponse,
   },
@@ -77,10 +77,10 @@ var DataEntriesService = exports.DataEntriesService = {
     path: '/DataEntries/Search',
     requestStream: false,
     responseStream: true,
-    requestType: data$entries_pb.SearchRequest,
+    requestType: data$entries_pb.DataEntriesSearchRequest,
     responseType: data$entries_pb.DataEntryResponse,
-    requestSerialize: serialize_SearchRequest,
-    requestDeserialize: deserialize_SearchRequest,
+    requestSerialize: serialize_DataEntriesSearchRequest,
+    requestDeserialize: deserialize_DataEntriesSearchRequest,
     responseSerialize: serialize_DataEntryResponse,
     responseDeserialize: deserialize_DataEntryResponse,
   },

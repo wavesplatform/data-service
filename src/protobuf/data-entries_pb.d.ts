@@ -6,7 +6,7 @@
 import * as jspb from "google-protobuf";
 import * as transaction_pb from "./transaction_pb";
 
-export class ByTransactionRequest extends jspb.Message { 
+export class DataEntriesByTransactionRequest extends jspb.Message { 
     getTransactionId(): Uint8Array | string;
     getTransactionId_asU8(): Uint8Array;
     getTransactionId_asB64(): string;
@@ -14,22 +14,22 @@ export class ByTransactionRequest extends jspb.Message {
 
 
     serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): ByTransactionRequest.AsObject;
-    static toObject(includeInstance: boolean, msg: ByTransactionRequest): ByTransactionRequest.AsObject;
+    toObject(includeInstance?: boolean): DataEntriesByTransactionRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: DataEntriesByTransactionRequest): DataEntriesByTransactionRequest.AsObject;
     static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
     static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: ByTransactionRequest, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): ByTransactionRequest;
-    static deserializeBinaryFromReader(message: ByTransactionRequest, reader: jspb.BinaryReader): ByTransactionRequest;
+    static serializeBinaryToWriter(message: DataEntriesByTransactionRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): DataEntriesByTransactionRequest;
+    static deserializeBinaryFromReader(message: DataEntriesByTransactionRequest, reader: jspb.BinaryReader): DataEntriesByTransactionRequest;
 }
 
-export namespace ByTransactionRequest {
+export namespace DataEntriesByTransactionRequest {
     export type AsObject = {
         transactionId: Uint8Array | string,
     }
 }
 
-export class ByAddressRequest extends jspb.Message { 
+export class DataEntriesByAddressRequest extends jspb.Message { 
     getHeight(): number;
     setHeight(value: number): void;
 
@@ -82,19 +82,19 @@ export class ByAddressRequest extends jspb.Message {
     setStringValue(value: string): void;
 
 
-    getValueCase(): ByAddressRequest.ValueCase;
+    getValueCase(): DataEntriesByAddressRequest.ValueCase;
 
     serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): ByAddressRequest.AsObject;
-    static toObject(includeInstance: boolean, msg: ByAddressRequest): ByAddressRequest.AsObject;
+    toObject(includeInstance?: boolean): DataEntriesByAddressRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: DataEntriesByAddressRequest): DataEntriesByAddressRequest.AsObject;
     static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
     static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: ByAddressRequest, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): ByAddressRequest;
-    static deserializeBinaryFromReader(message: ByAddressRequest, reader: jspb.BinaryReader): ByAddressRequest;
+    static serializeBinaryToWriter(message: DataEntriesByAddressRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): DataEntriesByAddressRequest;
+    static deserializeBinaryFromReader(message: DataEntriesByAddressRequest, reader: jspb.BinaryReader): DataEntriesByAddressRequest;
 }
 
-export namespace ByAddressRequest {
+export namespace DataEntriesByAddressRequest {
     export type AsObject = {
         height: number,
         timestamp: number,
@@ -124,7 +124,7 @@ export namespace ByAddressRequest {
 
 }
 
-export class SearchRequest extends jspb.Message { 
+export class DataEntriesSearchRequest extends jspb.Message { 
     getHeight(): number;
     setHeight(value: number): void;
 
@@ -172,19 +172,19 @@ export class SearchRequest extends jspb.Message {
     setStringValue(value: string): void;
 
 
-    getValueCase(): SearchRequest.ValueCase;
+    getValueCase(): DataEntriesSearchRequest.ValueCase;
 
     serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): SearchRequest.AsObject;
-    static toObject(includeInstance: boolean, msg: SearchRequest): SearchRequest.AsObject;
+    toObject(includeInstance?: boolean): DataEntriesSearchRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: DataEntriesSearchRequest): DataEntriesSearchRequest.AsObject;
     static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
     static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: SearchRequest, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): SearchRequest;
-    static deserializeBinaryFromReader(message: SearchRequest, reader: jspb.BinaryReader): SearchRequest;
+    static serializeBinaryToWriter(message: DataEntriesSearchRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): DataEntriesSearchRequest;
+    static deserializeBinaryFromReader(message: DataEntriesSearchRequest, reader: jspb.BinaryReader): DataEntriesSearchRequest;
 }
 
-export namespace SearchRequest {
+export namespace DataEntriesSearchRequest {
     export type AsObject = {
         height: number,
         timestamp: number,

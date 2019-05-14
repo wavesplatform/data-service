@@ -4,45 +4,45 @@ import * as grpc from 'grpc';
 import { DataServiceConfig } from '../loadConfig';
 import {
   DataEntryResponse,
-  ByTransactionRequest,
-  ByAddressRequest,
-  SearchRequest,
+  DataEntriesByTransactionRequest,
+  DataEntriesByAddressRequest,
+  DataEntriesSearchRequest,
 } from '../protobuf/data-entries';
 
 const inject = require('./inject');
+
+const dataEntryResponseToBuffer = (res: DataEntryResponse) =>
+  Buffer.from(DataEntryResponse.encode(res).finish());
 
 const service = {
   byTransaction: {
     path: '/DataEntries/ByTransaction',
     requestStream: false,
     responseStream: true,
-    requestSerialize: (req: ByTransactionRequest) =>
-      Buffer.from(ByTransactionRequest.encode(req).finish()),
-    requestDeserialize: ByTransactionRequest.decode,
-    responseSerialize: (res: DataEntryResponse) =>
-      Buffer.from(DataEntryResponse.encode(res).finish()),
+    requestSerialize: (req: DataEntriesByTransactionRequest) =>
+      Buffer.from(DataEntriesByTransactionRequest.encode(req).finish()),
+    requestDeserialize: DataEntriesByTransactionRequest.decode,
+    responseSerialize: dataEntryResponseToBuffer,
     responseDeserialize: DataEntryResponse.decode,
   },
   byAddress: {
     path: '/DataEntries/ByAddress',
     requestStream: false,
     responseStream: true,
-    requestSerialize: (req: ByAddressRequest) =>
-      Buffer.from(ByAddressRequest.encode(req).finish()),
-    requestDeserialize: ByAddressRequest.decode,
-    responseSerialize: (res: DataEntryResponse) =>
-      Buffer.from(DataEntryResponse.encode(res).finish()),
+    requestSerialize: (req: DataEntriesByAddressRequest) =>
+      Buffer.from(DataEntriesByAddressRequest.encode(req).finish()),
+    requestDeserialize: DataEntriesByAddressRequest.decode,
+    responseSerialize: dataEntryResponseToBuffer,
     responseDeserialize: DataEntryResponse.decode,
   },
   search: {
     path: '/DataEntries/Search',
     requestStream: false,
     responseStream: true,
-    requestSerialize: (req: SearchRequest) =>
-      Buffer.from(SearchRequest.encode(req).finish()),
-    requestDeserialize: ByAddressRequest.decode,
-    responseSerialize: (res: DataEntryResponse) =>
-      Buffer.from(DataEntryResponse.encode(res).finish()),
+    requestSerialize: (req: DataEntriesSearchRequest) =>
+      Buffer.from(DataEntriesSearchRequest.encode(req).finish()),
+    requestDeserialize: DataEntriesSearchRequest.decode,
+    responseSerialize: dataEntryResponseToBuffer,
     responseDeserialize: DataEntryResponse.decode,
   },
 };

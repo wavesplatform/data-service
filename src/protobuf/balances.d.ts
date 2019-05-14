@@ -1,495 +1,429 @@
 import * as $protobuf from "protobufjs";
-/** Properties of a DataEntriesByTransactionRequest. */
-export interface IDataEntriesByTransactionRequest {
+/** Properties of a BalancesByTransactionRequest. */
+export interface IBalancesByTransactionRequest {
 
-    /** DataEntriesByTransactionRequest transactionId */
+    /** BalancesByTransactionRequest transactionId */
     transactionId?: (Uint8Array|null);
 }
 
-/** Represents a DataEntriesByTransactionRequest. */
-export class DataEntriesByTransactionRequest implements IDataEntriesByTransactionRequest {
+/** Represents a BalancesByTransactionRequest. */
+export class BalancesByTransactionRequest implements IBalancesByTransactionRequest {
 
     /**
-     * Constructs a new DataEntriesByTransactionRequest.
+     * Constructs a new BalancesByTransactionRequest.
      * @param [properties] Properties to set
      */
-    constructor(properties?: IDataEntriesByTransactionRequest);
+    constructor(properties?: IBalancesByTransactionRequest);
 
-    /** DataEntriesByTransactionRequest transactionId. */
+    /** BalancesByTransactionRequest transactionId. */
     public transactionId: Uint8Array;
 
     /**
-     * Creates a new DataEntriesByTransactionRequest instance using the specified properties.
+     * Creates a new BalancesByTransactionRequest instance using the specified properties.
      * @param [properties] Properties to set
-     * @returns DataEntriesByTransactionRequest instance
+     * @returns BalancesByTransactionRequest instance
      */
-    public static create(properties?: IDataEntriesByTransactionRequest): DataEntriesByTransactionRequest;
+    public static create(properties?: IBalancesByTransactionRequest): BalancesByTransactionRequest;
 
     /**
-     * Encodes the specified DataEntriesByTransactionRequest message. Does not implicitly {@link DataEntriesByTransactionRequest.verify|verify} messages.
-     * @param message DataEntriesByTransactionRequest message or plain object to encode
+     * Encodes the specified BalancesByTransactionRequest message. Does not implicitly {@link BalancesByTransactionRequest.verify|verify} messages.
+     * @param message BalancesByTransactionRequest message or plain object to encode
      * @param [writer] Writer to encode to
      * @returns Writer
      */
-    public static encode(message: IDataEntriesByTransactionRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+    public static encode(message: IBalancesByTransactionRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
     /**
-     * Encodes the specified DataEntriesByTransactionRequest message, length delimited. Does not implicitly {@link DataEntriesByTransactionRequest.verify|verify} messages.
-     * @param message DataEntriesByTransactionRequest message or plain object to encode
+     * Encodes the specified BalancesByTransactionRequest message, length delimited. Does not implicitly {@link BalancesByTransactionRequest.verify|verify} messages.
+     * @param message BalancesByTransactionRequest message or plain object to encode
      * @param [writer] Writer to encode to
      * @returns Writer
      */
-    public static encodeDelimited(message: IDataEntriesByTransactionRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+    public static encodeDelimited(message: IBalancesByTransactionRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
     /**
-     * Decodes a DataEntriesByTransactionRequest message from the specified reader or buffer.
+     * Decodes a BalancesByTransactionRequest message from the specified reader or buffer.
      * @param reader Reader or buffer to decode from
      * @param [length] Message length if known beforehand
-     * @returns DataEntriesByTransactionRequest
+     * @returns BalancesByTransactionRequest
      * @throws {Error} If the payload is not a reader or valid buffer
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
-    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): DataEntriesByTransactionRequest;
+    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): BalancesByTransactionRequest;
 
     /**
-     * Decodes a DataEntriesByTransactionRequest message from the specified reader or buffer, length delimited.
+     * Decodes a BalancesByTransactionRequest message from the specified reader or buffer, length delimited.
      * @param reader Reader or buffer to decode from
-     * @returns DataEntriesByTransactionRequest
+     * @returns BalancesByTransactionRequest
      * @throws {Error} If the payload is not a reader or valid buffer
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
-    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): DataEntriesByTransactionRequest;
+    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): BalancesByTransactionRequest;
 
     /**
-     * Verifies a DataEntriesByTransactionRequest message.
+     * Verifies a BalancesByTransactionRequest message.
      * @param message Plain object to verify
      * @returns `null` if valid, otherwise the reason why it is not
      */
     public static verify(message: { [k: string]: any }): (string|null);
 
     /**
-     * Creates a DataEntriesByTransactionRequest message from a plain object. Also converts values to their respective internal types.
+     * Creates a BalancesByTransactionRequest message from a plain object. Also converts values to their respective internal types.
      * @param object Plain object
-     * @returns DataEntriesByTransactionRequest
+     * @returns BalancesByTransactionRequest
      */
-    public static fromObject(object: { [k: string]: any }): DataEntriesByTransactionRequest;
+    public static fromObject(object: { [k: string]: any }): BalancesByTransactionRequest;
 
     /**
-     * Creates a plain object from a DataEntriesByTransactionRequest message. Also converts values to other types if specified.
-     * @param message DataEntriesByTransactionRequest
+     * Creates a plain object from a BalancesByTransactionRequest message. Also converts values to other types if specified.
+     * @param message BalancesByTransactionRequest
      * @param [options] Conversion options
      * @returns Plain object
      */
-    public static toObject(message: DataEntriesByTransactionRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+    public static toObject(message: BalancesByTransactionRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
     /**
-     * Converts this DataEntriesByTransactionRequest to JSON.
+     * Converts this BalancesByTransactionRequest to JSON.
      * @returns JSON object
      */
     public toJSON(): { [k: string]: any };
 }
 
-/** Properties of a DataEntriesByAddressRequest. */
-export interface IDataEntriesByAddressRequest {
+/** Properties of a BalancesByAddressRequest. */
+export interface IBalancesByAddressRequest {
 
-    /** DataEntriesByAddressRequest height */
+    /** BalancesByAddressRequest height */
     height?: (number|null);
 
-    /** DataEntriesByAddressRequest timestamp */
+    /** BalancesByAddressRequest timestamp */
     timestamp?: (Long|null);
 
-    /** DataEntriesByAddressRequest address */
+    /** BalancesByAddressRequest address */
     address?: (Uint8Array|null);
 
-    /** DataEntriesByAddressRequest limit */
+    /** BalancesByAddressRequest asset */
+    asset?: (Uint8Array|null);
+
+    /** BalancesByAddressRequest limit */
     limit?: (number|null);
 
-    /** DataEntriesByAddressRequest after */
+    /** BalancesByAddressRequest after */
     after?: (Uint8Array|null);
-
-    /** DataEntriesByAddressRequest key */
-    key?: (string|null);
-
-    /** DataEntriesByAddressRequest type */
-    type?: (number|null);
-
-    /** DataEntriesByAddressRequest intValue */
-    intValue?: (Long|null);
-
-    /** DataEntriesByAddressRequest boolValue */
-    boolValue?: (boolean|null);
-
-    /** DataEntriesByAddressRequest binaryValue */
-    binaryValue?: (Uint8Array|null);
-
-    /** DataEntriesByAddressRequest stringValue */
-    stringValue?: (string|null);
 }
 
-/** Represents a DataEntriesByAddressRequest. */
-export class DataEntriesByAddressRequest implements IDataEntriesByAddressRequest {
+/** Represents a BalancesByAddressRequest. */
+export class BalancesByAddressRequest implements IBalancesByAddressRequest {
 
     /**
-     * Constructs a new DataEntriesByAddressRequest.
+     * Constructs a new BalancesByAddressRequest.
      * @param [properties] Properties to set
      */
-    constructor(properties?: IDataEntriesByAddressRequest);
+    constructor(properties?: IBalancesByAddressRequest);
 
-    /** DataEntriesByAddressRequest height. */
+    /** BalancesByAddressRequest height. */
     public height: number;
 
-    /** DataEntriesByAddressRequest timestamp. */
+    /** BalancesByAddressRequest timestamp. */
     public timestamp: Long;
 
-    /** DataEntriesByAddressRequest address. */
+    /** BalancesByAddressRequest address. */
     public address: Uint8Array;
 
-    /** DataEntriesByAddressRequest limit. */
+    /** BalancesByAddressRequest asset. */
+    public asset: Uint8Array;
+
+    /** BalancesByAddressRequest limit. */
     public limit: number;
 
-    /** DataEntriesByAddressRequest after. */
+    /** BalancesByAddressRequest after. */
     public after: Uint8Array;
 
-    /** DataEntriesByAddressRequest key. */
-    public key: string;
-
-    /** DataEntriesByAddressRequest type. */
-    public type: number;
-
-    /** DataEntriesByAddressRequest intValue. */
-    public intValue: Long;
-
-    /** DataEntriesByAddressRequest boolValue. */
-    public boolValue: boolean;
-
-    /** DataEntriesByAddressRequest binaryValue. */
-    public binaryValue: Uint8Array;
-
-    /** DataEntriesByAddressRequest stringValue. */
-    public stringValue: string;
-
-    /** DataEntriesByAddressRequest value. */
-    public value?: ("intValue"|"boolValue"|"binaryValue"|"stringValue");
-
     /**
-     * Creates a new DataEntriesByAddressRequest instance using the specified properties.
+     * Creates a new BalancesByAddressRequest instance using the specified properties.
      * @param [properties] Properties to set
-     * @returns DataEntriesByAddressRequest instance
+     * @returns BalancesByAddressRequest instance
      */
-    public static create(properties?: IDataEntriesByAddressRequest): DataEntriesByAddressRequest;
+    public static create(properties?: IBalancesByAddressRequest): BalancesByAddressRequest;
 
     /**
-     * Encodes the specified DataEntriesByAddressRequest message. Does not implicitly {@link DataEntriesByAddressRequest.verify|verify} messages.
-     * @param message DataEntriesByAddressRequest message or plain object to encode
+     * Encodes the specified BalancesByAddressRequest message. Does not implicitly {@link BalancesByAddressRequest.verify|verify} messages.
+     * @param message BalancesByAddressRequest message or plain object to encode
      * @param [writer] Writer to encode to
      * @returns Writer
      */
-    public static encode(message: IDataEntriesByAddressRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+    public static encode(message: IBalancesByAddressRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
     /**
-     * Encodes the specified DataEntriesByAddressRequest message, length delimited. Does not implicitly {@link DataEntriesByAddressRequest.verify|verify} messages.
-     * @param message DataEntriesByAddressRequest message or plain object to encode
+     * Encodes the specified BalancesByAddressRequest message, length delimited. Does not implicitly {@link BalancesByAddressRequest.verify|verify} messages.
+     * @param message BalancesByAddressRequest message or plain object to encode
      * @param [writer] Writer to encode to
      * @returns Writer
      */
-    public static encodeDelimited(message: IDataEntriesByAddressRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+    public static encodeDelimited(message: IBalancesByAddressRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
     /**
-     * Decodes a DataEntriesByAddressRequest message from the specified reader or buffer.
+     * Decodes a BalancesByAddressRequest message from the specified reader or buffer.
      * @param reader Reader or buffer to decode from
      * @param [length] Message length if known beforehand
-     * @returns DataEntriesByAddressRequest
+     * @returns BalancesByAddressRequest
      * @throws {Error} If the payload is not a reader or valid buffer
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
-    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): DataEntriesByAddressRequest;
+    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): BalancesByAddressRequest;
 
     /**
-     * Decodes a DataEntriesByAddressRequest message from the specified reader or buffer, length delimited.
+     * Decodes a BalancesByAddressRequest message from the specified reader or buffer, length delimited.
      * @param reader Reader or buffer to decode from
-     * @returns DataEntriesByAddressRequest
+     * @returns BalancesByAddressRequest
      * @throws {Error} If the payload is not a reader or valid buffer
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
-    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): DataEntriesByAddressRequest;
+    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): BalancesByAddressRequest;
 
     /**
-     * Verifies a DataEntriesByAddressRequest message.
+     * Verifies a BalancesByAddressRequest message.
      * @param message Plain object to verify
      * @returns `null` if valid, otherwise the reason why it is not
      */
     public static verify(message: { [k: string]: any }): (string|null);
 
     /**
-     * Creates a DataEntriesByAddressRequest message from a plain object. Also converts values to their respective internal types.
+     * Creates a BalancesByAddressRequest message from a plain object. Also converts values to their respective internal types.
      * @param object Plain object
-     * @returns DataEntriesByAddressRequest
+     * @returns BalancesByAddressRequest
      */
-    public static fromObject(object: { [k: string]: any }): DataEntriesByAddressRequest;
+    public static fromObject(object: { [k: string]: any }): BalancesByAddressRequest;
 
     /**
-     * Creates a plain object from a DataEntriesByAddressRequest message. Also converts values to other types if specified.
-     * @param message DataEntriesByAddressRequest
+     * Creates a plain object from a BalancesByAddressRequest message. Also converts values to other types if specified.
+     * @param message BalancesByAddressRequest
      * @param [options] Conversion options
      * @returns Plain object
      */
-    public static toObject(message: DataEntriesByAddressRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+    public static toObject(message: BalancesByAddressRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
     /**
-     * Converts this DataEntriesByAddressRequest to JSON.
+     * Converts this BalancesByAddressRequest to JSON.
      * @returns JSON object
      */
     public toJSON(): { [k: string]: any };
 }
 
-/** Properties of a DataEntriesSearchRequest. */
-export interface IDataEntriesSearchRequest {
+/** Properties of a BalancesByAssetRequest. */
+export interface IBalancesByAssetRequest {
 
-    /** DataEntriesSearchRequest height */
+    /** BalancesByAssetRequest height */
     height?: (number|null);
 
-    /** DataEntriesSearchRequest timestamp */
+    /** BalancesByAssetRequest timestamp */
     timestamp?: (Long|null);
 
-    /** DataEntriesSearchRequest limit */
+    /** BalancesByAssetRequest asset */
+    asset?: (Uint8Array|null);
+
+    /** BalancesByAssetRequest limit */
     limit?: (number|null);
 
-    /** DataEntriesSearchRequest after */
+    /** BalancesByAssetRequest after */
     after?: (Uint8Array|null);
-
-    /** DataEntriesSearchRequest key */
-    key?: (string|null);
-
-    /** DataEntriesSearchRequest type */
-    type?: (number|null);
-
-    /** DataEntriesSearchRequest intValue */
-    intValue?: (Long|null);
-
-    /** DataEntriesSearchRequest boolValue */
-    boolValue?: (boolean|null);
-
-    /** DataEntriesSearchRequest binaryValue */
-    binaryValue?: (Uint8Array|null);
-
-    /** DataEntriesSearchRequest stringValue */
-    stringValue?: (string|null);
 }
 
-/** Represents a DataEntriesSearchRequest. */
-export class DataEntriesSearchRequest implements IDataEntriesSearchRequest {
+/** Represents a BalancesByAssetRequest. */
+export class BalancesByAssetRequest implements IBalancesByAssetRequest {
 
     /**
-     * Constructs a new DataEntriesSearchRequest.
+     * Constructs a new BalancesByAssetRequest.
      * @param [properties] Properties to set
      */
-    constructor(properties?: IDataEntriesSearchRequest);
+    constructor(properties?: IBalancesByAssetRequest);
 
-    /** DataEntriesSearchRequest height. */
+    /** BalancesByAssetRequest height. */
     public height: number;
 
-    /** DataEntriesSearchRequest timestamp. */
+    /** BalancesByAssetRequest timestamp. */
     public timestamp: Long;
 
-    /** DataEntriesSearchRequest limit. */
+    /** BalancesByAssetRequest asset. */
+    public asset: Uint8Array;
+
+    /** BalancesByAssetRequest limit. */
     public limit: number;
 
-    /** DataEntriesSearchRequest after. */
+    /** BalancesByAssetRequest after. */
     public after: Uint8Array;
 
-    /** DataEntriesSearchRequest key. */
-    public key: string;
-
-    /** DataEntriesSearchRequest type. */
-    public type: number;
-
-    /** DataEntriesSearchRequest intValue. */
-    public intValue: Long;
-
-    /** DataEntriesSearchRequest boolValue. */
-    public boolValue: boolean;
-
-    /** DataEntriesSearchRequest binaryValue. */
-    public binaryValue: Uint8Array;
-
-    /** DataEntriesSearchRequest stringValue. */
-    public stringValue: string;
-
-    /** DataEntriesSearchRequest value. */
-    public value?: ("intValue"|"boolValue"|"binaryValue"|"stringValue");
-
     /**
-     * Creates a new DataEntriesSearchRequest instance using the specified properties.
+     * Creates a new BalancesByAssetRequest instance using the specified properties.
      * @param [properties] Properties to set
-     * @returns DataEntriesSearchRequest instance
+     * @returns BalancesByAssetRequest instance
      */
-    public static create(properties?: IDataEntriesSearchRequest): DataEntriesSearchRequest;
+    public static create(properties?: IBalancesByAssetRequest): BalancesByAssetRequest;
 
     /**
-     * Encodes the specified DataEntriesSearchRequest message. Does not implicitly {@link DataEntriesSearchRequest.verify|verify} messages.
-     * @param message DataEntriesSearchRequest message or plain object to encode
+     * Encodes the specified BalancesByAssetRequest message. Does not implicitly {@link BalancesByAssetRequest.verify|verify} messages.
+     * @param message BalancesByAssetRequest message or plain object to encode
      * @param [writer] Writer to encode to
      * @returns Writer
      */
-    public static encode(message: IDataEntriesSearchRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+    public static encode(message: IBalancesByAssetRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
     /**
-     * Encodes the specified DataEntriesSearchRequest message, length delimited. Does not implicitly {@link DataEntriesSearchRequest.verify|verify} messages.
-     * @param message DataEntriesSearchRequest message or plain object to encode
+     * Encodes the specified BalancesByAssetRequest message, length delimited. Does not implicitly {@link BalancesByAssetRequest.verify|verify} messages.
+     * @param message BalancesByAssetRequest message or plain object to encode
      * @param [writer] Writer to encode to
      * @returns Writer
      */
-    public static encodeDelimited(message: IDataEntriesSearchRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+    public static encodeDelimited(message: IBalancesByAssetRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
     /**
-     * Decodes a DataEntriesSearchRequest message from the specified reader or buffer.
+     * Decodes a BalancesByAssetRequest message from the specified reader or buffer.
      * @param reader Reader or buffer to decode from
      * @param [length] Message length if known beforehand
-     * @returns DataEntriesSearchRequest
+     * @returns BalancesByAssetRequest
      * @throws {Error} If the payload is not a reader or valid buffer
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
-    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): DataEntriesSearchRequest;
+    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): BalancesByAssetRequest;
 
     /**
-     * Decodes a DataEntriesSearchRequest message from the specified reader or buffer, length delimited.
+     * Decodes a BalancesByAssetRequest message from the specified reader or buffer, length delimited.
      * @param reader Reader or buffer to decode from
-     * @returns DataEntriesSearchRequest
+     * @returns BalancesByAssetRequest
      * @throws {Error} If the payload is not a reader or valid buffer
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
-    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): DataEntriesSearchRequest;
+    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): BalancesByAssetRequest;
 
     /**
-     * Verifies a DataEntriesSearchRequest message.
+     * Verifies a BalancesByAssetRequest message.
      * @param message Plain object to verify
      * @returns `null` if valid, otherwise the reason why it is not
      */
     public static verify(message: { [k: string]: any }): (string|null);
 
     /**
-     * Creates a DataEntriesSearchRequest message from a plain object. Also converts values to their respective internal types.
+     * Creates a BalancesByAssetRequest message from a plain object. Also converts values to their respective internal types.
      * @param object Plain object
-     * @returns DataEntriesSearchRequest
+     * @returns BalancesByAssetRequest
      */
-    public static fromObject(object: { [k: string]: any }): DataEntriesSearchRequest;
+    public static fromObject(object: { [k: string]: any }): BalancesByAssetRequest;
 
     /**
-     * Creates a plain object from a DataEntriesSearchRequest message. Also converts values to other types if specified.
-     * @param message DataEntriesSearchRequest
+     * Creates a plain object from a BalancesByAssetRequest message. Also converts values to other types if specified.
+     * @param message BalancesByAssetRequest
      * @param [options] Conversion options
      * @returns Plain object
      */
-    public static toObject(message: DataEntriesSearchRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+    public static toObject(message: BalancesByAssetRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
     /**
-     * Converts this DataEntriesSearchRequest to JSON.
+     * Converts this BalancesByAssetRequest to JSON.
      * @returns JSON object
      */
     public toJSON(): { [k: string]: any };
 }
 
-/** Properties of a DataEntryResponse. */
-export interface IDataEntryResponse {
+/** Properties of a Balance. */
+export interface IBalance {
 
-    /** DataEntryResponse address */
+    /** Balance address */
     address?: (Uint8Array|null);
 
-    /** DataEntryResponse entry */
-    entry?: (DataTransactionData.IDataEntry|null);
+    /** Balance amount */
+    amount?: (IAmount|null);
 }
 
-/** Represents a DataEntryResponse. */
-export class DataEntryResponse implements IDataEntryResponse {
+/** Represents a Balance. */
+export class Balance implements IBalance {
 
     /**
-     * Constructs a new DataEntryResponse.
+     * Constructs a new Balance.
      * @param [properties] Properties to set
      */
-    constructor(properties?: IDataEntryResponse);
+    constructor(properties?: IBalance);
 
-    /** DataEntryResponse address. */
+    /** Balance address. */
     public address: Uint8Array;
 
-    /** DataEntryResponse entry. */
-    public entry?: (DataTransactionData.IDataEntry|null);
+    /** Balance amount. */
+    public amount?: (IAmount|null);
 
     /**
-     * Creates a new DataEntryResponse instance using the specified properties.
+     * Creates a new Balance instance using the specified properties.
      * @param [properties] Properties to set
-     * @returns DataEntryResponse instance
+     * @returns Balance instance
      */
-    public static create(properties?: IDataEntryResponse): DataEntryResponse;
+    public static create(properties?: IBalance): Balance;
 
     /**
-     * Encodes the specified DataEntryResponse message. Does not implicitly {@link DataEntryResponse.verify|verify} messages.
-     * @param message DataEntryResponse message or plain object to encode
+     * Encodes the specified Balance message. Does not implicitly {@link Balance.verify|verify} messages.
+     * @param message Balance message or plain object to encode
      * @param [writer] Writer to encode to
      * @returns Writer
      */
-    public static encode(message: IDataEntryResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+    public static encode(message: IBalance, writer?: $protobuf.Writer): $protobuf.Writer;
 
     /**
-     * Encodes the specified DataEntryResponse message, length delimited. Does not implicitly {@link DataEntryResponse.verify|verify} messages.
-     * @param message DataEntryResponse message or plain object to encode
+     * Encodes the specified Balance message, length delimited. Does not implicitly {@link Balance.verify|verify} messages.
+     * @param message Balance message or plain object to encode
      * @param [writer] Writer to encode to
      * @returns Writer
      */
-    public static encodeDelimited(message: IDataEntryResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+    public static encodeDelimited(message: IBalance, writer?: $protobuf.Writer): $protobuf.Writer;
 
     /**
-     * Decodes a DataEntryResponse message from the specified reader or buffer.
+     * Decodes a Balance message from the specified reader or buffer.
      * @param reader Reader or buffer to decode from
      * @param [length] Message length if known beforehand
-     * @returns DataEntryResponse
+     * @returns Balance
      * @throws {Error} If the payload is not a reader or valid buffer
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
-    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): DataEntryResponse;
+    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Balance;
 
     /**
-     * Decodes a DataEntryResponse message from the specified reader or buffer, length delimited.
+     * Decodes a Balance message from the specified reader or buffer, length delimited.
      * @param reader Reader or buffer to decode from
-     * @returns DataEntryResponse
+     * @returns Balance
      * @throws {Error} If the payload is not a reader or valid buffer
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
-    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): DataEntryResponse;
+    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Balance;
 
     /**
-     * Verifies a DataEntryResponse message.
+     * Verifies a Balance message.
      * @param message Plain object to verify
      * @returns `null` if valid, otherwise the reason why it is not
      */
     public static verify(message: { [k: string]: any }): (string|null);
 
     /**
-     * Creates a DataEntryResponse message from a plain object. Also converts values to their respective internal types.
+     * Creates a Balance message from a plain object. Also converts values to their respective internal types.
      * @param object Plain object
-     * @returns DataEntryResponse
+     * @returns Balance
      */
-    public static fromObject(object: { [k: string]: any }): DataEntryResponse;
+    public static fromObject(object: { [k: string]: any }): Balance;
 
     /**
-     * Creates a plain object from a DataEntryResponse message. Also converts values to other types if specified.
-     * @param message DataEntryResponse
+     * Creates a plain object from a Balance message. Also converts values to other types if specified.
+     * @param message Balance
      * @param [options] Conversion options
      * @returns Plain object
      */
-    public static toObject(message: DataEntryResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+    public static toObject(message: Balance, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
     /**
-     * Converts this DataEntryResponse to JSON.
+     * Converts this Balance to JSON.
      * @returns JSON object
      */
     public toJSON(): { [k: string]: any };
 }
 
-/** Represents a DataEntries */
-export class DataEntries extends $protobuf.rpc.Service {
+/** Represents a Balances */
+export class Balances extends $protobuf.rpc.Service {
 
     /**
-     * Constructs a new DataEntries service.
+     * Constructs a new Balances service.
      * @param rpcImpl RPC implementation
      * @param [requestDelimited=false] Whether requests are length-delimited
      * @param [responseDelimited=false] Whether responses are length-delimited
@@ -497,79 +431,100 @@ export class DataEntries extends $protobuf.rpc.Service {
     constructor(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean);
 
     /**
-     * Creates new DataEntries service using the specified rpc implementation.
+     * Creates new Balances service using the specified rpc implementation.
      * @param rpcImpl RPC implementation
      * @param [requestDelimited=false] Whether requests are length-delimited
      * @param [responseDelimited=false] Whether responses are length-delimited
      * @returns RPC service. Useful where requests and/or responses are streamed.
      */
-    public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): DataEntries;
+    public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): Balances;
 
     /**
      * Calls ByTransaction.
-     * @param request DataEntriesByTransactionRequest message or plain object
-     * @param callback Node-style callback called with the error, if any, and DataEntryResponse
+     * @param request BalancesByTransactionRequest message or plain object
+     * @param callback Node-style callback called with the error, if any, and Balance
      */
-    public byTransaction(request: IDataEntriesByTransactionRequest, callback: DataEntries.ByTransactionCallback): void;
+    public byTransaction(request: IBalancesByTransactionRequest, callback: Balances.ByTransactionCallback): void;
 
     /**
      * Calls ByTransaction.
-     * @param request DataEntriesByTransactionRequest message or plain object
+     * @param request BalancesByTransactionRequest message or plain object
      * @returns Promise
      */
-    public byTransaction(request: IDataEntriesByTransactionRequest): Promise<DataEntryResponse>;
+    public byTransaction(request: IBalancesByTransactionRequest): Promise<Balance>;
 
     /**
      * Calls ByAddress.
-     * @param request DataEntriesByAddressRequest message or plain object
-     * @param callback Node-style callback called with the error, if any, and DataEntryResponse
+     * @param request BalancesByAddressRequest message or plain object
+     * @param callback Node-style callback called with the error, if any, and Balance
      */
-    public byAddress(request: IDataEntriesByAddressRequest, callback: DataEntries.ByAddressCallback): void;
+    public byAddress(request: IBalancesByAddressRequest, callback: Balances.ByAddressCallback): void;
 
     /**
      * Calls ByAddress.
-     * @param request DataEntriesByAddressRequest message or plain object
+     * @param request BalancesByAddressRequest message or plain object
      * @returns Promise
      */
-    public byAddress(request: IDataEntriesByAddressRequest): Promise<DataEntryResponse>;
+    public byAddress(request: IBalancesByAddressRequest): Promise<Balance>;
 
     /**
-     * Calls Search.
-     * @param request DataEntriesSearchRequest message or plain object
-     * @param callback Node-style callback called with the error, if any, and DataEntryResponse
+     * Calls ByAsset.
+     * @param request BalancesByAssetRequest message or plain object
+     * @param callback Node-style callback called with the error, if any, and Balance
      */
-    public search(request: IDataEntriesSearchRequest, callback: DataEntries.SearchCallback): void;
+    public byAsset(request: IBalancesByAssetRequest, callback: Balances.ByAssetCallback): void;
 
     /**
-     * Calls Search.
-     * @param request DataEntriesSearchRequest message or plain object
+     * Calls ByAsset.
+     * @param request BalancesByAssetRequest message or plain object
      * @returns Promise
      */
-    public search(request: IDataEntriesSearchRequest): Promise<DataEntryResponse>;
+    public byAsset(request: IBalancesByAssetRequest): Promise<Balance>;
+
+    /**
+     * Calls ByTest.
+     * @param request BalancesByAssetRequest message or plain object
+     * @param callback Node-style callback called with the error, if any, and Balance
+     */
+    public byTest(request: IBalancesByAssetRequest, callback: Balances.ByTestCallback): void;
+
+    /**
+     * Calls ByTest.
+     * @param request BalancesByAssetRequest message or plain object
+     * @returns Promise
+     */
+    public byTest(request: IBalancesByAssetRequest): Promise<Balance>;
 }
 
-export namespace DataEntries {
+export namespace Balances {
 
     /**
-     * Callback as used by {@link DataEntries#byTransaction}.
+     * Callback as used by {@link Balances#byTransaction}.
      * @param error Error, if any
-     * @param [response] DataEntryResponse
+     * @param [response] Balance
      */
-    type ByTransactionCallback = (error: (Error|null), response?: DataEntryResponse) => void;
+    type ByTransactionCallback = (error: (Error|null), response?: Balance) => void;
 
     /**
-     * Callback as used by {@link DataEntries#byAddress}.
+     * Callback as used by {@link Balances#byAddress}.
      * @param error Error, if any
-     * @param [response] DataEntryResponse
+     * @param [response] Balance
      */
-    type ByAddressCallback = (error: (Error|null), response?: DataEntryResponse) => void;
+    type ByAddressCallback = (error: (Error|null), response?: Balance) => void;
 
     /**
-     * Callback as used by {@link DataEntries#search}.
+     * Callback as used by {@link Balances#byAsset}.
      * @param error Error, if any
-     * @param [response] DataEntryResponse
+     * @param [response] Balance
      */
-    type SearchCallback = (error: (Error|null), response?: DataEntryResponse) => void;
+    type ByAssetCallback = (error: (Error|null), response?: Balance) => void;
+
+    /**
+     * Callback as used by {@link Balances#byTest}.
+     * @param error Error, if any
+     * @param [response] Balance
+     */
+    type ByTestCallback = (error: (Error|null), response?: Balance) => void;
 }
 
 /** Properties of an AssetAmount. */

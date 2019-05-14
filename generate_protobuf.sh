@@ -16,13 +16,24 @@ protoc \
 -I protobuf \
 ./protobuf/*.proto
 
-# generate js data-structures (including all transactions)
+# generate js data-structures for data-entries service (including all transactions)
 ./node_modules/protobufjs/bin/pbjs \
 -t static-module \
 --force-long \
 -w commonjs \
 -o ./src/protobuf/data-entries.js \
-./protobuf/*.proto
+./protobuf/data-entries.proto ./protobuf/recipient.proto ./protobuf/script.proto ./protobuf/transaction.proto
 
-# generate ts data-structures (including all transactions)
+# generate ts data-structures for data-entries service (including all transactions)
 ./node_modules/protobufjs/bin/pbts -o ./src/protobuf/data-entries.d.ts ./src/protobuf/data-entries.js
+
+# generate js data-structures for balances service (including all transactions)
+./node_modules/protobufjs/bin/pbjs \
+-t static-module \
+--force-long \
+-w commonjs \
+-o ./src/protobuf/balances.js \
+./protobuf/balances.proto ./protobuf/recipient.proto ./protobuf/script.proto ./protobuf/transaction.proto
+
+# generate ts data-structures for balances service (including all transactions)
+./node_modules/protobufjs/bin/pbts -o ./src/protobuf/balances.d.ts ./src/protobuf/balances.js
