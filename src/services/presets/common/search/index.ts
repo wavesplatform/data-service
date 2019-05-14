@@ -1,11 +1,15 @@
 import { identity } from 'ramda';
 import { SchemaLike } from 'joi';
-
-import { getData } from './pg';
+import { Task } from 'folktale/concurrency/task';
 import { search } from '../../../_common/createResolver';
-import { ServicePresetInitOptions } from '../../../presets/types';
 import { validateInput, validateResult } from '../../validation';
 import { List, Serializable } from '../../../../types';
+import { EmitEvent } from 'services/_common/createResolver/types';
+import { DbError } from '../../../../errorHandling';
+
+type CommonServicePresetInitOptions = {
+  emitEvent: EmitEvent;
+};
 
 export const searchPreset = <
   Request,
@@ -13,24 +17,24 @@ export const searchPreset = <
   ResponseTransformed extends Serializable<string, any>
 >({
   name,
-  sql,
+  getData,
   inputSchema,
   resultSchema,
   transformResult,
 }: {
   name: string;
-  sql: (r: Request) => string;
+  getData: (request: Request) => Task<DbError, ResponseRaw[]>;
   inputSchema: SchemaLike;
   resultSchema: SchemaLike;
   transformResult: (
     response: ResponseRaw[],
-    request?: Request
+    request: Request
   ) => List<ResponseTransformed>;
-}) => ({ pg, emitEvent }: ServicePresetInitOptions) =>
+}) => ({ emitEvent }: CommonServicePresetInitOptions) =>
   search<Request, Request, ResponseRaw, List<ResponseTransformed>>({
     transformInput: identity,
     transformResult,
     validateInput: validateInput(inputSchema, name),
     validateResult: validateResult(resultSchema, name),
-    getData: getData<Request, ResponseRaw>({ name, sql })(pg),
+    getData,
   })({ emitEvent });

@@ -70,7 +70,7 @@ const getResolver = <
     ResponseRaw,
     ResponseTransformed
   >
-) => ({ db, emitEvent = () => () => {} }: RuntimeResolverDependenties) => (
+) => ({ emitEvent = () => () => {} }: RuntimeResolverDependenties) => (
   request: RequestRaw
 ) =>
   createResolver<
@@ -81,7 +81,7 @@ const getResolver = <
   >(
     dependencies.validateInput,
     dependencies.transformInput,
-    dependencies.dbQuery(db),
+    dependencies.getData,
     applyValidation.get(dependencies.validateResult),
     result => dependencies.transformResult(result, request),
     emitEvent,
@@ -100,7 +100,7 @@ const mgetResolver = <
     ResponseRaw,
     ResponseTransformed
   >
-) => ({ db, emitEvent = () => () => {} }: RuntimeResolverDependenties) => (
+) => ({ emitEvent = () => () => {} }: RuntimeResolverDependenties) => (
   request: RequestRaw
 ) =>
   createResolver<
@@ -111,7 +111,7 @@ const mgetResolver = <
   >(
     dependencies.validateInput,
     dependencies.transformInput,
-    dependencies.dbQuery(db),
+    dependencies.getData,
     applyValidation.mget(dependencies.validateResult),
     result => dependencies.transformResult(result, request),
     emitEvent,
@@ -130,7 +130,7 @@ const searchResolver = <
     ResponseRaw,
     ResponseTransformed
   >
-) => ({ db, emitEvent = () => () => {} }: RuntimeResolverDependenties) => (
+) => ({ emitEvent = () => () => {} }: RuntimeResolverDependenties) => (
   request: RequestRaw
 ) =>
   createResolver<
@@ -141,7 +141,7 @@ const searchResolver = <
   >(
     dependencies.validateInput,
     dependencies.transformInput,
-    dependencies.dbQuery(db),
+    dependencies.getData,
     applyValidation.search(dependencies.validateResult),
     result =>
       dependencies.transformResult(
@@ -151,10 +151,6 @@ const searchResolver = <
     emitEvent,
     request
   );
-
-// @todo remove
-export const one = getResolver;
-export const many = mgetResolver;
 
 export const get = getResolver;
 export const mget = mgetResolver;

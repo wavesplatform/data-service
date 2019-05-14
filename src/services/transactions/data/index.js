@@ -38,16 +38,16 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       transformResult: transformResultGet(transaction)(transformTxInfo),
       validateInput: validateInput(inputGet, createServiceName('get')),
       validateResult: validateResult(resultSchema, createServiceName('get')),
-      dbQuery: pgData.get,
-    })({ db: pg, emitEvent }),
+      getData: pgData.get(pg),
+    })({ emitEvent }),
 
     mget: mget({
       transformInput: identity,
       transformResult: transformResultMget(transaction)(transformTxInfo),
       validateInput: validateInput(inputMget, createServiceName('mget')),
       validateResult: validateResult(resultSchema, createServiceName('mget')),
-      dbQuery: pgData.mget,
-    })({ db: pg, emitEvent }),
+      getData: pgData.mget(pg),
+    })({ emitEvent }),
 
     search: search({
       transformInput: transformInputSearch,
@@ -62,7 +62,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
         createServiceName('search')
       ),
       validateResult: validateResult(resultSchema, createServiceName('search')),
-      dbQuery: pgData.search,
-    })({ db: pg, emitEvent }),
+      getData: pgData.search(pg),
+    })({ emitEvent }),
   };
 };

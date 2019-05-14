@@ -7,6 +7,11 @@ const dateOrNull = str => parseDate(str).getOrElse(null);
 const trimedStringOrNull = q =>
   typeof q === 'undefined' ? undefined : q.toString().trim();
 
+const intOrNull = x => {
+  const y = parseInt(x);
+  return isNaN(y) ? null : y;
+};
+
 module.exports = {
   timeStart: dateOrNull,
   timeEnd: dateOrNull,
@@ -17,5 +22,6 @@ module.exports = {
   sort: defaultTo('desc'),
   after: identity,
   ids: parseArrayQuery,
+  intOrNull,
   query: trimedStringOrNull,
 };

@@ -8,6 +8,7 @@ import { inputGet as input } from '../inputSchema';
 import { SchemaLike } from 'joi';
 import { PgDriver } from '../../../../../db/driver';
 import { Serializable } from '../../../../../types';
+import * as grpc from 'grpc';
 
 const createService = (resultSchema: SchemaLike) =>
   getByIdPreset<string, string, Serializable<'test', string>>({
@@ -22,6 +23,7 @@ const createService = (resultSchema: SchemaLike) =>
     }),
   })({
     pg: { oneOrNone: (id: string) => taskOf(id) } as PgDriver,
+    dataEntries: new grpc.Client('', grpc.credentials.createInsecure()),
     emitEvent: always(identity),
   });
 

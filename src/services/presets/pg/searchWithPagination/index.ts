@@ -56,8 +56,8 @@ export const searchWithPaginationPreset = <
     transformResult: transformResults(transformResult),
     validateInput: validateInput(inputSchema, name),
     validateResult: validateResult(resultSchema, name),
-    dbQuery: getData<RequestWithCursor<Request, Cursor>, ResponseRaw>({
+    getData: getData<RequestWithCursor<Request, Cursor>, ResponseRaw>({
       name,
       sql,
-    }),
-  })({ db: pg, emitEvent });
+    })(pg),
+  })({ emitEvent });

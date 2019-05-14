@@ -9,6 +9,7 @@ import {
   toSerializable,
 } from '../../../../../types/serialization';
 import { PgDriver } from '../../../../../db/driver';
+import * as grpc from 'grpc';
 const { inputMget: input } = require('../inputSchema');
 
 const createService = (resultSchema: SchemaLike) =>
@@ -25,6 +26,7 @@ const createService = (resultSchema: SchemaLike) =>
     pg: {
       any: ids => taskOf(ids.split(';')),
     } as PgDriver,
+    dataEntries: new grpc.Client('', grpc.credentials.createInsecure()),
     emitEvent: always(identity),
   });
 
