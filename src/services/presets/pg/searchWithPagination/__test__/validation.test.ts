@@ -42,7 +42,8 @@ const service = searchWithPaginationPreset<
     toSerializable<'tx', ResponseRaw>('tx', response),
 })({
   pg: { any: filters => task(mockTxs) } as PgDriver,
-  dataEntries: new grpc.Client('', grpc.credentials.createInsecure()),
+  balances: {} as grpc.Client,
+  dataEntries: {} as grpc.Client,
   emitEvent: always(identity),
 });
 

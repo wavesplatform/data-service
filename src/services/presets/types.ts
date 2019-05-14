@@ -4,6 +4,7 @@ import { EmitEvent } from 'services/_common/createResolver/types';
 
 export type ServicePresetInitOptions = {
   pg: PgDriver;
+  balances: grpc.Client;
   dataEntries: grpc.Client;
   emitEvent: EmitEvent;
 };

@@ -23,7 +23,8 @@ const createService = (resultSchema: SchemaLike) =>
     }),
   })({
     pg: { oneOrNone: (id: string) => taskOf(id) } as PgDriver,
-    dataEntries: new grpc.Client('', grpc.credentials.createInsecure()),
+    balances: {} as grpc.Client,
+    dataEntries: {} as grpc.Client,
     emitEvent: always(identity),
   });
 

@@ -39,7 +39,8 @@ const service = searchPreset<
     list(res.map(tx => toSerializable<'tx', TestTransaction>('tx', tx))),
 })({
   pg: { any: filters => task(mockTxs) } as PgDriver,
-  dataEntries: new grpc.Client('', grpc.credentials.createInsecure()),
+  balances: {} as grpc.Client,
+  dataEntries: {} as grpc.Client,
   emitEvent: always(identity),
 });
 

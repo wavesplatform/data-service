@@ -26,7 +26,8 @@ const createService = (resultSchema: SchemaLike) =>
     pg: {
       any: ids => taskOf(ids.split(';')),
     } as PgDriver,
-    dataEntries: new grpc.Client('', grpc.credentials.createInsecure()),
+    balances: {} as grpc.Client,
+    dataEntries: {} as grpc.Client,
     emitEvent: always(identity),
   });
 
