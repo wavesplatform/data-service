@@ -11,7 +11,7 @@ import { Task, task } from 'folktale/concurrency/task';
 import { DbError, toDbError } from '../../errorHandling';
 import base58 from '../../utils/base58';
 
-type DataEntriesRequest = {
+export type DataEntriesRequest = {
   address?: string;
   height?: number;
   timestamp?: Date;

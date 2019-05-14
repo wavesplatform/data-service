@@ -1,8 +1,11 @@
 import { toSerializable, Serializable } from './serialization';
 import { Maybe } from 'folktale/maybe';
 import { Interval, interval, Unit } from './interval';
+import { Balance as GrpcBalance } from '../protobuf/balances';
+import { DataEntryResponse as GrpcDataEntryResponse } from '../protobuf/data-entries';
 
 export { Serializable, FromSerializable } from './serialization';
+import { List } from './list';
 
 export const fromMaybe = <A, B>(factory: (a?: A) => B) => (mb: Maybe<A>): B =>
   mb.matchWith({
@@ -51,6 +54,23 @@ export type DataEntryInfo = unknown;
 export type DataEntry = Serializable<'dataEntry', DataEntryInfo>;
 export const dataEntry = (data: DataEntryInfo = null): DataEntry =>
   toSerializable('dataEntry', data);
+
+// @todo StateUpdateInfo
+export type StateUpdate = {
+  balances: GrpcBalance[];
+  dataEntries: GrpcDataEntryResponse[];
+};
+export type StateUpdateInfo = {
+  balances: List<BalanceInfo>;
+  dataEntries: List<DataEntryInfo>;
+};
+export type SerializableStateUpdate = Serializable<
+  'stateUpdate',
+  StateUpdateInfo | null
+>;
+export const stateUpdate = (
+  data: StateUpdateInfo | null = null
+): SerializableStateUpdate => toSerializable('stateUpdate', data);
 
 export { List, list } from './list';
 export { Interval, interval, Unit };

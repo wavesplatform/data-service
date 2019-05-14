@@ -14,6 +14,8 @@ import { inputSearch, output } from './schema';
 import { transformResult } from './transformResult';
 import * as grpc from 'grpc';
 
+export { BalancesRequest } from './data';
+
 export default ({
   drivers,
   emitEvent,
