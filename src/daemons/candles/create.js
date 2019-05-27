@@ -5,7 +5,6 @@ const { fromNullable } = require('folktale/maybe');
 const logTaskProgress = require('../utils/logTaskProgress');
 
 const {
-  getNow,
   truncateTable,
   insertAllMinuteCandles,
   insertAllCandles,
@@ -35,7 +34,7 @@ const getStartBlock = (exchangeTx, candle) => {
     if (candle.max_height > exchangeTx.height) {
       return exchangeTx.height - 2000; // handle rollback
     } else {
-      return Math.min(candle.max_height, exchangeTx.height) - 1;
+      return exchangeTx.height - 1;
     }
   }
 
@@ -74,22 +73,21 @@ const updateCandlesLoop = (logTask, pg, tableName) => {
         .batch([
           t.any(selectLastExchangeTx()),
           t.any(selectLastCandle(tableName)),
-          t.one(getNow()),
         ])
-        .then(([lastTx, candle, { now }]) => {
+        .then(([lastTx, candle]) => {
           const startHeight = getStartBlock(head(lastTx), head(candle));
           return t
             .one(selectMinTimestampFromHeight(startHeight))
-            .then(row => [row.time_stamp, { now }]);
+            .then(row => row.time_stamp);
         })
-        .then(([timestamp, { now }]) => {
+        .then(timestamp => {
           const nextInterval = compose(
             m => m.getOrElse(undefined),
             map(interval =>
               t.any(
                 insertOrUpdateCandlesFromShortInterval(
                   tableName,
-                  now,
+                  timestamp,
                   interval[0],
                   interval[1]
                 )

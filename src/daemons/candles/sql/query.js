@@ -3,12 +3,6 @@ const pg = knex({ client: 'pg' });
 
 const { serializeCandle, candlePresets } = require('./utils');
 
-const getNow = () =>
-  pg
-    .select()
-    .column(pg.raw('now()'))
-    .toString();
-
 /** makeCandleCalculateColumns :: Number -> Array */
 const makeCandleCalculateColumns = longerInterval => {
   return {
@@ -88,7 +82,7 @@ const selectExchanges = pg({ t: 'txs_7' }).column(
   `price`
 );
 
-/** selectExchangesAfterTimestamp :: Number -> QueryBuilder */
+/** selectExchangesAfterTimestamp :: Date -> QueryBuilder */
 const selectExchangesAfterTimestamp = fromTimestamp =>
   selectExchanges
     .clone()
@@ -141,7 +135,7 @@ const insertOrUpdateCandles = (tableName, candles) => {
       .raw(
         `${pg({ t: tableName }).insert(
           candles.map(serializeCandle)
-        )} on conflict (time_start,amount_asset_id, price_asset_id, interval_in_secs) do update set ${updatedFieldsExcluded}`
+        )} on conflict (time_start, amount_asset_id, price_asset_id, interval_in_secs) do update set ${updatedFieldsExcluded}`
       )
       .toString();
   }
@@ -152,7 +146,7 @@ const insertOrUpdateCandles = (tableName, candles) => {
 /** insertOrUpdateCandlesFromShortInterval :: (String, Date, Number, Number) -> String query */
 const insertOrUpdateCandlesFromShortInterval = (
   tableName,
-  now,
+  fromTimestamp,
   shortInterval,
   longerInterval
 ) =>
@@ -163,10 +157,10 @@ const insertOrUpdateCandlesFromShortInterval = (
           .select(makeCandleCalculateColumns(longerInterval))
           .where('interval_in_secs', shortInterval)
           .whereRaw(
-            `time_start >= to_timestamp(floor((extract('epoch' from '${now.toISOString()}'::timestamp) / ${longerInterval} )) * ${longerInterval})`
+            `time_start >= to_timestamp(floor(extract('epoch' from '${fromTimestamp.toISOString()}'::timestamp) / ${longerInterval}) * ${longerInterval})`
           )
           .groupBy('candle_time', 'amount_asset_id', 'price_asset_id');
-      })} on conflict (time_start,amount_asset_id, price_asset_id, interval_in_secs) do update set ${updatedFieldsExcluded}`
+      })} on conflict (time_start, amount_asset_id, price_asset_id, interval_in_secs) do update set ${updatedFieldsExcluded}`
     )
     .toString();
 
@@ -203,7 +197,7 @@ const insertAllCandles = (tableName, shortInterval, longerInterval) =>
       .groupBy(['candle_time', 'amount_asset_id', 'price_asset_id']);
   }).toString();
 
-/** selectCandlesByMinute :: Number -> String query */
+/** selectCandlesByMinute :: Date -> String query */
 const selectCandlesByMinute = fromTimetamp =>
   pg({ t: 'txs_7' })
     .columns(candleSelectColumns)
@@ -219,7 +213,6 @@ const selectCandlesByMinute = fromTimetamp =>
     .toString();
 
 module.exports = {
-  getNow,
   truncateTable,
   insertAllMinuteCandles,
   insertAllCandles,
