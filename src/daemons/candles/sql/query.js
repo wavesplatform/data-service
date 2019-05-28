@@ -173,9 +173,7 @@ const truncateTable = tableName =>
 /** insertAllMinuteCandles :: String -> String query */
 const insertAllMinuteCandles = tableName =>
   insertIntoCandlesFromSelect(tableName, function() {
-    this.from({ t: 'txs_7' })
-      .columns(candleSelectColumns)
-      .select()
+    this.select(candleSelectColumns)
       .from(selectExchanges.clone().as('e'))
       .innerJoin(
         { a_dec: 'asset_decimals' },
@@ -183,8 +181,7 @@ const insertAllMinuteCandles = tableName =>
         'a_dec.asset_id'
       )
       .innerJoin({ p_dec: 'asset_decimals' }, 'e.price_asset', 'p_dec.asset_id')
-      .groupByRaw('e.amount_asset, e.price_asset, e.candle_time')
-      .toString();
+      .groupByRaw('e.candle_time, e.amount_asset, e.price_asset');
   }).toString();
 
 /** insertAllCandles :: (String, Number, Number, Number) -> String query */
@@ -192,16 +189,14 @@ const insertAllCandles = (tableName, shortInterval, longerInterval) =>
   insertIntoCandlesFromSelect(tableName, function() {
     this.from({ t: tableName })
       .column(makeCandleCalculateColumns(longerInterval))
-      .select()
       .where('t.interval_in_secs', shortInterval)
       .groupBy(['candle_time', 'amount_asset_id', 'price_asset_id']);
   }).toString();
 
 /** selectCandlesByMinute :: Date -> String query */
 const selectCandlesByMinute = fromTimetamp =>
-  pg({ t: 'txs_7' })
+  pg
     .columns(candleSelectColumns)
-    .select()
     .from(
       selectExchangesAfterTimestamp(fromTimetamp)
         .clone()
@@ -209,7 +204,7 @@ const selectCandlesByMinute = fromTimetamp =>
     )
     .innerJoin({ a_dec: 'asset_decimals' }, 'e.amount_asset', 'a_dec.asset_id')
     .innerJoin({ p_dec: 'asset_decimals' }, 'e.price_asset', 'p_dec.asset_id')
-    .groupBy(['e.amount_asset', 'e.price_asset', 'e.candle_time'])
+    .groupBy(['e.candle_time', 'e.amount_asset', 'e.price_asset'])
     .toString();
 
 module.exports = {
