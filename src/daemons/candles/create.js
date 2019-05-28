@@ -34,7 +34,7 @@ const getStartBlock = (exchangeTx, candle) => {
     if (candle.max_height > exchangeTx.height) {
       return exchangeTx.height - 2000; // handle rollback
     } else {
-      return exchangeTx.height - 1;
+      return candle.max_height - 1;
     }
   }
 

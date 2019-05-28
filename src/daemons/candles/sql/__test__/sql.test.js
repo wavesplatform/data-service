@@ -14,8 +14,8 @@ describe('candles daemon sql test', () => {
     expect(sql.insertAllCandles('candles', 60, 300)).toMatchSnapshot();
   });
 
-  it('get all candles from exchange tx grouped by 1 minute and after 122 block height', () => {
-    expect(sql.selectCandlesByMinute(122)).toMatchSnapshot();
+  it('get all candles from exchange tx grouped by 1 minute and after timestamp', () => {
+    expect(sql.selectCandlesByMinute(new Date('2019-01-01T00:00:00.000Z'))).toMatchSnapshot();
   });
 
   it('insert or update array of candles', () => {
@@ -50,7 +50,7 @@ describe('candles daemon sql test', () => {
   });
 
   it('get last exchange tx', () => {
-    expect(sql.selectLastExchangeTx('candles').toString()).toMatchSnapshot();
+    expect(sql.selectLastExchangeTx().toString()).toMatchSnapshot();
   });
 
   it('insert or update candles from height', () => {
@@ -58,7 +58,7 @@ describe('candles daemon sql test', () => {
       sql
         .insertOrUpdateCandlesFromShortInterval(
           'candles',
-          new Date(0),
+          new Date('2019-01-01T00:00:00.000Z'),
           60,
           300
         )
