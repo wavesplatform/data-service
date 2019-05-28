@@ -27,6 +27,7 @@ const columns = {
   buy_matcher_fee: pg.raw('t.buy_matcher_fee * 10^(-8)'),
 
   o1_id: pg.raw("order1->>'id'"),
+  o1_version: pg.raw("order1->>'version'"),
   o1_time_stamp: pg.raw("text_timestamp_cast(order1->>'timestamp')"),
   o1_expiration: pg.raw("text_timestamp_cast(order1->>'expiration')"),
   o1_signature: pg.raw("order1->>'signature'"),
@@ -36,8 +37,10 @@ const columns = {
   o1_price: pg.raw("(order1->>'price')::double precision"),
   o1_amount: pg.raw("(order1->>'amount')::double precision"),
   o1_matcher_fee: pg.raw("(order1->>'matcherFee')::double precision * 10^(-8)"),
+  o1_matcher_fee_asset_id: pg.raw("order1->>'matcherFeeAssetId'"),
 
   o2_id: pg.raw("order2->>'id'"),
+  o2_version: pg.raw("order2->>'version'"),
   o2_time_stamp: pg.raw("text_timestamp_cast(order2->>'timestamp')"),
   o2_expiration: pg.raw("text_timestamp_cast(order2->>'expiration')"),
   o2_signature: pg.raw("order2->>'signature'"),
@@ -47,6 +50,7 @@ const columns = {
   o2_price: pg.raw("(order2->>'price')::double precision"),
   o2_amount: pg.raw("(order2->>'amount')::double precision"),
   o2_matcher_fee: pg.raw("(order2->>'matcherFee')::double precision * 10^(-8)"),
+  o2_matcher_fee_asset_id: pg.raw("order2->>'matcherFeeAssetId'"),
 };
 
 const select = pg({ t: 'txs_7' }).select(columns);

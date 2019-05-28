@@ -5,6 +5,7 @@ const transformTxInfo = require('../_common/transformTxInfo');
 
 const createOrder = prefix => ({
   [`${prefix}_id`]: id,
+  [`${prefix}_version`]: version,
   [`${prefix}_sender_public_key`]: senderPublicKey,
   [`${prefix}_sender`]: sender,
   [`${prefix}_type`]: orderType,
@@ -14,6 +15,7 @@ const createOrder = prefix => ({
   [`${prefix}_expiration`]: expiration,
   [`${prefix}_signature`]: signature,
   [`${prefix}_matcher_fee`]: matcherFee,
+  [`${prefix}_matcher_fee_asset_id`]: matcherFeeAssetId,
   price_asset: priceAsset,
   amount_asset: amountAsset,
   sender_public_key: matcherPublicKey,
@@ -33,6 +35,7 @@ const createOrder = prefix => ({
   expiration,
   matcherFee,
   signature,
+  matcherFeeAssetId: version === '3' ? matcherFeeAssetId : undefined,
 });
 
 /** transformTx:: RawTxInfo -> TxInfo */
