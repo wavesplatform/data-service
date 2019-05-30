@@ -6,6 +6,7 @@ import {
   BalancesByAddressRequest,
   BalancesByAssetRequest,
 } from '../../protobuf/balances';
+import { BalancesService } from '../../protobuf/balances_grpc_pb';
 
 import { Task, task } from 'folktale/concurrency/task';
 import { DbError, toDbError } from '../../errorHandling';
@@ -49,11 +50,11 @@ export const getBalances = (client: grpc.Client) => (
 
     const getPathByReq = (req: BalancesRequest) => {
       if (req.transaction_id) {
-        return '/Balances/ByTransaction';
+        return BalancesService.byTransaction.path;
       } else if (req.address) {
-        return '/Balances/ByAddress';
+        return BalancesService.byAddress.path;
       } else {
-        return '/Balances/ByAsset';
+        return BalancesService.byAsset.path;
       }
     };
 

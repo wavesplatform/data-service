@@ -6,6 +6,7 @@ import {
   DataEntriesByAddressRequest,
   DataEntriesSearchRequest,
 } from '../../protobuf/data-entries';
+import { DataEntriesService } from '../../protobuf/data-entries_grpc_pb';
 
 import { Task, task } from 'folktale/concurrency/task';
 import { DbError, toDbError } from '../../errorHandling';
@@ -51,11 +52,11 @@ export const getDataEntries = (client: grpc.Client) => (
 
     const getPathByReq = (req: DataEntriesRequest) => {
       if (req.transaction_id) {
-        return '/DataEntries/ByTransaction';
+        return DataEntriesService.byTransaction.path;
       } else if (req.address) {
-        return '/DataEntries/ByAddress';
+        return DataEntriesService.byAddress.path;
       } else {
-        return '/DataEntries/Search';
+        return DataEntriesService.search.path;
       }
     };
 
