@@ -28,6 +28,7 @@ const data = require('../../services/transactions/data');
 const setScript = require('../../services/transactions/setScript');
 const sponsorship = require('../../services/transactions/sponsorship');
 const setAssetScript = require('../../services/transactions/setAssetScript');
+const invokeScript = require('../../services/transactions/invokeScript');
 const all = require('../../services/transactions/all');
 
 // filters
@@ -63,7 +64,7 @@ const transactionsEndpointsConfig = {
     service: issue,
     options: createOptions({
       assetId: identity,
-      script: identity
+      script: identity,
     }),
   },
   '/transactions/transfer': {
@@ -127,6 +128,10 @@ const transactionsEndpointsConfig = {
   '/transactions/set-asset-script': {
     service: setAssetScript,
     options: createOptions({ assetId: identity, script: identity }),
+  },
+  '/transactions/invoke-script': {
+    service: invokeScript,
+    options: createOptions({ dapp: identity, function: identity }),
   },
 };
 

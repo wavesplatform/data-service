@@ -5,7 +5,7 @@ const commonFilters = require('../../../presets/pg/searchWithPagination/commonFi
 const result = Joi.object().keys({
   tx_type: Joi.number()
     .min(1)
-    .max(15)
+    .max(16)
     .required(),
   time_stamp: Joi.date().required(),
   id: Joi.string()
