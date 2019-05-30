@@ -19,24 +19,26 @@ const createOrder = prefix => ({
   price_asset: priceAsset,
   amount_asset: amountAsset,
   sender_public_key: matcherPublicKey,
-}) => ({
-  id,
-  senderPublicKey,
-  matcherPublicKey,
-  assetPair: {
-    amountAsset,
-    priceAsset,
-  },
-  orderType,
-  price,
-  sender,
-  amount,
-  timestamp,
-  expiration,
-  matcherFee,
-  signature,
-  matcherFeeAssetId: version === '3' ? matcherFeeAssetId : undefined,
-});
+}) => {
+  const tx = {
+    id,
+    senderPublicKey,
+    matcherPublicKey,
+    assetPair: {
+      amountAsset,
+      priceAsset,
+    },
+    orderType,
+    price,
+    sender,
+    amount,
+    timestamp,
+    expiration,
+    matcherFee,
+    signature,
+  };
+  return version === '3' ? { ...tx, matcherFeeAssetId } : tx;
+};
 
 /** transformTx:: RawTxInfo -> TxInfo */
 module.exports = tx => {
