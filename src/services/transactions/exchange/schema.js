@@ -1,10 +1,12 @@
 const Joi = require('../../../utils/validation/joi');
 
 const commonFields = require('../_common/commonFieldsSchemas');
-const commonFilters = require('../../presets/pg/searchWithPagination/commonFilterSchemas').default;
+const commonFilters = require('../../presets/pg/searchWithPagination/commonFilterSchemas')
+  .default;
 
 const orderTypes = prefix => ({
   [`${prefix}_id`]: Joi.string().required(),
+  [`${prefix}_version`]: Joi.string().required(),
   [`${prefix}_type`]: Joi.string().required(),
   [`${prefix}_sender`]: Joi.string().required(),
   [`${prefix}_sender_public_key`]: Joi.string().required(),
@@ -24,6 +26,7 @@ const orderTypes = prefix => ({
   [`${prefix}_expiration`]: Joi.object()
     .type(Date)
     .required(),
+  [`${prefix}_matcher_fee_asset_id`]: Joi.string().allow(null),
 });
 
 const result = Joi.object().keys({
