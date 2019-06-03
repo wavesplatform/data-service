@@ -14,8 +14,11 @@ export default {
       .map(transformResult)
       .map(head)
       .map(Maybe.fromNullable)
-      .mapRejected(
-        toDbError({ request: 'transactions.invokeScript.get', params: id })
+      .mapRejected(e =>
+        toDbError(
+          { request: 'transactions.invokeScript.get', params: id },
+          e.error
+        )
       ),
 
   mget: pg => ids =>
@@ -23,18 +26,25 @@ export default {
       .any(sql.mget(ids))
       .map(transformResult)
       .map(matchRequestsResults(propEq('id'), ids))
-      .mapRejected(
-        toDbError({ request: 'transactions.invokeScript.mget', params: ids })
+      .mapRejected(e =>
+        toDbError(
+          { request: 'transactions.invokeScript.mget', params: ids },
+          e.error
+        )
       ),
 
   search: pg => filters =>
     pg
       .any(sql.search(filters))
       .map(transformResult)
-      .mapRejected(
-        toDbError({
-          toDbError: 'transactions.invokeScript.search',
-          params: filters,
-        })
+      .mapRejected(e =>
+        toDbError(
+          {
+            request: 'transactions.invokeScript.search',
+            params: filters,
+            message: e.message,
+          },
+          e.error
+        )
       ),
 };

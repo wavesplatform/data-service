@@ -1,7 +1,7 @@
 import * as knex from 'knex';
 const pg = knex({ client: 'pg' });
 
-const columnsWithoutFee = [
+const columnsWithoutFeeAndPaymentAssetId = [
   // common
   'height',
   'tx_type',
@@ -26,16 +26,13 @@ const columnsWithoutFee = [
   'position_in_args',
 
   // payment
+  // payment asset id queries at select function
   'amount',
-  'asset_id',
   'position_in_payment',
 ];
 
-export const select = pg({ t: 'txs_16' })
-  .select(columnsWithoutFee)
-  .select({
-    fee: pg.raw('fee * 10^(-8)'),
-  })
+export const txs = pg({ t: 'txs_16' })
+  .select('*')
   .leftJoin({ a: 'txs_16_args' }, 'a.tx_id', 't.id')
   .leftJoin({ p: 'txs_16_payment' }, 'p.tx_id', 't.id');
 
@@ -43,9 +40,21 @@ export const fSelect = pg
   .select('id')
   .min({ time_stamp: 'time_stamp' })
   .from('txs_16')
-  .leftJoin({ a: 'txs_16_args' }, 'a.tx_id', 't.id')
-  .leftJoin({ p: 'txs_16_payment' }, 'p.tx_id', 't.id')
   .groupBy('id');
+
+export const select = pg
+  .select(columnsWithoutFeeAndPaymentAssetId)
+  .select({
+    amount: pg.raw(
+      'amount * 10^(case when txs.asset_id is null then -8 else -p_dec.decimals end)'
+    ),
+    asset_id: 'txs.asset_id',
+  })
+  .select({
+    fee: pg.raw('fee * 10^(-8)'),
+  })
+  .from({ txs })
+  .leftJoin({ p_dec: 'asset_decimals' }, 'p_dec.asset_id', 'txs.asset_id');
 
 export const composeQuery = (filteringQ: knex.QueryBuilder) =>
   select.clone().whereIn('id', pg.select('id').from({ filtered: filteringQ }));

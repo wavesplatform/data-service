@@ -20,10 +20,16 @@ export type RequestWithCursor<
   after?: CursorType;
 };
 
+export type BaseResponse = {
+  timestamp: Date;
+  id: string;
+  [key: string]: any;
+};
+
 export const searchWithPaginationPreset = <
   Request extends WithSortOrder,
   ResponseRaw,
-  ResponseTransformed extends Serializable<string, unknown>
+  ResponseTransformed extends Serializable<string, BaseResponse>
 >({
   name,
   sql,
