@@ -91,6 +91,7 @@ const transactionsEndpointsConfig = {
       matcher: identity,
       amountAsset: identity,
       priceAsset: identity,
+      orderId: identity,
     }),
   },
   '/transactions/lease': {
