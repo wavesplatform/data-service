@@ -1,22 +1,16 @@
 const {
   always,
-  append,
-  assoc,
-  assocPath,
+  complement,
   compose,
   cond,
   either,
-  evolve,
+  filter,
   groupBy,
-  identity,
   isEmpty,
   isNil,
   map,
-  merge,
   omit,
-  pathOr,
   prop,
-  reduce,
   sortBy,
   T,
   uniqWith,
@@ -50,43 +44,39 @@ const removeUnnecessaryFromRow = omit([
   'position_in_payment',
 ]);
 
-const appendArgsToTx = (tx, row) =>
-  compose(
-    cond([
-      [
-        always(!isNil(row.amount)),
-        assoc(
-          'payment',
-          uniqWith(
-            (a, b) => a.positionInPayment === b.positionInPayment,
-            append(getPaymentItem(row), tx.payment)
-          )
-        ),
-      ],
-      [T, identity],
-    ]),
-    cond([
-      [
-        always(!isNil(row.arg_type)),
-        assocPath(
-          ['call', 'args'],
-          uniqWith(
-            (a, b) => a.positionInArgs === b.positionInArgs,
-            append(getArg(row), pathOr([], ['call', 'args'], tx))
-          )
-        ),
-      ],
-      [T, identity],
-    ]),
-    cond([
-      [
-        always(!isNil(row.function_name)),
-        assoc('call', { function: row.function_name, args: [] }),
-      ],
-      [T, identity],
-    ]),
-    merge(removeUnnecessaryFromRow(row))
-  )(tx);
+const buildTxFromTxs = txs => {
+  if (!Array.isArray(txs) || !txs.length) {
+    return null;
+  }
+
+  const firstRow = txs[0];
+  const tx = removeUnnecessaryFromRow(firstRow);
+
+  // fill tx.payment
+  tx.payment = compose(
+    map(omit(['positionInPayment'])),
+    sortBy(prop('positionInPayment')),
+    uniqWith((a, b) => a.positionInPayment === b.positionInPayment),
+    map(getPaymentItem),
+    filter(always(complement(isNil(prop('amount')))))
+  )(txs);
+
+  // fill tx.call
+  if (!isNil(firstRow.function_name)) {
+    tx.call = {
+      function: firstRow.function_name,
+      args: compose(
+        map(omit(['positionInArgs'])),
+        sortBy(prop('positionInArgs')),
+        uniqWith((a, b) => a.positionInArgs === b.positionInArgs),
+        map(getArg),
+        filter(always(complement(isNil(prop('arg_type')))))
+      )(txs),
+    };
+  }
+
+  return tx;
+};
 
 /**
  * Db returns list of object
@@ -100,24 +90,7 @@ const toTxs = cond([
   [
     T,
     compose(
-      // sort by position in tx, then remove it
-      map(
-        evolve({
-          call: evolve({
-            args: compose(
-              map(omit(['positionInArgs'])),
-              sortBy(prop('positionInArgs'))
-            ),
-          }),
-          payment: compose(
-            compose(
-              map(omit(['positionInPayment'])),
-              sortBy(prop('positionInPayment'))
-            )
-          ),
-        })
-      ),
-      map(reduce(appendArgsToTx, { payment: [] })),
+      map(buildTxFromTxs),
       values,
       groupBy(prop('id'))
     ),
