@@ -11,10 +11,13 @@ const bySender = curryN(
     .whereRaw("array[order1->>'sender', order2->>'sender'] @> ?", `{${sender}}`)
 );
 
+// adding unneeded sort to force the use of index
+// https://stackoverflow.com/questions/21385555/postgresql-query-very-slow-with-limit-1/27237698#27237698
 const byOrder = curryN(
   2,
   (orderId, q) => q.clone()
     .whereRaw("array[order1->>'id', order2->>'id'] @> ?", `{${orderId}}`)
+    .orderBy("height")
 );
 
 module.exports = {
