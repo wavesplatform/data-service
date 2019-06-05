@@ -45,7 +45,7 @@ export const transformResults = <
   responses: ResponseRaw[],
   request: RequestWithCursor<Request, Cursor>
 ): List<ResponseTransformed> => {
-  const isLastPage = request.limit && responses.length < request.limit;
+  const isLastPage = responses.length < request.limit;
   const trimmedResponses = isLastPage ? responses : dropLast(1, responses);
 
   const transformedData = trimmedResponses.map(

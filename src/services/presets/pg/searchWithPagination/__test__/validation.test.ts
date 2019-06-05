@@ -58,18 +58,21 @@ describe('searchWithPagination preset validation', () => {
     it('fails if timeEnd < 0', done =>
       assertValidationError(done, {
         timeEnd: parseDate('-1525132900000').unsafeGet(),
+        limit: 10,
         sort: SortOrder.Ascending,
       }));
     it('fails if timeStart < 0', done =>
       assertValidationError(done, {
         timeEnd: parseDate('1525132900000').unsafeGet(),
         timeStart: parseDate('-1525132800000').unsafeGet(),
+        limit: 10,
         sort: SortOrder.Ascending,
       }));
     it('fails if timeEnd < timeStart', done =>
       assertValidationError(done, {
         timeEnd: parseDate('1525132700000').unsafeGet(),
         timeStart: parseDate('1525132800000').unsafeGet(),
+        limit: 10,
         sort: SortOrder.Ascending,
       }));
     it('fails if timeStart->invalid Date', done => {

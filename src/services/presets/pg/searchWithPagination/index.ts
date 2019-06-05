@@ -14,7 +14,7 @@ export type WithSortOrder = {
 };
 
 export type WithLimit = {
-  limit?: number;
+  limit: number;
 };
 
 export type RequestWithCursor<
