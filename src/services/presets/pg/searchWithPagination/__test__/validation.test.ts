@@ -3,7 +3,7 @@ import { always, identity } from 'ramda';
 
 import { parseDate } from '../../../../../utils/parseDate';
 import { Joi } from '../../../../../utils/validation';
-import { searchWithPaginationPreset, WithSortOrder } from '..';
+import { searchWithPaginationPreset, WithSortOrder, WithLimit } from '..';
 import commonFilterSchemas from '../commonFilterSchemas';
 import {
   Serializable,
@@ -17,11 +17,10 @@ const mockTxs: ResponseRaw[] = [
   { id: 'w', timestamp: new Date() },
 ];
 
-type Request = WithSortOrder & {
+type Request = WithSortOrder & WithLimit & {
   timeEnd?: Date;
   timeStart?: Date;
-  limit?: number;
-};
+}
 
 type ResponseRaw = {
   id: string;
