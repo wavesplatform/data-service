@@ -6,22 +6,21 @@ export const transformResult = (d: Balance): BalanceInfo => {
   return {
     ...d,
     address: base58.encode(d.address),
-    amount: d.amount
-      ? {
-          wavesAmount:
-            d.amount.assetAmount === null && d.amount.wavesAmount
-              ? d.amount.wavesAmount.toNumber()
-              : undefined,
-          assetAmount:
-            d.amount.assetAmount &&
-            d.amount.assetAmount.amount &&
-            d.amount.assetAmount.assetId
-              ? {
-                  amount: d.amount.assetAmount.amount.toNumber(),
-                  amountId: base58.encode(d.amount.assetAmount.assetId),
-                }
-              : undefined,
-        }
-      : null,
+    amount:
+      d.amount && d.amount.amount
+        ? {
+            wavesAmount:
+              d.amount.assetId === null
+                ? d.amount.amount.toNumber()
+                : undefined,
+            assetAmount:
+              d.amount.assetId && d.amount.assetId.issuedAsset
+                ? {
+                    amount: d.amount.amount.toNumber(),
+                    assetId: base58.encode(d.amount.assetId.issuedAsset),
+                  }
+                : undefined,
+          }
+        : null,
   };
 };

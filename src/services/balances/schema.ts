@@ -16,17 +16,11 @@ export const inputSearch = Joi.object()
 export const output = Joi.object().keys({
   address: Joi.binary(),
   amount: Joi.object().keys({
-    assetAmount: Joi.object()
-      .keys({
-        amount: Joi.object()
-          .long()
-          .int64(),
-        assetId: Joi.binary(),
-      })
-      .allow(null),
-    wavesAmount: Joi.object()
+    amount: Joi.object()
       .long()
-      .int64()
-      .allow(null),
+      .int64(),
+    assetId: Joi.object().keys({
+      issuedAsset: Joi.binary(),
+    }),
   }),
 });

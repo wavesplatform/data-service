@@ -1,7 +1,0 @@
-// Transactions
-syntax = "proto3";
-option java_package = "com.wavesplatform.protobuf.transaction";
-
-message Script {
-    bytes bytes = 1;
-}

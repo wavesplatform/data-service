@@ -6,6 +6,52 @@
 import * as jspb from "google-protobuf";
 import * as script_pb from "./script_pb";
 import * as recipient_pb from "./recipient_pb";
+import * as google_protobuf_empty_pb from "google-protobuf/google/protobuf/empty_pb";
+
+export class AssetId extends jspb.Message { 
+
+    hasWaves(): boolean;
+    clearWaves(): void;
+    getWaves(): google_protobuf_empty_pb.Empty | undefined;
+    setWaves(value?: google_protobuf_empty_pb.Empty): void;
+
+
+    hasIssuedAsset(): boolean;
+    clearIssuedAsset(): void;
+    getIssuedAsset(): Uint8Array | string;
+    getIssuedAsset_asU8(): Uint8Array;
+    getIssuedAsset_asB64(): string;
+    setIssuedAsset(value: Uint8Array | string): void;
+
+
+    getAssetCase(): AssetId.AssetCase;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): AssetId.AsObject;
+    static toObject(includeInstance: boolean, msg: AssetId): AssetId.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: AssetId, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): AssetId;
+    static deserializeBinaryFromReader(message: AssetId, reader: jspb.BinaryReader): AssetId;
+}
+
+export namespace AssetId {
+    export type AsObject = {
+        waves?: google_protobuf_empty_pb.Empty.AsObject,
+        issuedAsset: Uint8Array | string,
+    }
+
+    export enum AssetCase {
+        ASSET_NOT_SET = 0,
+    
+    WAVES = 1,
+
+    ISSUED_ASSET = 2,
+
+    }
+
+}
 
 export class AssetAmount extends jspb.Message { 
     getAssetId(): Uint8Array | string;
@@ -36,19 +82,14 @@ export namespace AssetAmount {
 
 export class Amount extends jspb.Message { 
 
-    hasWavesAmount(): boolean;
-    clearWavesAmount(): void;
-    getWavesAmount(): number;
-    setWavesAmount(value: number): void;
+    hasAssetId(): boolean;
+    clearAssetId(): void;
+    getAssetId(): AssetId | undefined;
+    setAssetId(value?: AssetId): void;
 
+    getAmount(): number;
+    setAmount(value: number): void;
 
-    hasAssetAmount(): boolean;
-    clearAssetAmount(): void;
-    getAssetAmount(): AssetAmount | undefined;
-    setAssetAmount(value?: AssetAmount): void;
-
-
-    getAmountCase(): Amount.AmountCase;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): Amount.AsObject;
@@ -62,19 +103,9 @@ export class Amount extends jspb.Message {
 
 export namespace Amount {
     export type AsObject = {
-        wavesAmount: number,
-        assetAmount?: AssetAmount.AsObject,
+        assetId?: AssetId.AsObject,
+        amount: number,
     }
-
-    export enum AmountCase {
-        AMOUNT_NOT_SET = 0,
-    
-    WAVES_AMOUNT = 1,
-
-    ASSET_AMOUNT = 2,
-
-    }
-
 }
 
 export class SignedTransaction extends jspb.Message { 
@@ -221,6 +252,12 @@ export class Transaction extends jspb.Message {
     setSetAssetScript(value?: SetAssetScriptTransactionData): void;
 
 
+    hasInvokeScript(): boolean;
+    clearInvokeScript(): void;
+    getInvokeScript(): InvokeScriptTransactionData | undefined;
+    setInvokeScript(value?: InvokeScriptTransactionData): void;
+
+
     getDataCase(): Transaction.DataCase;
 
     serializeBinary(): Uint8Array;
@@ -255,6 +292,7 @@ export namespace Transaction {
         setScript?: SetScriptTransactionData.AsObject,
         sponsorFee?: SponsorFeeTransactionData.AsObject,
         setAssetScript?: SetAssetScriptTransactionData.AsObject,
+        invokeScript?: InvokeScriptTransactionData.AsObject,
     }
 
     export enum DataCase {
@@ -289,6 +327,8 @@ export namespace Transaction {
     SPONSOR_FEE = 114,
 
     SET_ASSET_SCRIPT = 115,
+
+    INVOKE_SCRIPT = 116,
 
     }
 
@@ -499,10 +539,11 @@ export namespace DataTransactionData {
 }
 
 export class MassTransferTransactionData extends jspb.Message { 
-    getAssetId(): Uint8Array | string;
-    getAssetId_asU8(): Uint8Array;
-    getAssetId_asB64(): string;
-    setAssetId(value: Uint8Array | string): void;
+
+    hasAssetId(): boolean;
+    clearAssetId(): void;
+    getAssetId(): AssetId | undefined;
+    setAssetId(value?: AssetId): void;
 
     clearTransfersList(): void;
     getTransfersList(): Array<MassTransferTransactionData.Transfer>;
@@ -527,7 +568,7 @@ export class MassTransferTransactionData extends jspb.Message {
 
 export namespace MassTransferTransactionData {
     export type AsObject = {
-        assetId: Uint8Array | string,
+        assetId?: AssetId.AsObject,
         transfersList: Array<MassTransferTransactionData.Transfer.AsObject>,
         attachment: Uint8Array | string,
     }
@@ -769,18 +810,6 @@ export namespace SetScriptTransactionData {
 }
 
 export class ExchangeTransactionData extends jspb.Message { 
-
-    hasBuySellOrders(): boolean;
-    clearBuySellOrders(): void;
-    getBuySellOrders(): ExchangeTransactionData.BuySellOrders | undefined;
-    setBuySellOrders(value?: ExchangeTransactionData.BuySellOrders): void;
-
-
-    hasMakerTakerOrders(): boolean;
-    clearMakerTakerOrders(): void;
-    getMakerTakerOrders(): ExchangeTransactionData.MakerTakerOrders | undefined;
-    setMakerTakerOrders(value?: ExchangeTransactionData.MakerTakerOrders): void;
-
     getAmount(): number;
     setAmount(value: number): void;
 
@@ -793,8 +822,14 @@ export class ExchangeTransactionData extends jspb.Message {
     getSellMatcherFee(): number;
     setSellMatcherFee(value: number): void;
 
+    clearOrdersList(): void;
+    getOrdersList(): Array<ExchangeTransactionData.Order>;
+    setOrdersList(value: Array<ExchangeTransactionData.Order>): void;
+    addOrders(value?: ExchangeTransactionData.Order, index?: number): ExchangeTransactionData.Order;
 
-    getOrdersCase(): ExchangeTransactionData.OrdersCase;
+    getTaker(): number;
+    setTaker(value: number): void;
+
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): ExchangeTransactionData.AsObject;
@@ -808,12 +843,12 @@ export class ExchangeTransactionData extends jspb.Message {
 
 export namespace ExchangeTransactionData {
     export type AsObject = {
-        buySellOrders?: ExchangeTransactionData.BuySellOrders.AsObject,
-        makerTakerOrders?: ExchangeTransactionData.MakerTakerOrders.AsObject,
         amount: number,
         price: number,
         buyMatcherFee: number,
         sellMatcherFee: number,
+        ordersList: Array<ExchangeTransactionData.Order.AsObject>,
+        taker: number,
     }
 
 
@@ -995,16 +1030,6 @@ export namespace ExchangeTransactionData {
 
     }
 
-
-    export enum OrdersCase {
-        ORDERS_NOT_SET = 0,
-    
-    BUY_SELL_ORDERS = 1,
-
-    MAKER_TAKER_ORDERS = 2,
-
-    }
-
 }
 
 export class SponsorFeeTransactionData extends jspb.Message { 
@@ -1029,4 +1054,100 @@ export namespace SponsorFeeTransactionData {
     export type AsObject = {
         minFee?: AssetAmount.AsObject,
     }
+}
+
+export class InvokeScriptTransactionData extends jspb.Message { 
+    getDappAddress(): Uint8Array | string;
+    getDappAddress_asU8(): Uint8Array;
+    getDappAddress_asB64(): string;
+    setDappAddress(value: Uint8Array | string): void;
+
+    getFunctionCall(): Uint8Array | string;
+    getFunctionCall_asU8(): Uint8Array;
+    getFunctionCall_asB64(): string;
+    setFunctionCall(value: Uint8Array | string): void;
+
+    clearPaymentsList(): void;
+    getPaymentsList(): Array<Amount>;
+    setPaymentsList(value: Array<Amount>): void;
+    addPayments(value?: Amount, index?: number): Amount;
+
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): InvokeScriptTransactionData.AsObject;
+    static toObject(includeInstance: boolean, msg: InvokeScriptTransactionData): InvokeScriptTransactionData.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: InvokeScriptTransactionData, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): InvokeScriptTransactionData;
+    static deserializeBinaryFromReader(message: InvokeScriptTransactionData, reader: jspb.BinaryReader): InvokeScriptTransactionData;
+}
+
+export namespace InvokeScriptTransactionData {
+    export type AsObject = {
+        dappAddress: Uint8Array | string,
+        functionCall: Uint8Array | string,
+        paymentsList: Array<Amount.AsObject>,
+    }
+}
+
+export class InvokeScriptResult extends jspb.Message { 
+    clearDataList(): void;
+    getDataList(): Array<DataTransactionData.DataEntry>;
+    setDataList(value: Array<DataTransactionData.DataEntry>): void;
+    addData(value?: DataTransactionData.DataEntry, index?: number): DataTransactionData.DataEntry;
+
+    clearTransfersList(): void;
+    getTransfersList(): Array<InvokeScriptResult.Payment>;
+    setTransfersList(value: Array<InvokeScriptResult.Payment>): void;
+    addTransfers(value?: InvokeScriptResult.Payment, index?: number): InvokeScriptResult.Payment;
+
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): InvokeScriptResult.AsObject;
+    static toObject(includeInstance: boolean, msg: InvokeScriptResult): InvokeScriptResult.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: InvokeScriptResult, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): InvokeScriptResult;
+    static deserializeBinaryFromReader(message: InvokeScriptResult, reader: jspb.BinaryReader): InvokeScriptResult;
+}
+
+export namespace InvokeScriptResult {
+    export type AsObject = {
+        dataList: Array<DataTransactionData.DataEntry.AsObject>,
+        transfersList: Array<InvokeScriptResult.Payment.AsObject>,
+    }
+
+
+    export class Payment extends jspb.Message { 
+    getAddress(): Uint8Array | string;
+    getAddress_asU8(): Uint8Array;
+    getAddress_asB64(): string;
+    setAddress(value: Uint8Array | string): void;
+
+
+    hasAmount(): boolean;
+    clearAmount(): void;
+    getAmount(): Amount | undefined;
+    setAmount(value?: Amount): void;
+
+
+        serializeBinary(): Uint8Array;
+        toObject(includeInstance?: boolean): Payment.AsObject;
+        static toObject(includeInstance: boolean, msg: Payment): Payment.AsObject;
+        static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+        static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+        static serializeBinaryToWriter(message: Payment, writer: jspb.BinaryWriter): void;
+        static deserializeBinary(bytes: Uint8Array): Payment;
+        static deserializeBinaryFromReader(message: Payment, reader: jspb.BinaryReader): Payment;
+    }
+
+    export namespace Payment {
+        export type AsObject = {
+        address: Uint8Array | string,
+        amount?: Amount.AsObject,
+        }
+    }
+
 }

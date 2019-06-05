@@ -1243,6 +1243,248 @@ $root.Balances = (function() {
     return Balances;
 })();
 
+$root.AssetId = (function() {
+
+    /**
+     * Properties of an AssetId.
+     * @exports IAssetId
+     * @interface IAssetId
+     * @property {google.protobuf.IEmpty|null} [waves] AssetId waves
+     * @property {Uint8Array|null} [issuedAsset] AssetId issuedAsset
+     */
+
+    /**
+     * Constructs a new AssetId.
+     * @exports AssetId
+     * @classdesc Represents an AssetId.
+     * @implements IAssetId
+     * @constructor
+     * @param {IAssetId=} [properties] Properties to set
+     */
+    function AssetId(properties) {
+        if (properties)
+            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                if (properties[keys[i]] != null)
+                    this[keys[i]] = properties[keys[i]];
+    }
+
+    /**
+     * AssetId waves.
+     * @member {google.protobuf.IEmpty|null|undefined} waves
+     * @memberof AssetId
+     * @instance
+     */
+    AssetId.prototype.waves = null;
+
+    /**
+     * AssetId issuedAsset.
+     * @member {Uint8Array} issuedAsset
+     * @memberof AssetId
+     * @instance
+     */
+    AssetId.prototype.issuedAsset = $util.newBuffer([]);
+
+    // OneOf field names bound to virtual getters and setters
+    var $oneOfFields;
+
+    /**
+     * AssetId asset.
+     * @member {"waves"|"issuedAsset"|undefined} asset
+     * @memberof AssetId
+     * @instance
+     */
+    Object.defineProperty(AssetId.prototype, "asset", {
+        get: $util.oneOfGetter($oneOfFields = ["waves", "issuedAsset"]),
+        set: $util.oneOfSetter($oneOfFields)
+    });
+
+    /**
+     * Creates a new AssetId instance using the specified properties.
+     * @function create
+     * @memberof AssetId
+     * @static
+     * @param {IAssetId=} [properties] Properties to set
+     * @returns {AssetId} AssetId instance
+     */
+    AssetId.create = function create(properties) {
+        return new AssetId(properties);
+    };
+
+    /**
+     * Encodes the specified AssetId message. Does not implicitly {@link AssetId.verify|verify} messages.
+     * @function encode
+     * @memberof AssetId
+     * @static
+     * @param {IAssetId} message AssetId message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    AssetId.encode = function encode(message, writer) {
+        if (!writer)
+            writer = $Writer.create();
+        if (message.waves != null && message.hasOwnProperty("waves"))
+            $root.google.protobuf.Empty.encode(message.waves, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+        if (message.issuedAsset != null && message.hasOwnProperty("issuedAsset"))
+            writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.issuedAsset);
+        return writer;
+    };
+
+    /**
+     * Encodes the specified AssetId message, length delimited. Does not implicitly {@link AssetId.verify|verify} messages.
+     * @function encodeDelimited
+     * @memberof AssetId
+     * @static
+     * @param {IAssetId} message AssetId message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    AssetId.encodeDelimited = function encodeDelimited(message, writer) {
+        return this.encode(message, writer).ldelim();
+    };
+
+    /**
+     * Decodes an AssetId message from the specified reader or buffer.
+     * @function decode
+     * @memberof AssetId
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @param {number} [length] Message length if known beforehand
+     * @returns {AssetId} AssetId
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    AssetId.decode = function decode(reader, length) {
+        if (!(reader instanceof $Reader))
+            reader = $Reader.create(reader);
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.AssetId();
+        while (reader.pos < end) {
+            var tag = reader.uint32();
+            switch (tag >>> 3) {
+            case 1:
+                message.waves = $root.google.protobuf.Empty.decode(reader, reader.uint32());
+                break;
+            case 2:
+                message.issuedAsset = reader.bytes();
+                break;
+            default:
+                reader.skipType(tag & 7);
+                break;
+            }
+        }
+        return message;
+    };
+
+    /**
+     * Decodes an AssetId message from the specified reader or buffer, length delimited.
+     * @function decodeDelimited
+     * @memberof AssetId
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @returns {AssetId} AssetId
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    AssetId.decodeDelimited = function decodeDelimited(reader) {
+        if (!(reader instanceof $Reader))
+            reader = new $Reader(reader);
+        return this.decode(reader, reader.uint32());
+    };
+
+    /**
+     * Verifies an AssetId message.
+     * @function verify
+     * @memberof AssetId
+     * @static
+     * @param {Object.<string,*>} message Plain object to verify
+     * @returns {string|null} `null` if valid, otherwise the reason why it is not
+     */
+    AssetId.verify = function verify(message) {
+        if (typeof message !== "object" || message === null)
+            return "object expected";
+        var properties = {};
+        if (message.waves != null && message.hasOwnProperty("waves")) {
+            properties.asset = 1;
+            {
+                var error = $root.google.protobuf.Empty.verify(message.waves);
+                if (error)
+                    return "waves." + error;
+            }
+        }
+        if (message.issuedAsset != null && message.hasOwnProperty("issuedAsset")) {
+            if (properties.asset === 1)
+                return "asset: multiple values";
+            properties.asset = 1;
+            if (!(message.issuedAsset && typeof message.issuedAsset.length === "number" || $util.isString(message.issuedAsset)))
+                return "issuedAsset: buffer expected";
+        }
+        return null;
+    };
+
+    /**
+     * Creates an AssetId message from a plain object. Also converts values to their respective internal types.
+     * @function fromObject
+     * @memberof AssetId
+     * @static
+     * @param {Object.<string,*>} object Plain object
+     * @returns {AssetId} AssetId
+     */
+    AssetId.fromObject = function fromObject(object) {
+        if (object instanceof $root.AssetId)
+            return object;
+        var message = new $root.AssetId();
+        if (object.waves != null) {
+            if (typeof object.waves !== "object")
+                throw TypeError(".AssetId.waves: object expected");
+            message.waves = $root.google.protobuf.Empty.fromObject(object.waves);
+        }
+        if (object.issuedAsset != null)
+            if (typeof object.issuedAsset === "string")
+                $util.base64.decode(object.issuedAsset, message.issuedAsset = $util.newBuffer($util.base64.length(object.issuedAsset)), 0);
+            else if (object.issuedAsset.length)
+                message.issuedAsset = object.issuedAsset;
+        return message;
+    };
+
+    /**
+     * Creates a plain object from an AssetId message. Also converts values to other types if specified.
+     * @function toObject
+     * @memberof AssetId
+     * @static
+     * @param {AssetId} message AssetId
+     * @param {$protobuf.IConversionOptions} [options] Conversion options
+     * @returns {Object.<string,*>} Plain object
+     */
+    AssetId.toObject = function toObject(message, options) {
+        if (!options)
+            options = {};
+        var object = {};
+        if (message.waves != null && message.hasOwnProperty("waves")) {
+            object.waves = $root.google.protobuf.Empty.toObject(message.waves, options);
+            if (options.oneofs)
+                object.asset = "waves";
+        }
+        if (message.issuedAsset != null && message.hasOwnProperty("issuedAsset")) {
+            object.issuedAsset = options.bytes === String ? $util.base64.encode(message.issuedAsset, 0, message.issuedAsset.length) : options.bytes === Array ? Array.prototype.slice.call(message.issuedAsset) : message.issuedAsset;
+            if (options.oneofs)
+                object.asset = "issuedAsset";
+        }
+        return object;
+    };
+
+    /**
+     * Converts this AssetId to JSON.
+     * @function toJSON
+     * @memberof AssetId
+     * @instance
+     * @returns {Object.<string,*>} JSON object
+     */
+    AssetId.prototype.toJSON = function toJSON() {
+        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+    };
+
+    return AssetId;
+})();
+
 $root.AssetAmount = (function() {
 
     /**
@@ -1482,8 +1724,8 @@ $root.Amount = (function() {
      * Properties of an Amount.
      * @exports IAmount
      * @interface IAmount
-     * @property {Long|null} [wavesAmount] Amount wavesAmount
-     * @property {IAssetAmount|null} [assetAmount] Amount assetAmount
+     * @property {IAssetId|null} [assetId] Amount assetId
+     * @property {Long|null} [amount] Amount amount
      */
 
     /**
@@ -1502,34 +1744,20 @@ $root.Amount = (function() {
     }
 
     /**
-     * Amount wavesAmount.
-     * @member {Long} wavesAmount
+     * Amount assetId.
+     * @member {IAssetId|null|undefined} assetId
      * @memberof Amount
      * @instance
      */
-    Amount.prototype.wavesAmount = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
-
-    /**
-     * Amount assetAmount.
-     * @member {IAssetAmount|null|undefined} assetAmount
-     * @memberof Amount
-     * @instance
-     */
-    Amount.prototype.assetAmount = null;
-
-    // OneOf field names bound to virtual getters and setters
-    var $oneOfFields;
+    Amount.prototype.assetId = null;
 
     /**
      * Amount amount.
-     * @member {"wavesAmount"|"assetAmount"|undefined} amount
+     * @member {Long} amount
      * @memberof Amount
      * @instance
      */
-    Object.defineProperty(Amount.prototype, "amount", {
-        get: $util.oneOfGetter($oneOfFields = ["wavesAmount", "assetAmount"]),
-        set: $util.oneOfSetter($oneOfFields)
-    });
+    Amount.prototype.amount = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
 
     /**
      * Creates a new Amount instance using the specified properties.
@@ -1555,10 +1783,10 @@ $root.Amount = (function() {
     Amount.encode = function encode(message, writer) {
         if (!writer)
             writer = $Writer.create();
-        if (message.wavesAmount != null && message.hasOwnProperty("wavesAmount"))
-            writer.uint32(/* id 1, wireType 0 =*/8).int64(message.wavesAmount);
-        if (message.assetAmount != null && message.hasOwnProperty("assetAmount"))
-            $root.AssetAmount.encode(message.assetAmount, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+        if (message.assetId != null && message.hasOwnProperty("assetId"))
+            $root.AssetId.encode(message.assetId, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+        if (message.amount != null && message.hasOwnProperty("amount"))
+            writer.uint32(/* id 2, wireType 0 =*/16).int64(message.amount);
         return writer;
     };
 
@@ -1594,10 +1822,10 @@ $root.Amount = (function() {
             var tag = reader.uint32();
             switch (tag >>> 3) {
             case 1:
-                message.wavesAmount = reader.int64();
+                message.assetId = $root.AssetId.decode(reader, reader.uint32());
                 break;
             case 2:
-                message.assetAmount = $root.AssetAmount.decode(reader, reader.uint32());
+                message.amount = reader.int64();
                 break;
             default:
                 reader.skipType(tag & 7);
@@ -1634,22 +1862,14 @@ $root.Amount = (function() {
     Amount.verify = function verify(message) {
         if (typeof message !== "object" || message === null)
             return "object expected";
-        var properties = {};
-        if (message.wavesAmount != null && message.hasOwnProperty("wavesAmount")) {
-            properties.amount = 1;
-            if (!$util.isInteger(message.wavesAmount) && !(message.wavesAmount && $util.isInteger(message.wavesAmount.low) && $util.isInteger(message.wavesAmount.high)))
-                return "wavesAmount: integer|Long expected";
+        if (message.assetId != null && message.hasOwnProperty("assetId")) {
+            var error = $root.AssetId.verify(message.assetId);
+            if (error)
+                return "assetId." + error;
         }
-        if (message.assetAmount != null && message.hasOwnProperty("assetAmount")) {
-            if (properties.amount === 1)
-                return "amount: multiple values";
-            properties.amount = 1;
-            {
-                var error = $root.AssetAmount.verify(message.assetAmount);
-                if (error)
-                    return "assetAmount." + error;
-            }
-        }
+        if (message.amount != null && message.hasOwnProperty("amount"))
+            if (!$util.isInteger(message.amount) && !(message.amount && $util.isInteger(message.amount.low) && $util.isInteger(message.amount.high)))
+                return "amount: integer|Long expected";
         return null;
     };
 
@@ -1665,20 +1885,20 @@ $root.Amount = (function() {
         if (object instanceof $root.Amount)
             return object;
         var message = new $root.Amount();
-        if (object.wavesAmount != null)
-            if ($util.Long)
-                (message.wavesAmount = $util.Long.fromValue(object.wavesAmount)).unsigned = false;
-            else if (typeof object.wavesAmount === "string")
-                message.wavesAmount = parseInt(object.wavesAmount, 10);
-            else if (typeof object.wavesAmount === "number")
-                message.wavesAmount = object.wavesAmount;
-            else if (typeof object.wavesAmount === "object")
-                message.wavesAmount = new $util.LongBits(object.wavesAmount.low >>> 0, object.wavesAmount.high >>> 0).toNumber();
-        if (object.assetAmount != null) {
-            if (typeof object.assetAmount !== "object")
-                throw TypeError(".Amount.assetAmount: object expected");
-            message.assetAmount = $root.AssetAmount.fromObject(object.assetAmount);
+        if (object.assetId != null) {
+            if (typeof object.assetId !== "object")
+                throw TypeError(".Amount.assetId: object expected");
+            message.assetId = $root.AssetId.fromObject(object.assetId);
         }
+        if (object.amount != null)
+            if ($util.Long)
+                (message.amount = $util.Long.fromValue(object.amount)).unsigned = false;
+            else if (typeof object.amount === "string")
+                message.amount = parseInt(object.amount, 10);
+            else if (typeof object.amount === "number")
+                message.amount = object.amount;
+            else if (typeof object.amount === "object")
+                message.amount = new $util.LongBits(object.amount.low >>> 0, object.amount.high >>> 0).toNumber();
         return message;
     };
 
@@ -1695,19 +1915,21 @@ $root.Amount = (function() {
         if (!options)
             options = {};
         var object = {};
-        if (message.wavesAmount != null && message.hasOwnProperty("wavesAmount")) {
-            if (typeof message.wavesAmount === "number")
-                object.wavesAmount = options.longs === String ? String(message.wavesAmount) : message.wavesAmount;
+        if (options.defaults) {
+            object.assetId = null;
+            if ($util.Long) {
+                var long = new $util.Long(0, 0, false);
+                object.amount = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+            } else
+                object.amount = options.longs === String ? "0" : 0;
+        }
+        if (message.assetId != null && message.hasOwnProperty("assetId"))
+            object.assetId = $root.AssetId.toObject(message.assetId, options);
+        if (message.amount != null && message.hasOwnProperty("amount"))
+            if (typeof message.amount === "number")
+                object.amount = options.longs === String ? String(message.amount) : message.amount;
             else
-                object.wavesAmount = options.longs === String ? $util.Long.prototype.toString.call(message.wavesAmount) : options.longs === Number ? new $util.LongBits(message.wavesAmount.low >>> 0, message.wavesAmount.high >>> 0).toNumber() : message.wavesAmount;
-            if (options.oneofs)
-                object.amount = "wavesAmount";
-        }
-        if (message.assetAmount != null && message.hasOwnProperty("assetAmount")) {
-            object.assetAmount = $root.AssetAmount.toObject(message.assetAmount, options);
-            if (options.oneofs)
-                object.amount = "assetAmount";
-        }
+                object.amount = options.longs === String ? $util.Long.prototype.toString.call(message.amount) : options.longs === Number ? new $util.LongBits(message.amount.low >>> 0, message.amount.high >>> 0).toNumber() : message.amount;
         return object;
     };
 
@@ -1985,6 +2207,7 @@ $root.Transaction = (function() {
      * @property {ISetScriptTransactionData|null} [setScript] Transaction setScript
      * @property {ISponsorFeeTransactionData|null} [sponsorFee] Transaction sponsorFee
      * @property {ISetAssetScriptTransactionData|null} [setAssetScript] Transaction setAssetScript
+     * @property {IInvokeScriptTransactionData|null} [invokeScript] Transaction invokeScript
      */
 
     /**
@@ -2162,17 +2385,25 @@ $root.Transaction = (function() {
      */
     Transaction.prototype.setAssetScript = null;
 
+    /**
+     * Transaction invokeScript.
+     * @member {IInvokeScriptTransactionData|null|undefined} invokeScript
+     * @memberof Transaction
+     * @instance
+     */
+    Transaction.prototype.invokeScript = null;
+
     // OneOf field names bound to virtual getters and setters
     var $oneOfFields;
 
     /**
      * Transaction data.
-     * @member {"genesis"|"payment"|"issue"|"transfer"|"reissue"|"burn"|"exchange"|"lease"|"leaseCancel"|"createAlias"|"massTransfer"|"dataTransaction"|"setScript"|"sponsorFee"|"setAssetScript"|undefined} data
+     * @member {"genesis"|"payment"|"issue"|"transfer"|"reissue"|"burn"|"exchange"|"lease"|"leaseCancel"|"createAlias"|"massTransfer"|"dataTransaction"|"setScript"|"sponsorFee"|"setAssetScript"|"invokeScript"|undefined} data
      * @memberof Transaction
      * @instance
      */
     Object.defineProperty(Transaction.prototype, "data", {
-        get: $util.oneOfGetter($oneOfFields = ["genesis", "payment", "issue", "transfer", "reissue", "burn", "exchange", "lease", "leaseCancel", "createAlias", "massTransfer", "dataTransaction", "setScript", "sponsorFee", "setAssetScript"]),
+        get: $util.oneOfGetter($oneOfFields = ["genesis", "payment", "issue", "transfer", "reissue", "burn", "exchange", "lease", "leaseCancel", "createAlias", "massTransfer", "dataTransaction", "setScript", "sponsorFee", "setAssetScript", "invokeScript"]),
         set: $util.oneOfSetter($oneOfFields)
     });
 
@@ -2240,6 +2471,8 @@ $root.Transaction = (function() {
             $root.SponsorFeeTransactionData.encode(message.sponsorFee, writer.uint32(/* id 114, wireType 2 =*/914).fork()).ldelim();
         if (message.setAssetScript != null && message.hasOwnProperty("setAssetScript"))
             $root.SetAssetScriptTransactionData.encode(message.setAssetScript, writer.uint32(/* id 115, wireType 2 =*/922).fork()).ldelim();
+        if (message.invokeScript != null && message.hasOwnProperty("invokeScript"))
+            $root.InvokeScriptTransactionData.encode(message.invokeScript, writer.uint32(/* id 116, wireType 2 =*/930).fork()).ldelim();
         return writer;
     };
 
@@ -2333,6 +2566,9 @@ $root.Transaction = (function() {
                 break;
             case 115:
                 message.setAssetScript = $root.SetAssetScriptTransactionData.decode(reader, reader.uint32());
+                break;
+            case 116:
+                message.invokeScript = $root.InvokeScriptTransactionData.decode(reader, reader.uint32());
                 break;
             default:
                 reader.skipType(tag & 7);
@@ -2535,6 +2771,16 @@ $root.Transaction = (function() {
                     return "setAssetScript." + error;
             }
         }
+        if (message.invokeScript != null && message.hasOwnProperty("invokeScript")) {
+            if (properties.data === 1)
+                return "data: multiple values";
+            properties.data = 1;
+            {
+                var error = $root.InvokeScriptTransactionData.verify(message.invokeScript);
+                if (error)
+                    return "invokeScript." + error;
+            }
+        }
         return null;
     };
 
@@ -2647,6 +2893,11 @@ $root.Transaction = (function() {
             if (typeof object.setAssetScript !== "object")
                 throw TypeError(".Transaction.setAssetScript: object expected");
             message.setAssetScript = $root.SetAssetScriptTransactionData.fromObject(object.setAssetScript);
+        }
+        if (object.invokeScript != null) {
+            if (typeof object.invokeScript !== "object")
+                throw TypeError(".Transaction.invokeScript: object expected");
+            message.invokeScript = $root.InvokeScriptTransactionData.fromObject(object.invokeScript);
         }
         return message;
     };
@@ -2768,6 +3019,11 @@ $root.Transaction = (function() {
             object.setAssetScript = $root.SetAssetScriptTransactionData.toObject(message.setAssetScript, options);
             if (options.oneofs)
                 object.data = "setAssetScript";
+        }
+        if (message.invokeScript != null && message.hasOwnProperty("invokeScript")) {
+            object.invokeScript = $root.InvokeScriptTransactionData.toObject(message.invokeScript, options);
+            if (options.oneofs)
+                object.data = "invokeScript";
         }
         return object;
     };
@@ -4229,7 +4485,7 @@ $root.MassTransferTransactionData = (function() {
      * Properties of a MassTransferTransactionData.
      * @exports IMassTransferTransactionData
      * @interface IMassTransferTransactionData
-     * @property {Uint8Array|null} [assetId] MassTransferTransactionData assetId
+     * @property {IAssetId|null} [assetId] MassTransferTransactionData assetId
      * @property {Array.<MassTransferTransactionData.ITransfer>|null} [transfers] MassTransferTransactionData transfers
      * @property {Uint8Array|null} [attachment] MassTransferTransactionData attachment
      */
@@ -4252,11 +4508,11 @@ $root.MassTransferTransactionData = (function() {
 
     /**
      * MassTransferTransactionData assetId.
-     * @member {Uint8Array} assetId
+     * @member {IAssetId|null|undefined} assetId
      * @memberof MassTransferTransactionData
      * @instance
      */
-    MassTransferTransactionData.prototype.assetId = $util.newBuffer([]);
+    MassTransferTransactionData.prototype.assetId = null;
 
     /**
      * MassTransferTransactionData transfers.
@@ -4299,7 +4555,7 @@ $root.MassTransferTransactionData = (function() {
         if (!writer)
             writer = $Writer.create();
         if (message.assetId != null && message.hasOwnProperty("assetId"))
-            writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.assetId);
+            $root.AssetId.encode(message.assetId, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
         if (message.transfers != null && message.transfers.length)
             for (var i = 0; i < message.transfers.length; ++i)
                 $root.MassTransferTransactionData.Transfer.encode(message.transfers[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
@@ -4340,7 +4596,7 @@ $root.MassTransferTransactionData = (function() {
             var tag = reader.uint32();
             switch (tag >>> 3) {
             case 1:
-                message.assetId = reader.bytes();
+                message.assetId = $root.AssetId.decode(reader, reader.uint32());
                 break;
             case 2:
                 if (!(message.transfers && message.transfers.length))
@@ -4385,9 +4641,11 @@ $root.MassTransferTransactionData = (function() {
     MassTransferTransactionData.verify = function verify(message) {
         if (typeof message !== "object" || message === null)
             return "object expected";
-        if (message.assetId != null && message.hasOwnProperty("assetId"))
-            if (!(message.assetId && typeof message.assetId.length === "number" || $util.isString(message.assetId)))
-                return "assetId: buffer expected";
+        if (message.assetId != null && message.hasOwnProperty("assetId")) {
+            var error = $root.AssetId.verify(message.assetId);
+            if (error)
+                return "assetId." + error;
+        }
         if (message.transfers != null && message.hasOwnProperty("transfers")) {
             if (!Array.isArray(message.transfers))
                 return "transfers: array expected";
@@ -4415,11 +4673,11 @@ $root.MassTransferTransactionData = (function() {
         if (object instanceof $root.MassTransferTransactionData)
             return object;
         var message = new $root.MassTransferTransactionData();
-        if (object.assetId != null)
-            if (typeof object.assetId === "string")
-                $util.base64.decode(object.assetId, message.assetId = $util.newBuffer($util.base64.length(object.assetId)), 0);
-            else if (object.assetId.length)
-                message.assetId = object.assetId;
+        if (object.assetId != null) {
+            if (typeof object.assetId !== "object")
+                throw TypeError(".MassTransferTransactionData.assetId: object expected");
+            message.assetId = $root.AssetId.fromObject(object.assetId);
+        }
         if (object.transfers) {
             if (!Array.isArray(object.transfers))
                 throw TypeError(".MassTransferTransactionData.transfers: array expected");
@@ -4454,13 +4712,7 @@ $root.MassTransferTransactionData = (function() {
         if (options.arrays || options.defaults)
             object.transfers = [];
         if (options.defaults) {
-            if (options.bytes === String)
-                object.assetId = "";
-            else {
-                object.assetId = [];
-                if (options.bytes !== Array)
-                    object.assetId = $util.newBuffer(object.assetId);
-            }
+            object.assetId = null;
             if (options.bytes === String)
                 object.attachment = "";
             else {
@@ -4470,7 +4722,7 @@ $root.MassTransferTransactionData = (function() {
             }
         }
         if (message.assetId != null && message.hasOwnProperty("assetId"))
-            object.assetId = options.bytes === String ? $util.base64.encode(message.assetId, 0, message.assetId.length) : options.bytes === Array ? Array.prototype.slice.call(message.assetId) : message.assetId;
+            object.assetId = $root.AssetId.toObject(message.assetId, options);
         if (message.transfers && message.transfers.length) {
             object.transfers = [];
             for (var j = 0; j < message.transfers.length; ++j)
@@ -6313,12 +6565,12 @@ $root.ExchangeTransactionData = (function() {
      * Properties of an ExchangeTransactionData.
      * @exports IExchangeTransactionData
      * @interface IExchangeTransactionData
-     * @property {ExchangeTransactionData.IBuySellOrders|null} [buySellOrders] ExchangeTransactionData buySellOrders
-     * @property {ExchangeTransactionData.IMakerTakerOrders|null} [makerTakerOrders] ExchangeTransactionData makerTakerOrders
      * @property {Long|null} [amount] ExchangeTransactionData amount
      * @property {Long|null} [price] ExchangeTransactionData price
      * @property {Long|null} [buyMatcherFee] ExchangeTransactionData buyMatcherFee
      * @property {Long|null} [sellMatcherFee] ExchangeTransactionData sellMatcherFee
+     * @property {Array.<ExchangeTransactionData.IOrder>|null} [orders] ExchangeTransactionData orders
+     * @property {number|null} [taker] ExchangeTransactionData taker
      */
 
     /**
@@ -6330,27 +6582,12 @@ $root.ExchangeTransactionData = (function() {
      * @param {IExchangeTransactionData=} [properties] Properties to set
      */
     function ExchangeTransactionData(properties) {
+        this.orders = [];
         if (properties)
             for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                 if (properties[keys[i]] != null)
                     this[keys[i]] = properties[keys[i]];
     }
-
-    /**
-     * ExchangeTransactionData buySellOrders.
-     * @member {ExchangeTransactionData.IBuySellOrders|null|undefined} buySellOrders
-     * @memberof ExchangeTransactionData
-     * @instance
-     */
-    ExchangeTransactionData.prototype.buySellOrders = null;
-
-    /**
-     * ExchangeTransactionData makerTakerOrders.
-     * @member {ExchangeTransactionData.IMakerTakerOrders|null|undefined} makerTakerOrders
-     * @memberof ExchangeTransactionData
-     * @instance
-     */
-    ExchangeTransactionData.prototype.makerTakerOrders = null;
 
     /**
      * ExchangeTransactionData amount.
@@ -6384,19 +6621,21 @@ $root.ExchangeTransactionData = (function() {
      */
     ExchangeTransactionData.prototype.sellMatcherFee = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
 
-    // OneOf field names bound to virtual getters and setters
-    var $oneOfFields;
-
     /**
      * ExchangeTransactionData orders.
-     * @member {"buySellOrders"|"makerTakerOrders"|undefined} orders
+     * @member {Array.<ExchangeTransactionData.IOrder>} orders
      * @memberof ExchangeTransactionData
      * @instance
      */
-    Object.defineProperty(ExchangeTransactionData.prototype, "orders", {
-        get: $util.oneOfGetter($oneOfFields = ["buySellOrders", "makerTakerOrders"]),
-        set: $util.oneOfSetter($oneOfFields)
-    });
+    ExchangeTransactionData.prototype.orders = $util.emptyArray;
+
+    /**
+     * ExchangeTransactionData taker.
+     * @member {number} taker
+     * @memberof ExchangeTransactionData
+     * @instance
+     */
+    ExchangeTransactionData.prototype.taker = 0;
 
     /**
      * Creates a new ExchangeTransactionData instance using the specified properties.
@@ -6422,18 +6661,19 @@ $root.ExchangeTransactionData = (function() {
     ExchangeTransactionData.encode = function encode(message, writer) {
         if (!writer)
             writer = $Writer.create();
-        if (message.buySellOrders != null && message.hasOwnProperty("buySellOrders"))
-            $root.ExchangeTransactionData.BuySellOrders.encode(message.buySellOrders, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-        if (message.makerTakerOrders != null && message.hasOwnProperty("makerTakerOrders"))
-            $root.ExchangeTransactionData.MakerTakerOrders.encode(message.makerTakerOrders, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
         if (message.amount != null && message.hasOwnProperty("amount"))
-            writer.uint32(/* id 3, wireType 0 =*/24).int64(message.amount);
+            writer.uint32(/* id 1, wireType 0 =*/8).int64(message.amount);
         if (message.price != null && message.hasOwnProperty("price"))
-            writer.uint32(/* id 4, wireType 0 =*/32).int64(message.price);
+            writer.uint32(/* id 2, wireType 0 =*/16).int64(message.price);
         if (message.buyMatcherFee != null && message.hasOwnProperty("buyMatcherFee"))
-            writer.uint32(/* id 5, wireType 0 =*/40).int64(message.buyMatcherFee);
+            writer.uint32(/* id 3, wireType 0 =*/24).int64(message.buyMatcherFee);
         if (message.sellMatcherFee != null && message.hasOwnProperty("sellMatcherFee"))
-            writer.uint32(/* id 6, wireType 0 =*/48).int64(message.sellMatcherFee);
+            writer.uint32(/* id 4, wireType 0 =*/32).int64(message.sellMatcherFee);
+        if (message.orders != null && message.orders.length)
+            for (var i = 0; i < message.orders.length; ++i)
+                $root.ExchangeTransactionData.Order.encode(message.orders[i], writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+        if (message.taker != null && message.hasOwnProperty("taker"))
+            writer.uint32(/* id 6, wireType 0 =*/48).int32(message.taker);
         return writer;
     };
 
@@ -6469,22 +6709,24 @@ $root.ExchangeTransactionData = (function() {
             var tag = reader.uint32();
             switch (tag >>> 3) {
             case 1:
-                message.buySellOrders = $root.ExchangeTransactionData.BuySellOrders.decode(reader, reader.uint32());
-                break;
-            case 2:
-                message.makerTakerOrders = $root.ExchangeTransactionData.MakerTakerOrders.decode(reader, reader.uint32());
-                break;
-            case 3:
                 message.amount = reader.int64();
                 break;
-            case 4:
+            case 2:
                 message.price = reader.int64();
                 break;
-            case 5:
+            case 3:
                 message.buyMatcherFee = reader.int64();
                 break;
-            case 6:
+            case 4:
                 message.sellMatcherFee = reader.int64();
+                break;
+            case 5:
+                if (!(message.orders && message.orders.length))
+                    message.orders = [];
+                message.orders.push($root.ExchangeTransactionData.Order.decode(reader, reader.uint32()));
+                break;
+            case 6:
+                message.taker = reader.int32();
                 break;
             default:
                 reader.skipType(tag & 7);
@@ -6521,25 +6763,6 @@ $root.ExchangeTransactionData = (function() {
     ExchangeTransactionData.verify = function verify(message) {
         if (typeof message !== "object" || message === null)
             return "object expected";
-        var properties = {};
-        if (message.buySellOrders != null && message.hasOwnProperty("buySellOrders")) {
-            properties.orders = 1;
-            {
-                var error = $root.ExchangeTransactionData.BuySellOrders.verify(message.buySellOrders);
-                if (error)
-                    return "buySellOrders." + error;
-            }
-        }
-        if (message.makerTakerOrders != null && message.hasOwnProperty("makerTakerOrders")) {
-            if (properties.orders === 1)
-                return "orders: multiple values";
-            properties.orders = 1;
-            {
-                var error = $root.ExchangeTransactionData.MakerTakerOrders.verify(message.makerTakerOrders);
-                if (error)
-                    return "makerTakerOrders." + error;
-            }
-        }
         if (message.amount != null && message.hasOwnProperty("amount"))
             if (!$util.isInteger(message.amount) && !(message.amount && $util.isInteger(message.amount.low) && $util.isInteger(message.amount.high)))
                 return "amount: integer|Long expected";
@@ -6552,6 +6775,18 @@ $root.ExchangeTransactionData = (function() {
         if (message.sellMatcherFee != null && message.hasOwnProperty("sellMatcherFee"))
             if (!$util.isInteger(message.sellMatcherFee) && !(message.sellMatcherFee && $util.isInteger(message.sellMatcherFee.low) && $util.isInteger(message.sellMatcherFee.high)))
                 return "sellMatcherFee: integer|Long expected";
+        if (message.orders != null && message.hasOwnProperty("orders")) {
+            if (!Array.isArray(message.orders))
+                return "orders: array expected";
+            for (var i = 0; i < message.orders.length; ++i) {
+                var error = $root.ExchangeTransactionData.Order.verify(message.orders[i]);
+                if (error)
+                    return "orders." + error;
+            }
+        }
+        if (message.taker != null && message.hasOwnProperty("taker"))
+            if (!$util.isInteger(message.taker))
+                return "taker: integer expected";
         return null;
     };
 
@@ -6567,16 +6802,6 @@ $root.ExchangeTransactionData = (function() {
         if (object instanceof $root.ExchangeTransactionData)
             return object;
         var message = new $root.ExchangeTransactionData();
-        if (object.buySellOrders != null) {
-            if (typeof object.buySellOrders !== "object")
-                throw TypeError(".ExchangeTransactionData.buySellOrders: object expected");
-            message.buySellOrders = $root.ExchangeTransactionData.BuySellOrders.fromObject(object.buySellOrders);
-        }
-        if (object.makerTakerOrders != null) {
-            if (typeof object.makerTakerOrders !== "object")
-                throw TypeError(".ExchangeTransactionData.makerTakerOrders: object expected");
-            message.makerTakerOrders = $root.ExchangeTransactionData.MakerTakerOrders.fromObject(object.makerTakerOrders);
-        }
         if (object.amount != null)
             if ($util.Long)
                 (message.amount = $util.Long.fromValue(object.amount)).unsigned = false;
@@ -6613,6 +6838,18 @@ $root.ExchangeTransactionData = (function() {
                 message.sellMatcherFee = object.sellMatcherFee;
             else if (typeof object.sellMatcherFee === "object")
                 message.sellMatcherFee = new $util.LongBits(object.sellMatcherFee.low >>> 0, object.sellMatcherFee.high >>> 0).toNumber();
+        if (object.orders) {
+            if (!Array.isArray(object.orders))
+                throw TypeError(".ExchangeTransactionData.orders: array expected");
+            message.orders = [];
+            for (var i = 0; i < object.orders.length; ++i) {
+                if (typeof object.orders[i] !== "object")
+                    throw TypeError(".ExchangeTransactionData.orders: object expected");
+                message.orders[i] = $root.ExchangeTransactionData.Order.fromObject(object.orders[i]);
+            }
+        }
+        if (object.taker != null)
+            message.taker = object.taker | 0;
         return message;
     };
 
@@ -6629,6 +6866,8 @@ $root.ExchangeTransactionData = (function() {
         if (!options)
             options = {};
         var object = {};
+        if (options.arrays || options.defaults)
+            object.orders = [];
         if (options.defaults) {
             if ($util.Long) {
                 var long = new $util.Long(0, 0, false);
@@ -6650,16 +6889,7 @@ $root.ExchangeTransactionData = (function() {
                 object.sellMatcherFee = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
             } else
                 object.sellMatcherFee = options.longs === String ? "0" : 0;
-        }
-        if (message.buySellOrders != null && message.hasOwnProperty("buySellOrders")) {
-            object.buySellOrders = $root.ExchangeTransactionData.BuySellOrders.toObject(message.buySellOrders, options);
-            if (options.oneofs)
-                object.orders = "buySellOrders";
-        }
-        if (message.makerTakerOrders != null && message.hasOwnProperty("makerTakerOrders")) {
-            object.makerTakerOrders = $root.ExchangeTransactionData.MakerTakerOrders.toObject(message.makerTakerOrders, options);
-            if (options.oneofs)
-                object.orders = "makerTakerOrders";
+            object.taker = 0;
         }
         if (message.amount != null && message.hasOwnProperty("amount"))
             if (typeof message.amount === "number")
@@ -6681,6 +6911,13 @@ $root.ExchangeTransactionData = (function() {
                 object.sellMatcherFee = options.longs === String ? String(message.sellMatcherFee) : message.sellMatcherFee;
             else
                 object.sellMatcherFee = options.longs === String ? $util.Long.prototype.toString.call(message.sellMatcherFee) : options.longs === Number ? new $util.LongBits(message.sellMatcherFee.low >>> 0, message.sellMatcherFee.high >>> 0).toNumber() : message.sellMatcherFee;
+        if (message.orders && message.orders.length) {
+            object.orders = [];
+            for (var j = 0; j < message.orders.length; ++j)
+                object.orders[j] = $root.ExchangeTransactionData.Order.toObject(message.orders[j], options);
+        }
+        if (message.taker != null && message.hasOwnProperty("taker"))
+            object.taker = message.taker;
         return object;
     };
 
@@ -8119,6 +8356,754 @@ $root.SponsorFeeTransactionData = (function() {
     return SponsorFeeTransactionData;
 })();
 
+$root.InvokeScriptTransactionData = (function() {
+
+    /**
+     * Properties of an InvokeScriptTransactionData.
+     * @exports IInvokeScriptTransactionData
+     * @interface IInvokeScriptTransactionData
+     * @property {Uint8Array|null} [dappAddress] InvokeScriptTransactionData dappAddress
+     * @property {Uint8Array|null} [functionCall] InvokeScriptTransactionData functionCall
+     * @property {Array.<IAmount>|null} [payments] InvokeScriptTransactionData payments
+     */
+
+    /**
+     * Constructs a new InvokeScriptTransactionData.
+     * @exports InvokeScriptTransactionData
+     * @classdesc Represents an InvokeScriptTransactionData.
+     * @implements IInvokeScriptTransactionData
+     * @constructor
+     * @param {IInvokeScriptTransactionData=} [properties] Properties to set
+     */
+    function InvokeScriptTransactionData(properties) {
+        this.payments = [];
+        if (properties)
+            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                if (properties[keys[i]] != null)
+                    this[keys[i]] = properties[keys[i]];
+    }
+
+    /**
+     * InvokeScriptTransactionData dappAddress.
+     * @member {Uint8Array} dappAddress
+     * @memberof InvokeScriptTransactionData
+     * @instance
+     */
+    InvokeScriptTransactionData.prototype.dappAddress = $util.newBuffer([]);
+
+    /**
+     * InvokeScriptTransactionData functionCall.
+     * @member {Uint8Array} functionCall
+     * @memberof InvokeScriptTransactionData
+     * @instance
+     */
+    InvokeScriptTransactionData.prototype.functionCall = $util.newBuffer([]);
+
+    /**
+     * InvokeScriptTransactionData payments.
+     * @member {Array.<IAmount>} payments
+     * @memberof InvokeScriptTransactionData
+     * @instance
+     */
+    InvokeScriptTransactionData.prototype.payments = $util.emptyArray;
+
+    /**
+     * Creates a new InvokeScriptTransactionData instance using the specified properties.
+     * @function create
+     * @memberof InvokeScriptTransactionData
+     * @static
+     * @param {IInvokeScriptTransactionData=} [properties] Properties to set
+     * @returns {InvokeScriptTransactionData} InvokeScriptTransactionData instance
+     */
+    InvokeScriptTransactionData.create = function create(properties) {
+        return new InvokeScriptTransactionData(properties);
+    };
+
+    /**
+     * Encodes the specified InvokeScriptTransactionData message. Does not implicitly {@link InvokeScriptTransactionData.verify|verify} messages.
+     * @function encode
+     * @memberof InvokeScriptTransactionData
+     * @static
+     * @param {IInvokeScriptTransactionData} message InvokeScriptTransactionData message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    InvokeScriptTransactionData.encode = function encode(message, writer) {
+        if (!writer)
+            writer = $Writer.create();
+        if (message.dappAddress != null && message.hasOwnProperty("dappAddress"))
+            writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.dappAddress);
+        if (message.functionCall != null && message.hasOwnProperty("functionCall"))
+            writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.functionCall);
+        if (message.payments != null && message.payments.length)
+            for (var i = 0; i < message.payments.length; ++i)
+                $root.Amount.encode(message.payments[i], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+        return writer;
+    };
+
+    /**
+     * Encodes the specified InvokeScriptTransactionData message, length delimited. Does not implicitly {@link InvokeScriptTransactionData.verify|verify} messages.
+     * @function encodeDelimited
+     * @memberof InvokeScriptTransactionData
+     * @static
+     * @param {IInvokeScriptTransactionData} message InvokeScriptTransactionData message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    InvokeScriptTransactionData.encodeDelimited = function encodeDelimited(message, writer) {
+        return this.encode(message, writer).ldelim();
+    };
+
+    /**
+     * Decodes an InvokeScriptTransactionData message from the specified reader or buffer.
+     * @function decode
+     * @memberof InvokeScriptTransactionData
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @param {number} [length] Message length if known beforehand
+     * @returns {InvokeScriptTransactionData} InvokeScriptTransactionData
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    InvokeScriptTransactionData.decode = function decode(reader, length) {
+        if (!(reader instanceof $Reader))
+            reader = $Reader.create(reader);
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.InvokeScriptTransactionData();
+        while (reader.pos < end) {
+            var tag = reader.uint32();
+            switch (tag >>> 3) {
+            case 1:
+                message.dappAddress = reader.bytes();
+                break;
+            case 2:
+                message.functionCall = reader.bytes();
+                break;
+            case 3:
+                if (!(message.payments && message.payments.length))
+                    message.payments = [];
+                message.payments.push($root.Amount.decode(reader, reader.uint32()));
+                break;
+            default:
+                reader.skipType(tag & 7);
+                break;
+            }
+        }
+        return message;
+    };
+
+    /**
+     * Decodes an InvokeScriptTransactionData message from the specified reader or buffer, length delimited.
+     * @function decodeDelimited
+     * @memberof InvokeScriptTransactionData
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @returns {InvokeScriptTransactionData} InvokeScriptTransactionData
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    InvokeScriptTransactionData.decodeDelimited = function decodeDelimited(reader) {
+        if (!(reader instanceof $Reader))
+            reader = new $Reader(reader);
+        return this.decode(reader, reader.uint32());
+    };
+
+    /**
+     * Verifies an InvokeScriptTransactionData message.
+     * @function verify
+     * @memberof InvokeScriptTransactionData
+     * @static
+     * @param {Object.<string,*>} message Plain object to verify
+     * @returns {string|null} `null` if valid, otherwise the reason why it is not
+     */
+    InvokeScriptTransactionData.verify = function verify(message) {
+        if (typeof message !== "object" || message === null)
+            return "object expected";
+        if (message.dappAddress != null && message.hasOwnProperty("dappAddress"))
+            if (!(message.dappAddress && typeof message.dappAddress.length === "number" || $util.isString(message.dappAddress)))
+                return "dappAddress: buffer expected";
+        if (message.functionCall != null && message.hasOwnProperty("functionCall"))
+            if (!(message.functionCall && typeof message.functionCall.length === "number" || $util.isString(message.functionCall)))
+                return "functionCall: buffer expected";
+        if (message.payments != null && message.hasOwnProperty("payments")) {
+            if (!Array.isArray(message.payments))
+                return "payments: array expected";
+            for (var i = 0; i < message.payments.length; ++i) {
+                var error = $root.Amount.verify(message.payments[i]);
+                if (error)
+                    return "payments." + error;
+            }
+        }
+        return null;
+    };
+
+    /**
+     * Creates an InvokeScriptTransactionData message from a plain object. Also converts values to their respective internal types.
+     * @function fromObject
+     * @memberof InvokeScriptTransactionData
+     * @static
+     * @param {Object.<string,*>} object Plain object
+     * @returns {InvokeScriptTransactionData} InvokeScriptTransactionData
+     */
+    InvokeScriptTransactionData.fromObject = function fromObject(object) {
+        if (object instanceof $root.InvokeScriptTransactionData)
+            return object;
+        var message = new $root.InvokeScriptTransactionData();
+        if (object.dappAddress != null)
+            if (typeof object.dappAddress === "string")
+                $util.base64.decode(object.dappAddress, message.dappAddress = $util.newBuffer($util.base64.length(object.dappAddress)), 0);
+            else if (object.dappAddress.length)
+                message.dappAddress = object.dappAddress;
+        if (object.functionCall != null)
+            if (typeof object.functionCall === "string")
+                $util.base64.decode(object.functionCall, message.functionCall = $util.newBuffer($util.base64.length(object.functionCall)), 0);
+            else if (object.functionCall.length)
+                message.functionCall = object.functionCall;
+        if (object.payments) {
+            if (!Array.isArray(object.payments))
+                throw TypeError(".InvokeScriptTransactionData.payments: array expected");
+            message.payments = [];
+            for (var i = 0; i < object.payments.length; ++i) {
+                if (typeof object.payments[i] !== "object")
+                    throw TypeError(".InvokeScriptTransactionData.payments: object expected");
+                message.payments[i] = $root.Amount.fromObject(object.payments[i]);
+            }
+        }
+        return message;
+    };
+
+    /**
+     * Creates a plain object from an InvokeScriptTransactionData message. Also converts values to other types if specified.
+     * @function toObject
+     * @memberof InvokeScriptTransactionData
+     * @static
+     * @param {InvokeScriptTransactionData} message InvokeScriptTransactionData
+     * @param {$protobuf.IConversionOptions} [options] Conversion options
+     * @returns {Object.<string,*>} Plain object
+     */
+    InvokeScriptTransactionData.toObject = function toObject(message, options) {
+        if (!options)
+            options = {};
+        var object = {};
+        if (options.arrays || options.defaults)
+            object.payments = [];
+        if (options.defaults) {
+            if (options.bytes === String)
+                object.dappAddress = "";
+            else {
+                object.dappAddress = [];
+                if (options.bytes !== Array)
+                    object.dappAddress = $util.newBuffer(object.dappAddress);
+            }
+            if (options.bytes === String)
+                object.functionCall = "";
+            else {
+                object.functionCall = [];
+                if (options.bytes !== Array)
+                    object.functionCall = $util.newBuffer(object.functionCall);
+            }
+        }
+        if (message.dappAddress != null && message.hasOwnProperty("dappAddress"))
+            object.dappAddress = options.bytes === String ? $util.base64.encode(message.dappAddress, 0, message.dappAddress.length) : options.bytes === Array ? Array.prototype.slice.call(message.dappAddress) : message.dappAddress;
+        if (message.functionCall != null && message.hasOwnProperty("functionCall"))
+            object.functionCall = options.bytes === String ? $util.base64.encode(message.functionCall, 0, message.functionCall.length) : options.bytes === Array ? Array.prototype.slice.call(message.functionCall) : message.functionCall;
+        if (message.payments && message.payments.length) {
+            object.payments = [];
+            for (var j = 0; j < message.payments.length; ++j)
+                object.payments[j] = $root.Amount.toObject(message.payments[j], options);
+        }
+        return object;
+    };
+
+    /**
+     * Converts this InvokeScriptTransactionData to JSON.
+     * @function toJSON
+     * @memberof InvokeScriptTransactionData
+     * @instance
+     * @returns {Object.<string,*>} JSON object
+     */
+    InvokeScriptTransactionData.prototype.toJSON = function toJSON() {
+        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+    };
+
+    return InvokeScriptTransactionData;
+})();
+
+$root.InvokeScriptResult = (function() {
+
+    /**
+     * Properties of an InvokeScriptResult.
+     * @exports IInvokeScriptResult
+     * @interface IInvokeScriptResult
+     * @property {Array.<DataTransactionData.IDataEntry>|null} [data] InvokeScriptResult data
+     * @property {Array.<InvokeScriptResult.IPayment>|null} [transfers] InvokeScriptResult transfers
+     */
+
+    /**
+     * Constructs a new InvokeScriptResult.
+     * @exports InvokeScriptResult
+     * @classdesc Represents an InvokeScriptResult.
+     * @implements IInvokeScriptResult
+     * @constructor
+     * @param {IInvokeScriptResult=} [properties] Properties to set
+     */
+    function InvokeScriptResult(properties) {
+        this.data = [];
+        this.transfers = [];
+        if (properties)
+            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                if (properties[keys[i]] != null)
+                    this[keys[i]] = properties[keys[i]];
+    }
+
+    /**
+     * InvokeScriptResult data.
+     * @member {Array.<DataTransactionData.IDataEntry>} data
+     * @memberof InvokeScriptResult
+     * @instance
+     */
+    InvokeScriptResult.prototype.data = $util.emptyArray;
+
+    /**
+     * InvokeScriptResult transfers.
+     * @member {Array.<InvokeScriptResult.IPayment>} transfers
+     * @memberof InvokeScriptResult
+     * @instance
+     */
+    InvokeScriptResult.prototype.transfers = $util.emptyArray;
+
+    /**
+     * Creates a new InvokeScriptResult instance using the specified properties.
+     * @function create
+     * @memberof InvokeScriptResult
+     * @static
+     * @param {IInvokeScriptResult=} [properties] Properties to set
+     * @returns {InvokeScriptResult} InvokeScriptResult instance
+     */
+    InvokeScriptResult.create = function create(properties) {
+        return new InvokeScriptResult(properties);
+    };
+
+    /**
+     * Encodes the specified InvokeScriptResult message. Does not implicitly {@link InvokeScriptResult.verify|verify} messages.
+     * @function encode
+     * @memberof InvokeScriptResult
+     * @static
+     * @param {IInvokeScriptResult} message InvokeScriptResult message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    InvokeScriptResult.encode = function encode(message, writer) {
+        if (!writer)
+            writer = $Writer.create();
+        if (message.data != null && message.data.length)
+            for (var i = 0; i < message.data.length; ++i)
+                $root.DataTransactionData.DataEntry.encode(message.data[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+        if (message.transfers != null && message.transfers.length)
+            for (var i = 0; i < message.transfers.length; ++i)
+                $root.InvokeScriptResult.Payment.encode(message.transfers[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+        return writer;
+    };
+
+    /**
+     * Encodes the specified InvokeScriptResult message, length delimited. Does not implicitly {@link InvokeScriptResult.verify|verify} messages.
+     * @function encodeDelimited
+     * @memberof InvokeScriptResult
+     * @static
+     * @param {IInvokeScriptResult} message InvokeScriptResult message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    InvokeScriptResult.encodeDelimited = function encodeDelimited(message, writer) {
+        return this.encode(message, writer).ldelim();
+    };
+
+    /**
+     * Decodes an InvokeScriptResult message from the specified reader or buffer.
+     * @function decode
+     * @memberof InvokeScriptResult
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @param {number} [length] Message length if known beforehand
+     * @returns {InvokeScriptResult} InvokeScriptResult
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    InvokeScriptResult.decode = function decode(reader, length) {
+        if (!(reader instanceof $Reader))
+            reader = $Reader.create(reader);
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.InvokeScriptResult();
+        while (reader.pos < end) {
+            var tag = reader.uint32();
+            switch (tag >>> 3) {
+            case 1:
+                if (!(message.data && message.data.length))
+                    message.data = [];
+                message.data.push($root.DataTransactionData.DataEntry.decode(reader, reader.uint32()));
+                break;
+            case 2:
+                if (!(message.transfers && message.transfers.length))
+                    message.transfers = [];
+                message.transfers.push($root.InvokeScriptResult.Payment.decode(reader, reader.uint32()));
+                break;
+            default:
+                reader.skipType(tag & 7);
+                break;
+            }
+        }
+        return message;
+    };
+
+    /**
+     * Decodes an InvokeScriptResult message from the specified reader or buffer, length delimited.
+     * @function decodeDelimited
+     * @memberof InvokeScriptResult
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @returns {InvokeScriptResult} InvokeScriptResult
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    InvokeScriptResult.decodeDelimited = function decodeDelimited(reader) {
+        if (!(reader instanceof $Reader))
+            reader = new $Reader(reader);
+        return this.decode(reader, reader.uint32());
+    };
+
+    /**
+     * Verifies an InvokeScriptResult message.
+     * @function verify
+     * @memberof InvokeScriptResult
+     * @static
+     * @param {Object.<string,*>} message Plain object to verify
+     * @returns {string|null} `null` if valid, otherwise the reason why it is not
+     */
+    InvokeScriptResult.verify = function verify(message) {
+        if (typeof message !== "object" || message === null)
+            return "object expected";
+        if (message.data != null && message.hasOwnProperty("data")) {
+            if (!Array.isArray(message.data))
+                return "data: array expected";
+            for (var i = 0; i < message.data.length; ++i) {
+                var error = $root.DataTransactionData.DataEntry.verify(message.data[i]);
+                if (error)
+                    return "data." + error;
+            }
+        }
+        if (message.transfers != null && message.hasOwnProperty("transfers")) {
+            if (!Array.isArray(message.transfers))
+                return "transfers: array expected";
+            for (var i = 0; i < message.transfers.length; ++i) {
+                var error = $root.InvokeScriptResult.Payment.verify(message.transfers[i]);
+                if (error)
+                    return "transfers." + error;
+            }
+        }
+        return null;
+    };
+
+    /**
+     * Creates an InvokeScriptResult message from a plain object. Also converts values to their respective internal types.
+     * @function fromObject
+     * @memberof InvokeScriptResult
+     * @static
+     * @param {Object.<string,*>} object Plain object
+     * @returns {InvokeScriptResult} InvokeScriptResult
+     */
+    InvokeScriptResult.fromObject = function fromObject(object) {
+        if (object instanceof $root.InvokeScriptResult)
+            return object;
+        var message = new $root.InvokeScriptResult();
+        if (object.data) {
+            if (!Array.isArray(object.data))
+                throw TypeError(".InvokeScriptResult.data: array expected");
+            message.data = [];
+            for (var i = 0; i < object.data.length; ++i) {
+                if (typeof object.data[i] !== "object")
+                    throw TypeError(".InvokeScriptResult.data: object expected");
+                message.data[i] = $root.DataTransactionData.DataEntry.fromObject(object.data[i]);
+            }
+        }
+        if (object.transfers) {
+            if (!Array.isArray(object.transfers))
+                throw TypeError(".InvokeScriptResult.transfers: array expected");
+            message.transfers = [];
+            for (var i = 0; i < object.transfers.length; ++i) {
+                if (typeof object.transfers[i] !== "object")
+                    throw TypeError(".InvokeScriptResult.transfers: object expected");
+                message.transfers[i] = $root.InvokeScriptResult.Payment.fromObject(object.transfers[i]);
+            }
+        }
+        return message;
+    };
+
+    /**
+     * Creates a plain object from an InvokeScriptResult message. Also converts values to other types if specified.
+     * @function toObject
+     * @memberof InvokeScriptResult
+     * @static
+     * @param {InvokeScriptResult} message InvokeScriptResult
+     * @param {$protobuf.IConversionOptions} [options] Conversion options
+     * @returns {Object.<string,*>} Plain object
+     */
+    InvokeScriptResult.toObject = function toObject(message, options) {
+        if (!options)
+            options = {};
+        var object = {};
+        if (options.arrays || options.defaults) {
+            object.data = [];
+            object.transfers = [];
+        }
+        if (message.data && message.data.length) {
+            object.data = [];
+            for (var j = 0; j < message.data.length; ++j)
+                object.data[j] = $root.DataTransactionData.DataEntry.toObject(message.data[j], options);
+        }
+        if (message.transfers && message.transfers.length) {
+            object.transfers = [];
+            for (var j = 0; j < message.transfers.length; ++j)
+                object.transfers[j] = $root.InvokeScriptResult.Payment.toObject(message.transfers[j], options);
+        }
+        return object;
+    };
+
+    /**
+     * Converts this InvokeScriptResult to JSON.
+     * @function toJSON
+     * @memberof InvokeScriptResult
+     * @instance
+     * @returns {Object.<string,*>} JSON object
+     */
+    InvokeScriptResult.prototype.toJSON = function toJSON() {
+        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+    };
+
+    InvokeScriptResult.Payment = (function() {
+
+        /**
+         * Properties of a Payment.
+         * @memberof InvokeScriptResult
+         * @interface IPayment
+         * @property {Uint8Array|null} [address] Payment address
+         * @property {IAmount|null} [amount] Payment amount
+         */
+
+        /**
+         * Constructs a new Payment.
+         * @memberof InvokeScriptResult
+         * @classdesc Represents a Payment.
+         * @implements IPayment
+         * @constructor
+         * @param {InvokeScriptResult.IPayment=} [properties] Properties to set
+         */
+        function Payment(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Payment address.
+         * @member {Uint8Array} address
+         * @memberof InvokeScriptResult.Payment
+         * @instance
+         */
+        Payment.prototype.address = $util.newBuffer([]);
+
+        /**
+         * Payment amount.
+         * @member {IAmount|null|undefined} amount
+         * @memberof InvokeScriptResult.Payment
+         * @instance
+         */
+        Payment.prototype.amount = null;
+
+        /**
+         * Creates a new Payment instance using the specified properties.
+         * @function create
+         * @memberof InvokeScriptResult.Payment
+         * @static
+         * @param {InvokeScriptResult.IPayment=} [properties] Properties to set
+         * @returns {InvokeScriptResult.Payment} Payment instance
+         */
+        Payment.create = function create(properties) {
+            return new Payment(properties);
+        };
+
+        /**
+         * Encodes the specified Payment message. Does not implicitly {@link InvokeScriptResult.Payment.verify|verify} messages.
+         * @function encode
+         * @memberof InvokeScriptResult.Payment
+         * @static
+         * @param {InvokeScriptResult.IPayment} message Payment message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        Payment.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.address != null && message.hasOwnProperty("address"))
+                writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.address);
+            if (message.amount != null && message.hasOwnProperty("amount"))
+                $root.Amount.encode(message.amount, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified Payment message, length delimited. Does not implicitly {@link InvokeScriptResult.Payment.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof InvokeScriptResult.Payment
+         * @static
+         * @param {InvokeScriptResult.IPayment} message Payment message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        Payment.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a Payment message from the specified reader or buffer.
+         * @function decode
+         * @memberof InvokeScriptResult.Payment
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {InvokeScriptResult.Payment} Payment
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        Payment.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.InvokeScriptResult.Payment();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.address = reader.bytes();
+                    break;
+                case 2:
+                    message.amount = $root.Amount.decode(reader, reader.uint32());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a Payment message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof InvokeScriptResult.Payment
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {InvokeScriptResult.Payment} Payment
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        Payment.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a Payment message.
+         * @function verify
+         * @memberof InvokeScriptResult.Payment
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        Payment.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.address != null && message.hasOwnProperty("address"))
+                if (!(message.address && typeof message.address.length === "number" || $util.isString(message.address)))
+                    return "address: buffer expected";
+            if (message.amount != null && message.hasOwnProperty("amount")) {
+                var error = $root.Amount.verify(message.amount);
+                if (error)
+                    return "amount." + error;
+            }
+            return null;
+        };
+
+        /**
+         * Creates a Payment message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof InvokeScriptResult.Payment
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {InvokeScriptResult.Payment} Payment
+         */
+        Payment.fromObject = function fromObject(object) {
+            if (object instanceof $root.InvokeScriptResult.Payment)
+                return object;
+            var message = new $root.InvokeScriptResult.Payment();
+            if (object.address != null)
+                if (typeof object.address === "string")
+                    $util.base64.decode(object.address, message.address = $util.newBuffer($util.base64.length(object.address)), 0);
+                else if (object.address.length)
+                    message.address = object.address;
+            if (object.amount != null) {
+                if (typeof object.amount !== "object")
+                    throw TypeError(".InvokeScriptResult.Payment.amount: object expected");
+                message.amount = $root.Amount.fromObject(object.amount);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a Payment message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof InvokeScriptResult.Payment
+         * @static
+         * @param {InvokeScriptResult.Payment} message Payment
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        Payment.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                if (options.bytes === String)
+                    object.address = "";
+                else {
+                    object.address = [];
+                    if (options.bytes !== Array)
+                        object.address = $util.newBuffer(object.address);
+                }
+                object.amount = null;
+            }
+            if (message.address != null && message.hasOwnProperty("address"))
+                object.address = options.bytes === String ? $util.base64.encode(message.address, 0, message.address.length) : options.bytes === Array ? Array.prototype.slice.call(message.address) : message.address;
+            if (message.amount != null && message.hasOwnProperty("amount"))
+                object.amount = $root.Amount.toObject(message.amount, options);
+            return object;
+        };
+
+        /**
+         * Converts this Payment to JSON.
+         * @function toJSON
+         * @memberof InvokeScriptResult.Payment
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        Payment.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return Payment;
+    })();
+
+    return InvokeScriptResult;
+})();
+
 $root.Script = (function() {
 
     /**
@@ -8549,6 +9534,190 @@ $root.Recipient = (function() {
     };
 
     return Recipient;
+})();
+
+$root.google = (function() {
+
+    /**
+     * Namespace google.
+     * @exports google
+     * @namespace
+     */
+    var google = {};
+
+    google.protobuf = (function() {
+
+        /**
+         * Namespace protobuf.
+         * @memberof google
+         * @namespace
+         */
+        var protobuf = {};
+
+        protobuf.Empty = (function() {
+
+            /**
+             * Properties of an Empty.
+             * @memberof google.protobuf
+             * @interface IEmpty
+             */
+
+            /**
+             * Constructs a new Empty.
+             * @memberof google.protobuf
+             * @classdesc Represents an Empty.
+             * @implements IEmpty
+             * @constructor
+             * @param {google.protobuf.IEmpty=} [properties] Properties to set
+             */
+            function Empty(properties) {
+                if (properties)
+                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * Creates a new Empty instance using the specified properties.
+             * @function create
+             * @memberof google.protobuf.Empty
+             * @static
+             * @param {google.protobuf.IEmpty=} [properties] Properties to set
+             * @returns {google.protobuf.Empty} Empty instance
+             */
+            Empty.create = function create(properties) {
+                return new Empty(properties);
+            };
+
+            /**
+             * Encodes the specified Empty message. Does not implicitly {@link google.protobuf.Empty.verify|verify} messages.
+             * @function encode
+             * @memberof google.protobuf.Empty
+             * @static
+             * @param {google.protobuf.IEmpty} message Empty message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            Empty.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                return writer;
+            };
+
+            /**
+             * Encodes the specified Empty message, length delimited. Does not implicitly {@link google.protobuf.Empty.verify|verify} messages.
+             * @function encodeDelimited
+             * @memberof google.protobuf.Empty
+             * @static
+             * @param {google.protobuf.IEmpty} message Empty message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            Empty.encodeDelimited = function encodeDelimited(message, writer) {
+                return this.encode(message, writer).ldelim();
+            };
+
+            /**
+             * Decodes an Empty message from the specified reader or buffer.
+             * @function decode
+             * @memberof google.protobuf.Empty
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {google.protobuf.Empty} Empty
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            Empty.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.google.protobuf.Empty();
+                while (reader.pos < end) {
+                    var tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Decodes an Empty message from the specified reader or buffer, length delimited.
+             * @function decodeDelimited
+             * @memberof google.protobuf.Empty
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @returns {google.protobuf.Empty} Empty
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            Empty.decodeDelimited = function decodeDelimited(reader) {
+                if (!(reader instanceof $Reader))
+                    reader = new $Reader(reader);
+                return this.decode(reader, reader.uint32());
+            };
+
+            /**
+             * Verifies an Empty message.
+             * @function verify
+             * @memberof google.protobuf.Empty
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            Empty.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                return null;
+            };
+
+            /**
+             * Creates an Empty message from a plain object. Also converts values to their respective internal types.
+             * @function fromObject
+             * @memberof google.protobuf.Empty
+             * @static
+             * @param {Object.<string,*>} object Plain object
+             * @returns {google.protobuf.Empty} Empty
+             */
+            Empty.fromObject = function fromObject(object) {
+                if (object instanceof $root.google.protobuf.Empty)
+                    return object;
+                return new $root.google.protobuf.Empty();
+            };
+
+            /**
+             * Creates a plain object from an Empty message. Also converts values to other types if specified.
+             * @function toObject
+             * @memberof google.protobuf.Empty
+             * @static
+             * @param {google.protobuf.Empty} message Empty
+             * @param {$protobuf.IConversionOptions} [options] Conversion options
+             * @returns {Object.<string,*>} Plain object
+             */
+            Empty.toObject = function toObject() {
+                return {};
+            };
+
+            /**
+             * Converts this Empty to JSON.
+             * @function toJSON
+             * @memberof google.protobuf.Empty
+             * @instance
+             * @returns {Object.<string,*>} JSON object
+             */
+            Empty.prototype.toJSON = function toJSON() {
+                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+            };
+
+            return Empty;
+        })();
+
+        return protobuf;
+    })();
+
+    return google;
 })();
 
 module.exports = $root;

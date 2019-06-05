@@ -15,3 +15,5 @@ yarn-error.log
 prepros.cfg
 *.log
 logs/*
+
+protobuf_temp/

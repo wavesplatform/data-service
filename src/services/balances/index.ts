@@ -9,12 +9,13 @@ import { Balance } from '../../protobuf/balances';
 import { EmitEvent } from '../_common/createResolver/types';
 import { searchPreset } from '../presets/common/search';
 import { getBalances } from './data';
+export { getBalances };
 
 import { inputSearch, output } from './schema';
 import { transformResult } from './transformResult';
 import * as grpc from 'grpc';
 
-export { BalancesRequest } from './data';
+export { BalancesRequest } from './types';
 
 export default ({
   drivers,

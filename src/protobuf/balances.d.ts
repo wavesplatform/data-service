@@ -527,6 +527,105 @@ export namespace Balances {
     type ByTestCallback = (error: (Error|null), response?: Balance) => void;
 }
 
+/** Properties of an AssetId. */
+export interface IAssetId {
+
+    /** AssetId waves */
+    waves?: (google.protobuf.IEmpty|null);
+
+    /** AssetId issuedAsset */
+    issuedAsset?: (Uint8Array|null);
+}
+
+/** Represents an AssetId. */
+export class AssetId implements IAssetId {
+
+    /**
+     * Constructs a new AssetId.
+     * @param [properties] Properties to set
+     */
+    constructor(properties?: IAssetId);
+
+    /** AssetId waves. */
+    public waves?: (google.protobuf.IEmpty|null);
+
+    /** AssetId issuedAsset. */
+    public issuedAsset: Uint8Array;
+
+    /** AssetId asset. */
+    public asset?: ("waves"|"issuedAsset");
+
+    /**
+     * Creates a new AssetId instance using the specified properties.
+     * @param [properties] Properties to set
+     * @returns AssetId instance
+     */
+    public static create(properties?: IAssetId): AssetId;
+
+    /**
+     * Encodes the specified AssetId message. Does not implicitly {@link AssetId.verify|verify} messages.
+     * @param message AssetId message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encode(message: IAssetId, writer?: $protobuf.Writer): $protobuf.Writer;
+
+    /**
+     * Encodes the specified AssetId message, length delimited. Does not implicitly {@link AssetId.verify|verify} messages.
+     * @param message AssetId message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encodeDelimited(message: IAssetId, writer?: $protobuf.Writer): $protobuf.Writer;
+
+    /**
+     * Decodes an AssetId message from the specified reader or buffer.
+     * @param reader Reader or buffer to decode from
+     * @param [length] Message length if known beforehand
+     * @returns AssetId
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): AssetId;
+
+    /**
+     * Decodes an AssetId message from the specified reader or buffer, length delimited.
+     * @param reader Reader or buffer to decode from
+     * @returns AssetId
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): AssetId;
+
+    /**
+     * Verifies an AssetId message.
+     * @param message Plain object to verify
+     * @returns `null` if valid, otherwise the reason why it is not
+     */
+    public static verify(message: { [k: string]: any }): (string|null);
+
+    /**
+     * Creates an AssetId message from a plain object. Also converts values to their respective internal types.
+     * @param object Plain object
+     * @returns AssetId
+     */
+    public static fromObject(object: { [k: string]: any }): AssetId;
+
+    /**
+     * Creates a plain object from an AssetId message. Also converts values to other types if specified.
+     * @param message AssetId
+     * @param [options] Conversion options
+     * @returns Plain object
+     */
+    public static toObject(message: AssetId, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+    /**
+     * Converts this AssetId to JSON.
+     * @returns JSON object
+     */
+    public toJSON(): { [k: string]: any };
+}
+
 /** Properties of an AssetAmount. */
 export interface IAssetAmount {
 
@@ -626,11 +725,11 @@ export class AssetAmount implements IAssetAmount {
 /** Properties of an Amount. */
 export interface IAmount {
 
-    /** Amount wavesAmount */
-    wavesAmount?: (Long|null);
+    /** Amount assetId */
+    assetId?: (IAssetId|null);
 
-    /** Amount assetAmount */
-    assetAmount?: (IAssetAmount|null);
+    /** Amount amount */
+    amount?: (Long|null);
 }
 
 /** Represents an Amount. */
@@ -642,14 +741,11 @@ export class Amount implements IAmount {
      */
     constructor(properties?: IAmount);
 
-    /** Amount wavesAmount. */
-    public wavesAmount: Long;
-
-    /** Amount assetAmount. */
-    public assetAmount?: (IAssetAmount|null);
+    /** Amount assetId. */
+    public assetId?: (IAssetId|null);
 
     /** Amount amount. */
-    public amount?: ("wavesAmount"|"assetAmount");
+    public amount: Long;
 
     /**
      * Creates a new Amount instance using the specified properties.
@@ -880,6 +976,9 @@ export interface ITransaction {
 
     /** Transaction setAssetScript */
     setAssetScript?: (ISetAssetScriptTransactionData|null);
+
+    /** Transaction invokeScript */
+    invokeScript?: (IInvokeScriptTransactionData|null);
 }
 
 /** Represents a Transaction. */
@@ -951,8 +1050,11 @@ export class Transaction implements ITransaction {
     /** Transaction setAssetScript. */
     public setAssetScript?: (ISetAssetScriptTransactionData|null);
 
+    /** Transaction invokeScript. */
+    public invokeScript?: (IInvokeScriptTransactionData|null);
+
     /** Transaction data. */
-    public data?: ("genesis"|"payment"|"issue"|"transfer"|"reissue"|"burn"|"exchange"|"lease"|"leaseCancel"|"createAlias"|"massTransfer"|"dataTransaction"|"setScript"|"sponsorFee"|"setAssetScript");
+    public data?: ("genesis"|"payment"|"issue"|"transfer"|"reissue"|"burn"|"exchange"|"lease"|"leaseCancel"|"createAlias"|"massTransfer"|"dataTransaction"|"setScript"|"sponsorFee"|"setAssetScript"|"invokeScript");
 
     /**
      * Creates a new Transaction instance using the specified properties.
@@ -1623,7 +1725,7 @@ export namespace DataTransactionData {
 export interface IMassTransferTransactionData {
 
     /** MassTransferTransactionData assetId */
-    assetId?: (Uint8Array|null);
+    assetId?: (IAssetId|null);
 
     /** MassTransferTransactionData transfers */
     transfers?: (MassTransferTransactionData.ITransfer[]|null);
@@ -1642,7 +1744,7 @@ export class MassTransferTransactionData implements IMassTransferTransactionData
     constructor(properties?: IMassTransferTransactionData);
 
     /** MassTransferTransactionData assetId. */
-    public assetId: Uint8Array;
+    public assetId?: (IAssetId|null);
 
     /** MassTransferTransactionData transfers. */
     public transfers: MassTransferTransactionData.ITransfer[];
@@ -2501,12 +2603,6 @@ export class SetScriptTransactionData implements ISetScriptTransactionData {
 /** Properties of an ExchangeTransactionData. */
 export interface IExchangeTransactionData {
 
-    /** ExchangeTransactionData buySellOrders */
-    buySellOrders?: (ExchangeTransactionData.IBuySellOrders|null);
-
-    /** ExchangeTransactionData makerTakerOrders */
-    makerTakerOrders?: (ExchangeTransactionData.IMakerTakerOrders|null);
-
     /** ExchangeTransactionData amount */
     amount?: (Long|null);
 
@@ -2518,6 +2614,12 @@ export interface IExchangeTransactionData {
 
     /** ExchangeTransactionData sellMatcherFee */
     sellMatcherFee?: (Long|null);
+
+    /** ExchangeTransactionData orders */
+    orders?: (ExchangeTransactionData.IOrder[]|null);
+
+    /** ExchangeTransactionData taker */
+    taker?: (number|null);
 }
 
 /** Represents an ExchangeTransactionData. */
@@ -2528,12 +2630,6 @@ export class ExchangeTransactionData implements IExchangeTransactionData {
      * @param [properties] Properties to set
      */
     constructor(properties?: IExchangeTransactionData);
-
-    /** ExchangeTransactionData buySellOrders. */
-    public buySellOrders?: (ExchangeTransactionData.IBuySellOrders|null);
-
-    /** ExchangeTransactionData makerTakerOrders. */
-    public makerTakerOrders?: (ExchangeTransactionData.IMakerTakerOrders|null);
 
     /** ExchangeTransactionData amount. */
     public amount: Long;
@@ -2548,7 +2644,10 @@ export class ExchangeTransactionData implements IExchangeTransactionData {
     public sellMatcherFee: Long;
 
     /** ExchangeTransactionData orders. */
-    public orders?: ("buySellOrders"|"makerTakerOrders");
+    public orders: ExchangeTransactionData.IOrder[];
+
+    /** ExchangeTransactionData taker. */
+    public taker: number;
 
     /**
      * Creates a new ExchangeTransactionData instance using the specified properties.
@@ -3167,6 +3266,303 @@ export class SponsorFeeTransactionData implements ISponsorFeeTransactionData {
     public toJSON(): { [k: string]: any };
 }
 
+/** Properties of an InvokeScriptTransactionData. */
+export interface IInvokeScriptTransactionData {
+
+    /** InvokeScriptTransactionData dappAddress */
+    dappAddress?: (Uint8Array|null);
+
+    /** InvokeScriptTransactionData functionCall */
+    functionCall?: (Uint8Array|null);
+
+    /** InvokeScriptTransactionData payments */
+    payments?: (IAmount[]|null);
+}
+
+/** Represents an InvokeScriptTransactionData. */
+export class InvokeScriptTransactionData implements IInvokeScriptTransactionData {
+
+    /**
+     * Constructs a new InvokeScriptTransactionData.
+     * @param [properties] Properties to set
+     */
+    constructor(properties?: IInvokeScriptTransactionData);
+
+    /** InvokeScriptTransactionData dappAddress. */
+    public dappAddress: Uint8Array;
+
+    /** InvokeScriptTransactionData functionCall. */
+    public functionCall: Uint8Array;
+
+    /** InvokeScriptTransactionData payments. */
+    public payments: IAmount[];
+
+    /**
+     * Creates a new InvokeScriptTransactionData instance using the specified properties.
+     * @param [properties] Properties to set
+     * @returns InvokeScriptTransactionData instance
+     */
+    public static create(properties?: IInvokeScriptTransactionData): InvokeScriptTransactionData;
+
+    /**
+     * Encodes the specified InvokeScriptTransactionData message. Does not implicitly {@link InvokeScriptTransactionData.verify|verify} messages.
+     * @param message InvokeScriptTransactionData message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encode(message: IInvokeScriptTransactionData, writer?: $protobuf.Writer): $protobuf.Writer;
+
+    /**
+     * Encodes the specified InvokeScriptTransactionData message, length delimited. Does not implicitly {@link InvokeScriptTransactionData.verify|verify} messages.
+     * @param message InvokeScriptTransactionData message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encodeDelimited(message: IInvokeScriptTransactionData, writer?: $protobuf.Writer): $protobuf.Writer;
+
+    /**
+     * Decodes an InvokeScriptTransactionData message from the specified reader or buffer.
+     * @param reader Reader or buffer to decode from
+     * @param [length] Message length if known beforehand
+     * @returns InvokeScriptTransactionData
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): InvokeScriptTransactionData;
+
+    /**
+     * Decodes an InvokeScriptTransactionData message from the specified reader or buffer, length delimited.
+     * @param reader Reader or buffer to decode from
+     * @returns InvokeScriptTransactionData
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): InvokeScriptTransactionData;
+
+    /**
+     * Verifies an InvokeScriptTransactionData message.
+     * @param message Plain object to verify
+     * @returns `null` if valid, otherwise the reason why it is not
+     */
+    public static verify(message: { [k: string]: any }): (string|null);
+
+    /**
+     * Creates an InvokeScriptTransactionData message from a plain object. Also converts values to their respective internal types.
+     * @param object Plain object
+     * @returns InvokeScriptTransactionData
+     */
+    public static fromObject(object: { [k: string]: any }): InvokeScriptTransactionData;
+
+    /**
+     * Creates a plain object from an InvokeScriptTransactionData message. Also converts values to other types if specified.
+     * @param message InvokeScriptTransactionData
+     * @param [options] Conversion options
+     * @returns Plain object
+     */
+    public static toObject(message: InvokeScriptTransactionData, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+    /**
+     * Converts this InvokeScriptTransactionData to JSON.
+     * @returns JSON object
+     */
+    public toJSON(): { [k: string]: any };
+}
+
+/** Properties of an InvokeScriptResult. */
+export interface IInvokeScriptResult {
+
+    /** InvokeScriptResult data */
+    data?: (DataTransactionData.IDataEntry[]|null);
+
+    /** InvokeScriptResult transfers */
+    transfers?: (InvokeScriptResult.IPayment[]|null);
+}
+
+/** Represents an InvokeScriptResult. */
+export class InvokeScriptResult implements IInvokeScriptResult {
+
+    /**
+     * Constructs a new InvokeScriptResult.
+     * @param [properties] Properties to set
+     */
+    constructor(properties?: IInvokeScriptResult);
+
+    /** InvokeScriptResult data. */
+    public data: DataTransactionData.IDataEntry[];
+
+    /** InvokeScriptResult transfers. */
+    public transfers: InvokeScriptResult.IPayment[];
+
+    /**
+     * Creates a new InvokeScriptResult instance using the specified properties.
+     * @param [properties] Properties to set
+     * @returns InvokeScriptResult instance
+     */
+    public static create(properties?: IInvokeScriptResult): InvokeScriptResult;
+
+    /**
+     * Encodes the specified InvokeScriptResult message. Does not implicitly {@link InvokeScriptResult.verify|verify} messages.
+     * @param message InvokeScriptResult message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encode(message: IInvokeScriptResult, writer?: $protobuf.Writer): $protobuf.Writer;
+
+    /**
+     * Encodes the specified InvokeScriptResult message, length delimited. Does not implicitly {@link InvokeScriptResult.verify|verify} messages.
+     * @param message InvokeScriptResult message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encodeDelimited(message: IInvokeScriptResult, writer?: $protobuf.Writer): $protobuf.Writer;
+
+    /**
+     * Decodes an InvokeScriptResult message from the specified reader or buffer.
+     * @param reader Reader or buffer to decode from
+     * @param [length] Message length if known beforehand
+     * @returns InvokeScriptResult
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): InvokeScriptResult;
+
+    /**
+     * Decodes an InvokeScriptResult message from the specified reader or buffer, length delimited.
+     * @param reader Reader or buffer to decode from
+     * @returns InvokeScriptResult
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): InvokeScriptResult;
+
+    /**
+     * Verifies an InvokeScriptResult message.
+     * @param message Plain object to verify
+     * @returns `null` if valid, otherwise the reason why it is not
+     */
+    public static verify(message: { [k: string]: any }): (string|null);
+
+    /**
+     * Creates an InvokeScriptResult message from a plain object. Also converts values to their respective internal types.
+     * @param object Plain object
+     * @returns InvokeScriptResult
+     */
+    public static fromObject(object: { [k: string]: any }): InvokeScriptResult;
+
+    /**
+     * Creates a plain object from an InvokeScriptResult message. Also converts values to other types if specified.
+     * @param message InvokeScriptResult
+     * @param [options] Conversion options
+     * @returns Plain object
+     */
+    public static toObject(message: InvokeScriptResult, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+    /**
+     * Converts this InvokeScriptResult to JSON.
+     * @returns JSON object
+     */
+    public toJSON(): { [k: string]: any };
+}
+
+export namespace InvokeScriptResult {
+
+    /** Properties of a Payment. */
+    interface IPayment {
+
+        /** Payment address */
+        address?: (Uint8Array|null);
+
+        /** Payment amount */
+        amount?: (IAmount|null);
+    }
+
+    /** Represents a Payment. */
+    class Payment implements IPayment {
+
+        /**
+         * Constructs a new Payment.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: InvokeScriptResult.IPayment);
+
+        /** Payment address. */
+        public address: Uint8Array;
+
+        /** Payment amount. */
+        public amount?: (IAmount|null);
+
+        /**
+         * Creates a new Payment instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns Payment instance
+         */
+        public static create(properties?: InvokeScriptResult.IPayment): InvokeScriptResult.Payment;
+
+        /**
+         * Encodes the specified Payment message. Does not implicitly {@link InvokeScriptResult.Payment.verify|verify} messages.
+         * @param message Payment message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: InvokeScriptResult.IPayment, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified Payment message, length delimited. Does not implicitly {@link InvokeScriptResult.Payment.verify|verify} messages.
+         * @param message Payment message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: InvokeScriptResult.IPayment, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a Payment message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns Payment
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): InvokeScriptResult.Payment;
+
+        /**
+         * Decodes a Payment message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns Payment
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): InvokeScriptResult.Payment;
+
+        /**
+         * Verifies a Payment message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a Payment message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns Payment
+         */
+        public static fromObject(object: { [k: string]: any }): InvokeScriptResult.Payment;
+
+        /**
+         * Creates a plain object from a Payment message. Also converts values to other types if specified.
+         * @param message Payment
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: InvokeScriptResult.Payment, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this Payment to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+    }
+}
+
 /** Properties of a Script. */
 export interface IScript {
 
@@ -3354,4 +3750,96 @@ export class Recipient implements IRecipient {
      * @returns JSON object
      */
     public toJSON(): { [k: string]: any };
+}
+
+/** Namespace google. */
+export namespace google {
+
+    /** Namespace protobuf. */
+    namespace protobuf {
+
+        /** Properties of an Empty. */
+        interface IEmpty {
+        }
+
+        /** Represents an Empty. */
+        class Empty implements IEmpty {
+
+            /**
+             * Constructs a new Empty.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: google.protobuf.IEmpty);
+
+            /**
+             * Creates a new Empty instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Empty instance
+             */
+            public static create(properties?: google.protobuf.IEmpty): google.protobuf.Empty;
+
+            /**
+             * Encodes the specified Empty message. Does not implicitly {@link google.protobuf.Empty.verify|verify} messages.
+             * @param message Empty message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: google.protobuf.IEmpty, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified Empty message, length delimited. Does not implicitly {@link google.protobuf.Empty.verify|verify} messages.
+             * @param message Empty message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: google.protobuf.IEmpty, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an Empty message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Empty
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.protobuf.Empty;
+
+            /**
+             * Decodes an Empty message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns Empty
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): google.protobuf.Empty;
+
+            /**
+             * Verifies an Empty message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates an Empty message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns Empty
+             */
+            public static fromObject(object: { [k: string]: any }): google.protobuf.Empty;
+
+            /**
+             * Creates a plain object from an Empty message. Also converts values to other types if specified.
+             * @param message Empty
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: google.protobuf.Empty, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this Empty to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+        }
+    }
 }

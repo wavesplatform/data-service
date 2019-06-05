@@ -4,8 +4,8 @@ import { Task, waitAll } from 'folktale/concurrency/task';
 import { Maybe, of } from 'folktale/maybe';
 import { DbError } from '../../errorHandling';
 import { StateUpdate } from '../../types';
-import { getBalances, BalancesRequest } from '../balances/data';
-import { getDataEntries, DataEntriesRequest } from '../data-entries/data';
+import { getBalances, BalancesRequest } from '../balances';
+import { getDataEntries, DataEntriesRequest } from '../data-entries';
 import { Balance } from '../../protobuf/balances';
 import { DataEntryResponse } from '../../protobuf/data-entries';
 

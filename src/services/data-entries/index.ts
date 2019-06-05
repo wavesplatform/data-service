@@ -4,12 +4,13 @@ import { DataEntryResponse } from '../../protobuf/data-entries';
 import { EmitEvent } from '../_common/createResolver/types';
 import { searchPreset } from '../presets/common/search';
 import { getDataEntries } from './data';
+export { getDataEntries };
 
 import { inputSearch, output } from './schema';
 import { transformResult } from './transformResult';
 import * as grpc from 'grpc';
 
-export { DataEntriesRequest } from './data';
+export { DataEntriesRequest } from './types';
 
 export default ({
   drivers,
