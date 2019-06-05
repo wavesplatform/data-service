@@ -17,7 +17,7 @@ export const transformInput = <Request extends WithSortOrder>(
 ): RequestWithCursor<Request, Cursor> => {
   const requestWithoutAfter = compose(
     omit(['after']),
-    evolve({'limit': inc})
+    evolve({limit: inc})
   )(request) as Request;
 
   if (!request.after) {
