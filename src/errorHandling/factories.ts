@@ -1,5 +1,6 @@
 import {
   AppError,
+  ResolverError,
   DbError,
   ValidationError,
   ErrorType,
@@ -16,6 +17,12 @@ export const toAppError: CurriedFunction3<
   AppError[type](err, meta)
 );
 
+export const toResolverError: CurriedFunction2<
+  ErrorMetaInfo,
+  Error,
+  ResolverError
+> = toAppError('Resolver') as any;
+
 export const toDbError: CurriedFunction2<
   ErrorMetaInfo,
   Error,
@@ -26,4 +33,4 @@ export const toValidationError: CurriedFunction2<
   ErrorMetaInfo,
   Error,
   ValidationError
-> = toAppError('Db') as any;
+> = toAppError('Validation') as any;

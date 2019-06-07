@@ -3,12 +3,6 @@ const pg = knex({ client: 'pg' });
 
 const { serializeCandle, candlePresets } = require('./utils');
 
-const getNow = () =>
-  pg
-    .select()
-    .column(pg.raw('now()'))
-    .toString();
-
 /** makeCandleCalculateColumns :: Number -> Array */
 const makeCandleCalculateColumns = longerInterval => {
   return {
@@ -88,9 +82,13 @@ const selectExchanges = pg({ t: 'txs_7' }).column(
   `price`
 );
 
-/** selectExchangesAfterBlock :: Number -> QueryBuilder */
-const selectExchangesAfterBlock = startBlock =>
-  selectExchanges.clone().where('t.height', '>=', startBlock);
+/** selectExchangesAfterTimestamp :: Date -> QueryBuilder */
+const selectExchangesAfterTimestamp = fromTimestamp =>
+  selectExchanges
+    .clone()
+    .whereRaw(
+      `t.time_stamp >= date_trunc('minute', '${fromTimestamp.toISOString()}'::timestamp)`
+    );
 
 /** selectLastCandle :: String -> String query */
 const selectLastCandle = tableName =>
@@ -108,6 +106,13 @@ const selectLastExchangeTx = () =>
     .orderBy('height', 'desc')
     .toString();
 
+/** selectLastExchangeTx :: String query */
+const selectMinTimestampFromHeight = height =>
+  pg({ t: 'txs_7' })
+    .select({ time_stamp: pg.min('time_stamp') })
+    .where('height', '>=', height)
+    .toString();
+
 /** for make complex query with "on conflict (...) update ... without set concrete values" See insertOrUpdateCandles or insertOrUpdateCandlesFromShortInterval */
 const updatedFieldsExcluded = [
   'open',
@@ -119,7 +124,6 @@ const updatedFieldsExcluded = [
   'txs_count',
   'volume',
   'weighted_average_price',
-  'interval_in_secs',
 ]
   .map(field => field + '=EXCLUDED.' + field)
   .join(', ');
@@ -131,7 +135,7 @@ const insertOrUpdateCandles = (tableName, candles) => {
       .raw(
         `${pg({ t: tableName }).insert(
           candles.map(serializeCandle)
-        )} on conflict (time_start,amount_asset_id, price_asset_id, interval_in_secs) do update set ${updatedFieldsExcluded}`
+        )} on conflict (time_start, amount_asset_id, price_asset_id, interval_in_secs) do update set ${updatedFieldsExcluded}`
       )
       .toString();
   }
@@ -142,7 +146,7 @@ const insertOrUpdateCandles = (tableName, candles) => {
 /** insertOrUpdateCandlesFromShortInterval :: (String, Date, Number, Number) -> String query */
 const insertOrUpdateCandlesFromShortInterval = (
   tableName,
-  now,
+  fromTimestamp,
   shortInterval,
   longerInterval
 ) =>
@@ -153,10 +157,10 @@ const insertOrUpdateCandlesFromShortInterval = (
           .select(makeCandleCalculateColumns(longerInterval))
           .where('interval_in_secs', shortInterval)
           .whereRaw(
-            `time_start >= to_timestamp(floor((extract('epoch' from '${now.toISOString()}'::timestamp) / ${longerInterval} )) * ${longerInterval})`
+            `time_start >= to_timestamp(floor(extract('epoch' from '${fromTimestamp.toISOString()}'::timestamp) / ${longerInterval}) * ${longerInterval})`
           )
           .groupBy('candle_time', 'amount_asset_id', 'price_asset_id');
-      })} on conflict (time_start,amount_asset_id, price_asset_id, interval_in_secs) do update set ${updatedFieldsExcluded}`
+      })} on conflict (time_start, amount_asset_id, price_asset_id, interval_in_secs) do update set ${updatedFieldsExcluded}`
     )
     .toString();
 
@@ -169,9 +173,7 @@ const truncateTable = tableName =>
 /** insertAllMinuteCandles :: String -> String query */
 const insertAllMinuteCandles = tableName =>
   insertIntoCandlesFromSelect(tableName, function() {
-    this.from({ t: 'txs_7' })
-      .columns(candleSelectColumns)
-      .select()
+    this.select(candleSelectColumns)
       .from(selectExchanges.clone().as('e'))
       .innerJoin(
         { a_dec: 'asset_decimals' },
@@ -179,8 +181,7 @@ const insertAllMinuteCandles = tableName =>
         'a_dec.asset_id'
       )
       .innerJoin({ p_dec: 'asset_decimals' }, 'e.price_asset', 'p_dec.asset_id')
-      .groupByRaw('e.amount_asset, e.price_asset, e.candle_time')
-      .toString();
+      .groupByRaw('e.candle_time, e.amount_asset, e.price_asset');
   }).toString();
 
 /** insertAllCandles :: (String, Number, Number, Number) -> String query */
@@ -188,28 +189,25 @@ const insertAllCandles = (tableName, shortInterval, longerInterval) =>
   insertIntoCandlesFromSelect(tableName, function() {
     this.from({ t: tableName })
       .column(makeCandleCalculateColumns(longerInterval))
-      .select()
       .where('t.interval_in_secs', shortInterval)
       .groupBy(['candle_time', 'amount_asset_id', 'price_asset_id']);
   }).toString();
 
-/** selectCandlesByMinute :: Number -> String query */
-const selectCandlesByMinute = startHeight =>
-  pg({ t: 'txs_7' })
+/** selectCandlesByMinute :: Date -> String query */
+const selectCandlesByMinute = fromTimetamp =>
+  pg
     .columns(candleSelectColumns)
-    .select()
     .from(
-      selectExchangesAfterBlock(startHeight)
+      selectExchangesAfterTimestamp(fromTimetamp)
         .clone()
         .as('e')
     )
     .innerJoin({ a_dec: 'asset_decimals' }, 'e.amount_asset', 'a_dec.asset_id')
     .innerJoin({ p_dec: 'asset_decimals' }, 'e.price_asset', 'p_dec.asset_id')
-    .groupBy(['e.amount_asset', 'e.price_asset', 'e.candle_time'])
+    .groupBy(['e.candle_time', 'e.amount_asset', 'e.price_asset'])
     .toString();
 
 module.exports = {
-  getNow,
   truncateTable,
   insertAllMinuteCandles,
   insertAllCandles,
@@ -218,4 +216,5 @@ module.exports = {
   selectLastCandle,
   selectLastExchangeTx,
   insertOrUpdateCandlesFromShortInterval,
+  selectMinTimestampFromHeight,
 };

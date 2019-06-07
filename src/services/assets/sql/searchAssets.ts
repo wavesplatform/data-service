@@ -94,7 +94,8 @@ export const searchAssets = (query: string): knex.QueryBuilder =>
             .unionAll(qb => searchByTicker(qb, query))
             .unionAll(qb => searchByName(qb, query)),
         })
-        .orderBy('r.asset_id');
+        .orderBy('r.asset_id')
+        .orderBy('r.rank', 'desc');
     })
     .from('assets_cte')
     .select(columns.map(col => 'a.' + col))

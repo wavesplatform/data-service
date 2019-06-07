@@ -5,7 +5,6 @@ const { fromNullable } = require('folktale/maybe');
 const logTaskProgress = require('../utils/logTaskProgress');
 
 const {
-  getNow,
   truncateTable,
   insertAllMinuteCandles,
   insertAllCandles,
@@ -14,6 +13,7 @@ const {
   selectLastCandle,
   selectLastExchangeTx,
   insertOrUpdateCandlesFromShortInterval,
+  selectMinTimestampFromHeight,
 } = require('./sql/query');
 
 /** for combining candles */
@@ -34,7 +34,7 @@ const getStartBlock = (exchangeTx, candle) => {
     if (candle.max_height > exchangeTx.height) {
       return exchangeTx.height - 2000; // handle rollback
     } else {
-      return Math.min(candle.max_height, exchangeTx.height) - 2;
+      return candle.max_height - 1;
     }
   }
 
@@ -61,9 +61,9 @@ const updateCandlesLoop = (logTask, pg, tableName) => {
     }),
   };
 
-  const pgPromiseUpdateCandles = (t, startBlockHeight) =>
+  const pgPromiseUpdateCandles = (t, fromTimetamp) =>
     t
-      .any(selectCandlesByMinute(startBlockHeight))
+      .any(selectCandlesByMinute(fromTimetamp))
       .then(candles => t.any(insertOrUpdateCandles(tableName, candles)));
 
   return logTask(
@@ -73,17 +73,21 @@ const updateCandlesLoop = (logTask, pg, tableName) => {
         .batch([
           t.any(selectLastExchangeTx()),
           t.any(selectLastCandle(tableName)),
-          t.one(getNow()),
         ])
-        .then(([lastTx, candle, { now }]) => {
+        .then(([lastTx, candle]) => {
           const startHeight = getStartBlock(head(lastTx), head(candle));
+          return t
+            .one(selectMinTimestampFromHeight(startHeight))
+            .then(row => row.time_stamp);
+        })
+        .then(timestamp => {
           const nextInterval = compose(
             m => m.getOrElse(undefined),
             map(interval =>
               t.any(
                 insertOrUpdateCandlesFromShortInterval(
                   tableName,
-                  now,
+                  timestamp,
                   interval[0],
                   interval[1]
                 )
@@ -93,7 +97,7 @@ const updateCandlesLoop = (logTask, pg, tableName) => {
             index => nth(index, intervalPairs)
           );
 
-          return pgPromiseUpdateCandles(t, startHeight).then(() =>
+          return pgPromiseUpdateCandles(t, timestamp).then(() =>
             t.sequence(nextInterval)
           );
         })
