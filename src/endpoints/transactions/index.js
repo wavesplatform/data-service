@@ -10,6 +10,7 @@ const {
   limit,
   ids,
   sort,
+  query,
 } = require('../_common/filters');
 
 // services
@@ -91,7 +92,8 @@ const transactionsEndpointsConfig = {
       matcher: identity,
       amountAsset: identity,
       priceAsset: identity,
-      orderId: identity,
+      sender: query,
+      orderId: query,
     }),
   },
   '/transactions/lease': {
