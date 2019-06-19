@@ -1,5 +1,5 @@
 import * as knex from 'knex';
-import { repeat, ifElse, pipe, always, identity } from 'ramda';
+import { repeat, pipe, always, identity } from 'ramda';
 import { Interval, Unit, interval } from '../../../types';
 import { add, trunc } from '../../../utils/date';
 import {
@@ -43,14 +43,10 @@ export interface CandleSelectionParams {
   timeEnd: Date;
   interval: string;
   matcher?: string;
-}
+};
 
-const whenDefined: <P, V>(optVal: P, fn: (val: V) => V) => ((val: V) => V) = (optVal, fn) =>
-  ifElse(
-    always(typeof optVal === 'undefined'),
-    identity,
-    fn
-  );
+const whenDefined: <P, V>(optVal: P | undefined, fn: (val: V) => V) => ((val: V) => V) =
+  (optVal, fn) => typeof optVal === 'undefined' ? identity : fn;
 
 export const selectCandles = ({
   amountAsset,
@@ -80,7 +76,7 @@ export const selectCandles = ({
           })
         )
     ),
-    whenDefined(matcher, q => q.where('matcher', matcher!))
+    whenDefined(matcher, q => q.clone().where('matcher', matcher!))
   )();
 
 export const periodsToQueries = ({

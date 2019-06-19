@@ -2,7 +2,7 @@ const { identity } = require('ramda');
 
 const { captureErrors } = require('../../utils/captureErrors');
 const { select } = require('../utils/selectors');
-const { parseFilterValues, timeStart, timeEnd, query: trimStr } = require('../_common/filters');
+const { parseFilterValues, timeStart, timeEnd, query: trimmedStringOrNull } = require('../_common/filters');
 const service = require('../../services/candles');
 
 const url = '/candles/:amountAsset/:priceAsset';
@@ -22,7 +22,7 @@ const candlesSearch = async ctx => {
     timeStart,
     timeEnd,
     interval: identity,
-    matcher: trimStr,
+    matcher: trimmedStringOrNull,
   })(query);
 
   // default
