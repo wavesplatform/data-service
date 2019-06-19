@@ -169,8 +169,7 @@ const output = Joi.object().keys({
     .base58()
     .required(),
   matcher: Joi.string()
-    .base58()
-    .required(),    
+    .base58(),
   max_height: Joi.number()
     .integer()
     .required(),

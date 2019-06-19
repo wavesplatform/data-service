@@ -1,5 +1,5 @@
 import * as knex from 'knex';
-import { repeat } from 'ramda';
+import { repeat, ifElse, pipe, always, identity } from 'ramda';
 import { Interval, Unit, interval } from '../../../types';
 import { add, trunc } from '../../../utils/date';
 import {
@@ -36,6 +36,22 @@ const FIELDS_WITH_DECIMALS: knex.ColumnName[] = [
 
 const DIVIDERS = ['1m', '5m', '15m', '30m', '1h', '3h', '6h', '12h', '1d'];
 
+export interface CandleSelectionParams {
+  amountAsset: string;
+  priceAsset: string;
+  timeStart: Date;
+  timeEnd: Date;
+  interval: string;
+  matcher?: string;
+}
+
+const whenDefined: <P, V>(optVal: P, fn: (val: V) => V) => ((val: V) => V) = (optVal, fn) =>
+  ifElse(
+    always(typeof optVal === 'undefined'),
+    identity,
+    fn
+  );
+
 export const selectCandles = ({
   amountAsset,
   priceAsset,
@@ -43,32 +59,29 @@ export const selectCandles = ({
   timeEnd,
   matcher,
   interval: inter,
-}: {
-  amountAsset: string;
-  priceAsset: string;
-  timeStart: Date;
-  timeEnd: Date;
-  interval: string;
-  matcher: string;
-}): knex.QueryBuilder =>
-  pg('candles')
-    .select(FIELDS)
-    .where('amount_asset_id', amountAsset)
-    .where('price_asset_id', priceAsset)
-    .where('matcher', matcher)
-    .where('time_start', '>=', timeStart)
-    .where('time_start', '<=', timeEnd)
-    .where(
-      'interval_in_secs',
-      // should always be valid after validation
-      highestDividerLessThan(
-        interval(inter).unsafeGet(),
-        unsafeIntervalsFromStrings(DIVIDERS)
-      ).matchWith({
-        Ok: ({ value: i }) => i.length / 1000,
-        Error: ({ value: error }) => interval('1m').unsafeGet().length / 1000,
-      })
-    );
+}: CandleSelectionParams): knex.QueryBuilder =>
+  pipe(
+    always(
+      pg('candles')
+        .select(FIELDS)
+        .where('amount_asset_id', amountAsset)
+        .where('price_asset_id', priceAsset)
+        .where('time_start', '>=', timeStart)
+        .where('time_start', '<=', timeEnd)
+        .where(
+          'interval_in_secs',
+          // should always be valid after validation
+          highestDividerLessThan(
+            interval(inter).unsafeGet(),
+            unsafeIntervalsFromStrings(DIVIDERS)
+          ).matchWith({
+            Ok: ({ value: i }) => i.length / 1000,
+            Error: ({ value: error }) => interval('1m').unsafeGet().length / 1000,
+          })
+        )
+    ),
+    whenDefined(matcher, q => q.where('matcher', matcher!))
+  )();
 
 export const periodsToQueries = ({
   amountAsset,
@@ -81,7 +94,7 @@ export const periodsToQueries = ({
   priceAsset: string;
   timeStart: Date;
   periods: Interval[];
-  matcher: string;
+  matcher?: string;
 }): knex.QueryBuilder[] => {
   const queries: knex.QueryBuilder[] = [];
 
@@ -135,11 +148,11 @@ export const sql = ({
     periodInMinutes
   ).reduce<Interval[]>(
     (periods, polynom) => [
-      ...periods,
-      ...repeat(
-        fromMilliseconds(polynom[0] * 1000 * 60).unsafeGet(),
-        polynom[1]
-      ),
+        ...periods,
+        ...repeat(
+          fromMilliseconds(polynom[0] * 1000 * 60).unsafeGet(),
+          polynom[1]
+        ),
     ],
     []
   );
