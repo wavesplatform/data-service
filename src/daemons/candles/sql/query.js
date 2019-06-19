@@ -67,7 +67,7 @@ const candleSelectColumns = [
   {
     interval_in_secs: 60,
   },
-  'sender_public_key as matcher',
+  'sender as matcher',
 ];
 
 /** insertIntoCandlesFromSelect :: (String, Function) -> QueryBuilder */
@@ -78,7 +78,7 @@ const insertIntoCandlesFromSelect = (tableName, selectFunction) =>
 const selectExchanges = pg({ t: 'txs_7' }).column(
   'amount_asset',
   'price_asset',
-  'sender_public_key',  
+  'sender',
   'height',
   { candle_time: pg.raw(`date_trunc('minute', t.time_stamp)`) },
   `amount`,
@@ -184,7 +184,7 @@ const insertAllMinuteCandles = tableName =>
         'a_dec.asset_id'
       )
       .innerJoin({ p_dec: 'asset_decimals' }, 'e.price_asset', 'p_dec.asset_id')
-      .groupByRaw('e.candle_time, e.amount_asset, e.price_asset, e.sender_public_key');
+      .groupByRaw('e.candle_time, e.amount_asset, e.price_asset, e.sender');
   }).toString();
 
 /** insertAllCandles :: (String, Number, Number, Number) -> String query */
@@ -207,7 +207,7 @@ const selectCandlesByMinute = fromTimetamp =>
     )
     .innerJoin({ a_dec: 'asset_decimals' }, 'e.amount_asset', 'a_dec.asset_id')
     .innerJoin({ p_dec: 'asset_decimals' }, 'e.price_asset', 'p_dec.asset_id')
-    .groupBy(['e.candle_time', 'e.amount_asset', 'e.price_asset', 'e.sender_public_key'])
+    .groupBy(['e.candle_time', 'e.amount_asset', 'e.price_asset', 'e.sender'])
     .toString();
 
 module.exports = {
