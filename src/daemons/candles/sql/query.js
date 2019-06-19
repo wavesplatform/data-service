@@ -24,7 +24,7 @@ const makeCandleCalculateColumns = longerInterval => {
     open: candlePresets.aggregate.open,
     close: candlePresets.aggregate.close,
     interval_in_secs: longerInterval,
-    sender_public_key: 'sender_public_key',
+    matcher: 'matcher',
   };
 };
 
@@ -72,7 +72,7 @@ const candleSelectColumns = [
   {
     interval_in_secs: 60,
   },
-  'sender_public_key',
+  'sender_public_key as matcher',
 ];
 
 /** insertIntoCandlesFromSelect :: (String, Function) -> QueryBuilder */
@@ -148,7 +148,7 @@ const insertOrUpdateCandles = (tableName, candles) => {
       .raw(
         `${pg({ t: tableName }).insert(
           candles.map(serializeCandle)
-        )} on conflict (time_start, amount_asset_id, price_asset_id, sender_public_key, interval_in_secs) do update set ${updatedFieldsExcluded}`
+        )} on conflict (time_start, amount_asset_id, price_asset_id, matcher, interval_in_secs) do update set ${updatedFieldsExcluded}`
       )
       .toString();
   }
@@ -172,8 +172,8 @@ const insertOrUpdateCandlesFromShortInterval = (
           .whereRaw(
             `time_start >= to_timestamp(floor(extract('epoch' from '${fromTimestamp.toISOString()}'::timestamp) / ${longerInterval}) * ${longerInterval})`
           )
-          .groupBy('candle_time', 'amount_asset_id', 'price_asset_id', 'sender_public_key');
-      })} on conflict (time_start, amount_asset_id, price_asset_id, sender_public_key, interval_in_secs) do update set ${updatedFieldsExcluded}`
+          .groupBy('candle_time', 'amount_asset_id', 'price_asset_id', 'matcher');
+      })} on conflict (time_start, amount_asset_id, price_asset_id, matcher, interval_in_secs) do update set ${updatedFieldsExcluded}`
     )
     .toString().logRet();
 
@@ -203,7 +203,7 @@ const insertAllCandles = (tableName, shortInterval, longerInterval) =>
     this.from({ t: tableName })
       .column(makeCandleCalculateColumns(longerInterval))
       .where('t.interval_in_secs', shortInterval)
-      .groupBy(['candle_time', 'amount_asset_id', 'price_asset_id', 'sender_public_key']);
+      .groupBy(['candle_time', 'amount_asset_id', 'price_asset_id', 'matcher']);
   }).toString().logRet();
 
 /** selectCandlesByMinute :: Date -> String query */
