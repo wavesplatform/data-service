@@ -25,6 +25,7 @@ const FIELDS = [
   'open',
   'close',
   'interval_in_secs',
+  'matcher',
 ];
 
 const FIELDS_WITH_DECIMALS: knex.ColumnName[] = [
@@ -40,6 +41,7 @@ export const selectCandles = ({
   priceAsset,
   timeStart,
   timeEnd,
+  matcher,
   interval: inter,
 }: {
   amountAsset: string;
@@ -47,11 +49,13 @@ export const selectCandles = ({
   timeStart: Date;
   timeEnd: Date;
   interval: string;
+  matcher: string;
 }): knex.QueryBuilder =>
   pg('candles')
     .select(FIELDS)
     .where('amount_asset_id', amountAsset)
     .where('price_asset_id', priceAsset)
+    .where('matcher', matcher)
     .where('time_start', '>=', timeStart)
     .where('time_start', '<=', timeEnd)
     .where(
@@ -71,11 +75,13 @@ export const periodsToQueries = ({
   priceAsset,
   timeStart,
   periods,
+  matcher,
 }: {
   amountAsset: string;
   priceAsset: string;
   timeStart: Date;
   periods: Interval[];
+  matcher: string;
 }): knex.QueryBuilder[] => {
   const queries: knex.QueryBuilder[] = [];
 
@@ -88,6 +94,7 @@ export const periodsToQueries = ({
       selectCandles({
         amountAsset,
         priceAsset,
+        matcher,
         timeStart: new Date(itTimestamp),
         timeEnd: timeEnd,
         interval: period.source,
@@ -103,7 +110,7 @@ export const periodsToQueries = ({
 export const sql = ({
   amountAsset,
   priceAsset,
-  params: { timeStart, timeEnd, interval: inter },
+  params: { timeStart, timeEnd, interval: inter, matcher, },
 }: {
   amountAsset: string;
   priceAsset: string;
@@ -111,6 +118,7 @@ export const sql = ({
     timeStart: Date;
     timeEnd: Date;
     interval: string;
+    matcher: string;
   };
 }): string => {
   // should always be valid after validation
@@ -145,6 +153,7 @@ export const sql = ({
         timeStart,
         timeEnd,
         interval: inter,
+        matcher,
       })
         .union(
           periodsToQueries({
@@ -152,6 +161,7 @@ export const sql = ({
             priceAsset,
             timeStart: ts,
             periods: periodsForQueries,
+            matcher,
           }),
           true
         )

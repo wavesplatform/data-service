@@ -168,6 +168,9 @@ const output = Joi.object().keys({
   price_asset_id: Joi.string()
     .base58()
     .required(),
+  matcher: Joi.string()
+    .base58()
+    .required(),    
   max_height: Joi.number()
     .integer()
     .required(),
