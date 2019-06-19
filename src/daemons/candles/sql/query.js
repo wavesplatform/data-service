@@ -1,11 +1,6 @@
 const knex = require('knex');
 const pg = knex({ client: 'pg' });
 
-String.prototype.logRet = function() {
-  console.log(this);
-  return this;
-}
-
 const { serializeCandle, candlePresets } = require('./utils');
 
 /** makeCandleCalculateColumns :: Number -> Array */
@@ -104,7 +99,7 @@ const selectLastCandle = tableName =>
     .select('max_height')
     .limit(1)
     .orderBy('max_height', 'desc')
-    .toString().logRet();
+    .toString();
 
 /** selectLastExchangeTx :: String query */
 const selectLastExchangeTx = () =>
@@ -112,19 +107,14 @@ const selectLastExchangeTx = () =>
     .select('height')
     .limit(1)
     .orderBy('height', 'desc')
-    .toString().logRet();
+    .toString();
 
 /** selectLastExchangeTx :: String query */
 const selectMinTimestampFromHeight = height =>
   pg.raw(`select min(time_stamp) as time_stamp 
           from (
             select time_stamp from txs_7 where height >= ${height} order by time_stamp
-          ) as t`).toString().logRet();
-
-// ({ t: 'txs_7' })
-//     .select({ time_stamp: pg.min('time_stamp') })
-//     .where('height', '>=', height)
-//     .toString().logRet();
+          ) as t`).toString();
 
 /** for make complex query with "on conflict (...) update ... without set concrete values" See insertOrUpdateCandles or insertOrUpdateCandlesFromShortInterval */
 const updatedFieldsExcluded = [
@@ -175,7 +165,7 @@ const insertOrUpdateCandlesFromShortInterval = (
           .groupBy('candle_time', 'amount_asset_id', 'price_asset_id', 'matcher');
       })} on conflict (time_start, amount_asset_id, price_asset_id, matcher, interval_in_secs) do update set ${updatedFieldsExcluded}`
     )
-    .toString().logRet();
+    .toString();
 
 /** truncateTable :: String -> String query */
 const truncateTable = tableName =>
@@ -195,7 +185,7 @@ const insertAllMinuteCandles = tableName =>
       )
       .innerJoin({ p_dec: 'asset_decimals' }, 'e.price_asset', 'p_dec.asset_id')
       .groupByRaw('e.candle_time, e.amount_asset, e.price_asset, e.sender_public_key');
-  }).toString().logRet();
+  }).toString();
 
 /** insertAllCandles :: (String, Number, Number, Number) -> String query */
 const insertAllCandles = (tableName, shortInterval, longerInterval) =>
@@ -204,7 +194,7 @@ const insertAllCandles = (tableName, shortInterval, longerInterval) =>
       .column(makeCandleCalculateColumns(longerInterval))
       .where('t.interval_in_secs', shortInterval)
       .groupBy(['candle_time', 'amount_asset_id', 'price_asset_id', 'matcher']);
-  }).toString().logRet();
+  }).toString();
 
 /** selectCandlesByMinute :: Date -> String query */
 const selectCandlesByMinute = fromTimetamp =>
@@ -218,7 +208,7 @@ const selectCandlesByMinute = fromTimetamp =>
     .innerJoin({ a_dec: 'asset_decimals' }, 'e.amount_asset', 'a_dec.asset_id')
     .innerJoin({ p_dec: 'asset_decimals' }, 'e.price_asset', 'p_dec.asset_id')
     .groupBy(['e.candle_time', 'e.amount_asset', 'e.price_asset', 'e.sender_public_key'])
-    .toString().logRet();
+    .toString();
 
 module.exports = {
   truncateTable,
