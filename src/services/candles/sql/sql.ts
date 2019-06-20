@@ -45,8 +45,8 @@ export interface CandleSelectionParams {
   matcher?: string;
 };
 
-const whenDefined: <P, V>(optVal: P | undefined, fn: (val: V) => V) => ((val: V) => V) =
-  (optVal, fn) => typeof optVal === 'undefined' ? identity : fn;
+const whenDefined: <P, V>(optVal: P | undefined, fn: (val: V, p: P) => V) => ((val: V) => V) =
+  (optVal, fn) => typeof optVal === 'undefined' ? identity : v => fn(v, optVal);
 
 export const selectCandles = ({
   amountAsset,
@@ -76,7 +76,7 @@ export const selectCandles = ({
           })
         )
     ),
-    whenDefined(matcher, q => q.clone().where('matcher', matcher!))
+    whenDefined(matcher, (q, matcher) => q.clone().where('matcher', matcher))
   )();
 
 export const periodsToQueries = ({
