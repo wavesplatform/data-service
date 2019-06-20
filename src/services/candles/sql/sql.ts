@@ -1,5 +1,5 @@
 import * as knex from 'knex';
-import { repeat } from 'ramda';
+import { repeat, pipe, always, identity } from 'ramda';
 import { Interval, Unit, interval } from '../../../types';
 import { add, trunc } from '../../../utils/date';
 import {
@@ -25,6 +25,7 @@ const FIELDS = [
   'open',
   'close',
   'interval_in_secs',
+  'matcher',
 ];
 
 const FIELDS_WITH_DECIMALS: knex.ColumnName[] = [
@@ -35,47 +36,61 @@ const FIELDS_WITH_DECIMALS: knex.ColumnName[] = [
 
 const DIVIDERS = ['1m', '5m', '15m', '30m', '1h', '3h', '6h', '12h', '1d'];
 
-export const selectCandles = ({
-  amountAsset,
-  priceAsset,
-  timeStart,
-  timeEnd,
-  interval: inter,
-}: {
+export interface CandleSelectionParams {
   amountAsset: string;
   priceAsset: string;
   timeStart: Date;
   timeEnd: Date;
   interval: string;
-}): knex.QueryBuilder =>
-  pg('candles')
-    .select(FIELDS)
-    .where('amount_asset_id', amountAsset)
-    .where('price_asset_id', priceAsset)
-    .where('time_start', '>=', timeStart)
-    .where('time_start', '<=', timeEnd)
-    .where(
-      'interval_in_secs',
-      // should always be valid after validation
-      highestDividerLessThan(
-        interval(inter).unsafeGet(),
-        unsafeIntervalsFromStrings(DIVIDERS)
-      ).matchWith({
-        Ok: ({ value: i }) => i.length / 1000,
-        Error: ({ value: error }) => interval('1m').unsafeGet().length / 1000,
-      })
-    );
+  matcher?: string;
+};
+
+const whenDefined: <P, V>(optVal: P | undefined, fn: (val: V, p: P) => V) => ((val: V) => V) =
+  (optVal, fn) => typeof optVal === 'undefined' ? identity : v => fn(v, optVal);
+
+export const selectCandles = ({
+  amountAsset,
+  priceAsset,
+  timeStart,
+  timeEnd,
+  matcher,
+  interval: inter,
+}: CandleSelectionParams): knex.QueryBuilder =>
+  pipe(
+    always(
+      pg('candles')
+        .select(FIELDS)
+        .where('amount_asset_id', amountAsset)
+        .where('price_asset_id', priceAsset)
+        .where('time_start', '>=', timeStart)
+        .where('time_start', '<=', timeEnd)
+        .where(
+          'interval_in_secs',
+          // should always be valid after validation
+          highestDividerLessThan(
+            interval(inter).unsafeGet(),
+            unsafeIntervalsFromStrings(DIVIDERS)
+          ).matchWith({
+            Ok: ({ value: i }) => i.length / 1000,
+            Error: ({ value: error }) => interval('1m').unsafeGet().length / 1000,
+          })
+        )
+    ),
+    whenDefined(matcher, (q, matcher) => q.clone().where('matcher', matcher))
+  )();
 
 export const periodsToQueries = ({
   amountAsset,
   priceAsset,
   timeStart,
   periods,
+  matcher,
 }: {
   amountAsset: string;
   priceAsset: string;
   timeStart: Date;
   periods: Interval[];
+  matcher?: string;
 }): knex.QueryBuilder[] => {
   const queries: knex.QueryBuilder[] = [];
 
@@ -88,6 +103,7 @@ export const periodsToQueries = ({
       selectCandles({
         amountAsset,
         priceAsset,
+        matcher,
         timeStart: new Date(itTimestamp),
         timeEnd: timeEnd,
         interval: period.source,
@@ -103,7 +119,7 @@ export const periodsToQueries = ({
 export const sql = ({
   amountAsset,
   priceAsset,
-  params: { timeStart, timeEnd, interval: inter },
+  params: { timeStart, timeEnd, interval: inter, matcher, },
 }: {
   amountAsset: string;
   priceAsset: string;
@@ -111,6 +127,7 @@ export const sql = ({
     timeStart: Date;
     timeEnd: Date;
     interval: string;
+    matcher: string;
   };
 }): string => {
   // should always be valid after validation
@@ -127,11 +144,11 @@ export const sql = ({
     periodInMinutes
   ).reduce<Interval[]>(
     (periods, polynom) => [
-      ...periods,
-      ...repeat(
-        fromMilliseconds(polynom[0] * 1000 * 60).unsafeGet(),
-        polynom[1]
-      ),
+        ...periods,
+        ...repeat(
+          fromMilliseconds(polynom[0] * 1000 * 60).unsafeGet(),
+          polynom[1]
+        ),
     ],
     []
   );
@@ -145,6 +162,7 @@ export const sql = ({
         timeStart,
         timeEnd,
         interval: inter,
+        matcher,
       })
         .union(
           periodsToQueries({
@@ -152,6 +170,7 @@ export const sql = ({
             priceAsset,
             timeStart: ts,
             periods: periodsForQueries,
+            matcher,
           }),
           true
         )
