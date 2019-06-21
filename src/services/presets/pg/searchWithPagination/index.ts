@@ -13,6 +13,10 @@ export type WithSortOrder = {
   sort: SortOrder;
 };
 
+export type WithLimit = {
+  limit: number;
+};
+
 export type RequestWithCursor<
   Request extends WithSortOrder,
   CursorType
@@ -27,7 +31,7 @@ export type BaseResponse = {
 };
 
 export const searchWithPaginationPreset = <
-  Request extends WithSortOrder,
+  Request extends WithSortOrder & WithLimit,
   ResponseRaw,
   ResponseTransformed extends Serializable<string, BaseResponse>
 >({
