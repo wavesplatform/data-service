@@ -7,3 +7,5 @@ export const parseDate = (str: string): Result<ValidationError, Date> => {
     ? error(new ValidationError('Date is not valid'))
     : ok(d);
 };
+
+export const dateOrNull = (str: string): Date | null => parseDate(str).getOrElse(null);

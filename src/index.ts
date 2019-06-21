@@ -4,6 +4,7 @@ import chalk from 'chalk';
 import { loadConfig } from './loadConfig';
 import * as router from './endpoints/';
 import * as injectDb from './middleware/injectDb';
+import * as injectConfig from './middleware/injectConfig';
 import * as injectEventBus from './middleware/injectEventBus';
 import * as accessLogMiddleware from './middleware/accessLog';
 import createEventBus from './eventBus/';
@@ -34,6 +35,7 @@ app
   .use(accessLogMiddleware)
   .use(serializer)
   .use(injectDb(options))
+  .use(injectConfig('defaultMatcher', options.defaultMatcher))
   .use(router.routes())
   .listen(options.port);
 

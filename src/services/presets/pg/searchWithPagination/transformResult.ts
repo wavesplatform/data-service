@@ -1,39 +1,49 @@
-import { fromNullable } from 'folktale/maybe';
-import { last, objOf } from 'ramda';
+import { compose, last, take } from 'ramda';
 
 import { Serializable, List, list } from '../../../../types';
 import { encode, Cursor } from '../../../_common/pagination/cursor';
-import { RequestWithCursor, WithSortOrder } from '.';
+import { RequestWithCursor, WithSortOrder, WithLimit } from '.';
 
-const maybeLastItem = <ResponseTransformed>(data: ResponseTransformed[]) =>
-  fromNullable(last(data));
+type ResponseMeta = {
+  isLastPage?: boolean;
+  lastCursor?: string;
+};
 
-const makeCursorFromLastData = <
+const makeCursorFromResponse = <
   Request extends WithSortOrder,
   ResponseTransformed extends Record<string, any>
 >(
   request: RequestWithCursor<Request, Cursor>,
   response: ResponseTransformed
-): Cursor => ({
-  timestamp: response.data.timestamp,
-  id: response.data.id,
-  sort: request.sort,
-});
+): string =>
+  encode({
+    timestamp: response.data.timestamp,
+    id: response.data.id,
+    sort: request.sort,
+  });
 
-const createCursorMeta = <
-  Request extends WithSortOrder,
-  ResponseTransformed extends Serializable<string, any>
+const createMeta = <
+  Request extends WithSortOrder & WithLimit,
+  ResponseRaw,
+  ResponseTransformed
 >(
   request: RequestWithCursor<Request, Cursor>,
-  responses: ResponseTransformed[]
-) =>
-  maybeLastItem(responses)
-    .map(lastItem => encode(makeCursorFromLastData(request, lastItem)))
-    .map(objOf('lastCursor'))
-    .getOrElse({});
+  responsesRaw: ResponseRaw[],
+  lastTransformedResponse: ResponseTransformed | undefined
+): ResponseMeta => {
+  const metaBuilder: ResponseMeta = {};
+  if (typeof lastTransformedResponse !== 'undefined') {
+    metaBuilder.isLastPage = responsesRaw.length < request.limit;
+    metaBuilder.lastCursor = makeCursorFromResponse(
+      request,
+      lastTransformedResponse
+    );
+  }
+  return metaBuilder;
+};
 
 export const transformResults = <
-  Request extends WithSortOrder,
+  Request extends WithSortOrder & WithLimit,
   ResponseRaw,
   ResponseTransformed extends Serializable<string, any>
 >(
@@ -45,9 +55,13 @@ export const transformResults = <
   responses: ResponseRaw[],
   request: RequestWithCursor<Request, Cursor>
 ): List<ResponseTransformed> => {
-  const transformedData = responses.map(response =>
-    transformDbResponse(response, request)
-  );
+  const transformedData = compose(
+    rs => rs.map(r => transformDbResponse(r, request)),
+    take<ResponseRaw>(request.limit - 1)
+  )(responses);
 
-  return list(transformedData, createCursorMeta(request, transformedData));
+  return list(
+    transformedData,
+    createMeta(request, responses, last(transformedData))
+  );
 };

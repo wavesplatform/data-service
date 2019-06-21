@@ -18,9 +18,21 @@ export type ServerConfig = {
   port: number;
 };
 
-export type DataServiceConfig = PostgresConfig & ServerConfig & LoggerConfig;
+export type DefaultMatcherConfig = {
+  defaultMatcher: string;
+}
+
+export type DataServiceConfig = PostgresConfig & ServerConfig & LoggerConfig & DefaultMatcherConfig;
 
 const envVariables = ['PGHOST', 'PGDATABASE', 'PGUSER', 'PGPASSWORD'];
+
+const guard = <T>(name: string, val?: T): T => {
+  if (typeof val === 'undefined') {
+    throw new Error('config value ' + name + ' should be defined');
+  }
+
+  return val;
+}
 
 const load = (): DataServiceConfig => {
   // assert all necessary env vars are set
@@ -37,6 +49,8 @@ const load = (): DataServiceConfig => {
       ? parseInt(process.env.PGPOOLSIZE)
       : 20,
     logLevel: process.env.LOG_LEVEL || 'info',
+
+    defaultMatcher: guard('DEFAULT_MATCHER', process.env.DEFAULT_MATCHER),
   };
 };
 

@@ -10,6 +10,7 @@ describe('sql queries from period', () => {
         priceAsset: '222',
         timeStart: new Date('2019-03-25T00:00:00.000Z'),
         periods: [],
+        matcher: '123',
       }).length
     ).toBe(0);
   });
@@ -20,6 +21,7 @@ describe('sql queries from period', () => {
       priceAsset: '222',
       timeStart: new Date('2019-03-25T00:00:00.000Z'),
       periods: unsafeIntervalsFromStrings(['30m', '5m', '1m']),
+      matcher: '123',
     });
     expect(periodQueries.length).toBe(3);
     expect(
@@ -36,6 +38,7 @@ describe('sql queries from period', () => {
       priceAsset: '222',
       timeStart: new Date('2019-03-25T00:00:00.000Z'),
       periods: unsafeIntervalsFromStrings(['30m', '15m', '1m', '1m', '1m']),
+      matcher: '123',
     });
     expect(periodQueries.length).toBe(5);
     expect(
@@ -57,6 +60,7 @@ describe('sql query from candles', () => {
           timeStart: new Date('2017-04-03T00:00:00.000Z'),
           timeEnd: new Date('2017-04-03T23:59:59.999Z'),
           interval: '1h',
+          matcher: '123',
         },
       })
     ).toMatchSnapshot();
@@ -71,6 +75,7 @@ describe('sql query from candles', () => {
           timeStart: new Date('2017-04-03T00:00:00.000Z'),
           timeEnd: new Date('2017-04-03T23:59:59.999Z'),
           interval: '1d',
+          matcher: '123',
         },
       })
     ).toMatchSnapshot();
@@ -85,6 +90,7 @@ describe('sql query from candles', () => {
           timeStart: new Date('2017-04-03T00:00:00.000Z'),
           timeEnd: new Date('2017-04-03T23:59:59.999Z'),
           interval: '1m',
+          matcher: '123',
         },
       })
     ).toMatchSnapshot();

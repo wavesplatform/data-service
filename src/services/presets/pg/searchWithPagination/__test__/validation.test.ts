@@ -3,7 +3,7 @@ import { always, identity } from 'ramda';
 
 import { parseDate } from '../../../../../utils/parseDate';
 import { Joi } from '../../../../../utils/validation';
-import { searchWithPaginationPreset, WithSortOrder } from '..';
+import { searchWithPaginationPreset, WithSortOrder, WithLimit } from '..';
 import commonFilterSchemas from '../commonFilterSchemas';
 import {
   Serializable,
@@ -17,11 +17,10 @@ const mockTxs: ResponseRaw[] = [
   { id: 'w', timestamp: new Date() },
 ];
 
-type Request = WithSortOrder & {
+type Request = WithSortOrder & WithLimit & {
   timeEnd?: Date;
   timeStart?: Date;
-  limit?: number;
-};
+}
 
 type ResponseRaw = {
   id: string;
@@ -59,18 +58,21 @@ describe('searchWithPagination preset validation', () => {
     it('fails if timeEnd < 0', done =>
       assertValidationError(done, {
         timeEnd: parseDate('-1525132900000').unsafeGet(),
+        limit: 10,
         sort: SortOrder.Ascending,
       }));
     it('fails if timeStart < 0', done =>
       assertValidationError(done, {
         timeEnd: parseDate('1525132900000').unsafeGet(),
         timeStart: parseDate('-1525132800000').unsafeGet(),
+        limit: 10,
         sort: SortOrder.Ascending,
       }));
     it('fails if timeEnd < timeStart', done =>
       assertValidationError(done, {
         timeEnd: parseDate('1525132700000').unsafeGet(),
         timeStart: parseDate('1525132800000').unsafeGet(),
+        limit: 10,
         sort: SortOrder.Ascending,
       }));
     it('fails if timeStart->invalid Date', done => {

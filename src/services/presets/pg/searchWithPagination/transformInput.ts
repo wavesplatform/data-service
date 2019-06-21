@@ -1,4 +1,4 @@
-import { omit } from 'ramda';
+import { omit, compose, evolve, inc } from 'ramda';
 
 import { decode, Cursor } from '../../../_common/pagination/cursor';
 import { RequestWithCursor, WithSortOrder } from './index';
@@ -15,7 +15,10 @@ const decodeAfter = (cursorString: string) =>
 export const transformInput = <Request extends WithSortOrder>(
   request: RequestWithCursor<Request, string>
 ): RequestWithCursor<Request, Cursor> => {
-  const requestWithoutAfter = omit(['after'], request) as Request;
+  const requestWithoutAfter = compose(
+    omit(['after']),
+    evolve({limit: inc})
+  )(request) as Request;
 
   if (!request.after) {
     return requestWithoutAfter;
