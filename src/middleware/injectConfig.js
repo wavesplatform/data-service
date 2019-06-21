@@ -2,8 +2,8 @@ const compose = require('koa-compose');
 
 const inject = require('./inject');
 
-module.exports = config => {
+module.exports = (key, value) => {
   return compose([
-    inject(['config'], config)
+    inject(['config', key], value)
   ]);
 };

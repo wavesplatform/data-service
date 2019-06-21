@@ -35,7 +35,7 @@ app
   .use(accessLogMiddleware)
   .use(serializer)
   .use(injectDb(options))
-  .use(injectConfig(options))
+  .use(injectConfig('defaultMatcher', options.defaultMatcher))
   .use(router.routes())
   .listen(options.port);
 
