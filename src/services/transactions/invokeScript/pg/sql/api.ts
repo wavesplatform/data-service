@@ -5,14 +5,14 @@ const { pickBindFilters } = require('../../../../../utils/db');
 
 // get — get by id
 // mget/search — apply filters
-module.exports = ({ filters: F }) => ({
-  get: id =>
+export const createApi = ({ filters: F }: { filters: any }) => ({
+  get: (id: string) =>
     pipe(
       F.id(id),
       String
     )(select),
 
-  mget: ids =>
+  mget: (ids: string[]) =>
     pipe(
       F.ids(ids),
       String
@@ -45,10 +45,12 @@ module.exports = ({ filters: F }) => ({
     const fs = pickBindFilters(F, fNames, withDefaults);
     const fQuery = pipe(...fs)(fSelect);
 
-    return pipe(
+    const sql = pipe(
       composeQuery,
       F.sort(withDefaults.sort),
       String
     )(fQuery);
+    console.log(sql)
+    return sql;
   },
 });

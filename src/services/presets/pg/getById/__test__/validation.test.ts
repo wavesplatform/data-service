@@ -1,4 +1,5 @@
 import { of as taskOf } from 'folktale/concurrency/task';
+import { Maybe } from 'folktale/maybe';
 import { always, identity } from 'ramda';
 
 import { Joi } from '../../../../../utils/validation';
@@ -8,16 +9,19 @@ import { inputGet as input } from '../inputSchema';
 import { SchemaLike } from 'joi';
 import { PgDriver } from '../../../../../db/driver';
 import { Serializable } from '../../../../../types';
+import { AppError } from '../../../../../errorHandling';
 
 const createService = (resultSchema: SchemaLike) =>
-  getByIdPreset<string, string, Serializable<'test', string>>({
+  getByIdPreset<string, string, string | null>({
     name: 'some_name',
     sql: identity,
     inputSchema: input,
     resultSchema,
     transformResult: identity,
-    resultTypeFactory: (s: string): Serializable<'test', string> => ({
-      data: s,
+    resultTypeFactory: (
+      s?: string | null
+    ): Serializable<'test', string | null> => ({
+      data: s ? s : null,
       __type: 'test',
     }),
   })({
@@ -34,7 +38,7 @@ describe('getById', () => {
       service('someidgoeshere2942415')
         .run()
         .listen({
-          onResolved: x => {
+          onResolved: (x: Maybe<Serializable<string, any>>) => {
             expect(x).toBeJust({
               data: 'someidgoeshere2942415',
               __type: 'test',
@@ -53,7 +57,7 @@ describe('getById', () => {
       service('someidgoeshere2942415')
         .run()
         .listen({
-          onRejected: e => {
+          onRejected: (e: AppError) => {
             expect(e.type).toBe('Resolver');
             done();
           },
