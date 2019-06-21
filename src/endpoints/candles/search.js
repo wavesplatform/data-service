@@ -31,6 +31,10 @@ const candlesSearch = async ctx => {
     fValues.timeEnd = new Date();
   }
 
+  if (!fValues.matcher) {
+    fValues.matcher = ctx.state.config.defaultMatcher;
+  }
+
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
     resolver: `${url}`,

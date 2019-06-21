@@ -1,5 +1,5 @@
 import * as knex from 'knex';
-import { repeat, pipe, always, identity } from 'ramda';
+import { repeat } from 'ramda';
 import { Interval, Unit, interval } from '../../../types';
 import { add, trunc } from '../../../utils/date';
 import {
@@ -42,11 +42,8 @@ export interface CandleSelectionParams {
   timeStart: Date;
   timeEnd: Date;
   interval: string;
-  matcher?: string;
+  matcher: string;
 };
-
-const whenDefined: <P, V>(optVal: P | undefined, fn: (val: V, p: P) => V) => ((val: V) => V) =
-  (optVal, fn) => typeof optVal === 'undefined' ? identity : v => fn(v, optVal);
 
 export const selectCandles = ({
   amountAsset,
@@ -56,28 +53,24 @@ export const selectCandles = ({
   matcher,
   interval: inter,
 }: CandleSelectionParams): knex.QueryBuilder =>
-  pipe(
-    always(
-      pg('candles')
-        .select(FIELDS)
-        .where('amount_asset_id', amountAsset)
-        .where('price_asset_id', priceAsset)
-        .where('time_start', '>=', timeStart)
-        .where('time_start', '<=', timeEnd)
-        .where(
-          'interval_in_secs',
-          // should always be valid after validation
-          highestDividerLessThan(
-            interval(inter).unsafeGet(),
-            unsafeIntervalsFromStrings(DIVIDERS)
-          ).matchWith({
-            Ok: ({ value: i }) => i.length / 1000,
-            Error: ({ value: error }) => interval('1m').unsafeGet().length / 1000,
-          })
-        )
-    ),
-    whenDefined(matcher, (q, matcher) => q.clone().where('matcher', matcher))
-  )();
+  pg('candles')
+  .select(FIELDS)
+  .where('amount_asset_id', amountAsset)
+  .where('price_asset_id', priceAsset)
+  .where('time_start', '>=', timeStart)
+  .where('time_start', '<=', timeEnd)
+  .where('matcher', matcher)
+  .where(
+    'interval_in_secs',
+    // should always be valid after validation
+    highestDividerLessThan(
+      interval(inter).unsafeGet(),
+      unsafeIntervalsFromStrings(DIVIDERS)
+    ).matchWith({
+      Ok: ({ value: i }) => i.length / 1000,
+      Error: ({ value: error }) => interval('1m').unsafeGet().length / 1000,
+    })
+  );
 
 export const periodsToQueries = ({
   amountAsset,
@@ -90,7 +83,7 @@ export const periodsToQueries = ({
   priceAsset: string;
   timeStart: Date;
   periods: Interval[];
-  matcher?: string;
+  matcher: string;
 }): knex.QueryBuilder[] => {
   const queries: knex.QueryBuilder[] = [];
 
