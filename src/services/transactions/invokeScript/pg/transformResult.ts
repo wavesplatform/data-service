@@ -19,18 +19,18 @@ const {
 
 import {
   InvokeScriptTxArgType,
-  DbRawInvokeScriptTxArgValue,
-  DbRawInvokeScriptTx,
+  RawInvokeScriptTxArgValue,
+  RawInvokeScriptTx,
+  RawInvokeScriptTx as DbRawInvokeScriptTx,
   InvokeScriptTxArg,
   InvokeScriptTxPayment,
-  RawInvokeScriptTx,
 } from '../types';
 
 const isNotNil = complement(isNil);
 
 const getArgFieldByType = (
   type: InvokeScriptTxArgType
-): keyof DbRawInvokeScriptTxArgValue => {
+): keyof RawInvokeScriptTxArgValue => {
   switch (type) {
     case 'integer':
       return 'arg_value_integer';
@@ -90,7 +90,7 @@ const buildTxFromTxs = (
         a.positionInPayment === b.positionInPayment
     ),
     map(getPaymentItem),
-    filter((tx: DbRawInvokeScriptTx) => isNotNil(prop('amount', tx)))
+    filter((tx: RawInvokeScriptTx) => isNotNil(prop('amount', tx)))
   )(txs);
 
   // fill tx.call
@@ -105,7 +105,7 @@ const buildTxFromTxs = (
             a.positionInArgs === b.positionInArgs
         ),
         map(getArg),
-        filter((tx: DbRawInvokeScriptTx) => isNotNil(prop('arg_type', tx)))
+        filter((tx: RawInvokeScriptTx) => isNotNil(prop('arg_type', tx)))
       )(txs),
     };
   }

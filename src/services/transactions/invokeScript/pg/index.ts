@@ -1,4 +1,4 @@
-import { fromNullable } from 'folktale/maybe';
+import { fromNullable, Maybe } from 'folktale/maybe';
 import { head, propEq } from 'ramda';
 
 import { PgDriver } from '../../../../db/driver';
@@ -7,14 +7,17 @@ import { toDbError } from '../../../../errorHandling';
 
 import sql from './sql';
 import { transformResult } from './transformResult';
-import { DbRawInvokeScriptTx } from '../types';
+import {
+  RawInvokeScriptTx as DbRawInvokeScriptTx,
+  RawInvokeScriptTx,
+} from '../types';
 
 export default {
   get: (pg: PgDriver) => (id: string) =>
     pg
       .any<DbRawInvokeScriptTx>(sql.get(id))
       .map(transformResult)
-      .map(head)
+      .map<RawInvokeScriptTx>(head)
       .map(fromNullable)
       .mapRejected(e =>
         toDbError(
@@ -27,7 +30,7 @@ export default {
     pg
       .any<DbRawInvokeScriptTx>(sql.mget(ids))
       .map(transformResult)
-      .map(matchRequestsResults(propEq('id'), ids))
+      .map<Maybe<RawInvokeScriptTx>[]>(matchRequestsResults(propEq('id'), ids))
       .mapRejected(e =>
         toDbError(
           { request: 'transactions.invokeScript.mget', params: ids },

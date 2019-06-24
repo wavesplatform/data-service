@@ -1,55 +1,46 @@
-import { DbRawTx, RawTx, Tx } from '../_common/types';
+import { RawTx, Tx } from '../_common/types';
 
 export type InvokeScriptTxArgType = 'integer' | 'boolean' | 'binary' | 'string';
 
-export type DbRawInvokeScriptTxArgValue = {
+export type RawInvokeScriptTxArgValue = {
   arg_value_integer: bigint | null;
   arg_value_boolean: boolean | null;
   arg_value_binary: Buffer | null;
   arg_value_string: string | null;
 };
 
-export type DbRawInvokeScriptTxArg = DbRawInvokeScriptTxArgValue & {
+export type RawInvokeScriptTxArg = RawInvokeScriptTxArgValue & {
   arg_type: InvokeScriptTxArgType | null;
   position_in_args: number | null;
 };
 
-export type DbRawInvokeScriptTxPayment = {
+export type RawInvokeScriptTxPayment = {
   amount: bigint | null;
   asset_id: string | null;
   position_in_payment: number | null;
 };
 
-export type DbRawInvokeScriptTx = DbRawTx &
-  DbRawInvokeScriptTxArg &
-  DbRawInvokeScriptTxPayment & {
+export type RawInvokeScriptTx = RawTx &
+  RawInvokeScriptTxArg &
+  RawInvokeScriptTxPayment & {
     dapp: string;
     function_name: string | null;
   };
 
 export type InvokeScriptTxArg = {
-  type: DbRawInvokeScriptTx['arg_type'];
+  type: RawInvokeScriptTx['arg_type'];
   value:
-    | DbRawInvokeScriptTx['arg_value_binary']
-    | DbRawInvokeScriptTx['arg_value_boolean']
-    | DbRawInvokeScriptTx['arg_value_integer']
-    | DbRawInvokeScriptTx['arg_value_string'];
-  positionInArgs: DbRawInvokeScriptTx['position_in_args'];
+    | RawInvokeScriptTx['arg_value_binary']
+    | RawInvokeScriptTx['arg_value_boolean']
+    | RawInvokeScriptTx['arg_value_integer']
+    | RawInvokeScriptTx['arg_value_string'];
+  positionInArgs: RawInvokeScriptTx['position_in_args'];
 };
 
 export type InvokeScriptTxPayment = {
-  amount: DbRawInvokeScriptTx['amount'];
-  assetId: DbRawInvokeScriptTx['asset_id'];
-  positionInPayment: DbRawInvokeScriptTx['position_in_payment'];
-};
-
-export type RawInvokeScriptTx = RawTx & {
-  dApp: string;
-  call: {
-    function: string;
-    args: InvokeScriptTxArg[];
-  };
-  payment: InvokeScriptTxPayment[];
+  amount: RawInvokeScriptTx['amount'];
+  assetId: RawInvokeScriptTx['asset_id'];
+  positionInPayment: RawInvokeScriptTx['position_in_payment'];
 };
 
 export type InvokeScriptTx = Tx & {
