@@ -1,23 +1,25 @@
 import { of as taskOf } from 'folktale/concurrency/task';
 import { always, identity } from 'ramda';
+import { SchemaLike } from 'joi';
 
 import { Joi } from '../../../../../utils/validation';
-
-import { getByIdPreset } from '..';
-import { inputGet as input } from '../inputSchema';
-import { SchemaLike } from 'joi';
 import { PgDriver } from '../../../../../db/driver';
 import { Serializable } from '../../../../../types';
 
+import { getByIdPreset } from '..';
+import { inputGet as input } from '../inputSchema';
+
 const createService = (resultSchema: SchemaLike) =>
-  getByIdPreset<string, string, Serializable<'test', string>>({
+  getByIdPreset<string, string, string | null>({
     name: 'some_name',
     sql: identity,
     inputSchema: input,
     resultSchema,
     transformResult: identity,
-    resultTypeFactory: (s: string): Serializable<'test', string> => ({
-      data: s,
+    resultTypeFactory: (
+      s?: string | null
+    ): Serializable<'test', string | null> => ({
+      data: s ? s : null,
       __type: 'test',
     }),
   })({

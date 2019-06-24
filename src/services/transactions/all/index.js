@@ -34,6 +34,7 @@ const createServices = {
   13: require('../setScript'),
   14: require('../sponsorship'),
   15: require('../setAssetScript'),
+  16: require('../invokeScript'),
 };
 
 const getData = prop('data');
