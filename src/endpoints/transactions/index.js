@@ -15,7 +15,7 @@ const {
 
 // services
 const genesis = require('../../services/transactions/genesis');
-const send = require('../../services/transactions/send');
+const payment = require('../../services/transactions/payment');
 const issue = require('../../services/transactions/issue');
 const transfer = require('../../services/transactions/transfer');
 const reissue = require('../../services/transactions/reissue');
@@ -57,8 +57,8 @@ const transactionsEndpointsConfig = {
     service: genesis,
     options: { filterParsers: omit(['sender'], commonTxFilters) },
   },
-  '/transactions/send': {
-    service: send,
+  '/transactions/payment': {
+    service: payment,
     options: createOptions(),
   },
   '/transactions/issue': {

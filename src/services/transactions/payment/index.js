@@ -21,7 +21,7 @@ const {
 module.exports = ({ drivers: { pg }, emitEvent }) => {
   return {
     get: getByIdPreset({
-      name: 'transactions.send.get',
+      name: 'transactions.payment.get',
       sql: sql.get,
       inputSchema: inputGet,
       resultSchema,
@@ -30,7 +30,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
     })({ pg, emitEvent }),
 
     mget: mgetByIdsPreset({
-      name: 'transactions.send.mget',
+      name: 'transactions.payment.mget',
       matchRequestResult: propEq('id'),
       sql: sql.mget,
       inputSchema: inputMget,
@@ -40,7 +40,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
     })({ pg, emitEvent }),
 
     search: searchWithPaginationPreset({
-      name: 'transactions.send.search',
+      name: 'transactions.payment.search',
       sql: sql.search,
       inputSchema: inputSearchSchema,
       resultSchema,
