@@ -21,8 +21,8 @@ const services = [
     tests: ['get', 'mget'],
   },
   {
-    name: 'send',
-    service: require('../../send'),
+    name: 'payment',
+    service: require('../../payment'),
     // first ID has 12 txs with it
     ids: [
       '5jpwaJnERa8Gr1ChgrNYnmxm2EtZ4KHC5bW1ZLL7LCY1bUV9gFWFAGjpJaPDCawmFzguqGBgYDyeocpEsKWeYDM1',
