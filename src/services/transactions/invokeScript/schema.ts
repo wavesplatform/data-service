@@ -32,7 +32,6 @@ export const result = Joi.object().keys({
 export const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
-    sender: Joi.string(),
     dapp: Joi.string().base58(),
     function: Joi.string(),
   })
