@@ -6,9 +6,7 @@ import commonFilters from '../../presets/pg/searchWithPagination/commonFilterSch
 export const result = Joi.object().keys({
   ...commonFields,
 
-  dapp: Joi.string()
-    .base58()
-    .required(),
+  dapp: Joi.string().required(),
   call: Joi.object()
     .keys({
       function: Joi.string(),
@@ -32,7 +30,7 @@ export const result = Joi.object().keys({
 export const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
-    dapp: Joi.string().base58(),
+    dapp: Joi.string(),
     function: Joi.string(),
   })
   .required();
