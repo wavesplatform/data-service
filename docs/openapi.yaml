@@ -872,6 +872,11 @@ paths:
           schema:
             type: string
         - in: query
+          name: orderId
+          description: Id of order related to the transaction
+          schema:
+            type: string
+        - in: query
           name: sender
           description: Address of a trader-participant in a transaction — an ORDER sender
           schema:
@@ -2633,6 +2638,8 @@ components:
             $ref: '#/components/schemas/Candle'
         lastCursor:
           type: string
+        isLastPage:
+          type: boolean          
     ListOfPair:
       type: object
       required:
@@ -2678,6 +2685,8 @@ components:
         lastCursor:
           type: string
           example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+        isLastPage:
+          type: boolean
     ListOfTxGenesis:
       type: object
       required:
@@ -2694,6 +2703,8 @@ components:
         lastCursor:
           type: string
           example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+        isLastPage:
+          type: boolean          
     ListOfTxSend:
       type: object
       required:
@@ -2710,6 +2721,8 @@ components:
         lastCursor:
           type: string
           example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+        isLastPage:
+          type: boolean          
     ListOfTxIssue:
       type: object
       required:
@@ -2726,6 +2739,8 @@ components:
         lastCursor:
           type: string
           example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+        isLastPage:
+          type: boolean          
     ListOfTxTransfer:
       type: object
       required:
@@ -2742,6 +2757,8 @@ components:
         lastCursor:
           type: string
           example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+        isLastPage:
+          type: boolean          
     ListOfTxReissue:
       type: object
       required:
@@ -2758,6 +2775,8 @@ components:
         lastCursor:
           type: string
           example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+        isLastPage:
+          type: boolean          
     ListOfTxBurn:
       type: object
       required:
@@ -2774,6 +2793,8 @@ components:
         lastCursor:
           type: string
           example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+        isLastPage:
+          type: boolean          
     ListOfTxExchange:
       type: object
       required:
@@ -2790,6 +2811,8 @@ components:
         lastCursor:
           type: string
           example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+        isLastPage:
+          type: boolean          
     ListOfTxLease:
       type: object
       required:
@@ -2806,6 +2829,8 @@ components:
         lastCursor:
           type: string
           example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+        isLastPage:
+          type: boolean          
     ListOfTxLeaseCancel:
       type: object
       required:
@@ -2822,6 +2847,8 @@ components:
         lastCursor:
           type: string
           example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+        isLastPage:
+          type: boolean          
     ListOfTxAlias:
       type: object
       required:
@@ -2838,6 +2865,8 @@ components:
         lastCursor:
           type: string
           example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+        isLastPage:
+          type: boolean          
     ListOfTxMassTransfer:
       type: object
       required:
@@ -2854,6 +2883,8 @@ components:
         lastCursor:
           type: string
           example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+        isLastPage:
+          type: boolean          
     ListOfTxData:
       type: object
       required:
@@ -2870,6 +2901,8 @@ components:
         lastCursor:
           type: string
           example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+        isLastPage:
+          type: boolean          
     ListOfTxSponsorship:
       type: object
       required:
@@ -2886,6 +2919,8 @@ components:
         lastCursor:
           type: string
           example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+        isLastPage:
+          type: boolean          
     ListOfTxSetScript:
       type: object
       required:
@@ -2902,6 +2937,8 @@ components:
         lastCursor:
           type: string
           example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+        isLastPage:
+          type: boolean          
     ListOfTxSetAssetScript:
       type: object
       required:
@@ -2918,6 +2955,8 @@ components:
         lastCursor:
           type: string
           example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+        isLastPage:
+          type: boolean
     ListOfTxInvokeScript:
       type: object
       required:
@@ -2934,3 +2973,5 @@ components:
         lastCursor:
           type: string
           example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+        isLastPage:
+          type: boolean

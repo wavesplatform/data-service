@@ -1430,6 +1430,14 @@
           },
           {
             "in": "query",
+            "name": "orderId",
+            "description": "Id of order related to the transaction",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
             "name": "sender",
             "description": "Address of a trader-participant in a transaction — an ORDER sender",
             "schema": {
@@ -4212,6 +4220,9 @@
           },
           "lastCursor": {
             "type": "string"
+          },
+          "isLastPage": {
+            "type": "boolean"
           }
         }
       },
@@ -4303,6 +4314,9 @@
           "lastCursor": {
             "type": "string",
             "example": "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          },
+          "isLastPage": {
+            "type": "boolean"
           }
         }
       },
@@ -4326,6 +4340,9 @@
           "lastCursor": {
             "type": "string",
             "example": "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          },
+          "isLastPage": {
+            "type": "boolean"
           }
         }
       },
@@ -4349,6 +4366,9 @@
           "lastCursor": {
             "type": "string",
             "example": "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          },
+          "isLastPage": {
+            "type": "boolean"
           }
         }
       },
@@ -4372,6 +4392,9 @@
           "lastCursor": {
             "type": "string",
             "example": "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          },
+          "isLastPage": {
+            "type": "boolean"
           }
         }
       },
@@ -4395,6 +4418,9 @@
           "lastCursor": {
             "type": "string",
             "example": "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          },
+          "isLastPage": {
+            "type": "boolean"
           }
         }
       },
@@ -4418,6 +4444,9 @@
           "lastCursor": {
             "type": "string",
             "example": "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          },
+          "isLastPage": {
+            "type": "boolean"
           }
         }
       },
@@ -4441,6 +4470,9 @@
           "lastCursor": {
             "type": "string",
             "example": "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          },
+          "isLastPage": {
+            "type": "boolean"
           }
         }
       },
@@ -4464,6 +4496,9 @@
           "lastCursor": {
             "type": "string",
             "example": "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          },
+          "isLastPage": {
+            "type": "boolean"
           }
         }
       },
@@ -4487,6 +4522,9 @@
           "lastCursor": {
             "type": "string",
             "example": "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          },
+          "isLastPage": {
+            "type": "boolean"
           }
         }
       },
@@ -4510,6 +4548,9 @@
           "lastCursor": {
             "type": "string",
             "example": "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          },
+          "isLastPage": {
+            "type": "boolean"
           }
         }
       },
@@ -4533,6 +4574,9 @@
           "lastCursor": {
             "type": "string",
             "example": "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          },
+          "isLastPage": {
+            "type": "boolean"
           }
         }
       },
@@ -4556,6 +4600,9 @@
           "lastCursor": {
             "type": "string",
             "example": "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          },
+          "isLastPage": {
+            "type": "boolean"
           }
         }
       },
@@ -4579,6 +4626,9 @@
           "lastCursor": {
             "type": "string",
             "example": "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          },
+          "isLastPage": {
+            "type": "boolean"
           }
         }
       },
@@ -4602,6 +4652,9 @@
           "lastCursor": {
             "type": "string",
             "example": "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          },
+          "isLastPage": {
+            "type": "boolean"
           }
         }
       },
@@ -4625,6 +4678,9 @@
           "lastCursor": {
             "type": "string",
             "example": "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          },
+          "isLastPage": {
+            "type": "boolean"
           }
         }
       },
@@ -4648,6 +4704,9 @@
           "lastCursor": {
             "type": "string",
             "example": "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          },
+          "isLastPage": {
+            "type": "boolean"
           }
         }
       },
@@ -4671,6 +4730,9 @@
           "lastCursor": {
             "type": "string",
             "example": "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          },
+          "isLastPage": {
+            "type": "boolean"
           }
         }
       }
