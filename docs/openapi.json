@@ -655,13 +655,13 @@
         }
       }
     },
-    "/transactions/send/{id}": {
+    "/transactions/payment/{id}": {
       "get": {
         "tags": [
           "transactions"
         ],
-        "summary": "Get send transaction info by id",
-        "operationId": "getTxsSend",
+        "summary": "Get payment transaction info by id",
+        "operationId": "getTxsPayment",
         "parameters": [
           {
             "name": "id",
@@ -675,11 +675,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Send transaction",
+            "description": "Payment transaction",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TxSend"
+                  "$ref": "#/components/schemas/TxPayment"
                 }
               }
             }
@@ -690,13 +690,13 @@
         }
       }
     },
-    "/transactions/send": {
+    "/transactions/payment": {
       "get": {
         "tags": [
           "transactions"
         ],
-        "summary": "Get a list of send transactions by applying filters",
-        "operationId": "searchTxsSend",
+        "summary": "Get a list of payment transactions by applying filters",
+        "operationId": "searchTxsPayment",
         "parameters": [
           {
             "in": "query",
@@ -781,11 +781,11 @@
         ],
         "responses": {
           "200": {
-            "description": "List of send transactions satisfying provided filters",
+            "description": "List of payment transactions satisfying provided filters",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListOfTxSend"
+                  "$ref": "#/components/schemas/ListOfTxPayment"
                 }
               }
             }
@@ -3598,7 +3598,7 @@
           }
         }
       },
-      "TxSend": {
+      "TxPayment": {
         "type": "object",
         "properties": {
           "__type": {
@@ -4264,7 +4264,7 @@
                   "$ref": "#/components/schemas/TxGenesis"
                 },
                 {
-                  "$ref": "#/components/schemas/TxSend"
+                  "$ref": "#/components/schemas/TxPayment"
                 },
                 {
                   "$ref": "#/components/schemas/TxIssue"
@@ -4346,7 +4346,7 @@
           }
         }
       },
-      "ListOfTxSend": {
+      "ListOfTxPayment": {
         "type": "object",
         "required": [
           "__type",
@@ -4360,7 +4360,7 @@
           "data": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/TxSend"
+              "$ref": "#/components/schemas/TxPayment"
             }
           },
           "lastCursor": {
