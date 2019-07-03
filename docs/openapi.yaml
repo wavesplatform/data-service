@@ -402,12 +402,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListOfTxGenesis'
-  '/transactions/send/{id}':
+  '/transactions/payment/{id}':
     get:
       tags:
         - transactions
-      summary: Get send transaction info by id
-      operationId: getTxsSend
+      summary: Get payment transaction info by id
+      operationId: getTxsPayment
       parameters:
         - name: id
           in: path
@@ -417,18 +417,18 @@ paths:
             type: string
       responses:
         '200':
-          description: Send transaction
+          description: Payment transaction
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TxSend'
+                $ref: '#/components/schemas/TxPayment'
         '404':
           description: Transaction not found
-  '/transactions/send':
+  '/transactions/payment':
     get:
       tags:
         - transactions
-      summary: "Get a list of send transactions by applying filters"
+      summary: "Get a list of payment transactions by applying filters"
       operationId: searchTxsSend
       parameters:
         - in: query
@@ -480,11 +480,11 @@ paths:
       responses:
         '200':
           description: >-
-            List of send transactions satisfying provided filters
+            List of payment transactions satisfying provided filters
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ListOfTxSend'
+                $ref: '#/components/schemas/ListOfTxPayment'
   '/transactions/issue/{id}':
     get:
       tags:
@@ -2222,7 +2222,7 @@ components:
                 type: string
             script:
               type: string
-    TxSend:
+    TxPayment:
       type: object
       properties:
         __type:
@@ -2667,7 +2667,7 @@ components:
           items:
             oneOf:
               - $ref: '#/components/schemas/TxGenesis'
-              - $ref: '#/components/schemas/TxSend'
+              - $ref: '#/components/schemas/TxPayment'
               - $ref: '#/components/schemas/TxIssue'
               - $ref: '#/components/schemas/TxTransfer'
               - $ref: '#/components/schemas/TxReissue'
@@ -2705,7 +2705,7 @@ components:
           example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
         isLastPage:
           type: boolean          
-    ListOfTxSend:
+    ListOfTxPayment:
       type: object
       required:
         - __type
@@ -2717,7 +2717,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/TxSend'
+            $ref: '#/components/schemas/TxPayment'
         lastCursor:
           type: string
           example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
