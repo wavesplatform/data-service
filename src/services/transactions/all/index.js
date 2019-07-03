@@ -20,7 +20,7 @@ const commonData = require('./commonData');
 
 const createServices = {
   1: require('../genesis'),
-  2: require('../send'),
+  2: require('../payment'),
   3: require('../issue'),
   4: require('../transfer'),
   5: require('../reissue'),
@@ -34,6 +34,7 @@ const createServices = {
   13: require('../setScript'),
   14: require('../sponsorship'),
   15: require('../setAssetScript'),
+  16: require('../invokeScript'),
 };
 
 const getData = prop('data');
@@ -41,7 +42,7 @@ const getData = prop('data');
 // @todo
 // request by (id, timestamp) instead of just id
 // to ensure correct tx response even if
-// id is duplicated (happens in send, alias txs)
+// id is duplicated (happens in payment, alias txs)
 module.exports = deps => {
   const commonTxData = commonData(deps);
   const txsServices = map(f => f(deps), createServices);

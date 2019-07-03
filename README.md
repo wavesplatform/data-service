@@ -77,6 +77,20 @@ To add candles and pairs functionality the following Docker daemons must be used
 - Pairs — calculate last pairs for 24h exchange transactions (see [description](https://hub.docker.com/r/wavesplatform/data-service-pairs/))
 
 
+#### Documentation
+You can run your own instance of Swagger online documentation.
+To do this, you have to:
+1. Build Docker image from docs/ directory:
+    ```bash
+    docker build -t wavesplatform/data-service-docs docs/
+    ```
+2. Run the container
+    ```bash
+    docker run --rm -d -p 8080:8080 -e SWAGGER_JSON=/app/openapi.json wavesplatform/data-service-docs
+    ```
+
+Its will start the documentation server at `localhost:8080`. Enjoy!
+
 #### General recommendations
 - Set up a dedicated web server such as Nginx in front of data-service backends (for ssl/caching/balancing)
 - Implement a caching strategy. Different endpoints may need different cache time (or no cache at all)

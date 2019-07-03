@@ -1,24 +1,20 @@
 import { Maybe } from 'folktale/maybe';
 
-import { list, List, FromSerializable, Serializable } from '../../../../types';
+import { list, List, Serializable } from '../../../../types';
 
 export const transformResults = <
   Request,
   ResponseRaw,
-  ResponseTransformed extends Serializable<string, any>
+  ResponseTransformed,
+  Result extends Serializable<string, any>
 >(
-  typeFactory: (
-    d?: FromSerializable<ResponseTransformed>
-  ) => ResponseTransformed
+  typeFactory: (d?: ResponseTransformed) => Result
 ) => (
   transformDbResponse: (
     results: ResponseRaw,
     request?: Request
-  ) => FromSerializable<ResponseTransformed>
-) => (
-  maybeResponses: Maybe<ResponseRaw>[],
-  request?: Request
-): List<ResponseTransformed> =>
+  ) => ResponseTransformed
+) => (maybeResponses: Maybe<ResponseRaw>[], request?: Request): List<Result> =>
   list(
     maybeResponses.map(response =>
       response

@@ -15,7 +15,7 @@ const {
 
 // services
 const genesis = require('../../services/transactions/genesis');
-const send = require('../../services/transactions/send');
+const payment = require('../../services/transactions/payment');
 const issue = require('../../services/transactions/issue');
 const transfer = require('../../services/transactions/transfer');
 const reissue = require('../../services/transactions/reissue');
@@ -29,6 +29,7 @@ const data = require('../../services/transactions/data');
 const setScript = require('../../services/transactions/setScript');
 const sponsorship = require('../../services/transactions/sponsorship');
 const setAssetScript = require('../../services/transactions/setAssetScript');
+const invokeScript = require('../../services/transactions/invokeScript');
 const all = require('../../services/transactions/all');
 
 // filters
@@ -56,15 +57,15 @@ const transactionsEndpointsConfig = {
     service: genesis,
     options: { filterParsers: omit(['sender'], commonTxFilters) },
   },
-  '/transactions/send': {
-    service: send,
+  '/transactions/payment': {
+    service: payment,
     options: createOptions(),
   },
   '/transactions/issue': {
     service: issue,
     options: createOptions({
       assetId: identity,
-      script: identity
+      script: identity,
     }),
   },
   '/transactions/transfer': {
@@ -130,6 +131,10 @@ const transactionsEndpointsConfig = {
   '/transactions/set-asset-script': {
     service: setAssetScript,
     options: createOptions({ assetId: identity, script: identity }),
+  },
+  '/transactions/invoke-script': {
+    service: invokeScript,
+    options: createOptions({ dapp: identity, function: identity }),
   },
 };
 

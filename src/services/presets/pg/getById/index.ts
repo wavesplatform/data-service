@@ -6,13 +6,9 @@ import { validateInput, validateResult } from '../../validation';
 import { transformResults as transformResultFn } from './transformResult';
 import { getData } from './pg';
 import { ServicePresetInitOptions } from '../../types';
-import { Serializable, FromSerializable } from '../../../../types';
+import { Serializable } from '../../../../types';
 
-export const getByIdPreset = <
-  Id,
-  ResponseRaw,
-  ResponseTransformed extends Serializable<string, any>
->({
+export const getByIdPreset = <Id, ResponseRaw, ResponseTransformed>({
   name,
   sql,
   inputSchema,
@@ -24,19 +20,19 @@ export const getByIdPreset = <
   inputSchema: SchemaLike;
   resultSchema: SchemaLike;
   resultTypeFactory: (
-    t: FromSerializable<ResponseTransformed>
-  ) => ResponseTransformed;
-  transformResult: (
-    response: ResponseRaw,
-    request?: Id
-  ) => FromSerializable<ResponseTransformed>;
+    t?: ResponseTransformed
+  ) => Serializable<string, ResponseTransformed>;
+  transformResult: (response: ResponseRaw, request?: Id) => ResponseTransformed;
   sql: (r: Id) => string;
 }) => ({ pg, emitEvent }: ServicePresetInitOptions) =>
-  get<Id, Id, ResponseRaw, ResponseTransformed>({
+  get<Id, Id, ResponseRaw, Serializable<string, ResponseTransformed>>({
     transformInput: identity,
-    transformResult: transformResultFn<Id, ResponseRaw, ResponseTransformed>(
-      resultTypeFactory
-    )(transformResult),
+    transformResult: transformResultFn<
+      Id,
+      ResponseRaw,
+      ResponseTransformed,
+      Serializable<string, ResponseTransformed>
+    >(resultTypeFactory)(transformResult),
     validateInput: validateInput(inputSchema, name),
     validateResult: validateResult(resultSchema, name),
     dbQuery: getData({ name, sql }),
