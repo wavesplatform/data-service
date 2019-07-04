@@ -3081,7 +3081,7 @@
           "id": {
             "type": "string"
           },
-          "sender": {
+          "orderSender": {
             "type": "string"
           },
           "senderPublicKey": {

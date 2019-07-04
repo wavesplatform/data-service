@@ -30,7 +30,7 @@ const createOrder = prefix => ({
     },
     orderType,
     price,
-    sender,
+    orderSender: sender,
     amount,
     timestamp,
     expiration,
