@@ -40,7 +40,7 @@ function createErrorInfo(
   type: ErrorType,
   error: Error,
   meta?: ErrorMetaInfo | joi.ValidationError
-): ValidationErrorInfo;
+): ErrorInfo | ValidationErrorInfo;
 function createErrorInfo(
   type: ErrorType,
   error: Error,
