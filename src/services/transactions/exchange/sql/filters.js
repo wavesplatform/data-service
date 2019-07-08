@@ -5,7 +5,7 @@ const { where } = require('../../../../utils/db/knex');
 const commonFilters = require('../../_common/sql/filters');
 const commonFiltersOrder = require('../../_common/sql/filtersOrder');
 
-const bySender = curryN(
+const byOrderSender = curryN(
   2,
   (sender, q) => q.clone()
     .whereRaw("array[order1->>'sender', order2->>'sender'] @> ?", `{${sender}}`)
@@ -28,7 +28,7 @@ module.exports = {
     amountAsset: where('t.amount_asset'),
     priceAsset: where('t.price_asset'),
     orderId: byOrder,
-    orderSender: bySender,
+    orderSender: byOrderSender,
     sortOuter: s => q =>
       q
         .clone()
