@@ -24,15 +24,16 @@ module.exports = {
   filters: {
     ...commonFilters,
     matcher: where('t.sender'),
+    sender: where('t.sender'),
     amountAsset: where('t.amount_asset'),
     priceAsset: where('t.price_asset'),
     orderId: byOrder,
-    sender: bySender,
+    orderSender: bySender,
     sortOuter: s => q =>
       q
         .clone()
         .orderBy('time_stamp', s)
         .orderBy('id', s),
   },
-  filtersOrder: [...commonFiltersOrder, 'matcher', 'orderId', 'amountAsset', 'priceAsset'],
+  filtersOrder: [...commonFiltersOrder, 'matcher', 'orderId', 'amountAsset', 'priceAsset', 'orderSender'],
 };

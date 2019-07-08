@@ -45,7 +45,6 @@ const createSql = ({
 
     search: fValues => {
       const fValuesPicked = pick(filtersOrder, fValues);
-
       const appliedFs = compose(
         map(x => filters[x](fValuesPicked[x])),
         filter(has(__, fValuesPicked)),
