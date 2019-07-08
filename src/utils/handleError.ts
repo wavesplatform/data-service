@@ -12,17 +12,21 @@ export const handleError = ({ ctx, error }: { ctx: any; error: AppError }) => {
     Resolver: () => {
       ctx.status = 500;
       ctx.body = {
-        message: 'Internal Error',
+        message: 'Internal Error. Please, try again later.',
       };
     },
     Validation: errorInfo => {
       ctx.status = 400;
       ctx.body = {
         message: 'Validation Error',
-        meta: errorInfo.meta.details.map(error => ({
-          message: error.message,
-          code: error.type,
-        })),
+        meta:
+          errorInfo.meta !== undefined
+            ? Array.isArray(errorInfo.meta.details)
+              ? errorInfo.meta.details.map(error => ({
+                  message: error.message,
+                }))
+              : errorInfo.meta
+            : undefined,
       };
     },
   });

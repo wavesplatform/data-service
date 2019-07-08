@@ -1,7 +1,7 @@
 import {
   AppError,
-  ResolverError,
   DbError,
+  ResolverError,
   ValidationError,
   ErrorType,
   ErrorMetaInfo,

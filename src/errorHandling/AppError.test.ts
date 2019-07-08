@@ -1,8 +1,4 @@
-import {
-  AppError,
-  AppErrorPattern,
-  ErrorInfoWithMeta,
-} from './AppError';
+import { AppError, AppErrorPattern, ErrorInfo } from './AppError';
 
 const errorTypes: (keyof AppErrorPattern<any>)[] = [
   'Resolver',
@@ -24,7 +20,7 @@ describe('AppError', () => {
     it(`${type} should be created from message`, () => {
       AppError[type]('Error message', { info: 'some-info' }).matchWith({
         ...throwPattern,
-        [type]: (err: ErrorInfoWithMeta) => {
+        [type]: (err: ErrorInfo) => {
           expect(err.error.message).toEqual('Error message');
           expect(err.meta).not.toBeUndefined();
           if (err.meta) expect(err.meta.info).toEqual('some-info');
@@ -37,7 +33,7 @@ describe('AppError', () => {
         info: 'some-info',
       }).matchWith({
         ...throwPattern,
-        [type]: (err: ErrorInfoWithMeta) => {
+        [type]: (err: ErrorInfo) => {
           expect(err.error.message).toEqual('Error message');
           expect(err.meta).not.toBeUndefined();
           if (err.meta) expect(err.meta.info).toEqual('some-info');
