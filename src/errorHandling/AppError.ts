@@ -121,26 +121,18 @@ export class DbError extends AppError implements ErrorInfo {
 export class ValidationError extends AppError {
   public readonly type = 'Validation';
   public readonly error: ErrorInfo['error'];
-  public readonly meta?: ErrorInfo['meta'] | { error: joi.ValidationError };
+  public readonly meta?: ErrorInfo['meta'] | joi.ValidationError;
 
-  constructor(
-    error: Error | string,
-    meta?: ErrorInfo['meta'] | { error: joi.ValidationError }
-  ) {
+  constructor(error: Error | string, meta?: ErrorInfo['meta']) {
     super();
     this.error = ensureError(error);
-    this.meta = meta;
+    this.meta =
+      meta && meta.error && isJoiError(meta.error) ? meta.error : meta;
   }
 
   public matchWith<C>(pattern: AppErrorPattern<C>): C {
     return pattern.Validation(
-      createErrorInfo(
-        this.type,
-        this.error,
-        this.meta && this.meta.error && isJoiError(this.meta.error)
-          ? this.meta.error
-          : this.meta
-      )
+      createErrorInfo(this.type, this.error, this.meta)
     );
   }
 }
