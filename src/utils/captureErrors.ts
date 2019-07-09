@@ -1,9 +1,11 @@
 import { Middleware } from 'koa';
-import { AppError } from '../errorHandling';
+import {
+  AppError,
+  DEFAULT_INTERNAL_SERVER_ERROR_MESSAGE,
+} from '../errorHandling';
 
-const isAppError = (error: any): error is AppError => {
-  return error && typeof error.matchWith === 'function' ? true : false;
-};
+const isAppError = (error: any): error is AppError =>
+  error && typeof error.matchWith === 'function';
 
 export const captureErrors = (
   errorHandler: ({ ctx, error }: { ctx: any; error: any }) => void
@@ -12,7 +14,7 @@ export const captureErrors = (
     if (isAppError(error)) return errorHandler({ ctx, error });
     ctx.status = 500;
     ctx.body = {
-      message: 'Something went wrong',
+      message: DEFAULT_INTERNAL_SERVER_ERROR_MESSAGE,
     };
     ctx.eventBus.emit('ERROR', {
       error: error,

@@ -1,4 +1,7 @@
-import { AppError } from '../errorHandling';
+import {
+  AppError,
+  DEFAULT_INTERNAL_SERVER_ERROR_MESSAGE,
+} from '../errorHandling';
 
 export const handleError = ({ ctx, error }: { ctx: any; error: AppError }) => {
   ctx.eventBus.emit('ERROR', error);
@@ -6,13 +9,13 @@ export const handleError = ({ ctx, error }: { ctx: any; error: AppError }) => {
     Db: () => {
       ctx.status = 500;
       ctx.body = {
-        message: 'Database Error',
+        message: DEFAULT_INTERNAL_SERVER_ERROR_MESSAGE,
       };
     },
     Resolver: () => {
       ctx.status = 500;
       ctx.body = {
-        message: 'Internal Error. Please, try again later.',
+        message: DEFAULT_INTERNAL_SERVER_ERROR_MESSAGE,
       };
     },
     Validation: errorInfo => {
