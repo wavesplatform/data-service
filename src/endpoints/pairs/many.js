@@ -7,7 +7,11 @@ const { parseArrayQuery } = require('../utils/parseArrayQuery');
 const { parseBool } = require('../utils/parseBool');
 const { limit, query } = require('../_common/filters');
 
-const { map, split, zipObj, compose } = require('ramda');
+const { defaultTo, map, split, zipObj, compose } = require('ramda');
+
+const { loadConfig } = require('../../loadConfig');
+
+const options = loadConfig();
 
 /**
  * @typedef {object} PairRequest
@@ -47,6 +51,10 @@ const pairsMany = createManyMiddleware(
         map(map(parseBool)),
         Maybe.fromNullable,
         parseArrayQuery
+      ),
+      matcher: compose(
+        query,
+        defaultTo(options.defaultMatcher)
       ),
       limit,
     },

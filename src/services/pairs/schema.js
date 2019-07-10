@@ -22,6 +22,7 @@ const inputSearch = Joi.object()
     match_exactly: Joi.array()
       .items(Joi.boolean(), Joi.boolean())
       .max(2),
+    matcher: Joi.string(),
     limit: Joi.number()
       .min(1)
       .max(limitMaximum),

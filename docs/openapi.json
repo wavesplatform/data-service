@@ -344,6 +344,14 @@
             }
           },
           {
+            "in": "query",
+            "name": "matcher",
+            "description": "Matcher address",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "limit",
             "in": "query",
             "description": "How many pairs to await in response.",

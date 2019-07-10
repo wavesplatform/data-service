@@ -18,11 +18,12 @@ const COLUMNS = [
   'volume_waves',
 ];
 
-type SearchWithLimitRequest = {
+type CommonSearchRequest = {
+  matcher: string;
   limit: number;
 };
 
-type SearchWithMatchExactly = SearchWithLimitRequest & {
+type SearchWithMatchExactly = CommonSearchRequest & {
   match_exactly?: boolean[];
 };
 
@@ -35,7 +36,7 @@ type SearchByAssetsRequest = SearchWithMatchExactly & {
 };
 
 type SearchRequest =
-  | SearchWithLimitRequest
+  | CommonSearchRequest
   | SearchByAssetRequest
   | SearchByAssetsRequest;
 
@@ -141,11 +142,11 @@ export const search = (req: SearchRequest): string => {
   //                 and prefix search of price asset by asset2
   //                 or amount asset by asset2 and price asset by asset1
 
-  const { limit } = req;
-
+  const { matcher, limit } = req;
   const q = pg({ t: 'pairs' })
     .select(COLUMNS.map(column => `t.${column}`))
     .orderByRaw('volume_waves desc NULLS LAST')
+    .where('matcher', matcher)
     .limit(limit);
 
   if (isSearchByAssetRequest(req)) {
@@ -209,6 +210,7 @@ export const search = (req: SearchRequest): string => {
               'reverse_cte.price_asset_id': 't1.amount_asset_id',
             }
           )
+          .where('matcher', matcher)
       )
       .toString();
   } else {
