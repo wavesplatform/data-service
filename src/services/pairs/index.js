@@ -55,10 +55,8 @@ module.exports = ({ drivers, emitEvent, orderPair, cache }) => {
         assetId => assetId !== 'WAVES'
       );
 
-      // try to get assets from cache
-      const cached = cache.mget(assets);
-
-      const notCached = assets.filter(assetId => !cached[assetId]);
+      // try to check asset existance through the cache
+      const notCached = assets.filter(assetId => !cache.has(assetId));
 
       if (notCached.length === 0) {
         // both of assets are cached
@@ -73,7 +71,7 @@ module.exports = ({ drivers, emitEvent, orderPair, cache }) => {
                 [T, () => taskOf(empty())],
               ]),
               length,
-              tap(forEach(tx => cache.set(tx.id, tx))),
+              tap(forEach(tx => cache.set(tx.id, true))),
               map(tx => tx.data),
               filter(tx => tx.data !== null),
               list => list.data
@@ -97,10 +95,8 @@ module.exports = ({ drivers, emitEvent, orderPair, cache }) => {
         .reduce((acc, pair) => [...acc, pair.amountAsset, pair.priceAsset], [])
         .filter(assetId => assetId !== 'WAVES');
 
-      // try to get all assets from cache
-      const cached = cache.mget(assets);
-
-      const notCached = assets.filter(assetId => !cached[assetId]);
+      // try to check asset existance through the cache
+      const notCached = assets.filter(assetId => !cache.has(assetId));
 
       if (notCached.length === 0) {
         // all of assets are in cache
@@ -115,7 +111,7 @@ module.exports = ({ drivers, emitEvent, orderPair, cache }) => {
                 [T, () => taskOf(null)],
               ]),
               length,
-              tap(forEach(tx => cache.set(tx.id, tx))),
+              tap(forEach(tx => cache.set(tx.id, true))),
               map(tx => tx.data),
               filter(tx => tx.data !== null),
               list => list.data
