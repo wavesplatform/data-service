@@ -18,6 +18,8 @@ const pairsOneEndpoint = async ctx => {
   const service = createService({
     drivers: ctx.state.drivers,
     emitEvent: ctx.eventBus.emit,
+    orderPair: ctx.orderPair,
+    cache: ctx.cache,
   });
 
   const pair = await service

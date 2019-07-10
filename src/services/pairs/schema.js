@@ -2,16 +2,50 @@ const Joi = require('../../utils/validation/joi');
 
 const limitMaximum = 1000;
 
-const inputGet = Joi.object().keys({
-  amountAsset: Joi.string()
-    .base58()
-    .required(),
-  priceAsset: Joi.string()
-    .base58()
-    .required(),
-});
+const JoiWithOrderPair = orderPair =>
+  Joi.extend(joi => ({
+    base: joi.object(),
+    name: 'object',
+    language: {
+      pair: 'in pair {{amountAsset}}/{{priceAsset}} is incorrect.',
+    },
+    rules: [
+      {
+        name: 'valid',
+        validate(_, value, state, options) {
+          const validAmountAsset = orderPair(
+            value.amountAsset,
+            value.priceAsset
+          )[0];
+          if (value.amountAsset !== validAmountAsset) {
+            return this.createError(
+              'object.pair',
+              { amountAsset: value.amountAsset, priceAsset: value.priceAsset },
+              state,
+              options,
+              { label: 'Asset order' }
+            );
+          }
+          return value;
+        },
+      },
+    ],
+  }));
 
-const inputMget = Joi.array().items(inputGet);
+const inputGet = orderPair =>
+  JoiWithOrderPair(orderPair)
+    .object()
+    .keys({
+      amountAsset: Joi.string()
+        .base58()
+        .required(),
+      priceAsset: Joi.string()
+        .base58()
+        .required(),
+    })
+    .valid();
+
+const inputMget = orderPair => Joi.array().items(inputGet(orderPair));
 
 const inputSearch = Joi.object()
   .keys({

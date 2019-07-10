@@ -42,6 +42,7 @@
   },
   "dependencies": {
     "@koa/cors": "^2.2.3",
+    "@waves/assets-pairs-order": "^4.0.0",
     "@waves/data-entities": "^1.8.0",
     "@waves/json-bigint": "git+https://github.com/wavesplatform/json-bigint.git",
     "chalk": "^2.3.2",
@@ -56,6 +57,7 @@
     "koa-qs": "^2.0.0",
     "koa-requestid": "^2.0.1",
     "koa-router": "^7.4.0",
+    "node-cache": "^4.2.0",
     "pg-promise": "^8.2.3",
     "qs": "^6.5.2",
     "ramda": "^0.25.0",

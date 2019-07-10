@@ -32,6 +32,8 @@ const createManyMiddleware = (
     const s = service({
       drivers: ctx.state.drivers,
       emitEvent: ctx.eventBus.emit,
+      orderPair: ctx.orderPair,
+      cache: ctx.cache,
     });
 
     if (!s.mget && !s.search) {
