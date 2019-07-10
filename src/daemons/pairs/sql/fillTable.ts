@@ -13,7 +13,14 @@ const selectVolumeWavesFromPairsCTE = pg({ d: 'pairs_cte' })
   );
 
 const selectExchanges = pg('txs_7')
-  .select(['price_asset', 'amount_asset', 'amount', 'price', 'time_stamp'])
+  .select([
+    'price_asset',
+    'amount_asset',
+    'amount',
+    'price',
+    'time_stamp',
+    'sender',
+  ])
   .whereRaw(`time_stamp >= now() - interval '1 day'`)
   .orderBy('time_stamp', 'desc');
 
@@ -41,11 +48,12 @@ const selectPairsCTE = pg
       high: pg.raw('max(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'),
       low: pg.raw('min(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'),
       txs_count: pg.raw('count(e.price)'),
+      matcher: 'sender',
     })
       .from(selectExchanges.clone().as('e'))
       .innerJoin('asset_decimals as a_dec', 'e.amount_asset', 'a_dec.asset_id')
       .innerJoin('asset_decimals as p_dec', 'e.price_asset', 'p_dec.asset_id')
-      .groupBy(['amount_asset', 'price_asset']);
+      .groupBy(['amount_asset', 'price_asset', 'sender']);
   })
   .from({ p: 'pairs_cte' })
   .columns(
@@ -63,7 +71,8 @@ const selectPairsCTE = pg
     'high',
     'low',
     'weighted_average_price',
-    'txs_count'
+    'txs_count',
+    'matcher'
   );
 
 export const fillTable = (tableName: string): string =>
