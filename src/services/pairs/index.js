@@ -7,6 +7,7 @@ const {
   length,
   map,
   T,
+  tap,
 } = require('ramda');
 const { of: maybeOf, empty } = require('folktale/maybe');
 const { of: taskOf } = require('folktale/concurrency/task');
@@ -14,7 +15,7 @@ const { getByIdPreset } = require('../presets/pg/getById');
 const { mgetByIdsPreset } = require('../presets/pg/mgetByIds');
 const { searchPreset } = require('../presets/pg/search');
 const { pair } = require('../../types');
-const createAssetsService = require('../assets');
+const createIssueTxsService = require('../transactions/issue');
 
 const {
   inputGet,
@@ -49,22 +50,33 @@ module.exports = ({ drivers, emitEvent, orderPair, cache }) => {
         )
       );
 
-      // try to get assets from cache
-      const values = cache.mget([request.amountAsset, request.priceAsset]);
+      // request asset list
+      const assets = [request.amountAsset, request.priceAsset].filter(
+        assetId => assetId !== 'WAVES'
+      );
 
-      if (values[request.amountAsset] && values[request.priceAsset]) {
+      // try to get assets from cache
+      const cached = cache.mget(assets);
+
+      const notCached = assets.filter(assetId => !cached[assetId]);
+
+      if (notCached.length === 0) {
         // both of assets are cached
         return getPairT;
       } else {
-        return createAssetsService({ drivers, emitEvent })
-          .mget([request.amountAsset, request.priceAsset])
+        return createIssueTxsService({ drivers, emitEvent })
+          .mget(notCached)
           .chain(
             compose(
-              cond([equals(2), getPairT, T, taskOf(empty())]),
+              cond([
+                [equals(notCached.length), () => getPairT],
+                [T, () => taskOf(empty())],
+              ]),
               length,
-              forEach(asset => cache.set(asset.id, asset)),
-              map(asset => asset.data),
-              filter(asset => asset.data !== null)
+              tap(forEach(tx => cache.set(tx.id, tx))),
+              map(tx => tx.data),
+              filter(tx => tx.data !== null),
+              list => list.data
             )
           );
       }
@@ -80,30 +92,33 @@ module.exports = ({ drivers, emitEvent, orderPair, cache }) => {
         resultTypeFactory: pair,
       })({ pg: drivers.pg, emitEvent })(request);
 
-      // full assets list
-      const assets = request.reduce(
-        (acc, pair) => [...acc, pair.amountAsset, pair.priceAsset],
-        []
-      );
-      // try to get all assets from cache
-      const values = cache.mget(assets);
+      // request asset list
+      const assets = request
+        .reduce((acc, pair) => [...acc, pair.amountAsset, pair.priceAsset], [])
+        .filter(assetId => assetId !== 'WAVES');
 
-      if (
-        Object.values(values).filter(assetOrNull => assetOrNull !== null)
-          .length === assets.length
-      ) {
-        // all assets were in cache
+      // try to get all assets from cache
+      const cached = cache.mget(assets);
+
+      const notCached = assets.filter(assetId => !cached[assetId]);
+
+      if (notCached.length === 0) {
+        // all of assets are in cache
         return mgetPairsT;
       } else {
-        return createAssetsService({ drivers, emitEvent })
-          .mget(assets)
+        return createIssueTxsService({ drivers, emitEvent })
+          .mget(notCached)
           .chain(
             compose(
-              cond([equals(assets.length), mgetPairsT, T, taskOf(null)]),
+              cond([
+                [equals(notCached.length), () => mgetPairsT],
+                [T, () => taskOf(null)],
+              ]),
               length,
-              forEach(asset => cache.set(asset.id, asset)),
-              map(asset => asset.data),
-              filter(asset => asset.data !== null)
+              tap(forEach(tx => cache.set(tx.id, tx))),
+              map(tx => tx.data),
+              filter(tx => tx.data !== null),
+              list => list.data
             )
           );
       }
