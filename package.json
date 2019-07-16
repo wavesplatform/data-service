@@ -16,7 +16,7 @@
     "dev:pairs": "export $(cat variables.stage.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect dist/daemons/pairs/index.js",
     "dev:pairs:t": "export $(cat variables.testnet.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect dist/daemons/pairs/index.js",
     "lint": "eslint src",
-    "dev": "export $(cat variables.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect dist/index.js",
+    "dev": "export $(cat variables.stage.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect dist/index.js",
     "dev:t": "export $(cat variables.testnet.env | xargs) && NODE_ENV=development LOG_LEVEL=debug nodemon --inspect dist/index.js",
     "test": "npm run test:u && npm run test:i",
     "test:t": "npm run test:u && npm run test:it",

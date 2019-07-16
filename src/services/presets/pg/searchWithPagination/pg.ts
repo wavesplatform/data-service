@@ -7,7 +7,7 @@ export const getData = <Request, ResponseRaw>({
 }: {
   name: string;
   sql: (req: Request) => string;
-}) => (pg: PgDriver) => (request: Request) =>
-  pg
+}) => (pg: PgDriver) => (request: Request) => 
+pg
     .any<ResponseRaw>(sql(request))
     .mapRejected(e => toDbError({ request: name, params: request }, e.error));

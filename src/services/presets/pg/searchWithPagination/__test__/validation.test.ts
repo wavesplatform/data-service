@@ -12,19 +12,16 @@ import {
 import { PgDriver } from '../../../../../db/driver';
 import { SortOrder } from '../../../../_common/pagination/cursor';
 
-const mockTxs: ResponseRaw[] = [
-  { id: 'q', timestamp: new Date() },
-  { id: 'w', timestamp: new Date() },
-];
+const mockTxs: ResponseRaw[] = [{ generated_id: 1 }, { generated_id: 2 }];
 
-type Request = WithSortOrder & WithLimit & {
-  timeEnd?: Date;
-  timeStart?: Date;
-}
+type Request = WithSortOrder &
+  WithLimit & {
+    timeEnd?: Date;
+    timeStart?: Date;
+  };
 
 type ResponseRaw = {
-  id: string;
-  timestamp: Date;
+  generated_id: number;
 };
 
 const service = searchWithPaginationPreset<

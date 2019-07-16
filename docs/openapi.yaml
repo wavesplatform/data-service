@@ -298,7 +298,7 @@ paths:
               - type: number
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: "Cursor in base64 encoding."
           schema:
             type: string
         - in: query
@@ -376,7 +376,7 @@ paths:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: "Cursor in base64 encoding."
           schema:
             type: string
         - in: query
@@ -459,7 +459,7 @@ paths:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: "Cursor in base64 encoding."
           schema:
             type: string
         - in: query
@@ -537,7 +537,7 @@ paths:
               - type: number
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: "Cursor in base64 encoding."
           schema:
             type: string
         - in: query
@@ -635,7 +635,7 @@ paths:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: "Cursor in base64 encoding."
           schema:
             type: string
         - in: query
@@ -718,7 +718,7 @@ paths:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: "Cursor in base64 encoding."
           schema:
             type: string
         - in: query
@@ -806,7 +806,7 @@ paths:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: "Cursor in base64 encoding."
           schema:
             type: string
         - in: query
@@ -909,7 +909,7 @@ paths:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: "Cursor in base64 encoding."
           schema:
             type: string
         - in: query
@@ -993,7 +993,7 @@ paths:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: "Cursor in base64 encoding."
           schema:
             type: string
         - in: query
@@ -1076,7 +1076,7 @@ paths:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: "Cursor in base64 encoding."
           schema:
             type: string
         - in: query
@@ -1154,7 +1154,7 @@ paths:
               - type: number
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: "Cursor in base64 encoding."
           schema:
             type: string
         - in: query
@@ -1242,7 +1242,7 @@ paths:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: "Cursor in base64 encoding."
           schema:
             type: string
         - in: query
@@ -1343,7 +1343,7 @@ paths:
               - type: number
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: "Cursor in base64 encoding."
           schema:
             type: string
         - in: query
@@ -1426,7 +1426,7 @@ paths:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: "Cursor in base64 encoding."
           schema:
             type: string
         - in: query
@@ -1509,7 +1509,7 @@ paths:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: "Cursor in base64 encoding."
           schema:
             type: string
         - in: query
@@ -1597,7 +1597,7 @@ paths:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: "Cursor in base64 encoding."
           schema:
             type: string
         - in: query
@@ -1685,7 +1685,7 @@ paths:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: "Cursor in base64 encoding."
           schema:
             type: string
         - in: query

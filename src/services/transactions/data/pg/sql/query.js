@@ -11,6 +11,7 @@ const select = pg
     'proofs',
     'sender',
     'sender_public_key',
+    'generated_id',
 
     // data values
     'tx_id',

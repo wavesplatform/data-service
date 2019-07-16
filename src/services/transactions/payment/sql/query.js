@@ -9,6 +9,7 @@ const columnsWithoutSatoshi = [
   'signature',
   'proofs',
   'tx_version',
+  'generated_id',
   // 'fee',
   'sender',
   'sender_public_key',

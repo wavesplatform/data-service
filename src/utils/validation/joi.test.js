@@ -16,18 +16,14 @@ describe('Joi extended with custom types', () => {
 
   it('should validate cursor correctly', () => {
     const validateCursor = validate(Joi.string().cursor());
-    assertPass(
-      validateCursor(
-        'MjAxOC0wOS0xOFQxMzo0NDozNC4wMDBaOjo2b3NpNGI2Q3FrS3oyMVVtWDlxeXdydDJ1aXQ4U1VCOE1udndONjJhNnFLbzo6ZGVzYw=='
-      )
-    );
+    assertPass(validateCursor('MTAwOjpkZXNj'));
     assertError(validateCursor('q')); // not base64
     assertError(validateCursor('MjAxOC0wOS')); // not decodable
     assertError(validateCursor(1));
     assertError(validateCursor(null));
   });
 
-  it('should validate cursor correctly', () => {
+  it('should validate base58 correctly', () => {
     const validateBase58 = validate(Joi.string().base58());
 
     assertPass(validateBase58('qwe'));

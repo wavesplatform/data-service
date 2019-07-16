@@ -20,6 +20,7 @@ module.exports = {
     .required()
     .allow(null),
   proofs: Joi.array().required(),
+  generated_id: Joi.number().required(),
 
   sender: Joi.string().required(),
   sender_public_key: Joi.string().required(),
