@@ -1,17 +1,11 @@
-const { getByIdPreset } = require('../presets/pg/getById');
-const { mgetByIdsPreset } = require('../presets/pg/mgetByIds');
-const { searchPreset } = require('../presets/pg/search');
-const { pair } = require('../../types');
+import { getByIdPreset } from '../presets/pg/getById';
+import { searchPreset } from '../presets/pg/search';
+import { pair } from '../../types';
 
-const {
-  inputGet,
-  inputMget,
-  inputSearch,
-  result: resultSchema,
-} = require('./schema');
-const { transformResult, transformResultSearch } = require('./transformResult');
-const sql = require('./sql');
-const matchRequestResult = require('./matchRequestResult');
+import mget from './mget';
+import { inputGet, inputSearch, result as resultSchema } from './schema';
+import { transformResult, transformResultSearch } from './transformResult';
+import * as sql from './sql';
 
 module.exports = ({ drivers, emitEvent }) => {
   return {
@@ -23,14 +17,11 @@ module.exports = ({ drivers, emitEvent }) => {
       transformResult: transformResult,
       resultTypeFactory: pair,
     })({ pg: drivers.pg, emitEvent }),
-    mget: mgetByIdsPreset({
+    mget: mget({
       name: 'pairs.mget',
       sql: sql.mget,
-      inputSchema: inputMget,
-      resultSchema,
       transformResult: transformResult,
-      matchRequestResult: matchRequestResult,
-      resultTypeFactory: pair,
+      typeFactory: pair,
     })({ pg: drivers.pg, emitEvent }),
     search: searchPreset({
       name: 'pairs.search',

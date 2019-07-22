@@ -1,6 +1,7 @@
 import * as knex from 'knex';
 import { compose } from 'ramda';
 import { escapeForTsQuery, prepareForLike } from '../../utils/db';
+import { Pair, MgetRequest } from './types';
 
 const pg = knex({ client: 'pg' });
 
@@ -74,13 +75,14 @@ const getMatchExactly = (matchExactly: boolean[] | undefined): boolean[] => {
   }
 };
 
-const query = (pairs: { amountAsset: string; priceAsset: string }[]): string =>
+const query = (pairs: Pair[], matcher: string): string =>
   pg({ t: 'pairs' })
     .select(COLUMNS)
     .whereIn(
       ['t.amount_asset_id', 't.price_asset_id'],
       pairs.map(pair => [pair.amountAsset, pair.priceAsset])
     )
+    .where('matcher', matcher)
     .toString();
 
 const searchAssets = (
@@ -131,11 +133,19 @@ const searchAssets = (
     );
 };
 
-export const get = (pair: {
-  amountAsset: string;
-  priceAsset: string;
-}): string => query([pair]);
-export const mget = query;
+export const get = (
+  request: Pair & {
+    matcher: string;
+  }
+): string =>
+  query(
+    [{ amountAsset: request.amountAsset, priceAsset: request.priceAsset }],
+    request.matcher
+  );
+
+export const mget = <Request extends MgetRequest>(request: Request): string =>
+  query(request.pairs, request.matcher);
+
 export const search = (req: SearchRequest): string => {
   // asset - prefix search of amount or price assets
   // asset1/asset2 - prefix search of amount asset by asset1
