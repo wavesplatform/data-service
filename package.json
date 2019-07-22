@@ -31,6 +31,7 @@
     "@types/koa": "^2.0.47",
     "@types/koa-bodyparser": "^4.2.1",
     "@types/koa-qs": "^2.0.0",
+    "@types/lru-cache": "^5.1.0",
     "@types/node": "^10.12.14",
     "@types/ramda": "^0.25.43",
     "eslint": "^5.15.1",

@@ -1,16 +1,19 @@
 import { identity } from 'ramda';
 import { SchemaLike } from 'joi';
+import { Task } from 'folktale/concurrency/task';
 
 import { getData } from './pg';
 import { search } from '../../../_common/createResolver';
 import { ServicePresetInitOptions } from '../../../presets/types';
 import { validateInput, validateResult } from '../../validation';
 import { List, Serializable } from '../../../../types';
+import { AppError } from 'errorHandling';
 
 export const searchPreset = <
   Request,
   ResponseRaw,
-  ResponseTransformed extends Serializable<string, any>
+  ResponseTransformed,
+  Result extends List<Serializable<string, ResponseTransformed | null>>
 >({
   name,
   sql,
@@ -22,12 +25,12 @@ export const searchPreset = <
   sql: (r: Request) => string;
   inputSchema: SchemaLike;
   resultSchema: SchemaLike;
-  transformResult: (
-    response: ResponseRaw[],
-    request?: Request
-  ) => List<ResponseTransformed>;
-}) => ({ pg, emitEvent }: ServicePresetInitOptions) =>
-  search<Request, Request, ResponseRaw, List<ResponseTransformed>>({
+  transformResult: (response: ResponseRaw[], request?: Request) => Result;
+}) => ({
+  pg,
+  emitEvent,
+}: ServicePresetInitOptions): ((request: Request) => Task<AppError, Result>) =>
+  search<Request, Request, ResponseRaw, Result>({
     transformInput: identity,
     transformResult,
     validateInput: validateInput(inputSchema, name),

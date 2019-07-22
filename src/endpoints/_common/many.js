@@ -8,7 +8,7 @@ const { parseFilterValues } = require('./filters');
 const createManyMiddleware = (
   { parseFiltersFn, filterParsers, mgetFilterName },
   url,
-  service
+  serviceSlug
 ) => {
   const handleError = ({ ctx, error }) => {
     ctx.eventBus.emit('ERROR', error);
@@ -29,12 +29,7 @@ const createManyMiddleware = (
   };
 
   return captureErrors(handleError)(async ctx => {
-    const s = service({
-      drivers: ctx.state.drivers,
-      emitEvent: ctx.eventBus.emit,
-      orderPair: ctx.orderPair,
-      cache: ctx.cache,
-    });
+    const s = ctx.services[serviceSlug];
 
     if (!s.mget && !s.search) {
       ctx.status = 404;

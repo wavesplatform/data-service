@@ -1,13 +1,16 @@
 import { get } from 'https';
+import { DataServiceConfig } from 'loadConfig';
 
 type MatcherSettings = {
   priceAssets: string[];
   orderVersions: number[];
 };
 
-export const loadMatcherSettings = (): Promise<MatcherSettings> =>
+export const loadMatcherSettings = (
+  options: DataServiceConfig
+): Promise<MatcherSettings> =>
   new Promise(resolve =>
-    get('https://matcher.wavesplatform.com/matcher/settings', res => {
+    get(options.matcherSettingsURL, res => {
       let rawData = '';
       res.on('data', (chunk: any) => (rawData += chunk));
       res.on('end', () => {

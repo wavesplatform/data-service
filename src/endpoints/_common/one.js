@@ -1,7 +1,7 @@
 const { captureErrors } = require('../../utils/captureErrors');
 const { select } = require('../utils/selectors');
 
-const createGetMiddleware = (url, service) => {
+const createGetMiddleware = (url, serviceSlug) => {
   const handleError = ({ ctx, error }) => {
     ctx.eventBus.emit('ERROR', error);
     error.matchWith({
@@ -21,10 +21,7 @@ const createGetMiddleware = (url, service) => {
   };
 
   return captureErrors(handleError)(async ctx => {
-    const s = service({
-      drivers: ctx.state.drivers,
-      emitEvent: ctx.eventBus.emit,
-    });
+    const s = ctx.services[serviceSlug];
 
     if (!s.get) {
       ctx.status = 404;

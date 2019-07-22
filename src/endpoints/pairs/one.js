@@ -1,4 +1,3 @@
-const createService = require('../../services/pairs');
 const { select } = require('../utils/selectors');
 const { captureErrors } = require('../../utils/captureErrors');
 
@@ -15,12 +14,7 @@ const pairsOneEndpoint = async ctx => {
     resolver: '/pairs/:id1/:id2',
   });
 
-  const service = createService({
-    drivers: ctx.state.drivers,
-    emitEvent: ctx.eventBus.emit,
-    orderPair: ctx.orderPair,
-    cache: ctx.cache,
-  });
+  const service = ctx.services.pairsService;
 
   const pair = await service
     .get({

@@ -8,7 +8,12 @@ import { getData } from './pg';
 import { ServicePresetInitOptions } from '../../types';
 import { Serializable } from '../../../../types';
 
-export const getByIdPreset = <Id, ResponseRaw, ResponseTransformed>({
+export const getByIdPreset = <
+  Id,
+  ResponseRaw,
+  ResponseTransformed,
+  Result extends Serializable<string, ResponseTransformed | null>
+>({
   name,
   sql,
   inputSchema,
@@ -19,19 +24,17 @@ export const getByIdPreset = <Id, ResponseRaw, ResponseTransformed>({
   name: string;
   inputSchema: SchemaLike;
   resultSchema: SchemaLike;
-  resultTypeFactory: (
-    t?: ResponseTransformed
-  ) => Serializable<string, ResponseTransformed>;
+  resultTypeFactory: (t: ResponseTransformed) => Result;
   transformResult: (response: ResponseRaw, request?: Id) => ResponseTransformed;
   sql: (r: Id) => string;
 }) => ({ pg, emitEvent }: ServicePresetInitOptions) =>
-  get<Id, Id, ResponseRaw, Serializable<string, ResponseTransformed>>({
+  get<Id, Id, ResponseRaw, Result>({
     transformInput: identity,
     transformResult: transformResultFn<
       Id,
       ResponseRaw,
       ResponseTransformed,
-      Serializable<string, ResponseTransformed>
+      Result
     >(resultTypeFactory)(transformResult),
     validateInput: validateInput(inputSchema, name),
     validateResult: validateResult(resultSchema, name),
