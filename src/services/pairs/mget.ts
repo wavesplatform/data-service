@@ -4,7 +4,7 @@ import { mget } from '../_common/createResolver';
 import { ServicePresetInitOptions } from '../presets/types';
 import { Serializable, List } from '../../types';
 import { validateInput, validateResult } from '../presets/validation';
-import { transformResults as transformResultsFn } from '../presets/pg/mgetByIds/transformResult';
+import { transformResults as transformResultsFn } from './transformResults';
 
 import { inputMget, result as resultSchema } from './schema';
 import { mgetPairs } from './pg';
