@@ -20,9 +20,14 @@ export type ServerConfig = {
 
 export type DefaultMatcherConfig = {
   defaultMatcher: string;
-}
+};
 
-export type DataServiceConfig = PostgresConfig & ServerConfig & LoggerConfig & DefaultMatcherConfig;
+export type DefaultConfig = PostgresConfig & ServerConfig & LoggerConfig;
+
+export type DataServiceConfig = PostgresConfig &
+  ServerConfig &
+  LoggerConfig &
+  DefaultMatcherConfig;
 
 const envVariables = ['PGHOST', 'PGDATABASE', 'PGUSER', 'PGPASSWORD'];
 
@@ -32,9 +37,9 @@ const guard = <T>(name: string, val?: T): T => {
   }
 
   return val;
-}
+};
 
-const load = (): DataServiceConfig => {
+export const loadDefaultConfig = (): DefaultConfig => {
   // assert all necessary env vars are set
   checkEnv(envVariables);
 
@@ -49,9 +54,12 @@ const load = (): DataServiceConfig => {
       ? parseInt(process.env.PGPOOLSIZE)
       : 20,
     logLevel: process.env.LOG_LEVEL || 'info',
-
-    defaultMatcher: guard('DEFAULT_MATCHER', process.env.DEFAULT_MATCHER),
   };
 };
+
+const load = (): DataServiceConfig => ({
+  ...loadDefaultConfig(),
+  defaultMatcher: guard('DEFAULT_MATCHER', process.env.DEFAULT_MATCHER),
+});
 
 export const loadConfig = memoizeWith(always('config'), load);
