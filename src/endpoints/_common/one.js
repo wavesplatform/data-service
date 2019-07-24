@@ -1,3 +1,4 @@
+const { DEFAULT_NOT_FOUND_MESSAGE } = require('../../errorHandling');
 const { captureErrors } = require('../../utils/captureErrors');
 const { handleError } = require('../../utils/handleError');
 const { select } = require('../utils/selectors');
@@ -12,7 +13,7 @@ const createGetMiddleware = (url, service) => {
     if (!s.get) {
       ctx.status = 404;
       ctx.body = {
-        message: 'Endpoint not found',
+        message: DEFAULT_NOT_FOUND_MESSAGE,
       };
       return;
     }
@@ -39,7 +40,7 @@ const createGetMiddleware = (url, service) => {
       Nothing: () => {
         ctx.status = 404;
         ctx.body = {
-          message: 'Instance not found',
+          message: DEFAULT_NOT_FOUND_MESSAGE,
         };
       },
     });

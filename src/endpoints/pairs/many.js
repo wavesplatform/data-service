@@ -1,6 +1,7 @@
 const { has, defaultTo, map, split, zipObj, compose } = require('ramda');
 const Maybe = require('folktale/maybe');
 
+const { DEFAULT_NOT_FOUND_MESSAGE } = require('../../errorHandling');
 const { loadConfig } = require('../../loadConfig');
 const { captureErrors } = require('../../utils/captureErrors');
 const { handleError } = require('../../utils/handleError');
@@ -73,7 +74,7 @@ const pairsManyEndpoint = async ctx => {
   if (!s.mget && !s.search) {
     ctx.status = 404;
     ctx.body = {
-      message: 'Endpoint not found',
+      message: DEFAULT_NOT_FOUND_MESSAGE,
     };
     return;
   }
@@ -98,7 +99,7 @@ const pairsManyEndpoint = async ctx => {
     } else {
       ctx.status = 404;
       ctx.body = {
-        message: 'Nothing found',
+        message: DEFAULT_NOT_FOUND_MESSAGE,
       };
       return;
     }
@@ -112,7 +113,7 @@ const pairsManyEndpoint = async ctx => {
     } else {
       ctx.status = 404;
       ctx.body = {
-        message: 'Nothing found',
+        message: DEFAULT_NOT_FOUND_MESSAGE,
       };
       return;
     }
@@ -127,7 +128,7 @@ const pairsManyEndpoint = async ctx => {
   } else {
     ctx.status = 404;
     ctx.body = {
-      message: 'Nothing found',
+      message: DEFAULT_NOT_FOUND_MESSAGE,
     };
   }
 };
