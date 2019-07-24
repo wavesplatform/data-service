@@ -9,9 +9,22 @@ const inputGet = Joi.object().keys({
   priceAsset: Joi.string()
     .base58()
     .required(),
+  matcher: Joi.string(),
 });
 
-const inputMget = Joi.array().items(inputGet);
+const inputMget = Joi.object().keys({
+  pairs: Joi.array().items(
+    Joi.object().keys({
+      amountAsset: Joi.string()
+        .base58()
+        .required(),
+      priceAsset: Joi.string()
+        .base58()
+        .required(),
+    })
+  ),
+  matcher: Joi.string(),
+});
 
 const inputSearch = Joi.object()
   .keys({
@@ -22,6 +35,7 @@ const inputSearch = Joi.object()
     match_exactly: Joi.array()
       .items(Joi.boolean(), Joi.boolean())
       .max(2),
+    matcher: Joi.string(),
     limit: Joi.number()
       .min(1)
       .max(limitMaximum),

@@ -1,19 +1,15 @@
 import * as knex from 'knex';
 const pg = knex({ client: 'pg' });
 
-const selectVolumeWavesFromPairsCTE = pg({ d: 'pairs_cte' })
-  .select(
-    pg.raw(
-      `case when d.amount_asset_id='WAVES' then p.quote_volume / d.weighted_average_price when d.price_asset_id='WAVES' then p.quote_volume * d.weighted_average_price end as volume_waves`
-    )
-  )
-  .whereRaw(`(d.amount_asset_id=p.price_asset_id AND d.price_asset_id='WAVES')`)
-  .orWhereRaw(
-    `(d.price_asset_id=p.price_asset_id AND d.amount_asset_id='WAVES')`
-  );
-
 const selectExchanges = pg('txs_7')
-  .select(['price_asset', 'amount_asset', 'amount', 'price', 'time_stamp'])
+  .select([
+    'price_asset',
+    'amount_asset',
+    'amount',
+    'price',
+    'time_stamp',
+    'sender',
+  ])
   .whereRaw(`time_stamp >= now() - interval '1 day'`)
   .orderBy('time_stamp', 'desc');
 
@@ -41,30 +37,42 @@ const selectPairsCTE = pg
       high: pg.raw('max(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'),
       low: pg.raw('min(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'),
       txs_count: pg.raw('count(e.price)'),
+      matcher: 'sender',
     })
       .from(selectExchanges.clone().as('e'))
       .innerJoin('asset_decimals as a_dec', 'e.amount_asset', 'a_dec.asset_id')
       .innerJoin('asset_decimals as p_dec', 'e.price_asset', 'p_dec.asset_id')
-      .groupBy(['amount_asset', 'price_asset']);
+      .groupBy(['amount_asset', 'price_asset', 'sender']);
   })
   .from({ p: 'pairs_cte' })
   .columns(
-    'amount_asset_id',
-    'price_asset_id',
-    'first_price',
-    'last_price',
-    'volume',
+    'p.amount_asset_id',
+    'p.price_asset_id',
+    'p.first_price',
+    'p.last_price',
+    'p.volume',
     {
       volume_waves: pg.raw(
-        `coalesce(volume_waves, (${selectVolumeWavesFromPairsCTE.toString()}))`
+        `coalesce(p.volume_waves, p.quote_volume / p1.weighted_average_price, p.quote_volume * p2.weighted_average_price)`
       ),
     },
-    'quote_volume',
-    'high',
-    'low',
-    'weighted_average_price',
-    'txs_count'
-  );
+    'p.quote_volume',
+    'p.high',
+    'p.low',
+    'p.weighted_average_price',
+    'p.txs_count',
+    'p.matcher'
+  )
+  .leftJoin('pairs_cte as p1', function() {
+    this.on(pg.raw("p1.amount_asset_id='WAVES'"))
+      .andOn('p1.price_asset_id', 'p.price_asset_id')
+      .andOn('p1.matcher', 'p.matcher');
+  })
+  .leftJoin('pairs_cte as p2', function() {
+    this.on('p2.amount_asset_id', 'p.amount_asset_id')
+      .andOn(pg.raw("p2.price_asset_id='WAVES'"))
+      .andOn('p2.matcher', 'p.matcher');
+  });
 
 export const fillTable = (tableName: string): string =>
   pg

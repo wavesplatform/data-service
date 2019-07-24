@@ -9,7 +9,6 @@ import * as injectEventBus from './middleware/injectEventBus';
 import * as accessLogMiddleware from './middleware/accessLog';
 import createEventBus from './eventBus/';
 import * as createAndSubscribeLogger from './logger';
-import * as removeErrorBodyProd from './middleware/removeErrorBodyProd';
 import * as serializer from './middleware/serializer';
 import * as setHeadersMiddleware from './middleware/setHeaders';
 
@@ -27,7 +26,6 @@ createAndSubscribeLogger({ options, eventBus });
 const requestId = createRequestId({ expose: 'X-Request-Id', header: false });
 
 app
-  .use(removeErrorBodyProd)
   .use(bodyParser())
   .use(requestId)
   .use(setHeadersMiddleware)
