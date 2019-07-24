@@ -23,6 +23,11 @@ declare module 'ramda' {
     map<T, U>(fn: (value: T) => U, v: T[]): U[];
     map<T, U>(fn: (value: T) => U): (v: T[]) => U[];
 
+    map<T, U>(fn: (value: T) => U, v: { string: T }): { string: U };
+    map<T extends { [key: string]: any }, U extends { string: any }>(
+      fn: (value: T) => U
+    ): (v: { [key: string]: typeof T[key] }) => { string: U };
+
     // Maybe
     map<F extends Maybe<any>, U>(
       fn: (value: RightType<F>) => U,

@@ -1,7 +1,7 @@
 import { CommonServiceCreatorDependencies } from '../../middleware/injectServices';
 import { searchPreset } from '../presets/pg/search';
 
-import { candle, Candle, CandleInfo, List, ServiceSearch } from '../../types';
+import { Candle, CandleInfo, List, ServiceSearch } from '../../types';
 
 import { sql } from './sql';
 import { inputSearch, output } from './schema';
@@ -36,7 +36,6 @@ export default ({
       inputSchema: inputSearch,
       resultSchema: output,
       transformResult: transformResults,
-      resultTypeFactory: candle,
     })({ pg: drivers.pg, emitEvent: emitEvent }),
   };
 };

@@ -1,6 +1,6 @@
 import { Task } from 'folktale/concurrency/task';
 import { Maybe } from 'folktale/maybe';
-import { Asset as AssetInfo } from '@waves/data-entities';
+import { Asset as AssetInfo, BigNumber } from '@waves/data-entities';
 import { AppError } from '../errorHandling';
 import { toSerializable, Serializable } from './serialization';
 import { Interval, interval, Unit } from './interval';
@@ -59,7 +59,22 @@ export const alias = (data: AliasInfo | null = null): Alias =>
   toSerializable('alias', data);
 
 // @todo CandleInfo
-export type CandleInfo = {};
+export type CandleInfo = {
+  time_start: Date | null;
+  matcher: string | null;
+  max_height: number;
+  open: BigNumber | null;
+  high: BigNumber;
+  low: BigNumber;
+  close: BigNumber | null;
+  volume: BigNumber;
+  quote_volume: BigNumber;
+  weighted_average_price: BigNumber;
+  txs_count: number;
+  interval_in_secs: number | null;
+  a_dec: number | null;
+  p_dec: number | null;
+};
 export type Candle = Serializable<'candle', CandleInfo | null>;
 export const candle = (data: CandleInfo | null = null): Candle =>
   toSerializable('candle', data);

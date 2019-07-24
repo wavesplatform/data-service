@@ -22,7 +22,6 @@ import { concatAll } from '../../utils/fp/concatAll';
 import { floor, ceil, add, trunc } from '../../utils/date';
 import { candleMonoid } from './candleMonoid';
 import { CandlesSearchRequest } from '.';
-import { any } from 'bluebird';
 
 const truncToMinutes = trunc(Unit.Minute);
 
@@ -124,17 +123,16 @@ export const transformResults = (
   compose(
     (candles: Candle[]) => list<Candle>(candles),
     map<any, Candle>(transformCandle),
-    sort(
-      (a: [string, any], b: [string, any]): number =>
-        new Date(a[0]).valueOf() - new Date(b[0]).valueOf()
+    sort<[string, CandleDbResponse]>(
+      (a, b): number => new Date(a[0]).valueOf() - new Date(b[0]).valueOf()
     ),
-    toPairs,
+    (o: { string: CandleDbResponse }) => toPairs(o),
     map((candle: CandleDbResponse) =>
       candle.a_dec && candle.p_dec
         ? candleFixedDecimals(candle, candle.a_dec, candle.p_dec)
         : candle
     ),
-    map<CandleDbResponse, CandleDbResponse>(concatAll(candleMonoid)),
+    map<CandleDbResponse[], CandleDbResponse>(concatAll(candleMonoid)),
     addMissingCandles(
       interval(request.params.interval).getOrElse(null),
       request.params.timeStart,

@@ -25,7 +25,7 @@ export const searchPreset = <
   sql: (r: Request) => string;
   inputSchema: SchemaLike;
   resultSchema: SchemaLike;
-  transformResult: (response: ResponseRaw[], request?: Request) => Result;
+  transformResult: (response: ResponseRaw[], request: Request) => Result;
 }) => ({
   pg,
   emitEvent,

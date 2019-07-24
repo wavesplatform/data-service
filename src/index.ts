@@ -12,7 +12,7 @@ import * as createAndSubscribeLogger from './logger';
 import * as removeErrorBodyProd from './middleware/removeErrorBodyProd';
 import * as serializer from './middleware/serializer';
 import * as setHeadersMiddleware from './middleware/setHeaders';
-import * as injectServices from './middleware/injectServices';
+import injectServices from './middleware/injectServices';
 
 import * as createRequestId from 'koa-requestid';
 import * as bodyParser from 'koa-bodyparser';
