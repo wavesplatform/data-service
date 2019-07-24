@@ -270,6 +270,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "in": "query",
+            "name": "matcher",
+            "description": "Matcher address",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
