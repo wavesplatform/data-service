@@ -19,6 +19,9 @@ const createManyMiddleware = (
 
     if (!s.mget && !s.search) {
       ctx.status = 404;
+      ctx.body = {
+        message: 'Endpoint not found',
+      };
       return;
     }
 
@@ -43,6 +46,9 @@ const createManyMiddleware = (
           .promise();
       } else {
         ctx.status = 404;
+        ctx.body = {
+          message: 'Nothing found',
+        };
         return;
       }
     } else {
@@ -54,6 +60,9 @@ const createManyMiddleware = (
           .promise();
       } else {
         ctx.status = 404;
+        ctx.body = {
+          message: 'Nothing found',
+        };
         return;
       }
     }
@@ -66,6 +75,9 @@ const createManyMiddleware = (
       ctx.state.returnValue = results;
     } else {
       ctx.status = 404;
+      ctx.body = {
+        message: 'Nothing found',
+      };
     }
   });
 };

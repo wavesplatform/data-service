@@ -11,6 +11,9 @@ const createGetMiddleware = (url, service) => {
 
     if (!s.get) {
       ctx.status = 404;
+      ctx.body = {
+        message: 'Endpoint not found',
+      };
       return;
     }
 
@@ -33,7 +36,12 @@ const createGetMiddleware = (url, service) => {
 
     x.matchWith({
       Just: ({ value }) => (ctx.state.returnValue = value),
-      Nothing: () => (ctx.status = 404),
+      Nothing: () => {
+        ctx.status = 404;
+        ctx.body = {
+          message: 'Instance not found',
+        };
+      },
     });
   });
 };
