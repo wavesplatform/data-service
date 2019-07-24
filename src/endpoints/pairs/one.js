@@ -1,3 +1,4 @@
+const { DEFAULT_NOT_FOUND_MESSAGE } = require('../../errorHandling');
 const createService = require('../../services/pairs');
 const { select } = require('../utils/selectors');
 const { captureErrors } = require('../../utils/captureErrors');
@@ -19,12 +20,20 @@ const pairsOneEndpoint = async ctx => {
     resolver: '/pairs/:id1/:id2',
   });
 
-  const service = createService({
+  const s = createService({
     drivers: ctx.state.drivers,
     emitEvent: ctx.eventBus.emit,
   });
 
-  const pair = await service
+  if (!s.get) {
+    ctx.status = 404;
+    ctx.body = {
+      message: DEFAULT_NOT_FOUND_MESSAGE,
+    };
+    return;
+  }
+
+  const pair = await s
     .get({
       amountAsset: id1,
       priceAsset: id2,
@@ -39,7 +48,12 @@ const pairsOneEndpoint = async ctx => {
 
   pair.matchWith({
     Just: ({ value }) => (ctx.state.returnValue = value),
-    Nothing: () => (ctx.status = 404),
+    Nothing: () => {
+      ctx.status = 404;
+      ctx.body = {
+        message: DEFAULT_NOT_FOUND_MESSAGE,
+      };
+    },
   });
 };
 

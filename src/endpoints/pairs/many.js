@@ -1,8 +1,10 @@
 const { has, defaultTo, map, split, zipObj, compose } = require('ramda');
 const Maybe = require('folktale/maybe');
 
+const { DEFAULT_NOT_FOUND_MESSAGE } = require('../../errorHandling');
 const { loadConfig } = require('../../loadConfig');
 const { captureErrors } = require('../../utils/captureErrors');
+const { handleError } = require('../../utils/handleError');
 
 const { select } = require('../utils/selectors');
 const { parseArrayQuery } = require('../utils/parseArrayQuery');
@@ -59,24 +61,6 @@ const filterParsers = {
   limit,
 };
 
-const handleError = ({ ctx, error }) => {
-  ctx.eventBus.emit('ERROR', error);
-  error.matchWith({
-    Db: () => {
-      ctx.status = 500;
-      ctx.body = 'Database Error';
-    },
-    Resolver: () => {
-      ctx.status = 500;
-      ctx.body = `Error resolving path`;
-    },
-    Validation: () => {
-      ctx.status = 400;
-      ctx.body = `Invalid query, check params, got: ${ctx.querystring}`;
-    },
-  });
-};
-
 /**
  * Endpoint
  * @name /pairs?pairs[]‌="{asset_id_1}/{asset_id_2}"&pairs[]="{asset_id_1}/{asset_id_2}" ...other params
@@ -89,6 +73,9 @@ const pairsManyEndpoint = async ctx => {
 
   if (!s.mget && !s.search) {
     ctx.status = 404;
+    ctx.body = {
+      message: DEFAULT_NOT_FOUND_MESSAGE,
+    };
     return;
   }
 
@@ -111,6 +98,9 @@ const pairsManyEndpoint = async ctx => {
         .promise();
     } else {
       ctx.status = 404;
+      ctx.body = {
+        message: DEFAULT_NOT_FOUND_MESSAGE,
+      };
       return;
     }
   } else {
@@ -122,6 +112,9 @@ const pairsManyEndpoint = async ctx => {
         .promise();
     } else {
       ctx.status = 404;
+      ctx.body = {
+        message: DEFAULT_NOT_FOUND_MESSAGE,
+      };
       return;
     }
   }
@@ -134,6 +127,9 @@ const pairsManyEndpoint = async ctx => {
     ctx.state.returnValue = results;
   } else {
     ctx.status = 404;
+    ctx.body = {
+      message: DEFAULT_NOT_FOUND_MESSAGE,
+    };
   }
 };
 
