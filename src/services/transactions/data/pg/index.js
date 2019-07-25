@@ -8,7 +8,7 @@ const { matchRequestsResults } = require('../../../../utils/db/index');
 const transformResult = require('./transformResult');
 const sql = require('./sql');
 
-module.exports = {
+const pg = {
   get: pg => id =>
     pg
       .any(sql.get(id))
@@ -37,3 +37,5 @@ module.exports = {
         })
       ),
 };
+
+module.exports = { pg };

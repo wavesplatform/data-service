@@ -1,9 +1,11 @@
-const { pick, compose } = require('ramda');
-const { renameKeys } = require('ramda-adjunct');
+import { pick, compose } from 'ramda';
+import { renameKeys } from 'ramda-adjunct';
 
-const transformTxInfo = require('../_common/transformTxInfo');
+import { transformTxInfo } from '../_common/transformTxInfo';
 
-const createOrder = prefix => ({
+import { ExchangeTxDbResponse } from './';
+
+const createOrder = (prefix: string) => <T extends { [key: string]: any }>({
   [`${prefix}_id`]: id,
   [`${prefix}_version`]: version,
   [`${prefix}_sender_public_key`]: senderPublicKey,
@@ -19,7 +21,7 @@ const createOrder = prefix => ({
   price_asset: priceAsset,
   amount_asset: amountAsset,
   sender_public_key: matcherPublicKey,
-}) => {
+}: T) => {
   const tx = {
     id,
     senderPublicKey,
@@ -41,7 +43,7 @@ const createOrder = prefix => ({
 };
 
 /** transformTx:: RawTxInfo -> TxInfo */
-module.exports = tx => {
+export default (tx: ExchangeTxDbResponse) => {
   const commonFields = compose(
     transformTxInfo,
     pick([

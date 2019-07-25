@@ -1,7 +1,11 @@
 import { omit, compose, evolve, inc } from 'ramda';
 
-import { decode, Cursor } from '../../../_common/pagination/cursor';
-import { RequestWithCursor, WithSortOrder } from './index';
+import { decode } from '../../../_common/pagination/cursor';
+import {
+  Cursor,
+  RequestWithCursor,
+  WithSortOrder,
+} from '../../../_common/pagination';
 
 const decodeAfter = (cursorString: string) =>
   decode(cursorString).matchWith({
@@ -17,7 +21,7 @@ export const transformInput = <Request extends WithSortOrder>(
 ): RequestWithCursor<Request, Cursor> => {
   const requestWithoutAfter = compose(
     omit(['after']),
-    evolve({limit: inc})
+    evolve({ limit: inc })
   )(request) as Request;
 
   if (!request.after) {

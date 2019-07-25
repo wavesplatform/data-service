@@ -1,6 +1,11 @@
 import * as knex from 'knex';
 import { compose } from 'ramda';
 import { escapeForTsQuery, prepareForLike } from '../../utils/db';
+import {
+  PairsSearchRequest,
+  SearchByAssetRequest,
+  SearchByAssetsRequest,
+} from '.';
 
 const pg = knex({ client: 'pg' });
 
@@ -18,29 +23,8 @@ const COLUMNS = [
   'volume_waves',
 ];
 
-type SearchWithLimitRequest = {
-  limit: number;
-};
-
-type SearchWithMatchExactly = SearchWithLimitRequest & {
-  match_exactly?: boolean[];
-};
-
-type SearchByAssetRequest = SearchWithMatchExactly & {
-  search_by_asset: string;
-};
-
-type SearchByAssetsRequest = SearchWithMatchExactly & {
-  search_by_assets: [string, string];
-};
-
-type SearchRequest =
-  | SearchWithLimitRequest
-  | SearchByAssetRequest
-  | SearchByAssetsRequest;
-
 const isSearchByAssetRequest = (
-  searchByAssetRequest: SearchRequest
+  searchByAssetRequest: PairsSearchRequest
 ): searchByAssetRequest is SearchByAssetRequest => {
   return (
     typeof searchByAssetRequest === 'object' &&
@@ -50,7 +34,7 @@ const isSearchByAssetRequest = (
 };
 
 const isSearchByAssetsRequest = (
-  searchByAssetRequest: SearchRequest
+  searchByAssetRequest: PairsSearchRequest
 ): searchByAssetRequest is SearchByAssetsRequest => {
   return (
     typeof searchByAssetRequest === 'object' &&
@@ -135,7 +119,7 @@ export const get = (pair: {
   priceAsset: string;
 }): string => query([pair]);
 export const mget = query;
-export const search = (req: SearchRequest): string => {
+export const search = (req: PairsSearchRequest): string => {
   // asset - prefix search of amount or price assets
   // asset1/asset2 - prefix search of amount asset by asset1
   //                 and prefix search of price asset by asset2

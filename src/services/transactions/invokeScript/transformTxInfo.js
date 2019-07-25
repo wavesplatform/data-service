@@ -1,9 +1,11 @@
-const { compose } = require('ramda');
+const { compose, isNil, reject } = require('ramda');
 const { renameKeys } = require('ramda-adjunct');
-
 const { transformTxInfo } = require('../_common/transformTxInfo');
 
 module.exports = compose(
   transformTxInfo,
-  renameKeys({ lease_id: 'leaseId' })
+  renameKeys({
+    dapp: 'dApp',
+  }),
+  reject(isNil)
 );

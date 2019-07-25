@@ -1,28 +1,36 @@
-import { createOrderPair, TOrderPair } from '@waves/assets-pairs-order';
 import * as LRU from 'lru-cache';
 import { Middleware } from 'koa-compose';
+import { createOrderPair, TOrderPair } from '@waves/assets-pairs-order';
 
-import {
-  Pair,
-  Transaction,
-  Service,
-  ServiceMesh,
-  Serializable,
-} from '../types';
+import { Service, Serializable } from '../types';
 import { loadMatcherSettings } from '../loadMatcherSettings';
 
-import createAliasesService from '../services/aliases';
-import createAssetsService from '../services/assets';
-import createCandlesService from '../services/candles';
-import createPairsService from '../services/pairs';
-import createAliasTxsService from '../services/transactions/alias';
-import createAllTxsService from '../services/transactions/all';
-import createBurnTxsService from '../services/transactions/burn';
-import createDataTxsService from '../services/transactions/data';
-import createExchangeTxsService from '../services/transactions/exchange';
-import createGenesisTxsService from '../services/transactions/genesis';
-import createInvokeScriptTxsService from '../services/transactions/invokeScript';
-import createIssueTxsService from '../services/transactions/issue';
+import createAliasesService, { AliasService } from '../services/aliases';
+import createAssetsService, { AssetsService } from '../services/assets';
+import createCandlesService, { CandlesService } from '../services/candles';
+import createPairsService, { PairsService } from '../services/pairs';
+import * as createAllTxsService from '../services/transactions/all';
+import createAliasTxsService, {
+  AliasTxsService,
+} from '../services/transactions/alias';
+import createBurnTxsService, {
+  BurnTxsService,
+} from '../services/transactions/burn';
+import createDataTxsService, {
+  DataTxsService,
+} from '../services/transactions/data';
+import createExchangeTxsService, {
+  ExchangeTxsService,
+} from '../services/transactions/exchange';
+import createGenesisTxsService, {
+  GenesisTxsService,
+} from '../services/transactions/genesis';
+import createInvokeScriptTxsService, {
+  InvokeScriptTxsService,
+} from '../services/transactions/invokeScript';
+import createIssueTxsService, {
+  IssueTxsService,
+} from '../services/transactions/issue';
 import createLeaseTxsService from '../services/transactions/lease';
 import createLeaseCancelTxsService from '../services/transactions/leaseCancel';
 import createMassTransferTxsService from '../services/transactions/massTransfer';
@@ -50,30 +58,51 @@ export type PairsServiceCreatorDependencies = CommonServiceCreatorDependencies &
   cache: LRU<any, any>;
 };
 
-const commonInitServiceMesh: {
-  [alias: string]: (
-    deps: CommonServiceCreatorDependencies
-  ) => Service<Serializable<string, any>>;
-} = {
-  aliasesService: createAliasesService,
-  assetsService: createAssetsService,
-  aliasTxsService: createAliasTxsService,
-  allTxsService: createAllTxsService,
-  burnTxsService: createBurnTxsService,
-  dataTxsService: createDataTxsService,
-  exchangeTxsService: createExchangeTxsService,
-  genesisTxsService: createGenesisTxsService,
-  invokeScriptTxsService: createInvokeScriptTxsService,
-  issueTxsService: createIssueTxsService,
-  leaseTxsService: createLeaseTxsService,
-  leaseCancelTxsService: createLeaseCancelTxsService,
-  massTransferTxsService: createMassTransferTxsService,
-  paymentTxsService: createPaymentTxsService,
-  reissueTxsService: createReissueTxsService,
-  setAssetScriptTxsService: createSetAssetScriptTxsService,
-  setScriptTxsService: createSetScriptTxsService,
-  sponsorshopTxsService: createSponsorshopTxsService,
-  transferTxsService: createTransferTxsService,
+export type ServiceMesh = {
+  aliases?: AliasService;
+  assets?: AssetsService;
+  candles?: CandlesService;
+  pairs?: PairsService;
+  allTxs?: Service<Serializable<string, any>>;
+  aliasTxs?: AliasTxsService;
+  burnTxs?: BurnTxsService;
+  dataTxs?: DataTxsService;
+  exchangeTxs?: ExchangeTxsService;
+  genesisTxs?: GenesisTxsService;
+  invokeScriptTxs?: InvokeScriptTxsService;
+  issueTxs?: IssueTxsService;
+  leaseTxs?: Service<Serializable<string, any>>;
+  leaseCancelTxs?: Service<Serializable<string, any>>;
+  massTransferTxs?: Service<Serializable<string, any>>;
+  paymentTxs?: Service<Serializable<string, any>>;
+  reissueTxs?: Service<Serializable<string, any>>;
+  setAssetScriptTxs?: Service<Serializable<string, any>>;
+  setScriptTxs?: Service<Serializable<string, any>>;
+  sponsorshopTxs?: Service<Serializable<string, any>>;
+  transferTxs?: Service<Serializable<string, any>>;
+};
+
+const commonInitServiceMesh: { [slug in keyof ServiceMesh]: any } = {
+  aliases: createAliasesService,
+  assets: createAssetsService,
+  candles: createCandlesService,
+  allTxs: createAllTxsService,
+  aliasTxs: createAliasTxsService,
+  burnTxs: createBurnTxsService,
+  dataTxs: createDataTxsService,
+  exchangeTxs: createExchangeTxsService,
+  genesisTxs: createGenesisTxsService,
+  invokeScriptTxs: createInvokeScriptTxsService,
+  issueTxs: createIssueTxsService,
+  leaseTxs: createLeaseTxsService,
+  leaseCancelTxs: createLeaseCancelTxsService,
+  massTransferTxs: createMassTransferTxsService,
+  paymentTxs: createPaymentTxsService,
+  reissueTxs: createReissueTxsService,
+  setAssetScriptTxs: createSetAssetScriptTxsService,
+  setScriptTxs: createSetScriptTxsService,
+  sponsorshopTxs: createSponsorshopTxsService,
+  transferTxs: createTransferTxsService,
 };
 
 export default (options: DataServiceConfig): Middleware<any> => async (
@@ -85,25 +114,50 @@ export default (options: DataServiceConfig): Middleware<any> => async (
     emitEvent,
   } = ctx;
 
-  // common init services
   const serviceMesh: ServiceMesh = {};
 
-  Object.keys(commonInitServiceMesh).forEach(serviceSlug => {
-    serviceMesh[serviceSlug] = commonInitServiceMesh[serviceSlug]({
-      drivers,
-      emitEvent,
-    });
-  });
+  const commonDeps = {
+    drivers,
+    emitEvent,
+  };
+
+  // common init services
+  serviceMesh.aliases = commonInitServiceMesh.aliases(commonDeps);
+  serviceMesh.assets = commonInitServiceMesh.assets(commonDeps);
+  serviceMesh.candles = commonInitServiceMesh.candles(commonDeps);
+  serviceMesh.allTxs = commonInitServiceMesh.allTxs(commonDeps);
+  serviceMesh.aliasTxs = commonInitServiceMesh.aliasTxs(commonDeps);
+  serviceMesh.burnTxs = commonInitServiceMesh.burnTxs(commonDeps);
+  serviceMesh.dataTxs = commonInitServiceMesh.dataTxs(commonDeps);
+  serviceMesh.exchangeTxs = commonInitServiceMesh.exchangeTxs(commonDeps);
+  serviceMesh.genesisTxs = commonInitServiceMesh.genesisTxs(commonDeps);
+  serviceMesh.invokeScriptTxs = commonInitServiceMesh.invokeScriptTxs(
+    commonDeps
+  );
+  serviceMesh.issueTxs = commonInitServiceMesh.issueTxs(commonDeps);
+  serviceMesh.leaseTxs = commonInitServiceMesh.leaseTxs(commonDeps);
+  serviceMesh.leaseCancelTxs = commonInitServiceMesh.leaseCancelTxs(commonDeps);
+  serviceMesh.massTransferTxs = commonInitServiceMesh.massTransferTxs(
+    commonDeps
+  );
+  serviceMesh.paymentTxs = commonInitServiceMesh.paymentTxs(commonDeps);
+  serviceMesh.reissueTxs = commonInitServiceMesh.reissueTxs(commonDeps);
+  serviceMesh.setAssetScriptTxs = commonInitServiceMesh.setAssetScriptTxs(
+    commonDeps
+  );
+  serviceMesh.setScriptTxs = commonInitServiceMesh.setScriptTxs(commonDeps);
+  serviceMesh.sponsorshopTxs = commonInitServiceMesh.sponsorshopTxs(commonDeps);
+  serviceMesh.transferTxs = commonInitServiceMesh.transferTxs(commonDeps);
 
   // specific init services
   const settings = await loadMatcherSettings(options);
-  const pairsService: Service<Pair> = createPairsService({
-    drivers,
-    emitEvent,
+  const pairsService = createPairsService({
+    ...commonDeps,
     cache,
     orderPair: createOrderPair(settings.priceAssets),
   })(serviceMesh);
-  serviceMesh.pairsService = pairsService;
+
+  serviceMesh.pairs = pairsService;
 
   ctx.services = serviceMesh;
 

@@ -1,6 +1,21 @@
-const { compose, pick, map, repeat, zipObj } = require('ramda');
-const { renameKeys } = require('ramda-adjunct');
-const { list, pair } = require('../../types');
+import { compose, pick, map, repeat, zipObj } from 'ramda';
+import { renameKeys } from 'ramda-adjunct';
+import { BigNumber } from '@waves/data-entities';
+import { list, pair } from '../../types';
+
+export type PairDbResponse = {
+  amount_asset_id: string;
+  price_asset_id: string;
+  first_price: BigNumber;
+  last_price: BigNumber;
+  volume: BigNumber;
+  quote_volume: BigNumber;
+  high: BigNumber;
+  low: BigNumber;
+  weighted_average_price: BigNumber;
+  txs_count: number;
+  volume_waves: BigNumber;
+};
 
 const pairDataFields = [
   'firstPrice',
@@ -28,15 +43,15 @@ const renamePairFields = renameKeys({
 });
 
 /** transformResult :: Object -> Object */
-const transformResult = compose(
+export const transformResult = compose(
   pickPairFields,
   renamePairFields
 );
 
 /** transformResultSearch :: Array -> Object */
-const transformResultSearch = compose(
+export const transformResultSearch = compose(
   list,
-  map(p =>
+  map((p: PairDbResponse) =>
     compose(
       pairObject => ({
         ...pairObject,
@@ -49,12 +64,5 @@ const transformResultSearch = compose(
   )
 );
 
-const createEmptyPair = () =>
+export const createEmptyPair = () =>
   pair(zipObj(pairDataFields, repeat(null, pairDataFields.length)));
-
-/** transformResult :: Object -> Object */
-module.exports = {
-  transformResult,
-  transformResultSearch,
-  createEmptyPair,
-};

@@ -1,4 +1,4 @@
-import { compose, identity } from 'ramda';
+import { identity, compose } from 'ramda';
 
 import { CommonServiceCreatorDependencies } from '../../../middleware/injectServices';
 import {
@@ -10,58 +10,75 @@ import {
   ServiceMget,
   ServiceSearch,
 } from '../../../types';
+
+import { WithLimit } from '../../_common';
 import { get, mget, search } from '../../_common/createResolver';
-import { CommonFilters } from '../_common/types';
+import { RawTx, CommonFilters } from '../_common/types';
+
+// validation
 import { inputGet } from '../../presets/pg/getById/inputSchema';
 import { inputMget } from '../../presets/pg/mgetByIds/inputSchema';
 import { validateInput, validateResult } from '../../presets/validation';
+
+// transformation
 import { transformResults as transformResultGet } from '../../presets/pg/getById/transformResult';
 import { transformResults as transformResultMget } from '../../presets/pg/mgetByIds/transformResult';
 import { transformInput as transformInputSearch } from '../../presets/pg/searchWithPagination/transformInput';
 import { transformResults as transformResultSearch } from '../../presets/pg/searchWithPagination/transformResult';
 
-import pgData from './pg';
 import {
   result as resultSchema,
   inputSearch as inputSearchSchema,
 } from './schema';
+import { pg as pgData } from './pg';
 import * as transformTxInfo from './transformTxInfo';
-import { RawInvokeScriptTx, InvokeScriptTx } from './types';
 
-const createServiceName = (type: string) => `transactions.invokeScript.${type}`;
+const createServiceName = (type: string): string => `transactions.data.${type}`;
 
-type InvokeScriptTxsSearchRequest = CommonFilters;
+type DataTxsSearchRequest = CommonFilters &
+  WithLimit & {
+    key: string;
+    type: string;
+    value: string;
+  };
 
-export type InvokeScriptTxsService = ServiceGet<string, Transaction> &
+type DataEntry = {
+  key: string;
+  type: string;
+  value: string;
+};
+
+type DataTxDbResponse = RawTx & {
+  data: DataEntry[];
+};
+
+export type DataTxsService = ServiceGet<string, Transaction> &
   ServiceMget<string[], Transaction> &
-  ServiceSearch<InvokeScriptTxsSearchRequest, Transaction>;
+  ServiceSearch<DataTxsSearchRequest, Transaction>;
 
 export default ({
   drivers: { pg },
   emitEvent,
-}: CommonServiceCreatorDependencies): InvokeScriptTxsService => {
+}: CommonServiceCreatorDependencies): DataTxsService => {
   return {
-    get: get<string, string, RawInvokeScriptTx, Transaction>({
+    get: get<string, string, DataTxDbResponse, Transaction>({
       transformInput: identity,
       transformResult: transformResultGet<
         string,
-        RawInvokeScriptTx,
-        InvokeScriptTx,
+        DataTxDbResponse,
+        TransactionInfo,
         Transaction
       >(transaction)(transformTxInfo),
-      validateInput: validateInput<string>(inputGet, createServiceName('get')),
-      validateResult: validateResult<RawInvokeScriptTx>(
-        resultSchema,
-        createServiceName('get')
-      ),
+      validateInput: validateInput(inputGet, createServiceName('get')),
+      validateResult: validateResult(resultSchema, createServiceName('get')),
       dbQuery: pgData.get,
     })({ db: pg, emitEvent }),
 
-    mget: mget<string[], string[], RawInvokeScriptTx, List<Transaction>>({
+    mget: mget<string[], string[], DataTxDbResponse, List<Transaction>>({
       transformInput: identity,
       transformResult: transformResultMget<
         string[],
-        RawInvokeScriptTx,
+        DataTxDbResponse,
         TransactionInfo,
         Transaction
       >(transaction)(transformTxInfo),
@@ -70,7 +87,12 @@ export default ({
       dbQuery: pgData.mget,
     })({ db: pg, emitEvent }),
 
-    search: search<any, any, RawInvokeScriptTx, List<Transaction>>({
+    search: search<
+      DataTxsSearchRequest,
+      DataTxsSearchRequest,
+      DataTxDbResponse,
+      List<Transaction>
+    >({
       transformInput: transformInputSearch,
       transformResult: transformResultSearch(
         compose(
@@ -78,14 +100,11 @@ export default ({
           transformTxInfo
         )
       ),
-      validateInput: validateInput<any>(
+      validateInput: validateInput(
         inputSearchSchema,
         createServiceName('search')
       ),
-      validateResult: validateResult<RawInvokeScriptTx>(
-        resultSchema,
-        createServiceName('search')
-      ),
+      validateResult: validateResult(resultSchema, createServiceName('search')),
       dbQuery: pgData.search,
     })({ db: pg, emitEvent }),
   };

@@ -1,5 +1,5 @@
-const { renameKeys } = require('ramda-adjunct');
-const { compose, ifElse, propEq, omit, identity, pathEq } = require('ramda');
+import { renameKeys } from 'ramda-adjunct';
+import { compose, ifElse, propEq, omit, identity, pathEq } from 'ramda';
 
 const hasNullSig = propEq('signature', null);
 const hasZeroProofs = pathEq(['proofs', 'length'], 0);
@@ -11,7 +11,7 @@ const processProofsAndSignature = ifElse(
 );
 
 /** transformTxInfo:: RawTxInfo -> TxInfo */
-const transformTxInfo = compose(
+export const transformTxInfo = compose(
   processProofsAndSignature,
   // remove version if it is null
   ifElse(propEq('version', null), omit(['version']), identity),
@@ -22,5 +22,3 @@ const transformTxInfo = compose(
     time_stamp: 'timestamp',
   })
 );
-
-module.exports = transformTxInfo;

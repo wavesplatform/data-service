@@ -41,15 +41,11 @@ export type Service<T extends Serializable<string, any>> =
   | ServiceMget<any, T>
   | ServiceSearch<any, T>;
 
-export type ServiceMesh = Record<string, Service<Serializable<string, any>>>;
-
-// asset
 export { AssetInfo };
 export type Asset = Serializable<'asset', AssetInfo | null>;
 export const asset = (data: AssetInfo | null = null): Asset =>
   toSerializable('asset', data);
 
-// alias
 export type AliasInfo = {
   alias: string;
   address: string | null;
@@ -58,7 +54,6 @@ export type Alias = Serializable<'alias', AliasInfo | null>;
 export const alias = (data: AliasInfo | null = null): Alias =>
   toSerializable('alias', data);
 
-// @todo CandleInfo
 export type CandleInfo = {
   time_start: Date | null;
   matcher: string | null;
@@ -79,14 +74,28 @@ export type Candle = Serializable<'candle', CandleInfo | null>;
 export const candle = (data: CandleInfo | null = null): Candle =>
   toSerializable('candle', data);
 
-// @todo PairInfo
-export type PairInfo = {};
+export type PairInfo = {
+  firstPrice: BigNumber;
+  lastPrice: BigNumber;
+  low: BigNumber;
+  high: BigNumber;
+  weightedAveragePrice: BigNumber;
+  volume: BigNumber;
+  quoteVolume: BigNumber;
+  volumeWaves: BigNumber;
+  txsCount: number;
+};
 export type Pair = Serializable<'pair', PairInfo | null>;
 export const pair = (data: PairInfo | null = null): Pair =>
   toSerializable('pair', data);
 
 // @todo TransactionInfo
-export type TransactionInfo = {};
-export type Transaction = Serializable<'transaction', TransactionInfo | null>;
+export type TransactionInfo = {
+  id: string;
+  timestamp: Date;
+};
+export type NotNullTransaction = Serializable<'transaction', TransactionInfo>;
+export type NullTransaction = Serializable<'transaction', null>;
+export type Transaction = NotNullTransaction | NullTransaction;
 export const transaction = (data: TransactionInfo | null = null): Transaction =>
   toSerializable('transaction', data);
