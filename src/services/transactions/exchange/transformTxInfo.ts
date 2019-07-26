@@ -32,7 +32,7 @@ const createOrder = (prefix: string) => <T extends { [key: string]: any }>({
     },
     orderType,
     price,
-    sender,
+    orderSender: sender,
     amount,
     timestamp,
     expiration,
@@ -71,6 +71,7 @@ export default (tx: ExchangeTxDbResponse) => {
   return {
     ...commonFields,
     ...exchangeTxFields,
+    matcher: tx.sender,
     order1: createOrder('o1')(tx),
     order2: createOrder('o2')(tx),
   };
