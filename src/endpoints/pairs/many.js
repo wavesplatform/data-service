@@ -1,13 +1,11 @@
-const createService = require('../../services/pairs');
 const Maybe = require('folktale/maybe');
+const { map, split, zipObj, compose } = require('ramda');
 
 const createManyMiddleware = require('../_common/many');
 
 const { parseArrayQuery } = require('../utils/parseArrayQuery');
 const { parseBool } = require('../utils/parseBool');
 const { limit, query } = require('../_common/filters');
-
-const { map, split, zipObj, compose } = require('ramda');
 
 /**
  * @typedef {object} PairRequest
@@ -53,7 +51,7 @@ const pairsMany = createManyMiddleware(
     mgetFilterName: 'pairs',
   },
   '/pairs',
-  createService
+  'pairs'
 );
 
 module.exports = pairsMany;

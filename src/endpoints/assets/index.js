@@ -3,9 +3,7 @@ const Router = require('koa-router');
 const createEndpoint = require('../_common');
 const { ids, limit, after, query } = require('../_common/filters');
 
-const createService = require('../../services/assets');
-
-module.exports = createEndpoint('/assets', createService, {
+module.exports = createEndpoint('/assets', 'assets', {
   filterParsers: {
     ids,
     limit,

@@ -10,7 +10,7 @@ import { getByIdPreset } from '..';
 import { inputGet as input } from '../inputSchema';
 
 const createService = (resultSchema: SchemaLike) =>
-  getByIdPreset<string, string, string | null>({
+  getByIdPreset<string, string, string, Serializable<'test', string | null>>({
     name: 'some_name',
     sql: identity,
     inputSchema: input,

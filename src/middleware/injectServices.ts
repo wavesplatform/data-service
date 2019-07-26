@@ -86,7 +86,6 @@ const commonInitServiceMesh: { [slug in keyof ServiceMesh]: any } = {
   aliases: createAliasesService,
   assets: createAssetsService,
   candles: createCandlesService,
-  allTxs: createAllTxsService,
   aliasTxs: createAliasTxsService,
   burnTxs: createBurnTxsService,
   dataTxs: createDataTxsService,
@@ -125,7 +124,6 @@ export default (options: DataServiceConfig): Middleware<any> => async (
   serviceMesh.aliases = commonInitServiceMesh.aliases(commonDeps);
   serviceMesh.assets = commonInitServiceMesh.assets(commonDeps);
   serviceMesh.candles = commonInitServiceMesh.candles(commonDeps);
-  serviceMesh.allTxs = commonInitServiceMesh.allTxs(commonDeps);
   serviceMesh.aliasTxs = commonInitServiceMesh.aliasTxs(commonDeps);
   serviceMesh.burnTxs = commonInitServiceMesh.burnTxs(commonDeps);
   serviceMesh.dataTxs = commonInitServiceMesh.dataTxs(commonDeps);
@@ -150,6 +148,26 @@ export default (options: DataServiceConfig): Middleware<any> => async (
   serviceMesh.transferTxs = commonInitServiceMesh.transferTxs(commonDeps);
 
   // specific init services
+  const allTxsService = createAllTxsService(commonDeps)({
+    1: serviceMesh.genesisTxs,
+    2: serviceMesh.paymentTxs,
+    3: serviceMesh.issueTxs,
+    4: serviceMesh.transferTxs,
+    5: serviceMesh.reissueTxs,
+    6: serviceMesh.burnTxs,
+    7: serviceMesh.exchangeTxs,
+    8: serviceMesh.leaseTxs,
+    9: serviceMesh.leaseCancelTxs,
+    10: serviceMesh.aliasTxs,
+    11: serviceMesh.massTransferTxs,
+    12: serviceMesh.dataTxs,
+    13: serviceMesh.setScriptTxs,
+    14: serviceMesh.sponsorshopTxs,
+    15: serviceMesh.setAssetScriptTxs,
+    16: serviceMesh.invokeScriptTxs,
+  });
+  serviceMesh.allTxs = allTxsService;
+
   const settings = await loadMatcherSettings(options);
   const pairsService = createPairsService({
     ...commonDeps,

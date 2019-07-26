@@ -4,12 +4,15 @@ import { of as taskOf } from 'folktale/concurrency/task';
 
 import { Joi } from '../../../../../utils/validation';
 import { mgetByIdsPreset } from '..';
-import { toSerializable } from '../../../../../types/serialization';
+import {
+  toSerializable,
+  Serializable,
+} from '../../../../../types/serialization';
 import { PgDriver } from '../../../../../db/driver';
 const { inputMget: input } = require('../inputSchema');
 
 const createService = (resultSchema: SchemaLike) =>
-  mgetByIdsPreset<string, string, string | null>({
+  mgetByIdsPreset<string, string, string, Serializable<'test', string | null>>({
     name: 'some_name',
     sql: (s: string[]) => s.join(';'),
     matchRequestResult: equals,

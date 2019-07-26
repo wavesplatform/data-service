@@ -1,17 +1,7 @@
-import { of as maybeOf, Maybe } from 'folktale/maybe';
-import { of as taskOf, rejected, Task } from 'folktale/concurrency/task';
-import {
-  compose,
-  cond,
-  equals,
-  filter,
-  forEach,
-  length,
-  map,
-  T,
-  tap,
-} from 'ramda';
+import { Maybe } from 'folktale/maybe';
+import { of as taskOf, rejected } from 'folktale/concurrency/task';
 
+import { AppError, ResolverError } from '../../errorHandling';
 import {
   PairsServiceCreatorDependencies,
   ServiceMesh,
@@ -24,9 +14,7 @@ import {
   ServiceGet,
   ServiceMget,
   ServiceSearch,
-  Transaction,
   TransactionInfo,
-  NotNullTransaction,
 } from '../../types';
 import { getByIdPreset } from '../presets/pg/getById';
 import { mgetByIdsPreset } from '../presets/pg/mgetByIds';
@@ -43,10 +31,8 @@ import {
   PairDbResponse,
   transformResult,
   transformResultSearch,
-  createEmptyPair,
 } from './transformResult';
 import * as sql from './sql';
-import { AppError, ResolverError } from 'errorHandling';
 
 export type PairsGetRequest = {
   amountAsset: string;
@@ -84,8 +70,8 @@ export type PairsService =
 export default ({
   drivers,
   emitEvent,
-  orderPair,
   cache,
+  orderPair,
 }: PairsServiceCreatorDependencies) => (serviceMesh: ServiceMesh) => {
   const getPairByRequest = getByIdPreset<
     PairsGetRequest,
@@ -133,12 +119,10 @@ export default ({
     get: (request: PairsGetRequest) => {
       const getPairT = getPairByRequest(request).chain<AppError, Maybe<Pair>>(
         maybePair =>
-          taskOf(
-            maybePair.matchWith({
-              Just: () => maybePair,
-              Nothing: () => maybeOf(createEmptyPair()),
-            })
-          )
+          maybePair.matchWith({
+            Just: () => taskOf(maybePair),
+            Nothing: () => rejected(new ResolverError('Pair not found')),
+          })
       );
 
       // request asset list
@@ -152,26 +136,21 @@ export default ({
         return getPairT;
       } else {
         return serviceMesh.issueTxs
-          ? serviceMesh.issueTxs
-              .mget(notCached)
-              .chain<AppError, Pair | Maybe<unknown>>(
-                compose(
-                  cond<number, Task<AppError, Maybe<unknown>>>([
-                    [equals(notCached.length), () => getPairT],
-                    [
-                      T,
-                      () =>
-                        rejected(new ResolverError(new Error('Check pair'))),
-                    ],
-                  ]),
-                  (l: TransactionInfo[]) => length(l),
-                  tap(forEach((tx: TransactionInfo) => cache.set(tx.id, true))),
-                  map((tx: NotNullTransaction) => tx.data),
-                  (l: Transaction[]): any[] =>
-                    filter((tx: Transaction) => tx.data !== null)(l),
-                  (list: List<Transaction>): Transaction[] => list.data
-                )
-              )
+          ? serviceMesh.issueTxs.mget(notCached).chain(list => {
+              const found = list.data
+                .map(tx => tx.data)
+                .filter(
+                  (t: TransactionInfo | null): t is TransactionInfo =>
+                    t !== null
+                );
+
+              if (found.length < notCached.length) {
+                return rejected(new ResolverError(new Error('Check pair')));
+              } else {
+                found.forEach(tx => cache.set(tx.id, true));
+                return getPairT;
+              }
+            })
           : rejected(
               new ResolverError(
                 new Error('Issue txs service is not initialized')
@@ -183,12 +162,10 @@ export default ({
       const mgetPairsT = mgetPairsByRequest(request);
 
       // request asset list
-      const assets = request
-        .reduce(
-          (acc: string[], pair) => [...acc, pair.amountAsset, pair.priceAsset],
-          []
-        )
-        .filter(assetId => assetId !== 'WAVES');
+      const assets = request.reduce(
+        (acc: string[], pair) => [...acc, pair.amountAsset, pair.priceAsset],
+        []
+      );
 
       // try to check asset existance through the cache
       const notCached = assets.filter(assetId => !cache.has(assetId));
@@ -198,23 +175,21 @@ export default ({
         return mgetPairsT;
       } else {
         return serviceMesh.issueTxs
-          ? serviceMesh.issueTxs.mget(notCached).chain(
-              compose(
-                cond([
-                  [equals(notCached.length), () => mgetPairsT],
-                  [
-                    T,
-                    () => rejected(new ResolverError(new Error('Check pairs'))),
-                  ],
-                ]),
-                length,
-                tap(forEach((tx: TransactionInfo) => cache.set(tx.id, true))),
-                map((tx: NotNullTransaction) => tx.data),
-                (l: Transaction[]): any[] =>
-                  filter((tx: Transaction) => tx.data !== null)(l),
-                (list: List<Transaction>): Transaction[] => list.data
-              )
-            )
+          ? serviceMesh.issueTxs.mget(notCached).chain(list => {
+              const found = list.data
+                .map(tx => tx.data)
+                .filter(
+                  (t: TransactionInfo | null): t is TransactionInfo =>
+                    t !== null
+                );
+
+              if (found.length < notCached.length) {
+                return rejected(new ResolverError(new Error('Check pairs')));
+              } else {
+                found.forEach(tx => cache.set(tx.id, true));
+                return mgetPairsT;
+              }
+            })
           : rejected(
               new ResolverError(
                 new Error('Issue txs service is not initialized')

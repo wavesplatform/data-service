@@ -11,7 +11,7 @@ import {
   ServiceSearch,
 } from '../../../types';
 
-import { WithLimit } from '../../_common';
+import { WithLimit, WithSortOrder } from '../../_common';
 import { get, mget, search } from '../../_common/createResolver';
 import { RawTx, CommonFilters } from '../_common/types';
 
@@ -36,6 +36,7 @@ import * as transformTxInfo from './transformTxInfo';
 const createServiceName = (type: string): string => `transactions.data.${type}`;
 
 type DataTxsSearchRequest = CommonFilters &
+  WithSortOrder &
   WithLimit & {
     key: string;
     type: string;

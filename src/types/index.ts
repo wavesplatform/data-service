@@ -94,8 +94,6 @@ export type TransactionInfo = {
   id: string;
   timestamp: Date;
 };
-export type NotNullTransaction = Serializable<'transaction', TransactionInfo>;
-export type NullTransaction = Serializable<'transaction', null>;
-export type Transaction = NotNullTransaction | NullTransaction;
+export type Transaction = Serializable<'transaction', TransactionInfo | null>;
 export const transaction = (data: TransactionInfo | null = null): Transaction =>
   toSerializable('transaction', data);

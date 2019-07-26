@@ -1,4 +1,4 @@
-import { propEq, compose } from 'ramda';
+import { propEq, compose, Omit } from 'ramda';
 import { BigNumber } from '@waves/data-entities';
 
 import { CommonServiceCreatorDependencies } from '../../../middleware/injectServices';

@@ -14,7 +14,7 @@ const pairsOneEndpoint = async ctx => {
     resolver: '/pairs/:id1/:id2',
   });
 
-  const service = ctx.services.pairsService;
+  const service = ctx.services.pairs;
 
   const pair = await service
     .get({

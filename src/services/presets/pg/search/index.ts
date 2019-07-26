@@ -2,12 +2,12 @@ import { identity } from 'ramda';
 import { SchemaLike } from 'joi';
 import { Task } from 'folktale/concurrency/task';
 
-import { getData } from './pg';
+import { AppError } from '../../../../errorHandling';
+import { List, Serializable } from '../../../../types';
 import { search } from '../../../_common/createResolver';
 import { ServicePresetInitOptions } from '../../../presets/types';
 import { validateInput, validateResult } from '../../validation';
-import { List, Serializable } from '../../../../types';
-import { AppError } from 'errorHandling';
+import { getData } from './pg';
 
 export const searchPreset = <
   Request,

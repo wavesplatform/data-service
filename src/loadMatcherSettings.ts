@@ -10,7 +10,7 @@ export const loadMatcherSettings = (
   options: DataServiceConfig
 ): Promise<MatcherSettings> =>
   new Promise(resolve =>
-    get(options.matcherSettingsURL, res => {
+    get(options.matcher.settingsURL, res => {
       let rawData = '';
       res.on('data', (chunk: any) => (rawData += chunk));
       res.on('end', () => {

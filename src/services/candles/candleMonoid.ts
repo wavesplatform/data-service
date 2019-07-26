@@ -1,6 +1,6 @@
 import { BigNumber } from '@waves/data-entities';
 import { Monoid } from '../../types/monoid';
-import { CandleDbResponse } from './transformResults';
+import { RawCandle } from './transformResults';
 
 // common
 export const leftNotNullMonoid = {
@@ -42,12 +42,12 @@ export const bigNumberHighestMonoid = {
 
 // individual
 export const weightedAveragePriceMonoid = {
-  concat: (a: CandleDbResponse, b: CandleDbResponse): BigNumber =>
+  concat: (a: RawCandle, b: RawCandle): BigNumber =>
     a.quote_volume.plus(b.quote_volume).dividedBy(a.volume.plus(b.volume)),
   empty: new BigNumber(0),
 };
 
-export const candleMonoid: Monoid<CandleDbResponse> = {
+export const candleMonoid: Monoid<RawCandle> = {
   concat: (a, b) => ({
     time_start: leftNotNullMonoid.concat(a.time_start, b.time_start),
     open: leftNotNullMonoid.concat(a.open, b.open),

@@ -24,6 +24,7 @@ import { candleMonoid } from './candleMonoid';
 import { CandlesSearchRequest } from '.';
 
 const truncToMinutes = trunc(Unit.Minute);
+const defaultInterval = interval('1m');
 
 export type CandleDbResponse = {
   time_start: Date;
@@ -44,12 +45,28 @@ export type CandleDbResponse = {
   p_dec: number;
 };
 
-/** transformCandle :: [Date, CandleDbResponse] -> Candle */
-export const transformCandle = ([time, c]: [
-  Date,
-  CandleDbResponse
-]): Candle => {
-  const isEmpty = (c: CandleDbResponse) => c.txs_count === 0;
+export type RawCandle = {
+  time_start: Date | null;
+  amount_asset_id: string | null;
+  price_asset_id: string | null;
+  matcher: string | null;
+  max_height: number;
+  open: BigNumber | null;
+  high: BigNumber;
+  low: BigNumber;
+  close: BigNumber | null;
+  volume: BigNumber;
+  quote_volume: BigNumber;
+  weighted_average_price: BigNumber;
+  txs_count: number;
+  interval_in_secs: number | null;
+  a_dec: number | null;
+  p_dec: number | null;
+};
+
+/** transformCandle :: [string, RawCandle] -> Candle */
+export const transformCandle = ([time, c]: [string, RawCandle]): Candle => {
+  const isEmpty = (c: RawCandle) => c.txs_count === 0;
 
   const renameFields = renameKeys({
     quote_volume: 'quoteVolume',
@@ -60,7 +77,7 @@ export const transformCandle = ([time, c]: [
   });
 
   return compose(
-    candle,
+    (c: any): Candle => candle(c),
     omit(['a_dec', 'p_dec']),
     renameFields,
     assoc('time_start', time),
@@ -73,7 +90,7 @@ export const transformCandle = ([time, c]: [
  * -> Map String CandleDbResponse[]-> Map String CandleDbResponse[] */
 export const addMissingCandles = curry(
   (
-    interval: Interval | null,
+    interval: Interval,
     timeStart: Date,
     timeEnd: Date
   ) => (candlesGroupedByTime: {
@@ -98,14 +115,16 @@ export const addMissingCandles = curry(
 );
 
 const candleFixedDecimals = (
-  candle: CandleDbResponse,
+  candle: RawCandle,
   aDecimals: number,
   pDecimals: number
 ) =>
   evolve(
     {
-      open: (t: BigNumber) => t.decimalPlaces(8 + pDecimals - aDecimals),
-      close: (t: BigNumber) => t.decimalPlaces(8 + pDecimals - aDecimals),
+      open: (t: BigNumber | null) =>
+        t ? t.decimalPlaces(8 + pDecimals - aDecimals) : null,
+      close: (t: BigNumber | null) =>
+        t ? t.decimalPlaces(8 + pDecimals - aDecimals) : null,
       high: (t: BigNumber) => t.decimalPlaces(8 + pDecimals - aDecimals),
       low: (t: BigNumber) => t.decimalPlaces(8 + pDecimals - aDecimals),
       volume: (t: BigNumber) => t.decimalPlaces(aDecimals),
@@ -120,28 +139,41 @@ export const transformResults = (
   result: CandleDbResponse[],
   request: CandlesSearchRequest
 ): List<Candle> =>
-  compose(
-    (candles: Candle[]) => list<Candle>(candles),
-    map<any, Candle>(transformCandle),
-    sort<[string, CandleDbResponse]>(
-      (a, b): number => new Date(a[0]).valueOf() - new Date(b[0]).valueOf()
+  compose<
+    CandleDbResponse[],
+    { [date: string]: CandleDbResponse[] },
+    { [date: string]: RawCandle[] },
+    { [date: string]: RawCandle },
+    { [date: string]: RawCandle },
+    [string, RawCandle][],
+    [string, RawCandle][],
+    Candle[],
+    List<Candle>
+  >(
+    list,
+    map(transformCandle),
+    sort((a, b): number => new Date(a[0]).valueOf() - new Date(b[0]).valueOf()),
+    toPairs,
+    map<{ [date: string]: RawCandle }, { [date: string]: RawCandle }>(
+      (candle: RawCandle) =>
+        candle.a_dec && candle.p_dec
+          ? candleFixedDecimals(candle, candle.a_dec, candle.p_dec)
+          : candle
     ),
-    (o: { string: CandleDbResponse }) => toPairs(o),
-    map((candle: CandleDbResponse) =>
-      candle.a_dec && candle.p_dec
-        ? candleFixedDecimals(candle, candle.a_dec, candle.p_dec)
-        : candle
+    map<{ [date: string]: RawCandle[] }, { [date: string]: RawCandle }>(
+      concatAll(candleMonoid)
     ),
-    map<CandleDbResponse[], CandleDbResponse>(concatAll(candleMonoid)),
     addMissingCandles(
-      interval(request.params.interval).getOrElse(null),
+      interval(request.params.interval).getOrElse(defaultInterval.unsafeGet()),
       request.params.timeStart,
       request.params.timeEnd
     ),
-    groupBy((candle: CandleDbResponse) =>
+    groupBy(candle =>
       truncToMinutes(
         floor(
-          interval(request.params.interval).getOrElse(null),
+          interval(request.params.interval).getOrElse(
+            defaultInterval.unsafeGet()
+          ),
           candle.time_start
         )
       )

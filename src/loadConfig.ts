@@ -19,8 +19,10 @@ export type ServerConfig = {
 };
 
 export type MatcherConfig = {
-  matcherSettingsURL: string;
-  defaultMatcher: string;
+  matcher: {
+    settingsURL: string;
+    default: string;
+  };
 };
 
 export type DataServiceConfig = PostgresConfig &
@@ -54,10 +56,12 @@ const load = (): DataServiceConfig => {
       : 20,
     logLevel: process.env.LOG_LEVEL || 'info',
 
-    matcherSettingsURL:
-      process.env.MATCHER_SETTINGS_URL ||
-      'https://matcher.wavesplatform.com/matcher/settings',
-    defaultMatcher: guard('DEFAULT_MATCHER', process.env.DEFAULT_MATCHER),
+    matcher: {
+      settingsURL:
+        process.env.MATCHER_SETTINGS_URL ||
+        'https://matcher.wavesplatform.com/matcher/settings',
+      default: guard('DEFAULT_MATCHER', process.env.DEFAULT_MATCHER),
+    },
   };
 };
 

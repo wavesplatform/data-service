@@ -1,7 +1,7 @@
-import { compose, pick, map, repeat, zipObj } from 'ramda';
+import { compose, pick, map } from 'ramda';
 import { renameKeys } from 'ramda-adjunct';
 import { BigNumber } from '@waves/data-entities';
-import { list, pair } from '../../types';
+import { list, List, pair, Pair } from '../../types';
 
 export type PairDbResponse = {
   amount_asset_id: string;
@@ -49,20 +49,18 @@ export const transformResult = compose(
 );
 
 /** transformResultSearch :: Array -> Object */
-export const transformResultSearch = compose(
-  list,
-  map((p: PairDbResponse) =>
-    compose(
-      pairObject => ({
-        ...pairObject,
-        amountAsset: p.amount_asset_id,
-        priceAsset: p.price_asset_id,
-      }),
-      pair,
-      transformResult
-    )(p)
-  )
-);
-
-export const createEmptyPair = () =>
-  pair(zipObj(pairDataFields, repeat(null, pairDataFields.length)));
+export const transformResultSearch = (a: PairDbResponse[]): List<Pair> =>
+  compose(
+    (l: Pair[]) => list(l),
+    map<PairDbResponse, Pair>((p: PairDbResponse) =>
+      compose(
+        pairObject => ({
+          ...pairObject,
+          amountAsset: p.amount_asset_id,
+          priceAsset: p.price_asset_id,
+        }),
+        pair,
+        (p: PairDbResponse): any => transformResult(p)
+      )(p)
+    )
+  )(a);
