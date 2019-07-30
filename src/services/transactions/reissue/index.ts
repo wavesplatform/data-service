@@ -29,9 +29,10 @@ import * as transformTxInfo from './transformTxInfo';
 type ReissueTxsSearchRequest = RequestWithCursor<
   CommonFilters & WithSortOrder & WithLimit,
   string
-> & {
-  assetId: string;
-};
+> &
+  Partial<{
+    assetId: string;
+  }>;
 
 type ReissueTxDbResponse = RawTx & {
   asset_id: string;

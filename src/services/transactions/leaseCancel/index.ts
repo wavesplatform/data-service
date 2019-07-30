@@ -29,9 +29,10 @@ import * as transformTxInfo from './transformTxInfo';
 type LeaseCancelTxsSearchRequest = RequestWithCursor<
   CommonFilters & WithSortOrder & WithLimit,
   string
-> & {
-  recipient: string;
-};
+> &
+  Partial<{
+    recipient: string;
+  }>;
 
 type LeaseCancelTxDbResponse = RawTx & {
   lease_id: string;

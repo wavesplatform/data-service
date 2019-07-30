@@ -30,9 +30,10 @@ import * as sql from './sql';
 type LeaseTxsSearchRequest = RequestWithCursor<
   CommonFilters & WithSortOrder & WithLimit,
   string
-> & {
-  recipient: string;
-};
+> &
+  Partial<{
+    recipient: string;
+  }>;
 
 type LeaseTxDbResponse = RawTx & {
   amount: BigNumber;

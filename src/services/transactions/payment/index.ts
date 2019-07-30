@@ -29,9 +29,7 @@ import * as sql from './sql';
 type PaymentTxsSearchRequest = RequestWithCursor<
   CommonFilters & WithSortOrder & WithLimit,
   string
-> & {
-  assetId: string;
-};
+>;
 
 type PaymentTxDbResponse = RawTx & {
   asset_id: string;

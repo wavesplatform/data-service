@@ -28,13 +28,13 @@ export const maxMonoid = {
   empty: 0,
 };
 
-export const bigNumberLowestMonoid = {
+export const bigNumberMinMonoid = {
   concat: (a: BigNumber, b: BigNumber): BigNumber =>
     a.comparedTo(b) === 1 ? b : a,
   empty: new BigNumber(+Infinity),
 };
 
-export const bigNumberHighestMonoid = {
+export const bigNumberMaxMonoid = {
   concat: (a: BigNumber, b: BigNumber): BigNumber =>
     a.comparedTo(b) === 1 ? a : b,
   empty: new BigNumber(-Infinity),
@@ -52,8 +52,8 @@ export const candleMonoid: Monoid<RawCandle> = {
     time_start: leftNotNullMonoid.concat(a.time_start, b.time_start),
     open: leftNotNullMonoid.concat(a.open, b.open),
     close: rightNotNullMonoid.concat(a.close, b.close),
-    high: bigNumberHighestMonoid.concat(a.high, b.high),
-    low: bigNumberLowestMonoid.concat(a.low, b.low),
+    high: bigNumberMaxMonoid.concat(a.high, b.high),
+    low: bigNumberMinMonoid.concat(a.low, b.low),
     volume: bigNumberPlusMonoid.concat(a.volume, b.volume),
     quote_volume: bigNumberPlusMonoid.concat(a.quote_volume, b.quote_volume),
     weighted_average_price: weightedAveragePriceMonoid.concat(a, b),
@@ -79,8 +79,8 @@ export const candleMonoid: Monoid<RawCandle> = {
     time_start: leftNotNullMonoid.empty,
     open: leftNotNullMonoid.empty,
     close: rightNotNullMonoid.empty,
-    high: bigNumberHighestMonoid.empty,
-    low: bigNumberLowestMonoid.empty,
+    high: bigNumberMaxMonoid.empty,
+    low: bigNumberMinMonoid.empty,
     volume: bigNumberPlusMonoid.empty,
     quote_volume: bigNumberPlusMonoid.empty,
     weighted_average_price: weightedAveragePriceMonoid.empty,

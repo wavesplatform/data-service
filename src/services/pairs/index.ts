@@ -84,7 +84,9 @@ export default ({
   const cache = new LRU(100000);
   cache.set('WAVES', true);
 
-  const settings = await loadMatcherSettings(options);
+  const settings = await loadMatcherSettings(options)
+    .run()
+    .promise();
   const orderPair = createOrderPair(settings.priceAssets);
 
   const getPairByRequest = getByIdPreset<

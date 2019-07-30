@@ -5,7 +5,7 @@ import { transformTxInfo } from '../_common/transformTxInfo';
 
 import { ExchangeTxDbResponse } from './';
 
-const createOrder = (prefix: string) => <T extends { [key: string]: any }>({
+const createOrder = (prefix: string) => <T extends Record<string, any>>({
   [`${prefix}_id`]: id,
   [`${prefix}_version`]: version,
   [`${prefix}_sender_public_key`]: senderPublicKey,

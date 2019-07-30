@@ -26,10 +26,11 @@ import * as sql from './sql';
 type SetScriptTxsSearchRequest = RequestWithCursor<
   CommonFilters & WithSortOrder & WithLimit,
   string
-> & {
-  sender: string;
-  script: string;
-};
+> &
+  Partial<{
+    sender: string;
+    script: string;
+  }>;
 
 type SetScriptTxDbResponse = RawTx & {
   script: string;

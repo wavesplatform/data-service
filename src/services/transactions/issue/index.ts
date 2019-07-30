@@ -29,9 +29,11 @@ import transformTxInfo from './transformTxInfo';
 type IssueTxsSearchRequest = RequestWithCursor<
   CommonFilters & WithSortOrder & WithLimit,
   string
-> & {
-  assetId: string;
-};
+> &
+  Partial<{
+    assetId: string;
+    script: string;
+  }>;
 
 type IssueTxDbResponse = RawTx & {
   asset_id: string;

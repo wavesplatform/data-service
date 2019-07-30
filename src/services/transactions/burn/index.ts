@@ -29,9 +29,10 @@ import transformTxInfo from './transformTxInfo';
 type BurnTxsSearchRequest = RequestWithCursor<
   CommonFilters & WithSortOrder & WithLimit,
   string
-> & {
-  assetId: string;
-};
+> &
+  Partial<{
+    assetId: string;
+  }>;
 
 type BurnTxDbResponse = RawTx & {
   asset_id: string;

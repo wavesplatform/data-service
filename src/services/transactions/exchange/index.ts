@@ -27,13 +27,14 @@ import transformTxInfo from './transformTxInfo';
 type ExchangeTxsSearchRequest = RequestWithCursor<
   CommonFilters & WithSortOrder & WithLimit,
   string
-> & {
-  matcher: string;
-  orderId: string;
-  sender: string;
-  amountAsset: string;
-  priceAsset: string;
-};
+> &
+  Partial<{
+    matcher: string;
+    orderId: string;
+    orderSender: string;
+    amountAsset: string;
+    priceAsset: string;
+  }>;
 
 export type ExchangeTxDbResponse = RawTx & {
   price_asset: string;

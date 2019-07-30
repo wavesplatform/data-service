@@ -21,19 +21,25 @@ export type ServiceGet<
   Request,
   ResponseTransformed extends Serializable<string, any>
 > = {
-  get: (request: Request) => Task<AppError, Maybe<ResponseTransformed>>;
+  readonly get: (
+    request: Request
+  ) => Task<AppError, Maybe<ResponseTransformed>>;
 };
 export type ServiceMget<
   Request,
   ResponseTransformed extends Serializable<string, any>
 > = {
-  mget: (request: Request) => Task<AppError, List<ResponseTransformed>>;
+  readonly mget: (
+    request: Request
+  ) => Task<AppError, List<ResponseTransformed>>;
 };
 export type ServiceSearch<
   Request,
   ResponseTransformed extends Serializable<string, any>
 > = {
-  search: (request: Request) => Task<AppError, List<ResponseTransformed>>;
+  readonly search: (
+    request: Request
+  ) => Task<AppError, List<ResponseTransformed>>;
 };
 
 export type Service<T extends Serializable<string, any>> =

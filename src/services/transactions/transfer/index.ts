@@ -27,11 +27,12 @@ import * as transformTxInfo from './transformTxInfo';
 type TransferTxsSearchRequest = RequestWithCursor<
   CommonFilters & WithSortOrder & WithLimit,
   string
-> & {
-  sender: string;
-  assetId: string;
-  recipient: string;
-};
+> &
+  Partial<{
+    sender: string;
+    assetId: string;
+    recipient: string;
+  }>;
 
 type TransferTxDbResponse = RawTx & {
   amount: BigNumber;

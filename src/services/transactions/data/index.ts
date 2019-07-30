@@ -37,11 +37,12 @@ const createServiceName = (type: string): string => `transactions.data.${type}`;
 
 type DataTxsSearchRequest = CommonFilters &
   WithSortOrder &
-  WithLimit & {
+  WithLimit &
+  Partial<{
     key: string;
     type: string;
     value: string;
-  };
+  }>;
 
 type DataEntry = {
   key: string;

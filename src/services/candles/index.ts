@@ -11,12 +11,10 @@ import { CandleDbResponse, transformResults } from './transformResults';
 export type CandlesSearchRequest = {
   amountAsset: string;
   priceAsset: string;
-  params: {
-    timeStart: Date;
-    timeEnd: Date;
-    interval: string;
-    matcher: string;
-  };
+  timeStart: Date;
+  timeEnd: Date;
+  interval: string;
+  matcher: string;
 };
 
 export type CandlesService = ServiceSearch<CandlesSearchRequest, Candle>;
