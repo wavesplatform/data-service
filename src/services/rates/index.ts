@@ -6,11 +6,13 @@ import { AppError } from "errorHandling";
 import { SortOrder } from "services/_common";
 import * as maybe from 'folktale/maybe';
 
-export type RatesEstimationService = ServiceGet<RateGetParams, Rate>;
-
 const WavesId: string = 'WAVES';
 
-type RateOrder = 'Straight' | 'Inverted';
+enum RateOrder {
+  Straight, Inverted
+}
+
+// type RateOrder = 'Straight' | 'Inverted';
 
 type RateRequest = [string, string, RateOrder];
 
@@ -28,7 +30,7 @@ export interface PairCheckService {
 const max = (data: BigNumber[]): maybe.Maybe<BigNumber> =>
   data.length === 0 ? maybe.empty() : maybe.of(BigNumber.max(...data));
 
-export class RateEstimator implements RatesEstimationService {
+export class RateEstimator implements ServiceGet<RateGetParams, Rate> {
   constructor(
     private readonly transactionService: ServiceSearch<ExchangeTxsSearchRequest, Transaction>,    
     private readonly pairChecker: PairCheckService
@@ -57,7 +59,7 @@ export class RateEstimator implements RatesEstimationService {
           ...transactions.map((x: any) => new BigNumber(x.data.price))
       ).div(transactions.length)
     ).map(
-      res => order === 'Straight' ? res : new BigNumber(1).div(res)
+      res => order === RateOrder.Straight ? res : new BigNumber(1).div(res)
     )
   }
   
@@ -65,8 +67,11 @@ export class RateEstimator implements RatesEstimationService {
     const requests: Task<AppError, RateRequest[]> = this.pairChecker.checkPair(matcher, [from, to]).map(
       (res: maybe.Maybe<[string, string]>) =>
         {
-          return res.map(([actualFrom, actualTo]: [string, string]): RateRequest[] => [[actualFrom, actualTo, from === actualFrom ? 'Straight' : 'Inverted']])
-            .getOrElse([[from, to, 'Straight'] as RateRequest, [to, from, 'Inverted'] as RateRequest]);
+          return res.map(
+            ([actualFrom, actualTo]: [string, string]): RateRequest[] =>
+              [[actualFrom, actualTo, from === actualFrom ? RateOrder.Straight : RateOrder.Inverted]]
+          )
+            .getOrElse([[from, to, RateOrder.Straight] as RateRequest, [to, from, RateOrder.Inverted] as RateRequest]);
         }
     );
 

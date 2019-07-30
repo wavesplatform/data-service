@@ -1,9 +1,10 @@
 import * as Router from 'koa-router';
-import { rateEstimateEndpointFactory, PairCheckService, RateEstimator } from './estimate'
+import { rateEstimateEndpointFactory } from './estimate'
 import * as task from 'folktale/concurrency/task';
 import * as maybe from 'folktale/maybe';
 import { ServiceSearch, Transaction } from 'types';
 import { ExchangeTxsSearchRequest } from 'services/transactions/exchange';
+import { PairCheckService, RateEstimator } from 'services/rates';
 
 type TxSearch = ServiceSearch<ExchangeTxsSearchRequest, Transaction>
 
