@@ -54,7 +54,7 @@ export class RateEstimator implements RatesEstimationService {
     ).map(
       // TODO: fix any
       transactions => transactions.length === 0 ? new BigNumber(0) : BigNumber.sum(
-        ...transactions.map((x: any) => new BigNumber(x.data.price))
+          ...transactions.map((x: any) => new BigNumber(x.data.price))
       ).div(transactions.length)
     ).map(
       res => order === 'Straight' ? res : new BigNumber(1).div(res)
@@ -65,9 +65,9 @@ export class RateEstimator implements RatesEstimationService {
     const requests: Task<AppError, RateRequest[]> = this.pairChecker.checkPair(matcher, [from, to]).map(
       (res: maybe.Maybe<[string, string]>) =>
         {
-                return res.map(([actualFrom, actualTo]: [string, string]): RateRequest[] => [[actualFrom, actualTo, from === actualFrom ? 'Straight' : 'Inverted']])
-                    .getOrElse([[from, to, 'Straight'] as RateRequest, [to, from, 'Inverted'] as RateRequest]);
-            }
+          return res.map(([actualFrom, actualTo]: [string, string]): RateRequest[] => [[actualFrom, actualTo, from === actualFrom ? 'Straight' : 'Inverted']])
+            .getOrElse([[from, to, 'Straight'] as RateRequest, [to, from, 'Inverted'] as RateRequest]);
+        }
     );
 
     const results = requests.map(
