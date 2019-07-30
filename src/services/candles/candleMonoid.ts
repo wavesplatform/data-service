@@ -3,32 +3,32 @@ import { Monoid } from '../../types/monoid';
 import { RawCandle } from './transformResults';
 
 // common
-export const leftNotNullMonoid = {
+export const leftNotNullMonoid: Monoid<any> = {
   concat: (a: any, b: any): any => a || b,
   empty: null,
 };
 
-export const rightNotNullMonoid = {
+export const rightNotNullMonoid: Monoid<any> = {
   concat: (a: any, b: any): any => b || a,
   empty: null,
 };
 
-export const sumMonoid = {
+export const sumMonoid: Monoid<number> = {
   concat: (a: number, b: number): number => a + b,
   empty: 0,
 };
 
-export const bigNumberPlusMonoid = {
+export const bigNumberPlusMonoid: Monoid<BigNumber> = {
   concat: (a: BigNumber, b: BigNumber): BigNumber => a.plus(b),
   empty: new BigNumber(0),
 };
 
-export const maxMonoid = {
+export const maxMonoid: Monoid<number> = {
   concat: (a: number, b: number): number => Math.max(a, b),
   empty: 0,
 };
 
-export const bigNumberMinMonoid = {
+export const bigNumberMinMonoid: Monoid<BigNumber> = {
   concat: (a: BigNumber, b: BigNumber): BigNumber =>
     a.comparedTo(b) === 1 ? b : a,
   empty: new BigNumber(+Infinity),
@@ -41,7 +41,7 @@ export const bigNumberMaxMonoid = {
 };
 
 // individual
-export const weightedAveragePriceMonoid = {
+export const weightedAveragePriceMonoid: Monoid<any> = {
   concat: (a: RawCandle, b: RawCandle): BigNumber =>
     a.quote_volume.plus(b.quote_volume).dividedBy(a.volume.plus(b.volume)),
   empty: new BigNumber(0),
