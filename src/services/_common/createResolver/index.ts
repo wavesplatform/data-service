@@ -70,7 +70,7 @@ const getResolver = <
     ResponseRaw,
     ResponseTransformed
   >
-) => ({ db, emitEvent = () => () => {} }: RuntimeResolverDependenties) => (
+) => ({ db, emitEvent = () => () => true }: RuntimeResolverDependenties) => (
   request: RequestRaw
 ) =>
   createResolver<
@@ -100,7 +100,7 @@ const mgetResolver = <
     ResponseRaw,
     ResponseTransformed
   >
-) => ({ db, emitEvent = () => () => {} }: RuntimeResolverDependenties) => (
+) => ({ db, emitEvent = () => () => true }: RuntimeResolverDependenties) => (
   request: RequestRaw
 ) =>
   createResolver<
@@ -130,7 +130,7 @@ const searchResolver = <
     ResponseRaw,
     ResponseTransformed
   >
-) => ({ db, emitEvent = () => () => {} }: RuntimeResolverDependenties) => (
+) => ({ db, emitEvent = () => () => true }: RuntimeResolverDependenties) => (
   request: RequestRaw
 ) =>
   createResolver<

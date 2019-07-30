@@ -1,4 +1,4 @@
-import { always, identity } from 'ramda';
+import { always, T } from 'ramda';
 import { of as task } from 'folktale/concurrency/task';
 
 import { Joi } from '../../../../../utils/validation';
@@ -39,7 +39,7 @@ const service = searchPreset<
     list(res.map(tx => toSerializable<'tx', TestTransaction>('tx', tx))),
 })({
   pg: { any: filters => task(mockTxs) } as PgDriver,
-  emitEvent: always(identity),
+  emitEvent: always(T),
 });
 
 describe('search preset validation', () => {

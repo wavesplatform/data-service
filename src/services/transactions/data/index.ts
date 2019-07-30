@@ -1,6 +1,6 @@
 import { identity, compose } from 'ramda';
 
-import { CommonServiceCreatorDependencies } from '../../../middleware/injectServices';
+import { CommonServiceCreatorDependencies } from '../..';
 import {
   transaction,
   TransactionInfo,

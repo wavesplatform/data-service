@@ -1,7 +1,7 @@
 const { captureErrors } = require('../../utils/captureErrors');
 const { select } = require('../utils/selectors');
 
-const createGetMiddleware = (url, serviceSlug) => {
+const createGetMiddleware = (url, service) => {
   const handleError = ({ ctx, error }) => {
     ctx.eventBus.emit('ERROR', error);
     error.matchWith({
@@ -21,9 +21,7 @@ const createGetMiddleware = (url, serviceSlug) => {
   };
 
   return captureErrors(handleError)(async ctx => {
-    const s = ctx.services[serviceSlug];
-
-    if (!s.get) {
+    if (!service.get) {
       ctx.status = 404;
       return;
     }
@@ -36,7 +34,7 @@ const createGetMiddleware = (url, serviceSlug) => {
       id,
     });
 
-    const x = await s
+    const x = await service
       .get(id)
       .run()
       .promise();

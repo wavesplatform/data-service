@@ -1,6 +1,5 @@
 import { propEq } from 'ramda';
 
-import { CommonServiceCreatorDependencies } from '../../middleware/injectServices';
 import {
   asset,
   Asset,
@@ -10,6 +9,8 @@ import {
   ServiceMget,
   ServiceSearch,
 } from '../../types';
+
+import { CommonServiceCreatorDependencies } from '..';
 
 // presets
 import { getByIdPreset } from '../presets/pg/getById';

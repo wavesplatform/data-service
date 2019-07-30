@@ -1,5 +1,5 @@
 import { of as task } from 'folktale/concurrency/task';
-import { always, identity } from 'ramda';
+import { always, T } from 'ramda';
 
 import { parseDate } from '../../../../../utils/parseDate';
 import { Joi } from '../../../../../utils/validation';
@@ -43,7 +43,7 @@ const service = searchWithPaginationPreset<
     toSerializable<'tx', ResponseRaw>('tx', response),
 })({
   pg: { any: filters => task(mockTxs) } as PgDriver,
-  emitEvent: always(identity),
+  emitEvent: always(T),
 });
 
 const assertValidationError = (done: jest.DoneCallback, v: Request) =>

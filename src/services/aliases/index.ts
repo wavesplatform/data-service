@@ -1,4 +1,4 @@
-import { CommonServiceCreatorDependencies } from '../../middleware/injectServices';
+import { CommonServiceCreatorDependencies } from '..';
 import { getByIdPreset } from '../presets/pg/getById';
 import { searchPreset } from '../presets/pg/search';
 import {

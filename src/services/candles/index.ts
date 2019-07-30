@@ -1,7 +1,8 @@
-import { CommonServiceCreatorDependencies } from '../../middleware/injectServices';
 import { searchPreset } from '../presets/pg/search';
 
 import { Candle, CandleInfo, List, ServiceSearch } from '../../types';
+
+import { CommonServiceCreatorDependencies } from '..';
 
 import { sql } from './sql';
 import { inputSearch, output } from './schema';

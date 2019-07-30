@@ -92,8 +92,10 @@ export const pair = (data: PairInfo | null = null): Pair =>
 // @todo TransactionInfo
 export type TransactionInfo = {
   id: string;
+  type: number;
   timestamp: Date;
 };
+export type NotNullTransaction = Serializable<'transaction', TransactionInfo>;
 export type Transaction = Serializable<'transaction', TransactionInfo | null>;
 export const transaction = (data: TransactionInfo | null = null): Transaction =>
   toSerializable('transaction', data);

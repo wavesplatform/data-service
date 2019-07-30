@@ -1,9 +1,10 @@
-const { compose, identity, toPairs, reduce, omit } = require('ramda');
+import { compose, identity, toPairs, reduce, omit } from 'ramda';
+import * as Router from 'koa-router';
 
-const Router = require('koa-router');
+import { ServiceMesh } from '../../services';
 
-const createEndpoint = require('../_common');
-const {
+import * as createEndpoint from '../_common';
+import {
   timeStart,
   timeEnd,
   after,
@@ -11,7 +12,7 @@ const {
   ids,
   sort,
   query,
-} = require('../_common/filters');
+} from '../_common/filters';
 
 // filters
 const commonTxFilters = {
@@ -25,51 +26,53 @@ const commonTxFilters = {
 };
 
 // common options
-const createOptions = specificFilters => ({
+const createOptions = (specificFilters?: { [key: string]: any }) => ({
   filterParsers: { ...commonTxFilters, ...specificFilters },
 });
 
-const transactionsEndpointsConfig = {
+const transactionsEndpointsConfig = (
+  services: ServiceMesh['transactions']
+): { [url: string]: TxServiceParams } => ({
   '/transactions/all': {
-    service: 'allTxs',
+    service: services.allTxs,
     options: createOptions(),
   },
   '/transactions/genesis': {
-    service: 'genesisTxs',
+    service: services.genesisTxs,
     options: { filterParsers: omit(['sender'], commonTxFilters) },
   },
   '/transactions/payment': {
-    service: 'paymentTxs',
+    service: services.paymentTxs,
     options: createOptions(),
   },
   '/transactions/issue': {
-    service: 'issueTxs',
+    service: services.issueTxs,
     options: createOptions({
       assetId: identity,
       script: identity,
     }),
   },
   '/transactions/transfer': {
-    service: 'transferTxs',
+    service: services.transferTxs,
     options: createOptions({
       assetId: identity,
       recipient: identity,
     }),
   },
   '/transactions/reissue': {
-    service: 'reissueTxs',
+    service: services.reissueTxs,
     options: createOptions({
       assetId: identity,
     }),
   },
   '/transactions/burn': {
-    service: 'burnTxs',
+    service: services.burnTxs,
     options: createOptions({
       assetId: identity,
     }),
   },
   '/transactions/exchange': {
-    service: 'exchangeTxs',
+    service: services.exchangeTxs,
     options: createOptions({
       matcher: identity,
       amountAsset: identity,
@@ -79,51 +82,67 @@ const transactionsEndpointsConfig = {
     }),
   },
   '/transactions/lease': {
-    service: 'leaseTxs',
+    service: services.leaseTxs,
     options: createOptions({ recipient: identity }),
   },
   '/transactions/lease-cancel': {
-    service: 'leaseCancelTxs',
+    service: services.leaseCancelTxs,
     options: createOptions({ recipient: identity }),
   },
   '/transactions/alias': {
-    service: 'aliasTxs',
+    service: services.aliasTxs,
     options: createOptions(),
   },
   '/transactions/mass-transfer': {
-    service: 'massTransferTxs',
+    service: services.massTransferTxs,
     options: createOptions({
       assetId: identity,
       recipient: identity,
     }),
   },
   '/transactions/data': {
-    service: 'dataTxs',
+    service: services.dataTxs,
     options: { parseFiltersFn: require('./parseDataTxFilters') },
   },
   '/transactions/set-script': {
-    service: 'setScriptTxs',
+    service: services.setScriptTxs,
     options: createOptions({ script: identity }),
   },
   '/transactions/sponsorship': {
-    service: 'sponsorshipTxs',
+    service: services.sponsorshopTxs,
     options: createOptions(),
   },
   '/transactions/set-asset-script': {
-    service: 'setAssetScriptTxs',
+    service: services.setAssetScriptTxs,
     options: createOptions({ assetId: identity, script: identity }),
   },
   '/transactions/invoke-script': {
-    service: 'invokeScriptTxs',
+    service: services.invokeScriptTxs,
     options: createOptions({ dapp: identity, function: identity }),
   },
+});
+
+type TxServiceParams = {
+  service: any;
+  options: TxServiceOptions;
 };
 
-module.exports = compose(
-  reduce(
-    (acc, [url, { service, options }]) =>
-      createEndpoint(url, service, options)(acc),
-    new Router()
-  ),
-  toPairs
-)(transactionsEndpointsConfig);
+type TxServiceOptions = {
+  filterParsers?: any;
+  parseFiltersFn?: any;
+  mgetFilterName?: any;
+};
+
+export default (txsServices: ServiceMesh['transactions']) =>
+  compose<
+    { [url: string]: TxServiceParams },
+    [string, TxServiceParams][],
+    Router<any, any>
+  >(
+    reduce(
+      (acc, [url, { service, options }]) =>
+        createEndpoint(url, service, options)(acc),
+      new Router()
+    ),
+    toPairs
+  )(transactionsEndpointsConfig(txsServices));

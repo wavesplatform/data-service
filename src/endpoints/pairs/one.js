@@ -5,7 +5,7 @@ const { captureErrors } = require('../../utils/captureErrors');
  * Endpoint
  * @name /pairs/id1/id2?...params
  */
-const pairsOneEndpoint = async ctx => {
+const pairsOneEndpoint = service => async ctx => {
   const { fromParams } = select(ctx);
   const [id1, id2] = fromParams(['id1', 'id2']);
 
@@ -13,8 +13,6 @@ const pairsOneEndpoint = async ctx => {
     url: ctx.originalUrl,
     resolver: '/pairs/:id1/:id2',
   });
-
-  const service = ctx.services.pairs;
 
   const pair = await service
     .get({
@@ -51,4 +49,5 @@ const handleError = ({ ctx, error }) => {
     },
   });
 };
-module.exports = captureErrors(handleError)(pairsOneEndpoint);
+module.exports = service =>
+  captureErrors(handleError)(pairsOneEndpoint(service));

@@ -7,9 +7,7 @@ const { trimmedStringIfDefined } = require('../utils/parseString');
 
 const url = '/candles/:amountAsset/:priceAsset';
 
-const candlesSearch = async ctx => {
-  const candles = ctx.services.candles;
-
+const candlesSearch = service => async ctx => {
   const { fromParams } = select(ctx);
   const [amountAsset, priceAsset] = fromParams(['amountAsset', 'priceAsset']);
 
@@ -37,7 +35,7 @@ const candlesSearch = async ctx => {
     query,
   });
 
-  let results = await candles
+  let results = await service
     .search({
       amountAsset,
       priceAsset,
@@ -75,4 +73,4 @@ const handleError = ({ ctx, error }) => {
   });
 };
 
-module.exports = captureErrors(handleError)(candlesSearch);
+module.exports = service => captureErrors(handleError)(candlesSearch(service));
