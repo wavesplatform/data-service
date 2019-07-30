@@ -1,14 +1,18 @@
 import * as Router from 'koa-router';
-import { rateEstimateEndpointFactory, PairCheckService, RateEstimator, TransactionService } from './estimate'
+import { rateEstimateEndpointFactory, PairCheckService, RateEstimator } from './estimate'
 import * as task from 'folktale/concurrency/task';
 import * as maybe from 'folktale/maybe';
+import { ServiceSearch, Transaction } from 'types';
+import { ExchangeTxsSearchRequest } from 'services/transactions/exchange';
+
+type TxSearch = ServiceSearch<ExchangeTxsSearchRequest, Transaction>
 
 const dummyPairCheck: PairCheckService = {
   checkPair() { return task.of(maybe.empty()) }
 }
 
 export default function(
-  transactionService: TransactionService,
+  transactionService: TxSearch,
   pairChecker: PairCheckService = dummyPairCheck
 ): Router {
   
