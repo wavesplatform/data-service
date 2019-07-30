@@ -8,6 +8,7 @@ import {
   unsafeIntervalsFromStringsReversed,
 } from '../../../utils/interval';
 import { highestDividerLessThan, numberToUnitsPolynom } from './utils';
+import { CandlesSearchRequest } from '..';
 
 const pg = knex({ client: 'pg' });
 
@@ -43,7 +44,7 @@ export interface CandleSelectionParams {
   timeEnd: Date;
   interval: string;
   matcher: string;
-};
+}
 
 export const selectCandles = ({
   amountAsset,
@@ -54,23 +55,23 @@ export const selectCandles = ({
   interval: inter,
 }: CandleSelectionParams): knex.QueryBuilder =>
   pg('candles')
-  .select(FIELDS)
-  .where('amount_asset_id', amountAsset)
-  .where('price_asset_id', priceAsset)
-  .where('time_start', '>=', timeStart)
-  .where('time_start', '<=', timeEnd)
-  .where('matcher', matcher)
-  .where(
-    'interval_in_secs',
-    // should always be valid after validation
-    highestDividerLessThan(
-      interval(inter).unsafeGet(),
-      unsafeIntervalsFromStrings(DIVIDERS)
-    ).matchWith({
-      Ok: ({ value: i }) => i.length / 1000,
-      Error: ({ value: error }) => interval('1m').unsafeGet().length / 1000,
-    })
-  );
+    .select(FIELDS)
+    .where('amount_asset_id', amountAsset)
+    .where('price_asset_id', priceAsset)
+    .where('time_start', '>=', timeStart)
+    .where('time_start', '<=', timeEnd)
+    .where('matcher', matcher)
+    .where(
+      'interval_in_secs',
+      // should always be valid after validation
+      highestDividerLessThan(
+        interval(inter).unsafeGet(),
+        unsafeIntervalsFromStrings(DIVIDERS)
+      ).matchWith({
+        Ok: ({ value: i }) => i.length / 1000,
+        Error: ({ value: error }) => interval('1m').unsafeGet().length / 1000,
+      })
+    );
 
 export const periodsToQueries = ({
   amountAsset,
@@ -112,17 +113,9 @@ export const periodsToQueries = ({
 export const sql = ({
   amountAsset,
   priceAsset,
-  params: { timeStart, timeEnd, interval: inter, matcher, },
-}: {
-  amountAsset: string;
-  priceAsset: string;
-  params: {
-    timeStart: Date;
-    timeEnd: Date;
-    interval: string;
-    matcher: string;
-  };
-}): string => {
+  params: { timeStart, timeEnd, interval: inter },
+  matcher,
+}: CandlesSearchRequest): string => {
   // should always be valid after validation
   const paramsInterval = interval(inter).unsafeGet();
 
@@ -137,11 +130,11 @@ export const sql = ({
     periodInMinutes
   ).reduce<Interval[]>(
     (periods, polynom) => [
-        ...periods,
-        ...repeat(
-          fromMilliseconds(polynom[0] * 1000 * 60).unsafeGet(),
-          polynom[1]
-        ),
+      ...periods,
+      ...repeat(
+        fromMilliseconds(polynom[0] * 1000 * 60).unsafeGet(),
+        polynom[1]
+      ),
     ],
     []
   );

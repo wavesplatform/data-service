@@ -157,6 +157,7 @@ const inputSearch = Joi.object()
         allow: ['1d', '12h', '6h', '3h', '1h', '30m', '15m', '5m', '1m'],
       })
       .required(),
+    matcher: Joi.string(),
   })
   .required();
 
@@ -168,8 +169,7 @@ const output = Joi.object().keys({
   price_asset_id: Joi.string()
     .base58()
     .required(),
-  matcher: Joi.string()
-    .base58(),
+  matcher: Joi.string().base58(),
   max_height: Joi.number()
     .integer()
     .required(),

@@ -78,7 +78,14 @@ export const transformCandle = ([time, c]: [string, RawCandle]): Candle => {
 
   return compose(
     (c: any): Candle => candle(c),
-    omit(['a_dec', 'p_dec']),
+    omit([
+      'a_dec',
+      'p_dec',
+      'interval_in_secs',
+      'matcher',
+      'amount_asset_id',
+      'price_asset_id',
+    ]),
     renameFields,
     assoc('time_start', time),
     assoc('txs_count', c.txs_count),

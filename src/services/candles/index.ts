@@ -11,9 +11,11 @@ import { CandleDbResponse, transformResults } from './transformResults';
 export type CandlesSearchRequest = {
   amountAsset: string;
   priceAsset: string;
-  timeStart: Date;
-  timeEnd: Date;
-  interval: string;
+  params: {
+    timeStart: Date;
+    timeEnd: Date;
+    interval: string;
+  };
   matcher: string;
 };
 
