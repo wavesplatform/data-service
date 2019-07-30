@@ -1,7 +1,11 @@
 import * as knex from 'knex';
 import { compose } from 'ramda';
 import { escapeForTsQuery, prepareForLike } from '../../utils/db';
-import { Pair, MgetRequest } from './types';
+import {
+  PairsSearchRequest,
+  SearchByAssetRequest,
+  SearchByAssetsRequest,
+} from '.';
 
 const pg = knex({ client: 'pg' });
 
@@ -19,30 +23,8 @@ const COLUMNS = [
   'volume_waves',
 ];
 
-type CommonSearchRequest = {
-  matcher: string;
-  limit: number;
-};
-
-type SearchWithMatchExactly = CommonSearchRequest & {
-  match_exactly?: boolean[];
-};
-
-type SearchByAssetRequest = SearchWithMatchExactly & {
-  search_by_asset: string;
-};
-
-type SearchByAssetsRequest = SearchWithMatchExactly & {
-  search_by_assets: [string, string];
-};
-
-type SearchRequest =
-  | CommonSearchRequest
-  | SearchByAssetRequest
-  | SearchByAssetsRequest;
-
 const isSearchByAssetRequest = (
-  searchByAssetRequest: SearchRequest
+  searchByAssetRequest: PairsSearchRequest
 ): searchByAssetRequest is SearchByAssetRequest => {
   return (
     typeof searchByAssetRequest === 'object' &&
@@ -52,7 +34,7 @@ const isSearchByAssetRequest = (
 };
 
 const isSearchByAssetsRequest = (
-  searchByAssetRequest: SearchRequest
+  searchByAssetRequest: PairsSearchRequest
 ): searchByAssetRequest is SearchByAssetsRequest => {
   return (
     typeof searchByAssetRequest === 'object' &&
@@ -133,20 +115,12 @@ const searchAssets = (
     );
 };
 
-export const get = (
-  request: Pair & {
-    matcher: string;
-  }
-): string =>
-  query(
-    [{ amountAsset: request.amountAsset, priceAsset: request.priceAsset }],
-    request.matcher
-  );
-
-export const mget = <Request extends MgetRequest>(request: Request): string =>
-  query(request.pairs, request.matcher);
-
-export const search = (req: SearchRequest): string => {
+export const get = (pair: {
+  amountAsset: string;
+  priceAsset: string;
+}): string => query([pair]);
+export const mget = query;
+export const search = (req: PairsSearchRequest): string => {
   // asset - prefix search of amount or price assets
   // asset1/asset2 - prefix search of amount asset by asset1
   //                 and prefix search of price asset by asset2

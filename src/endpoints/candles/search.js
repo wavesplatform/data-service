@@ -5,15 +5,11 @@ const { handleError } = require('../../utils/handleError');
 const { select } = require('../utils/selectors');
 const { parseFilterValues, timeStart, timeEnd } = require('../_common/filters');
 const { trimmedStringIfDefined } = require('../utils/parseString');
-const service = require('../../services/candles');
 
 const url = '/candles/:amountAsset/:priceAsset';
 
 const candlesSearch = async ctx => {
-  const candles = service({
-    drivers: ctx.state.drivers,
-    emitEvent: ctx.eventBus.emit,
-  });
+  const candles = ctx.services.candles;
 
   const { fromParams } = select(ctx);
   const [amountAsset, priceAsset] = fromParams(['amountAsset', 'priceAsset']);

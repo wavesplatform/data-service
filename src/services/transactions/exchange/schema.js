@@ -60,6 +60,7 @@ const inputSearch = Joi.object()
     sender: Joi.string(),
     amountAsset: Joi.string().base58(),
     priceAsset: Joi.string().base58(),
+    orderSender: Joi.string(),
   })
   .required();
 

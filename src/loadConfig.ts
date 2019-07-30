@@ -18,16 +18,17 @@ export type ServerConfig = {
   port: number;
 };
 
-export type DefaultMatcherConfig = {
-  defaultMatcher: string;
+export type MatcherConfig = {
+  matcher: {
+    settingsURL: string;
+    default: string;
+  };
 };
-
-export type DefaultConfig = PostgresConfig & ServerConfig & LoggerConfig;
 
 export type DataServiceConfig = PostgresConfig &
   ServerConfig &
   LoggerConfig &
-  DefaultMatcherConfig;
+  MatcherConfig;
 
 const envVariables = ['PGHOST', 'PGDATABASE', 'PGUSER', 'PGPASSWORD'];
 
@@ -54,6 +55,13 @@ export const loadDefaultConfig = (): DefaultConfig => {
       ? parseInt(process.env.PGPOOLSIZE)
       : 20,
     logLevel: process.env.LOG_LEVEL || 'info',
+
+    matcher: {
+      settingsURL:
+        process.env.MATCHER_SETTINGS_URL ||
+        'https://matcher.wavesplatform.com/matcher/settings',
+      default: guard('DEFAULT_MATCHER', process.env.DEFAULT_MATCHER),
+    },
   };
 };
 

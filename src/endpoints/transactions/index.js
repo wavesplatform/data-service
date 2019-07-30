@@ -13,25 +13,6 @@ const {
   query,
 } = require('../_common/filters');
 
-// services
-const genesis = require('../../services/transactions/genesis');
-const payment = require('../../services/transactions/payment');
-const issue = require('../../services/transactions/issue');
-const transfer = require('../../services/transactions/transfer');
-const reissue = require('../../services/transactions/reissue');
-const burn = require('../../services/transactions/burn');
-const exchange = require('../../services/transactions/exchange');
-const lease = require('../../services/transactions/lease');
-const leaseCancel = require('../../services/transactions/leaseCancel');
-const alias = require('../../services/transactions/alias');
-const massTransfer = require('../../services/transactions/massTransfer');
-const data = require('../../services/transactions/data');
-const setScript = require('../../services/transactions/setScript');
-const sponsorship = require('../../services/transactions/sponsorship');
-const setAssetScript = require('../../services/transactions/setAssetScript');
-const invokeScript = require('../../services/transactions/invokeScript');
-const all = require('../../services/transactions/all');
-
 // filters
 const commonTxFilters = {
   ids,
@@ -50,90 +31,90 @@ const createOptions = specificFilters => ({
 
 const transactionsEndpointsConfig = {
   '/transactions/all': {
-    service: all,
+    service: 'allTxs',
     options: createOptions(),
   },
   '/transactions/genesis': {
-    service: genesis,
+    service: 'genesisTxs',
     options: { filterParsers: omit(['sender'], commonTxFilters) },
   },
   '/transactions/payment': {
-    service: payment,
+    service: 'paymentTxs',
     options: createOptions(),
   },
   '/transactions/issue': {
-    service: issue,
+    service: 'issueTxs',
     options: createOptions({
       assetId: identity,
       script: identity,
     }),
   },
   '/transactions/transfer': {
-    service: transfer,
+    service: 'transferTxs',
     options: createOptions({
       assetId: identity,
       recipient: identity,
     }),
   },
   '/transactions/reissue': {
-    service: reissue,
+    service: 'reissueTxs',
     options: createOptions({
       assetId: identity,
     }),
   },
   '/transactions/burn': {
-    service: burn,
+    service: 'burnTxs',
     options: createOptions({
       assetId: identity,
     }),
   },
   '/transactions/exchange': {
-    service: exchange,
+    service: 'exchangeTxs',
     options: createOptions({
       matcher: identity,
       amountAsset: identity,
       priceAsset: identity,
-      sender: query,
       orderId: query,
+      orderSender: query,
     }),
   },
   '/transactions/lease': {
-    service: lease,
+    service: 'leaseTxs',
     options: createOptions({ recipient: identity }),
   },
   '/transactions/lease-cancel': {
-    service: leaseCancel,
+    service: 'leaseCancelTxs',
     options: createOptions({ recipient: identity }),
   },
   '/transactions/alias': {
-    service: alias,
+    service: 'aliasTxs',
     options: createOptions(),
   },
   '/transactions/mass-transfer': {
-    service: massTransfer,
+    service: 'massTransferTxs',
     options: createOptions({
       assetId: identity,
       recipient: identity,
     }),
   },
   '/transactions/data': {
-    service: data,
+    service: 'dataTxs',
     options: { parseFiltersFn: require('./parseDataTxFilters') },
   },
   '/transactions/set-script': {
-    service: setScript,
+    service: 'setScriptTxs',
     options: createOptions({ script: identity }),
   },
   '/transactions/sponsorship': {
-    service: sponsorship,
+    service: 'sponsorshipTxs',
     options: createOptions(),
   },
   '/transactions/set-asset-script': {
-    service: setAssetScript,
+    service: 'setAssetScriptTxs',
     options: createOptions({ assetId: identity, script: identity }),
   },
   '/transactions/invoke-script': {
-    service: invokeScript,
+    service: 'invokeScriptTxs',
     options: createOptions({ dapp: identity, function: identity }),
   },
 };

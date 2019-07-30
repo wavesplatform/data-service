@@ -20,3 +20,9 @@ export type Tx = CommonTxFields & {
   version?: number;
   senderPublicKey: string;
 };
+
+export type CommonFilters = {
+  timeStart: Date;
+  timeEnd: Date;
+  sender: string;
+};

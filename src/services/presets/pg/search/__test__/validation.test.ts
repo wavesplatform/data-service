@@ -2,7 +2,7 @@ import { always, identity } from 'ramda';
 import { of as task } from 'folktale/concurrency/task';
 
 import { Joi } from '../../../../../utils/validation';
-import { list } from '../../../../../types';
+import { list, List } from '../../../../../types';
 import { searchPreset } from '..';
 import {
   Serializable,
@@ -28,7 +28,8 @@ const mockTxs: TestTransaction[] = [
 const service = searchPreset<
   TestQueryOptions,
   TestTransaction,
-  Serializable<string, TestTransaction>
+  TestTransaction,
+  List<Serializable<'tx', TestTransaction | null>>
 >({
   name: 'some_name',
   sql: () => '',

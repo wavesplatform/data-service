@@ -3,9 +3,8 @@ const { identity } = require('ramda');
 
 const createEndpoint = require('./_common');
 const { parseBool } = require('./utils/parseBool');
-const createService = require('../services/aliases');
 
-module.exports = createEndpoint('/aliases', createService, {
+module.exports = createEndpoint('/aliases', 'aliases', {
   filterParsers: {
     address: identity,
     showBroken: parseBool,

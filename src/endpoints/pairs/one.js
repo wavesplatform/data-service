@@ -1,5 +1,3 @@
-const { DEFAULT_NOT_FOUND_MESSAGE } = require('../../errorHandling');
-const createService = require('../../services/pairs');
 const { select } = require('../utils/selectors');
 const { captureErrors } = require('../../utils/captureErrors');
 const { parseFilterValues } = require('../_common/filters');
@@ -20,10 +18,7 @@ const pairsOneEndpoint = async ctx => {
     resolver: '/pairs/:id1/:id2',
   });
 
-  const s = createService({
-    drivers: ctx.state.drivers,
-    emitEvent: ctx.eventBus.emit,
-  });
+  const service = ctx.services.pairs;
 
   if (!s.get) {
     ctx.status = 404;

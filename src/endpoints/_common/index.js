@@ -7,7 +7,7 @@ const { ids } = require('./filters');
 
 const create = (
   url,
-  service,
+  serviceSlug,
   { filterParsers = { ids }, parseFiltersFn, mgetFilterName = 'ids' } = {}
 ) => router => {
   const manyMiddleware = createManyMiddleware(
@@ -17,11 +17,11 @@ const create = (
       mgetFilterName,
     },
     url,
-    service
+    serviceSlug
   );
 
   return router
-    .get(`${url}/:id`, createOneMiddleware(url, service))
+    .get(`${url}/:id`, createOneMiddleware(url, serviceSlug))
     .get(`${url}`, manyMiddleware)
     .post(`${url}`, postToGet(manyMiddleware));
 };

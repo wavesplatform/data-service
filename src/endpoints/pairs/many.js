@@ -1,5 +1,5 @@
-const { has, defaultTo, map, split, zipObj, compose } = require('ramda');
 const Maybe = require('folktale/maybe');
+const { map, split, zipObj, compose } = require('ramda');
 
 const { DEFAULT_NOT_FOUND_MESSAGE } = require('../../errorHandling');
 const { loadConfig } = require('../../loadConfig');
@@ -16,8 +16,6 @@ const {
 } = require('../_common/filters');
 
 const createService = require('../../services/pairs');
-
-const options = loadConfig();
 
 /**
  * @typedef {object} PairRequest
@@ -65,72 +63,29 @@ const filterParsers = {
  * Endpoint
  * @name /pairs?pairs[]‌="{asset_id_1}/{asset_id_2}"&pairs[]="{asset_id_1}/{asset_id_2}" ...other params
  */
-const pairsManyEndpoint = async ctx => {
-  const s = createService({
-    drivers: ctx.state.drivers,
-    emitEvent: ctx.eventBus.emit,
-  });
-
-  if (!s.mget && !s.search) {
-    ctx.status = 404;
-    ctx.body = {
-      message: DEFAULT_NOT_FOUND_MESSAGE,
-    };
-    return;
-  }
-
-  const { query } = select(ctx);
-  const fValues = parseFilterValues(filterParsers)(query);
-
-  ctx.eventBus.emit('ENDPOINT_HIT', {
-    url: ctx.originalUrl,
-    resolver: '/pairs',
-    query,
-  });
-
-  let results;
-  if (has(mgetFilterName, fValues)) {
-    // mget hit
-    if (s.mget) {
-      results = await s
-        .mget({ pairs: fValues.pairs, matcher: fValues.matcher })
-        .run()
-        .promise();
-    } else {
-      ctx.status = 404;
-      ctx.body = {
-        message: DEFAULT_NOT_FOUND_MESSAGE,
-      };
-      return;
-    }
-  } else {
-    // search hit
-    if (s.search) {
-      results = await s
-        .search(fValues)
-        .run()
-        .promise();
-    } else {
-      ctx.status = 404;
-      ctx.body = {
-        message: DEFAULT_NOT_FOUND_MESSAGE,
-      };
-      return;
-    }
-  }
-
-  ctx.eventBus.emit('ENDPOINT_RESOLVED', {
-    value: results,
-  });
-
-  if (results) {
-    ctx.state.returnValue = results;
-  } else {
-    ctx.status = 404;
-    ctx.body = {
-      message: DEFAULT_NOT_FOUND_MESSAGE,
-    };
-  }
-};
+const pairsMany = createManyMiddleware(
+  {
+    filterParsers: {
+      pairs: compose(
+        m => m.getOrElse(null),
+        map(parsePairs),
+        Maybe.fromNullable,
+        parseArrayQuery
+      ),
+      search_by_asset: query,
+      search_by_assets: parseArrayQuery,
+      match_exactly: compose(
+        m => m.getOrElse(undefined),
+        map(map(parseBool)),
+        Maybe.fromNullable,
+        parseArrayQuery
+      ),
+      limit,
+    },
+    mgetFilterName: 'pairs',
+  },
+  '/pairs',
+  'pairs'
+);
 
 module.exports = captureErrors(handleError)(pairsManyEndpoint);
