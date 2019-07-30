@@ -56,11 +56,9 @@ describe('sql query from candles', () => {
       sql({
         amountAsset: '111',
         priceAsset: '222',
-        params: {
-          timeStart: new Date('2017-04-03T00:00:00.000Z'),
-          timeEnd: new Date('2017-04-03T23:59:59.999Z'),
-          interval: '1h',
-        },
+        timeStart: new Date('2017-04-03T00:00:00.000Z'),
+        timeEnd: new Date('2017-04-03T23:59:59.999Z'),
+        interval: '1h',
         matcher: '123',
       })
     ).toMatchSnapshot();
@@ -71,11 +69,9 @@ describe('sql query from candles', () => {
       sql({
         amountAsset: '111',
         priceAsset: '222',
-        params: {
-          timeStart: new Date('2017-04-03T00:00:00.000Z'),
-          timeEnd: new Date('2017-04-03T23:59:59.999Z'),
-          interval: '1d',
-        },
+        timeStart: new Date('2017-04-03T00:00:00.000Z'),
+        timeEnd: new Date('2017-04-03T23:59:59.999Z'),
+        interval: '1d',
         matcher: '123',
       })
     ).toMatchSnapshot();
@@ -86,11 +82,9 @@ describe('sql query from candles', () => {
       sql({
         amountAsset: '111',
         priceAsset: '222',
-        params: {
-          timeStart: new Date('2017-04-03T00:00:00.000Z'),
-          timeEnd: new Date('2017-04-03T23:59:59.999Z'),
-          interval: '1m',
-        },
+        timeStart: new Date('2017-04-03T00:00:00.000Z'),
+        timeEnd: new Date('2017-04-03T23:59:59.999Z'),
+        interval: '1m',
         matcher: '123',
       })
     ).toMatchSnapshot();

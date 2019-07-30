@@ -1,4 +1,3 @@
-import { CommonServiceCreatorDependencies } from '..';
 import { getByIdPreset } from '../presets/pg/getById';
 import { searchPreset } from '../presets/pg/search';
 import {
@@ -10,9 +9,11 @@ import {
   List,
 } from '../../types';
 
+import { CommonServiceCreatorDependencies } from '..';
+import { transformResults as transformSearch } from '../presets/pg/search/transformResult';
+
 import * as sql from './data/sql';
 import { AliasDbResponse, transformDbResponse } from './data/transformResult';
-import { transformResults as transformSearch } from '../presets/pg/search/transformResult';
 import { inputGet, inputSearch, output } from './schema';
 
 type AliasesSearchRequest = {

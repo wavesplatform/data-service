@@ -113,10 +113,13 @@ export const periodsToQueries = ({
 export const sql = ({
   amountAsset,
   priceAsset,
-  params: { timeStart, timeEnd, interval: inter },
+  timeStart,
+  timeEnd,
+  interval: inter,
   matcher,
 }: CandlesSearchRequest): string => {
   // should always be valid after validation
+  console.log('inter ', inter);
   const paramsInterval = interval(inter).unsafeGet();
 
   const ts = new Date(trunc(paramsInterval.unit, timeEnd));

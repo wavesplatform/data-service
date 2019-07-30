@@ -39,12 +39,7 @@ const candlesSearch = service => async ctx => {
     .search({
       amountAsset,
       priceAsset,
-      params: {
-        timeStart: fValues.timeStart,
-        timeEnd: fValues.timeEnd,
-        interval: fValues.interval,
-      },
-      matcher: fValues.matcher,
+      ...fValues,
     })
     .run()
     .promise();

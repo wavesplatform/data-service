@@ -1,4 +1,4 @@
-const transformTxInfo = require('../transformTxInfo');
+const { transformTxInfo } = require('../transformTxInfo');
 
 const txRaw = {
   tx_type: 8,

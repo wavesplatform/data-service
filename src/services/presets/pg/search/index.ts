@@ -1,6 +1,6 @@
-import { identity } from 'ramda';
 import { SchemaLike } from 'joi';
 import { Task } from 'folktale/concurrency/task';
+import { identity } from 'ramda';
 
 import { AppError } from '../../../../errorHandling';
 import { List, Serializable } from '../../../../types';

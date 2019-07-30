@@ -47,9 +47,6 @@ export type CandleDbResponse = {
 
 export type RawCandle = {
   time_start: Date | null;
-  amount_asset_id: string | null;
-  price_asset_id: string | null;
-  matcher: string | null;
   max_height: number;
   open: BigNumber | null;
   high: BigNumber;
@@ -59,7 +56,6 @@ export type RawCandle = {
   quote_volume: BigNumber;
   weighted_average_price: BigNumber;
   txs_count: number;
-  interval_in_secs: number | null;
   a_dec: number | null;
   p_dec: number | null;
 };
@@ -78,14 +74,7 @@ export const transformCandle = ([time, c]: [string, RawCandle]): Candle => {
 
   return compose(
     (c: any): Candle => candle(c),
-    omit([
-      'a_dec',
-      'p_dec',
-      'interval_in_secs',
-      'matcher',
-      'amount_asset_id',
-      'price_asset_id',
-    ]),
+    omit(['a_dec', 'p_dec']),
     renameFields,
     assoc('time_start', time),
     assoc('txs_count', c.txs_count),
@@ -171,16 +160,14 @@ export const transformResults = (
       concatAll(candleMonoid)
     ),
     addMissingCandles(
-      interval(request.params.interval).getOrElse(defaultInterval.unsafeGet()),
-      request.params.timeStart,
-      request.params.timeEnd
+      interval(request.interval).getOrElse(defaultInterval.unsafeGet()),
+      request.timeStart,
+      request.timeEnd
     ),
     groupBy(candle =>
       truncToMinutes(
         floor(
-          interval(request.params.interval).getOrElse(
-            defaultInterval.unsafeGet()
-          ),
+          interval(request.interval).getOrElse(defaultInterval.unsafeGet()),
           candle.time_start
         )
       )

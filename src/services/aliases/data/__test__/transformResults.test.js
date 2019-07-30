@@ -1,4 +1,4 @@
-const transformResult = require('../transformResult');
+const { transformDbResponse: transformResult } = require('../transformResult');
 
 describe('sql query results transformation', () => {
   it('alias with one address (duplicates equals to 0)', () => {

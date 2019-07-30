@@ -61,19 +61,6 @@ export const candleMonoid: Monoid<RawCandle> = {
     txs_count: sumMonoid.concat(a.txs_count, b.txs_count),
     a_dec: rightNotNullMonoid.concat(a.a_dec, b.a_dec),
     p_dec: rightNotNullMonoid.concat(a.p_dec, b.p_dec),
-    interval_in_secs: leftNotNullMonoid.concat(
-      a.interval_in_secs,
-      b.interval_in_secs
-    ),
-    matcher: leftNotNullMonoid.concat(a.matcher, b.matcher),
-    amount_asset_id: leftNotNullMonoid.concat(
-      a.amount_asset_id,
-      b.amount_asset_id
-    ),
-    price_asset_id: leftNotNullMonoid.concat(
-      a.price_asset_id,
-      b.price_asset_id
-    ),
   }),
   empty: {
     time_start: leftNotNullMonoid.empty,
@@ -88,9 +75,5 @@ export const candleMonoid: Monoid<RawCandle> = {
     txs_count: sumMonoid.empty,
     a_dec: rightNotNullMonoid.empty,
     p_dec: rightNotNullMonoid.empty,
-    interval_in_secs: leftNotNullMonoid.empty,
-    matcher: leftNotNullMonoid.empty,
-    amount_asset_id: leftNotNullMonoid.empty,
-    price_asset_id: leftNotNullMonoid.empty,
   },
 };
