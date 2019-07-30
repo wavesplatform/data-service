@@ -44,6 +44,7 @@ import { DataServiceConfig } from './../loadConfig';
 
 import { PgDriver } from '../db/driver';
 import { EmitEvent } from '../services/_common/createResolver/types';
+import { RateEstimator } from 'endpoints/rates/estimate';
 
 const cache = new LRU(100000);
 cache.set('WAVES', true);
@@ -57,6 +58,11 @@ export type PairsServiceCreatorDependencies = CommonServiceCreatorDependencies &
   orderPair: TOrderPair;
   cache: LRU<any, any>;
 };
+
+export type RateSerivceCreatorDependencies = CommonServiceCreatorDependencies & {
+  rateEstimator: RateEstimator,
+  cache: LRU<any, any>
+}
 
 export type ServiceMesh = {
   aliases?: AliasService;

@@ -5,9 +5,12 @@ import { parseFilterValues } from 'endpoints/_common/filters';
 import { captureErrors } from 'utils/captureErrors';
 import { handleError } from 'utils/handleError';
 import { Task, of, waitAll } from 'folktale/concurrency/task';
-import { Transaction } from 'types';
+import { Transaction, ServiceSearch } from 'types';
 import * as maybe from 'folktale/maybe';
 import { Context } from 'koa'
+import { ExchangeTxsSearchRequest } from 'services/transactions/exchange';
+import { SortOrder } from 'services/_common';
+import { AppError } from 'errorHandling';
 
 const WavesId: string = 'WAVES';
 
@@ -23,18 +26,7 @@ function map<T, R>(data: T[], fn: (val: T) => R): R[] {
 }
 
 export interface PairCheckService {
-  checkPair(matcher: string, pair: [string, string]): Task<Error, maybe.Maybe<[string, string]>>
-}
-
-type TransactionServiceGetParams = {
-  priceAsset: string,
-  amountAsset: string,
-  limit: number,
-  sender: string,
-}
-
-export interface TransactionService {
-  get(params: TransactionServiceGetParams): Task<Error, Transaction[]>
+  checkPair(matcher: string, pair: [string, string]): Task<AppError, maybe.Maybe<[string, string]>>
 }
 
 const max = (data: BigNumber[]): maybe.Maybe<BigNumber> =>
@@ -42,17 +34,21 @@ const max = (data: BigNumber[]): maybe.Maybe<BigNumber> =>
 
 export class RateEstimator {
   constructor(
-    private readonly transactionService: TransactionService,    
+    private readonly transactionService: ServiceSearch<ExchangeTxsSearchRequest, Transaction>,    
     private readonly pairChecker: PairCheckService
   ) {}
 
-  private countRateFromTransactions([amountAsset, priceAsset, order]: RateRequest, matcher: string): Task<Error, BigNumber> {
-    return this.transactionService.get(
+  private countRateFromTransactions([amountAsset, priceAsset, order]: RateRequest, matcher: string): Task<AppError, BigNumber> {
+    return this.transactionService.search(
       {
         amountAsset,
         priceAsset,
         limit: 5,
+        matcher,
         sender: matcher,
+        timeStart: new Date(0),
+        timeEnd: new Date(),
+        sort: SortOrder.Descending,
       }
     ).map(
       // TODO: fix any
@@ -64,8 +60,8 @@ export class RateEstimator {
     )
   }
   
-  private getActualRate(from: string, to: string, matcher: string): Task<Error, BigNumber> {
-    const requests: Task<Error, RateRequest[]> = this.pairChecker.checkPair(matcher, [from, to]).map(
+  private getActualRate(from: string, to: string, matcher: string): Task<AppError, BigNumber> {
+    const requests: Task<AppError, RateRequest[]> = this.pairChecker.checkPair(matcher, [from, to]).map(
       (res: maybe.Maybe<[string, string]>) =>
         res.map(
           ([actualFrom, actualTo]: [string, string]): RateRequest[] => [[actualFrom, actualTo, from === actualFrom ? 'Straight' : 'Inverted']]
@@ -82,7 +78,7 @@ export class RateEstimator {
     )
   }
 
-  public getRate(from: string, to: string, matcher: string): Task<Error, BigNumber> {
+  public getRate(from: string, to: string, matcher: string): Task<AppError, BigNumber> {
     if (from === to) {
       return of(new BigNumber(1));
     } if (from === WavesId || to === WavesId) {
