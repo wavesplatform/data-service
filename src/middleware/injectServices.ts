@@ -2,7 +2,7 @@ import * as LRU from 'lru-cache';
 import { Middleware } from 'koa-compose';
 import { createOrderPair, TOrderPair } from '@waves/assets-pairs-order';
 
-import { Service, Serializable } from '../types';
+import { Service, Serializable, ServiceSearch, Transaction, Rate } from '../types';
 import { loadMatcherSettings } from '../loadMatcherSettings';
 
 import createAliasesService, { AliasService } from '../services/aliases';
@@ -20,7 +20,7 @@ import createDataTxsService, {
   DataTxsService,
 } from '../services/transactions/data';
 import createExchangeTxsService, {
-  ExchangeTxsService,
+  ExchangeTxsService, ExchangeTxsSearchRequest,
 } from '../services/transactions/exchange';
 import createGenesisTxsService, {
   GenesisTxsService,
@@ -41,10 +41,11 @@ import createSetScriptTxsService from '../services/transactions/setScript';
 import createSponsorshopTxsService from '../services/transactions/sponsorship';
 import createTransferTxsService from '../services/transactions/transfer';
 import { DataServiceConfig } from './../loadConfig';
+import * as maybe from 'folktale/maybe';
 
 import { PgDriver } from '../db/driver';
 import { EmitEvent } from '../services/_common/createResolver/types';
-import { RateEstimator } from 'endpoints/rates/estimate';
+import { PairCheckService } from 'services/rates';
 
 const cache = new LRU(100000);
 cache.set('WAVES', true);
@@ -60,8 +61,9 @@ export type PairsServiceCreatorDependencies = CommonServiceCreatorDependencies &
 };
 
 export type RateSerivceCreatorDependencies = CommonServiceCreatorDependencies & {
-  rateEstimator: RateEstimator,
-  cache: LRU<any, any>
+  cache: LRU<string, maybe.Maybe<Rate>>,
+  txService: ServiceSearch<ExchangeTxsSearchRequest, Transaction>,
+  pairCheckService: PairCheckService,
 }
 
 export type ServiceMesh = {

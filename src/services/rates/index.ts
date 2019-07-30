@@ -5,14 +5,14 @@ import { Task, waitAll, of } from "folktale/concurrency/task";
 import { AppError } from "errorHandling";
 import { SortOrder } from "services/_common";
 import * as maybe from 'folktale/maybe';
+import { RateSerivceCreatorDependencies } from '../../middleware/injectServices'
+import { tap } from "utils/tap";
 
 const WavesId: string = 'WAVES';
 
 enum RateOrder {
   Straight, Inverted
 }
-
-// type RateOrder = 'Straight' | 'Inverted';
 
 type RateRequest = [string, string, RateOrder];
 
@@ -96,6 +96,33 @@ export class RateEstimator implements ServiceGet<RateGetParams, Rate> {
           this.getActualRate(priceAsset, WavesId, matcher)
         ]
       ).map(([rate1, rate2]) => rate2.eq(0) ? new BigNumber(0) : rate1.div(rate2));
+    }
+  }
+}
+
+export default function({
+  cache,
+  txService,
+  pairCheckService
+}: RateSerivceCreatorDependencies): ServiceGet<RateGetParams, Rate> {
+
+  function toCacheKey(params: RateGetParams): string {
+    return [params.matcher, params.amountAsset, params.priceAsset].join("::");
+  }
+
+  const estimator = new RateEstimator(txService, pairCheckService)
+  
+  return {
+    get(request) {
+      const key = toCacheKey(request);
+      
+      if (cache.has(key)) {
+        return of(cache.get(key)!)
+      }
+
+      return estimator.get(request).map(
+        tap(res => cache.set(key, res))
+      )
     }
   }
 }
