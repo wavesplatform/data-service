@@ -1,6 +1,7 @@
 import { Task } from 'folktale/concurrency/task';
 import { Maybe } from 'folktale/maybe';
-import { Asset as AssetInfo, BigNumber } from '@waves/data-entities';
+import { BigNumber } from '@waves/bignumber';
+import { Asset as AssetInfo } from '@waves/data-entities';
 import { AppError } from '../errorHandling';
 import { toSerializable, Serializable } from './serialization';
 import { Interval, interval, Unit } from './interval';
@@ -97,3 +98,8 @@ export type TransactionInfo = {
 export type Transaction = Serializable<'transaction', TransactionInfo | null>;
 export const transaction = (data: TransactionInfo | null = null): Transaction =>
   toSerializable('transaction', data);
+
+
+export type RateGetParams = { amountAsset: string, priceAsset: string, matcher: string }
+export type Rate = Serializable<'BigNumber', string | null>;
+export const rate = (data: BigNumber | null = null): Rate => toSerializable('BigNumber', data === null ? null : data.toString())
