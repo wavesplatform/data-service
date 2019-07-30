@@ -168,6 +168,8 @@ export default (options: DataServiceConfig): Middleware<any> => async (
   });
   serviceMesh.allTxs = allTxsService;
 
+  // initialize rates
+
   const settings = await loadMatcherSettings(options);
   const pairsService = createPairsService({
     ...commonDeps,

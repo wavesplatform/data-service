@@ -1,14 +1,13 @@
-// import * as txService from '../../services/transactions/exchange'
-// import * as pairsService from '../../services/pairs'
 import BigNumber from '@waves/bignumber'
-// import { select } from '../utils/selectors';
-// import { trimmedStringIfDefined } from 'endpoints/utils/parseString';
-// import { parseFilterValues } from 'endpoints/_common/filters';
-// import { captureErrors } from 'utils/captureErrors';
-// import { handleError } from 'utils/handleError';
+import { select } from '../utils/selectors';
+import { trimmedStringIfDefined } from 'endpoints/utils/parseString';
+import { parseFilterValues } from 'endpoints/_common/filters';
+import { captureErrors } from 'utils/captureErrors';
+import { handleError } from 'utils/handleError';
 import { Task, of, waitAll } from 'folktale/concurrency/task';
 import { Transaction } from 'types';
 import * as maybe from 'folktale/maybe';
+import { Context } from 'koa'
 
 const WavesId: string = 'WAVES';
 
@@ -23,7 +22,7 @@ function map<T, R>(data: T[], fn: (val: T) => R): R[] {
   }, []);
 }
 
-interface PairCheckService {
+export interface PairCheckService {
   checkPair(matcher: string, pair: [string, string]): Task<Error, maybe.Maybe<[string, string]>>
 }
 
@@ -34,7 +33,7 @@ type TransactionServiceGetParams = {
   sender: string,
 }
 
-interface TransactionService {
+export interface TransactionService {
   get(params: TransactionServiceGetParams): Task<Error, Transaction[]>
 }
 
@@ -43,8 +42,8 @@ const max = (data: BigNumber[]): maybe.Maybe<BigNumber> =>
 
 export class RateEstimator {
   constructor(
-    private readonly pairChecker: PairCheckService,
-    private readonly transactionService: TransactionService
+    private readonly transactionService: TransactionService,    
+    private readonly pairChecker: PairCheckService
   ) {}
 
   private countRateFromTransactions([amountAsset, priceAsset, order]: RateRequest, matcher: string): Task<Error, BigNumber> {
@@ -99,126 +98,41 @@ export class RateEstimator {
   }
 }
 
-// const rateEstimate = async ctx => {
-//   const transactions = txService(
-//     {
-//       drivers: ctx.state.drivers,
-//       emitEvent: ctx.eventBus.emit,
-//     }
-//   );
+export const rateEstimateEndpointFactory = (uri: string,  estimator: RateEstimator) =>
+  {
+    const handler = async (ctx: Context) => {
+      const { fromParams } = select(ctx);
+      const [amountAsset, priceAsset] = fromParams(['amountAsset', 'priceAsset']);
 
-//   const pairs = pairsService(
-//     {
-//       drivers: ctx.state.drivers,
-//       emitEvent: ctx.eventBus.emit,
-//     }    
-//   );
+      const { query } = select(ctx);
 
-//   function getRate(amountAsset: string, priceAsset: string, matcher: string): Task<Error, BigNumber> {
-//     const WavesId = 'WAVES';
+      const fValues = parseFilterValues({
+        // TODO:
+        matcher: trimmedStringIfDefined,
+      })(query);
 
-//     if (amountAsset === priceAsset) {     
-//       return of(new BigNumber(1));
-//     }
+      if (!fValues.matcher) {
+        fValues.matcher = ctx.state.config.defaultMatcher;
+      }
 
-//     if (from === WavesId || to === WavesId) {
-//       return _getRate(from, to, matcher);
-//     } else {
-//       return waitAll([
-//         _getRate(from, WavesId, matcher),
-//         _getRate(to, WavesId, matcher)
-//       ])
-//         .map(([rateFrom, rateTo]: [BigNumber, BigNumber]) => {
-//           return rateTo.eq(0) ? rateTo : rateFrom.div(rateTo);
-//         });
-//     }
-//   }
+      ctx.eventBus.emit('ENDPOINT_HIT', {
+        url: ctx.originalUrl,
+        resolver: uri,
+        query,
+      });
 
-//   type WithPrice = { price: number | string }
-//   type Pair = {}
+      const results = estimator.getRate(amountAsset, priceAsset, fValues.matcher)
 
-//   function calculateCurrentRate(trades: WithPrice[]): BigNumber {
-//     return (
-//       trades
-//         .reduce((result: BigNumber, item: WithPrice) => {
-//           return result.add(new BigNumber(item.price));
-//         }, new BigNumber(0))
-//         .div(trades.length)
-//     );
-//   };
+      ctx.eventBus.emit('ENDPOINT_RESOLVED', {
+        value: results,
+      });
 
-//   function getPair(amountAsset: string, priceAsset: string, matcher: string): Task<Error, Pair> {
-//     return pairs.get(
-//       {
-//         amountAsset,
-//         priceAsset,
-//         matcher,
-//       }
-//     );
-//   }
+      if (results) {
+        ctx.state.returnValue = results;
+      } else {
+        ctx.status = 404;
+      }
+    }
 
-//   function getTransactions(amountAsset: string, priceAsset: string, matcher: string): Task<Error, WithPrice[]> {
-//     return transactions.get(
-//       {
-//         limit: 5,
-//         amountAsset,
-//         priceAsset,
-//         sender: matcher,
-//       }
-//     );
-//   }
-
-//   function _getRate(fromId: string, toId: string, matcher: string): Task<Error, BigNumber> {
-//     const currentRate = (trades: WithPrice[]) => {
-//       return trades && trades.length ? calculateCurrentRate(trades) : new BigNumber(0);
-//     };
-
-//     return getPair(amountAsset, priceAsset, matcher)
-//       .map((pair: { amountAsset: string, priceAsset: string }) => {
-//         return getTransactions(pair.amountAsset, pair.priceAsset, matcher)
-//           .then(currentRate)
-//           .then((rate: BigNumber) => {
-//             if (fromId !== pair.priceAsset) {
-//               return rate;
-//             } else {
-//               return rate.eq(0) ? rate : new BigNumber(1).div(rate);
-//             }
-//           })
-//           .catch(() => new BigNumber(0));
-//       });
-//   }  
-
-//   const { fromParams } = select(ctx);
-//   const [amountAsset, priceAsset] = fromParams(['amountAsset', 'priceAsset']);
-
-//   const { query } = select(ctx);
-
-//   const fValues = parseFilterValues({
-//     // TODO:
-//     matcher: trimmedStringIfDefined,
-//   })(query);
-
-//   if (!fValues.matcher) {
-//     fValues.matcher = ctx.state.config.defaultMatcher;
-//   }
-
-//   ctx.eventBus.emit('ENDPOINT_HIT', {
-//     url: ctx.originalUrl,
-//     resolver: `${url}`,
-//     query,
-//   });
-
-//   const results = getRate(amountAsset, priceAsset, fValues.matcher)
-
-//   ctx.eventBus.emit('ENDPOINT_RESOLVED', {
-//     value: results,
-//   });
-
-//   if (results) {
-//     ctx.state.returnValue = results;
-//   } else {
-//     ctx.status = 404;
-//   }
-// };
-
-// module.exports = captureErrors(handleError)(rateEstimate);
+    return captureErrors(handleError)(handler);
+};

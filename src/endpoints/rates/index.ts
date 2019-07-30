@@ -1,9 +1,25 @@
-const Router = require('koa-router');
+import * as Router from 'koa-router';
+import { rateEstimateEndpointFactory, PairCheckService, RateEstimator, TransactionService } from './estimate'
+import * as task from 'folktale/concurrency/task';
+import * as maybe from 'folktale/maybe';
 
-const subrouter = Router();
+const dummyPairCheck: PairCheckService = {
+  checkPair() { return task.of(maybe.empty()) }
+}
 
-const candlesSearch = require('./search');
+export default function(
+  transactionService: TransactionService,
+  pairChecker: PairCheckService = dummyPairCheck
+): Router {
+  
+  const router = new Router();
 
-subrouter.get('/rates/:amountAsset/:priceAsset', candlesSearch);
+  const handler = rateEstimateEndpointFactory(
+    '/rates/:amountAsset/:priceAsset',
+    new RateEstimator(transactionService, pairChecker)
+  );
 
-module.exports = subrouter;
+  router.get('/rates/:amountAsset/:priceAsset', handler);
+  
+  return router;
+}
