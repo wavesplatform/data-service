@@ -1,12 +1,13 @@
-import { ServiceGet, Rate, rate, RateGetParams, Transaction, ServiceSearch } from "types";
+import { ServiceGet, Rate, rate, RateGetParams, Transaction, ServiceSearch, Serializable } from "types";
 import { ExchangeTxsSearchRequest } from "services/transactions/exchange";
 import { BigNumber } from "@waves/bignumber";
 import { Task, waitAll, of } from "folktale/concurrency/task";
 import { AppError } from "errorHandling";
 import { SortOrder } from "services/_common";
 import * as maybe from 'folktale/maybe';
-import { RateSerivceCreatorDependencies } from '../../middleware/injectServices'
+import { RateSerivceCreatorDependencies } from '../../services'
 import { tap } from "utils/tap";
+import * as LRU from 'lru-cache';
 
 const WavesId: string = 'WAVES';
 
@@ -100,15 +101,23 @@ export class RateEstimator implements ServiceGet<RateGetParams, Rate> {
   }
 }
 
+const toCacheKey = (params: RateGetParams): string =>
+  [params.matcher, params.amountAsset, params.priceAsset].join("::");
+
+const CACHE_AGE_MILLIS = 5000;
+const CACHE_SIZE = 100000;
+
 export default function({
-  cache,
   txService,
   pairCheckService
 }: RateSerivceCreatorDependencies): ServiceGet<RateGetParams, Rate> {
 
-  function toCacheKey(params: RateGetParams): string {
-    return [params.matcher, params.amountAsset, params.priceAsset].join("::");
-  }
+  const cache = new LRU<string, maybe.Maybe<Rate>>(
+    {
+      max: CACHE_SIZE,
+      maxAge: CACHE_AGE_MILLIS,
+    }
+  );
 
   const estimator = new RateEstimator(txService, pairCheckService)
   

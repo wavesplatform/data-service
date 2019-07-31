@@ -44,8 +44,6 @@ import createTransferTxsService, {
 import { DataServiceConfig } from '../loadConfig';
 import createRateService, { PairCheckService } from './rates'
 
-import * as maybe from 'folktale/maybe';
-
 import { PgDriver } from '../db/driver';
 import { EmitEvent } from './_common/createResolver/types';
 import { ServiceGet, ServiceSearch, Transaction, Rate, RateGetParams } from 'types';
@@ -56,7 +54,6 @@ export type CommonServiceCreatorDependencies = {
 };
 
 export type RateSerivceCreatorDependencies = CommonServiceCreatorDependencies & {
-  cache: LRU<string, maybe.Maybe<Rate>>,
   txService: ServiceSearch<ExchangeTxsSearchRequest, Transaction>,
   pairCheckService: PairCheckService,
 }
