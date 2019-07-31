@@ -35,6 +35,7 @@ The service uses following environment variables:
 |`PGPASSWORD`||YES|Postgres password|
 |`PGPOOLSIZE`|`20`|NO|Postgres pool size|
 |`LOG_LEVEL`|`info`|NO|Log level `['info','warn','error']`|
+|`DEFAULT_MATCHER`||YES|Default matcher address|
 
 `PGPOOLSIZE` is used by the `pg-pool` library to determine Postgres connection pool size per NodeJS process instance. A good value depends on your server and db configuration and can be found empirically. You can leave it at the default value to start with.
 
