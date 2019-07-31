@@ -1,4 +1,4 @@
-import { ServiceGet, Rate, rate, RateGetParams, Transaction, ServiceSearch, Serializable } from "types";
+import { ServiceGet, Rate, rate, RateGetParams, Transaction, ServiceSearch } from "types";
 import { ExchangeTxsSearchRequest } from "services/transactions/exchange";
 import { BigNumber } from "@waves/bignumber";
 import { Task, waitAll, of } from "folktale/concurrency/task";
