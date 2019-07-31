@@ -28,6 +28,10 @@ export interface PairCheckService {
   checkPair(matcher: string, pair: [string, string]): Task<AppError, maybe.Maybe<[string, string]>>
 }
 
+export const dummyPairCheck: PairCheckService = {
+  checkPair() { return of(maybe.empty()) }
+}
+
 const max = (data: BigNumber[]): maybe.Maybe<BigNumber> =>
   data.length === 0 ? maybe.empty() : maybe.of(BigNumber.max(...data));
 

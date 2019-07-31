@@ -42,7 +42,7 @@ import createTransferTxsService, {
   TransferTxsService,
 } from './transactions/transfer';
 import { DataServiceConfig } from '../loadConfig';
-import createRateService, { PairCheckService } from './rates'
+import createRateService, { PairCheckService, dummyPairCheck } from './rates'
 
 import { PgDriver } from '../db/driver';
 import { EmitEvent } from './_common/createResolver/types';
@@ -63,7 +63,7 @@ export type ServiceMesh = {
   assets?: AssetsService;
   candles?: CandlesService;
   pairs?: PairsService;
-  rates?: ServiceGet<RateGetParams, Rate>,
+  rates?: ServiceGet<RateGetParams, Rate>;
   transactions: {
     allTxs?: AllTxsService;
     aliasTxs?: AliasTxsService;
@@ -155,6 +155,14 @@ export default (options: DataServiceConfig) => async ({
     ),
     transferTxs: commonInitServiceMesh.transactions.transferTxs(commonDeps),
   };
+
+  serviceMesh.rates = commonInitServiceMesh.rates(
+    {
+      txService: serviceMesh.transactions.exchangeTxs,
+      pairCheckService: dummyPairCheck,
+        ...commonDeps,
+    }
+  )
 
   // specific init services
   // all txs service
