@@ -13,6 +13,7 @@ import {
   sort,
   query,
 } from '../_common/filters';
+import { Serializable, Service } from '../../types';
 
 // filters
 const commonTxFilters = {
@@ -26,7 +27,9 @@ const commonTxFilters = {
 };
 
 // common options
-const createOptions = (specificFilters?: { [key: string]: any }) => ({
+const createOptions = (
+  specificFilters?: Record<string, (param: string) => any>
+) => ({
   filterParsers: { ...commonTxFilters, ...specificFilters },
 });
 
@@ -34,45 +37,45 @@ const transactionsEndpointsConfig = (
   services: ServiceMesh['transactions']
 ): { [url: string]: TxServiceParams } => ({
   '/transactions/all': {
-    service: services.allTxs,
+    service: services.all,
     options: createOptions(),
   },
   '/transactions/genesis': {
-    service: services.genesisTxs,
+    service: services.genesis,
     options: { filterParsers: omit(['sender'], commonTxFilters) },
   },
   '/transactions/payment': {
-    service: services.paymentTxs,
+    service: services.payment,
     options: createOptions(),
   },
   '/transactions/issue': {
-    service: services.issueTxs,
+    service: services.issue,
     options: createOptions({
       assetId: identity,
       script: identity,
     }),
   },
   '/transactions/transfer': {
-    service: services.transferTxs,
+    service: services.transfer,
     options: createOptions({
       assetId: identity,
       recipient: identity,
     }),
   },
   '/transactions/reissue': {
-    service: services.reissueTxs,
+    service: services.reissue,
     options: createOptions({
       assetId: identity,
     }),
   },
   '/transactions/burn': {
-    service: services.burnTxs,
+    service: services.burn,
     options: createOptions({
       assetId: identity,
     }),
   },
   '/transactions/exchange': {
-    service: services.exchangeTxs,
+    service: services.exchange,
     options: createOptions({
       matcher: identity,
       amountAsset: identity,
@@ -82,60 +85,60 @@ const transactionsEndpointsConfig = (
     }),
   },
   '/transactions/lease': {
-    service: services.leaseTxs,
+    service: services.lease,
     options: createOptions({ recipient: identity }),
   },
   '/transactions/lease-cancel': {
-    service: services.leaseCancelTxs,
+    service: services.leaseCancel,
     options: createOptions({ recipient: identity }),
   },
   '/transactions/alias': {
-    service: services.aliasTxs,
+    service: services.alias,
     options: createOptions(),
   },
   '/transactions/mass-transfer': {
-    service: services.massTransferTxs,
+    service: services.massTransfer,
     options: createOptions({
       assetId: identity,
       recipient: identity,
     }),
   },
   '/transactions/data': {
-    service: services.dataTxs,
+    service: services.data,
     options: { parseFiltersFn: require('./parseDataTxFilters') },
   },
   '/transactions/set-script': {
-    service: services.setScriptTxs,
+    service: services.setScript,
     options: createOptions({ script: identity }),
   },
   '/transactions/sponsorship': {
-    service: services.sponsorshopTxs,
+    service: services.sponsorshop,
     options: createOptions(),
   },
   '/transactions/set-asset-script': {
-    service: services.setAssetScriptTxs,
+    service: services.setAssetScript,
     options: createOptions({ assetId: identity, script: identity }),
   },
   '/transactions/invoke-script': {
-    service: services.invokeScriptTxs,
+    service: services.invokeScript,
     options: createOptions({ dapp: identity, function: identity }),
   },
 });
 
 type TxServiceParams = {
-  service: any;
+  service: Service<Serializable<string, any>>;
   options: TxServiceOptions;
 };
 
 type TxServiceOptions = {
-  filterParsers?: any;
-  parseFiltersFn?: any;
-  mgetFilterName?: any;
+  filterParsers?: any; // { [param: string]: (param: string) => any }, but { ids: (strOrArr: any) => any } does not assign (ids does not assign)
+  parseFiltersFn?: (query: string) => Record<string, any>;
+  mgetFilterName?: string;
 };
 
 export default (txsServices: ServiceMesh['transactions']) =>
   compose<
-    { [url: string]: TxServiceParams },
+    Record<string, TxServiceParams>,
     [string, TxServiceParams][],
     Router<any, any>
   >(

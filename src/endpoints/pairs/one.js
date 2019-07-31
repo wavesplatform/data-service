@@ -3,21 +3,21 @@ const { captureErrors } = require('../../utils/captureErrors');
 
 /**
  * Endpoint
- * @name /pairs/id1/id2?...params
+ * @name /pairs/amountAsset/priceAsset?...params
  */
 const pairsOneEndpoint = service => async ctx => {
   const { fromParams } = select(ctx);
-  const [id1, id2] = fromParams(['id1', 'id2']);
+  const [amountAsset, priceAsset] = fromParams(['amountAsset', 'priceAsset']);
 
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
-    resolver: '/pairs/:id1/:id2',
+    resolver: '/pairs/:amountAsset/:priceAsset',
   });
 
   const pair = await service
     .get({
-      amountAsset: id1,
-      priceAsset: id2,
+      amountAsset,
+      priceAsset,
     })
     .run()
     .promise();
@@ -41,7 +41,7 @@ const handleError = ({ ctx, error }) => {
     },
     Resolver: () => {
       ctx.status = 500;
-      ctx.body = 'Error resolving /pairs/:id1/:id2';
+      ctx.body = 'Error resolving /pairs/:amountAsset/:priceAsset';
     },
     Validation: () => {
       ctx.status = 400;

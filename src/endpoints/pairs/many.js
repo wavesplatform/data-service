@@ -55,4 +55,4 @@ const pairsMany = pairsService =>
     pairsService
   );
 
-module.exports = pairsService => pairsMany(pairsService);
+module.exports = pairsMany;
