@@ -59,14 +59,27 @@ export class RateEstimator implements ServiceGet<RateGetParams, Rate> {
         timeEnd: new Date(),
         sort: SortOrder.Descending,
       }
-    ).map(
-      // TODO: fix any
-      transactions => transactions.data.length === 0 ? new BigNumber(0) : BigNumber.sum(
-          ...transactions.data.map((x: any) => new BigNumber(x.data.price))
-      ).div(transactions.data.length)
-    ).map(
-      res => order === RateOrder.Straight ? res : new BigNumber(1).div(res)
     )
+      .map(
+        // TODO: fix any
+        transactions => transactions.data.length === 0 ? new BigNumber(0) :
+          BigNumber.sum(
+              ...transactions.data.map((tx: any) => tx.data.price)
+          ).div(transactions.data.length)
+      )
+      .map(
+        res => {
+          if (order === RateOrder.Straight) {
+            return res;
+          }
+
+          if (res.isZero()) {
+            return res;
+          }
+
+          return new BigNumber(1).div(res);
+        }
+      )
   }
   
   private getActualRate(from: string, to: string, matcher: string): Task<AppError, BigNumber> {
