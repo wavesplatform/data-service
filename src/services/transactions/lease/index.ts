@@ -1,7 +1,7 @@
 import { propEq, compose } from 'ramda';
 import { BigNumber } from '@waves/data-entities';
 
-import { CommonServiceCreatorDependencies } from '../../../middleware/injectServices';
+import { CommonServiceCreatorDependencies } from '../..';
 import {
   transaction,
   TransactionInfo,
@@ -30,9 +30,10 @@ import * as sql from './sql';
 type LeaseTxsSearchRequest = RequestWithCursor<
   CommonFilters & WithSortOrder & WithLimit,
   string
-> & {
-  recipient: string;
-};
+> &
+  Partial<{
+    recipient: string;
+  }>;
 
 type LeaseTxDbResponse = RawTx & {
   amount: BigNumber;

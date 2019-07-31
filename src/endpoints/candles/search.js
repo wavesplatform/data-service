@@ -8,9 +8,7 @@ const { trimmedStringIfDefined } = require('../utils/parseString');
 
 const url = '/candles/:amountAsset/:priceAsset';
 
-const candlesSearch = async ctx => {
-  const candles = ctx.services.candles;
-
+const candlesSearch = service => async ctx => {
   const { fromParams } = select(ctx);
   const [amountAsset, priceAsset] = fromParams(['amountAsset', 'priceAsset']);
 
@@ -38,11 +36,11 @@ const candlesSearch = async ctx => {
     query,
   });
 
-  let results = await candles
+  let results = await service
     .search({
       amountAsset,
       priceAsset,
-      params: fValues,
+      ...fValues,
     })
     .run()
     .promise();
@@ -58,4 +56,22 @@ const candlesSearch = async ctx => {
   }
 };
 
-module.exports = captureErrors(handleError)(candlesSearch);
+const handleError = ({ ctx, error }) => {
+  ctx.eventBus.emit('ERROR', error);
+  error.matchWith({
+    Db: () => {
+      ctx.status = 500;
+      ctx.body = 'Database Error';
+    },
+    Resolver: () => {
+      ctx.status = 500;
+      ctx.body = `Error resolving ${url}`;
+    },
+    Validation: () => {
+      ctx.status = 400;
+      ctx.body = `Invalid query, check params, got: ${ctx.querystring}`;
+    },
+  });
+};
+
+module.exports = service => captureErrors(handleError)(candlesSearch(service));

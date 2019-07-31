@@ -1,4 +1,4 @@
-import { always, identity, equals } from 'ramda';
+import { always, identity, equals, T } from 'ramda';
 import { SchemaLike } from 'joi';
 import { of as taskOf } from 'folktale/concurrency/task';
 
@@ -25,7 +25,7 @@ const createService = (resultSchema: SchemaLike) =>
     pg: {
       any: ids => taskOf(ids.split(';')),
     } as PgDriver,
-    emitEvent: always(identity),
+    emitEvent: always(T),
   });
 
 describe('mgetByIds', () => {

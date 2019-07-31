@@ -1,6 +1,6 @@
 import { propEq, compose } from 'ramda';
 
-import { CommonServiceCreatorDependencies } from '../../../middleware/injectServices';
+import { CommonServiceCreatorDependencies } from '../..';
 import {
   transaction,
   TransactionInfo,
@@ -29,9 +29,10 @@ import * as transformTxInfo from './transformTxInfo';
 type LeaseCancelTxsSearchRequest = RequestWithCursor<
   CommonFilters & WithSortOrder & WithLimit,
   string
-> & {
-  recipient: string;
-};
+> &
+  Partial<{
+    recipient: string;
+  }>;
 
 type LeaseCancelTxDbResponse = RawTx & {
   lease_id: string;

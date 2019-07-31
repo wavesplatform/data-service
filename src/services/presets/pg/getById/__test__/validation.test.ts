@@ -1,5 +1,5 @@
 import { of as taskOf } from 'folktale/concurrency/task';
-import { always, identity } from 'ramda';
+import { always, identity, T } from 'ramda';
 import { SchemaLike } from 'joi';
 
 import { Joi } from '../../../../../utils/validation';
@@ -24,7 +24,7 @@ const createService = (resultSchema: SchemaLike) =>
     }),
   })({
     pg: { oneOrNone: (id: string) => taskOf(id) } as PgDriver,
-    emitEvent: always(identity),
+    emitEvent: always(T),
   });
 
 describe('getById', () => {

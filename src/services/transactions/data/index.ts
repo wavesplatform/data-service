@@ -1,6 +1,6 @@
 import { identity, compose } from 'ramda';
 
-import { CommonServiceCreatorDependencies } from '../../../middleware/injectServices';
+import { CommonServiceCreatorDependencies } from '../..';
 import {
   transaction,
   TransactionInfo,
@@ -37,11 +37,12 @@ const createServiceName = (type: string): string => `transactions.data.${type}`;
 
 type DataTxsSearchRequest = CommonFilters &
   WithSortOrder &
-  WithLimit & {
+  WithLimit &
+  Partial<{
     key: string;
     type: string;
     value: string;
-  };
+  }>;
 
 type DataEntry = {
   key: string;

@@ -1,6 +1,6 @@
 import { propEq, compose } from 'ramda';
 
-import { CommonServiceCreatorDependencies } from '../../../middleware/injectServices';
+import { CommonServiceCreatorDependencies } from '../..';
 import {
   transaction,
   TransactionInfo,
@@ -26,11 +26,11 @@ import * as transformTxInfo from './transformTxInfo';
 type SetAssetScriptTxsSearchRequest = RequestWithCursor<
   CommonFilters & WithSortOrder & WithLimit,
   string
-> & {
-  sender: string;
-  assetId: string;
-  script: string;
-};
+> &
+  Partial<{
+    assetId: string;
+    script: string;
+  }>;
 
 type SetAssetScriptTxDbResponse = RawTx & {
   asset_id: string;

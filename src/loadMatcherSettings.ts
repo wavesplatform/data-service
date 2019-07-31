@@ -1,5 +1,7 @@
 import { get } from 'https';
-import { DataServiceConfig } from 'loadConfig';
+import * as Task from 'folktale/concurrency/task';
+import { DataServiceConfig } from './loadConfig';
+import { ResolverError } from './errorHandling';
 
 type MatcherSettings = {
   priceAssets: string[];
@@ -8,14 +10,18 @@ type MatcherSettings = {
 
 export const loadMatcherSettings = (
   options: DataServiceConfig
-): Promise<MatcherSettings> =>
-  new Promise(resolve =>
-    get(options.matcher.settingsURL, res => {
-      let rawData = '';
-      res.on('data', (chunk: any) => (rawData += chunk));
-      res.on('end', () => {
-        const settings = JSON.parse(rawData);
-        resolve(settings);
+): Task.Task<ResolverError, MatcherSettings> =>
+  Task.task(resolver => {
+    try {
+      get(options.matcher.settingsURL, res => {
+        let rawData = '';
+        res.on('data', (chunk: any) => (rawData += chunk));
+        res.on('end', () => {
+          const settings = JSON.parse(rawData);
+          resolver.resolve(settings);
+        });
       });
-    })
-  );
+    } catch (e) {
+      resolver.reject(new ResolverError(e));
+    }
+  });

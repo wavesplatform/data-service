@@ -63,29 +63,30 @@ const filterParsers = {
  * Endpoint
  * @name /pairs?pairs[]‌="{asset_id_1}/{asset_id_2}"&pairs[]="{asset_id_1}/{asset_id_2}" ...other params
  */
-const pairsMany = createManyMiddleware(
-  {
-    filterParsers: {
-      pairs: compose(
-        m => m.getOrElse(null),
-        map(parsePairs),
-        Maybe.fromNullable,
-        parseArrayQuery
-      ),
-      search_by_asset: query,
-      search_by_assets: parseArrayQuery,
-      match_exactly: compose(
-        m => m.getOrElse(undefined),
-        map(map(parseBool)),
-        Maybe.fromNullable,
-        parseArrayQuery
-      ),
-      limit,
+const pairsMany = pairsService =>
+  createManyMiddleware(
+    {
+      filterParsers: {
+        pairs: compose(
+          m => m.getOrElse(null),
+          map(parsePairs),
+          Maybe.fromNullable,
+          parseArrayQuery
+        ),
+        search_by_asset: query,
+        search_by_assets: parseArrayQuery,
+        match_exactly: compose(
+          m => m.getOrElse(undefined),
+          map(map(parseBool)),
+          Maybe.fromNullable,
+          parseArrayQuery
+        ),
+        limit,
+      },
+      mgetFilterName: 'pairs',
     },
-    mgetFilterName: 'pairs',
-  },
-  '/pairs',
-  'pairs'
-);
+    '/pairs',
+    pairsService
+  );
 
-module.exports = captureErrors(handleError)(pairsManyEndpoint);
+module.exports = pairsService => pairsMany(pairsService);

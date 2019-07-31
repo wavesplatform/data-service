@@ -8,8 +8,8 @@ const { handleError } = require('../../utils/handleError');
  * Endpoint
  * @name /pairs/id1/id2?...params
  */
-const pairsOneEndpoint = async ctx => {
-  const { fromParams, query } = select(ctx);
+const pairsOneEndpoint = service => async ctx => {
+  const { fromParams } = select(ctx);
   const [id1, id2] = fromParams(['id1', 'id2']);
   const { matcher } = parseFilterValues({ matcher: parseQuery })(query);
 
@@ -18,17 +18,7 @@ const pairsOneEndpoint = async ctx => {
     resolver: '/pairs/:id1/:id2',
   });
 
-  const service = ctx.services.pairs;
-
-  if (!s.get) {
-    ctx.status = 404;
-    ctx.body = {
-      message: DEFAULT_NOT_FOUND_MESSAGE,
-    };
-    return;
-  }
-
-  const pair = await s
+  const pair = await service
     .get({
       amountAsset: id1,
       priceAsset: id2,
@@ -51,5 +41,5 @@ const pairsOneEndpoint = async ctx => {
     },
   });
 };
-
-module.exports = captureErrors(handleError)(pairsOneEndpoint);
+module.exports = service =>
+  captureErrors(handleError)(pairsOneEndpoint(service));

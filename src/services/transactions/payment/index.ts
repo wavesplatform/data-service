@@ -1,6 +1,5 @@
 import { propEq, compose } from 'ramda';
 
-import { CommonServiceCreatorDependencies } from '../../../middleware/injectServices';
 import {
   transaction,
   TransactionInfo,
@@ -9,6 +8,7 @@ import {
   ServiceMget,
   ServiceSearch,
 } from '../../../types';
+import { CommonServiceCreatorDependencies } from '../..';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
 import { getByIdPreset } from '../../presets/pg/getById';
@@ -29,9 +29,7 @@ import * as sql from './sql';
 type PaymentTxsSearchRequest = RequestWithCursor<
   CommonFilters & WithSortOrder & WithLimit,
   string
-> & {
-  assetId: string;
-};
+>;
 
 type PaymentTxDbResponse = RawTx & {
   asset_id: string;

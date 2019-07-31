@@ -22,19 +22,25 @@ export type ServiceGet<
   Request,
   ResponseTransformed extends Serializable<string, any>
 > = {
-  get: (request: Request) => Task<AppError, Maybe<ResponseTransformed>>;
+  readonly get: (
+    request: Request
+  ) => Task<AppError, Maybe<ResponseTransformed>>;
 };
 export type ServiceMget<
   Request,
   ResponseTransformed extends Serializable<string, any>
 > = {
-  mget: (request: Request) => Task<AppError, List<ResponseTransformed>>;
+  readonly mget: (
+    request: Request
+  ) => Task<AppError, List<ResponseTransformed>>;
 };
 export type ServiceSearch<
   Request,
   ResponseTransformed extends Serializable<string, any>
 > = {
-  search: (request: Request) => Task<AppError, List<ResponseTransformed>>;
+  readonly search: (
+    request: Request
+  ) => Task<AppError, List<ResponseTransformed>>;
 };
 
 export type Service<T extends Serializable<string, any>> =
@@ -56,20 +62,16 @@ export const alias = (data: AliasInfo | null = null): Alias =>
   toSerializable('alias', data);
 
 export type CandleInfo = {
-  time_start: Date | null;
-  matcher: string | null;
-  max_height: number;
+  timeStart: Date | null;
+  maxHeight: number;
   open: BigNumber | null;
   high: BigNumber;
   low: BigNumber;
   close: BigNumber | null;
   volume: BigNumber;
-  quote_volume: BigNumber;
-  weighted_average_price: BigNumber;
-  txs_count: number;
-  interval_in_secs: number | null;
-  a_dec: number | null;
-  p_dec: number | null;
+  quoteVolume: BigNumber;
+  weightedAveragePrice: BigNumber;
+  txsCount: number;
 };
 export type Candle = Serializable<'candle', CandleInfo | null>;
 export const candle = (data: CandleInfo | null = null): Candle =>
@@ -93,8 +95,10 @@ export const pair = (data: PairInfo | null = null): Pair =>
 // @todo TransactionInfo
 export type TransactionInfo = {
   id: string;
+  type: number;
   timestamp: Date;
 };
+export type NotNullTransaction = Serializable<'transaction', TransactionInfo>;
 export type Transaction = Serializable<'transaction', TransactionInfo | null>;
 export const transaction = (data: TransactionInfo | null = null): Transaction =>
   toSerializable('transaction', data);

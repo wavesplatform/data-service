@@ -1,11 +1,10 @@
 import { Maybe } from 'folktale/maybe';
 import { of as taskOf, rejected } from 'folktale/concurrency/task';
+import * as LRU from 'lru-cache';
+import { createOrderPair } from '@waves/assets-pairs-order';
 
-import { AppError, ResolverError } from '../../errorHandling';
-import {
-  PairsServiceCreatorDependencies,
-  ServiceMesh,
-} from '../../middleware/injectServices';
+import { loadMatcherSettings } from '../../loadMatcherSettings';
+import { AppError, ResolverError, ValidationError } from '../../errorHandling';
 import {
   pair,
   PairInfo,
@@ -16,6 +15,7 @@ import {
   ServiceSearch,
   TransactionInfo,
 } from '../../types';
+import { CommonServiceCreatorDependencies, ServiceMesh } from '..';
 import { getByIdPreset } from '../presets/pg/getById';
 import { mgetByIdsPreset } from '../presets/pg/mgetByIds';
 import { searchPreset } from '../presets/pg/search';
@@ -33,6 +33,7 @@ import {
   transformResultSearch,
 } from './transformResult';
 import * as sql from './sql';
+import { DataServiceConfig } from 'loadConfig';
 
 export type PairsGetRequest = {
   amountAsset: string;
@@ -62,6 +63,10 @@ export type PairsSearchRequest =
   | SearchByAssetRequest
   | SearchByAssetsRequest;
 
+export type PairsServiceCreatorDependencies = CommonServiceCreatorDependencies & {
+  options: DataServiceConfig;
+};
+
 export type PairsService =
   | ServiceGet<PairsGetRequest, Pair>
   | ServiceMget<PairsMgetRequest, Pair>
@@ -70,9 +75,20 @@ export type PairsService =
 export default ({
   drivers,
   emitEvent,
-  cache,
-  orderPair,
-}: PairsServiceCreatorDependencies) => (serviceMesh: ServiceMesh) => {
+  options,
+}: PairsServiceCreatorDependencies) => async ({
+  issueTxs,
+}: {
+  issueTxs: ServiceMesh['transactions']['issueTxs'];
+}): Promise<PairsService> => {
+  const cache = new LRU(100000);
+  cache.set('WAVES', true);
+
+  const settings = await loadMatcherSettings(options)
+    .run()
+    .promise();
+  const orderPair = createOrderPair(settings.priceAssets);
+
   const getPairByRequest = getByIdPreset<
     PairsGetRequest,
     PairDbResponse,
@@ -121,7 +137,7 @@ export default ({
         maybePair =>
           maybePair.matchWith({
             Just: () => taskOf(maybePair),
-            Nothing: () => rejected(new ResolverError('Pair not found')),
+            Nothing: () => rejected(new ValidationError('Pair not found')),
           })
       );
 
@@ -135,8 +151,8 @@ export default ({
         // both of assets are cached
         return getPairT;
       } else {
-        return serviceMesh.issueTxs
-          ? serviceMesh.issueTxs.mget(notCached).chain(list => {
+        return issueTxs
+          ? issueTxs.mget(notCached).chain(list => {
               const found = list.data
                 .map(tx => tx.data)
                 .filter(
@@ -145,7 +161,7 @@ export default ({
                 );
 
               if (found.length < notCached.length) {
-                return rejected(new ResolverError(new Error('Check pair')));
+                return rejected(new ValidationError(new Error('Check pair')));
               } else {
                 found.forEach(tx => cache.set(tx.id, true));
                 return getPairT;
@@ -174,8 +190,8 @@ export default ({
         // all of assets are in cache
         return mgetPairsT;
       } else {
-        return serviceMesh.issueTxs
-          ? serviceMesh.issueTxs.mget(notCached).chain(list => {
+        return issueTxs
+          ? issueTxs.mget(notCached).chain(list => {
               const found = list.data
                 .map(tx => tx.data)
                 .filter(
@@ -184,7 +200,7 @@ export default ({
                 );
 
               if (found.length < notCached.length) {
-                return rejected(new ResolverError(new Error('Check pairs')));
+                return rejected(new ValidationError(new Error('Check pairs')));
               } else {
                 found.forEach(tx => cache.set(tx.id, true));
                 return mgetPairsT;

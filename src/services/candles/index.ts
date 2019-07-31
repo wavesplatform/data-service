@@ -1,7 +1,8 @@
-import { CommonServiceCreatorDependencies } from '../../middleware/injectServices';
 import { searchPreset } from '../presets/pg/search';
 
 import { Candle, CandleInfo, List, ServiceSearch } from '../../types';
+
+import { CommonServiceCreatorDependencies } from '..';
 
 import { sql } from './sql';
 import { inputSearch, output } from './schema';
@@ -10,12 +11,10 @@ import { CandleDbResponse, transformResults } from './transformResults';
 export type CandlesSearchRequest = {
   amountAsset: string;
   priceAsset: string;
-  params: {
-    timeStart: Date;
-    timeEnd: Date;
-    interval: string;
-    matcher: string;
-  };
+  timeStart: Date;
+  timeEnd: Date;
+  interval: string;
+  matcher: string;
 };
 
 export type CandlesService = ServiceSearch<CandlesSearchRequest, Candle>;

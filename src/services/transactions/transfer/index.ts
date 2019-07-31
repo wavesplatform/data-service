@@ -1,7 +1,7 @@
 import { propEq, compose } from 'ramda';
 import { BigNumber } from '@waves/data-entities';
 
-import { CommonServiceCreatorDependencies } from '../../../middleware/injectServices';
+import { CommonServiceCreatorDependencies } from '../..';
 import {
   transaction,
   TransactionInfo,
@@ -27,11 +27,12 @@ import * as transformTxInfo from './transformTxInfo';
 type TransferTxsSearchRequest = RequestWithCursor<
   CommonFilters & WithSortOrder & WithLimit,
   string
-> & {
-  sender: string;
-  assetId: string;
-  recipient: string;
-};
+> &
+  Partial<{
+    sender: string;
+    assetId: string;
+    recipient: string;
+  }>;
 
 type TransferTxDbResponse = RawTx & {
   amount: BigNumber;

@@ -5,8 +5,8 @@ const {
   sumMonoid,
   bigNumberPlusMonoid,
   maxMonoid,
-  bigNumberHighestMonoid,
-  bigNumberLowestMonoid,
+  bigNumberMaxMonoid,
+  bigNumberMinMonoid,
   weightedAveragePriceMonoid,
   candleMonoid,
 } = require('../candleMonoid');
@@ -53,17 +53,17 @@ describe('monoid', () => {
     });
   });
 
-  describe('big number highest', () => {
-    it('should return bignumber highest monoid', () => {
-      expect(
-        bigNumberHighestMonoid.concat(BigNumber(10), BigNumber(2))
-      ).toEqual(BigNumber(10));
+  describe('big number max', () => {
+    it('should return bignumber max monoid', () => {
+      expect(bigNumberMaxMonoid.concat(BigNumber(10), BigNumber(2))).toEqual(
+        BigNumber(10)
+      );
     });
   });
 
-  describe('big number lowest', () => {
-    it('should return bignumber lowest monoid', () => {
-      expect(bigNumberLowestMonoid.concat(BigNumber(10), BigNumber(2))).toEqual(
+  describe('big number min', () => {
+    it('should return bignumber min monoid', () => {
+      expect(bigNumberMinMonoid.concat(BigNumber(10), BigNumber(2))).toEqual(
         BigNumber(2)
       );
     });

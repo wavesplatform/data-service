@@ -10,12 +10,10 @@ const { parseFilterValues } = require('./filters');
 const createManyMiddleware = (
   { parseFiltersFn, filterParsers, mgetFilterName },
   url,
-  serviceSlug
+  service
 ) => {
   return captureErrors(handleError)(async ctx => {
-    const s = ctx.services[serviceSlug];
-
-    if (!s.mget && !s.search) {
+    if (!service.mget && !service.search) {
       ctx.status = 404;
       ctx.body = {
         message: DEFAULT_NOT_FOUND_MESSAGE,
@@ -37,8 +35,8 @@ const createManyMiddleware = (
     let results;
     if (has(mgetFilterName, fValues)) {
       // mget hit
-      if (s.mget) {
-        results = await s
+      if (service.mget) {
+        results = await service
           .mget(fValues[mgetFilterName])
           .run()
           .promise();
@@ -51,8 +49,8 @@ const createManyMiddleware = (
       }
     } else {
       // search hit
-      if (s.search) {
-        results = await s
+      if (service.search) {
+        results = await service
           .search(fValues)
           .run()
           .promise();

@@ -1,6 +1,6 @@
 import { compose, identity } from 'ramda';
 
-import { CommonServiceCreatorDependencies } from '../../../middleware/injectServices';
+import { CommonServiceCreatorDependencies } from '../..';
 import {
   transaction,
   TransactionInfo,
@@ -30,7 +30,11 @@ import { RawInvokeScriptTx, InvokeScriptTx } from './types';
 
 const createServiceName = (type: string) => `transactions.invokeScript.${type}`;
 
-type InvokeScriptTxsSearchRequest = CommonFilters;
+type InvokeScriptTxsSearchRequest = CommonFilters &
+  Partial<{
+    dapp: string;
+    function: string;
+  }>;
 
 export type InvokeScriptTxsService = ServiceGet<string, Transaction> &
   ServiceMget<string[], Transaction> &
