@@ -1,13 +1,14 @@
-import { ServiceGet, Rate, rate, RateGetParams, Transaction, ServiceSearch } from "types";
-import { ExchangeTxsSearchRequest } from "services/transactions/exchange";
 import { BigNumber } from "@waves/bignumber";
 import { Task, waitAll, of } from "folktale/concurrency/task";
-import { AppError } from "errorHandling";
-import { SortOrder } from "services/_common";
 import * as maybe from 'folktale/maybe';
-import { RateSerivceCreatorDependencies } from '../../services'
-import { tap } from "utils/tap";
 import * as LRU from 'lru-cache';
+
+import { ServiceGet, Rate, rate, RateGetParams, Transaction, ServiceSearch } from "../../types";
+import { ExchangeTxsSearchRequest } from "../transactions/exchange";
+import { tap } from "../../utils/tap";
+import { AppError } from "../../errorHandling";
+import { SortOrder } from "../_common";
+import { RateSerivceCreatorDependencies } from '../../services'
 
 const WavesId: string = 'WAVES';
 
@@ -60,9 +61,9 @@ export class RateEstimator implements ServiceGet<RateGetParams, Rate> {
       }
     ).map(
       // TODO: fix any
-      transactions => transactions.length === 0 ? new BigNumber(0) : BigNumber.sum(
-          ...transactions.map((x: any) => new BigNumber(x.data.price))
-      ).div(transactions.length)
+      transactions => transactions.data.length === 0 ? new BigNumber(0) : BigNumber.sum(
+          ...transactions.data.map((x: any) => new BigNumber(x.data.price))
+      ).div(transactions.data.length)
     ).map(
       res => order === RateOrder.Straight ? res : new BigNumber(1).div(res)
     )

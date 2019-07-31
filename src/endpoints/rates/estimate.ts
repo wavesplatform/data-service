@@ -1,10 +1,11 @@
-import { ServiceGet, RateGetParams, Rate } from 'types';
-import { select } from '../utils/selectors';
 import { Context } from 'koa';
+
+import { ServiceGet, RateGetParams, Rate } from '../../types';
+import { select } from '../utils/selectors';
 import { captureErrors } from '../../utils/captureErrors';
 import { parseFilterValues } from '../_common/filters';
 import { query as parseQuery } from '../_common/filters/parsers';
-import { AppError } from 'errorHandling';
+import { AppError } from '../../errorHandling';
 
 /**
  * Endpoint
