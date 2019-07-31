@@ -32,7 +32,7 @@ const pg = {
       .map(transformResult)
       .mapRejected(
         toDbError({
-          request: 'transactions.data.many',
+          toDbError: 'transactions.data.many',
           params: filters,
         })
       ),

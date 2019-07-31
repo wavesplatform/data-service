@@ -24,7 +24,7 @@ import { result, inputSearch } from './schema';
 import * as sql from './sql';
 import transformTxInfo from './transformTxInfo';
 
-export type ExchangeTxsSearchRequest = RequestWithCursor<
+type ExchangeTxsSearchRequest = RequestWithCursor<
   CommonFilters & WithSortOrder & WithLimit,
   string
 > &

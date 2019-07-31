@@ -1,6 +1,4 @@
-const { DEFAULT_NOT_FOUND_MESSAGE } = require('../../errorHandling');
 const { captureErrors } = require('../../utils/captureErrors');
-const { handleError } = require('../../utils/handleError');
 const { select } = require('../utils/selectors');
 
 const createGetMiddleware = (url, service) => {
@@ -25,9 +23,6 @@ const createGetMiddleware = (url, service) => {
   return captureErrors(handleError)(async ctx => {
     if (!service.get) {
       ctx.status = 404;
-      ctx.body = {
-        message: DEFAULT_NOT_FOUND_MESSAGE,
-      };
       return;
     }
 
@@ -50,12 +45,7 @@ const createGetMiddleware = (url, service) => {
 
     x.matchWith({
       Just: ({ value }) => (ctx.state.returnValue = value),
-      Nothing: () => {
-        ctx.status = 404;
-        ctx.body = {
-          message: DEFAULT_NOT_FOUND_MESSAGE,
-        };
-      },
+      Nothing: () => (ctx.status = 404),
     });
   });
 };

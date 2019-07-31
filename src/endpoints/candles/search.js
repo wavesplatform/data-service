@@ -1,7 +1,6 @@
 const { identity } = require('ramda');
 
 const { captureErrors } = require('../../utils/captureErrors');
-const { handleError } = require('../../utils/handleError');
 const { select } = require('../utils/selectors');
 const { parseFilterValues, timeStart, timeEnd } = require('../_common/filters');
 const { trimmedStringIfDefined } = require('../utils/parseString');

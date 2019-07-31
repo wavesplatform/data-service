@@ -1,8 +1,6 @@
 const { has } = require('ramda');
 
-const { DEFAULT_NOT_FOUND_MESSAGE } = require('../../errorHandling');
 const { captureErrors } = require('../../utils/captureErrors');
-const { handleError } = require('../../utils/handleError');
 const { select } = require('../utils/selectors');
 
 const { parseFilterValues } = require('./filters');
@@ -12,12 +10,27 @@ const createManyMiddleware = (
   url,
   service
 ) => {
+  const handleError = ({ ctx, error }) => {
+    ctx.eventBus.emit('ERROR', error);
+    error.matchWith({
+      Db: () => {
+        ctx.status = 500;
+        ctx.body = 'Database Error';
+      },
+      Resolver: () => {
+        ctx.status = 500;
+        ctx.body = `Error resolving ${url}`;
+      },
+      Validation: () => {
+        ctx.status = 400;
+        ctx.body = `Invalid query, check params, got: ${ctx.querystring}`;
+      },
+    });
+  };
+
   return captureErrors(handleError)(async ctx => {
     if (!service.mget && !service.search) {
       ctx.status = 404;
-      ctx.body = {
-        message: DEFAULT_NOT_FOUND_MESSAGE,
-      };
       return;
     }
 
@@ -42,9 +55,6 @@ const createManyMiddleware = (
           .promise();
       } else {
         ctx.status = 404;
-        ctx.body = {
-          message: DEFAULT_NOT_FOUND_MESSAGE,
-        };
         return;
       }
     } else {
@@ -56,9 +66,6 @@ const createManyMiddleware = (
           .promise();
       } else {
         ctx.status = 404;
-        ctx.body = {
-          message: DEFAULT_NOT_FOUND_MESSAGE,
-        };
         return;
       }
     }
@@ -71,9 +78,6 @@ const createManyMiddleware = (
       ctx.state.returnValue = results;
     } else {
       ctx.status = 404;
-      ctx.body = {
-        message: DEFAULT_NOT_FOUND_MESSAGE,
-      };
     }
   });
 };

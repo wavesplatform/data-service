@@ -7,9 +7,6 @@ const Joi = rawJoi.extend(
   (joi: rawJoi.Root): rawJoi.Extension => ({
     base: joi.string().base64({ paddingRequired: false }),
     name: 'cursor',
-    language: {
-      wrong: 'must be a valid cursor string',
-    },
     rules: [
       {
         name: 'valid',

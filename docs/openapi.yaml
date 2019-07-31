@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 0.23.0
+  version: 0.22.0
   title: Waves Data Service
   description: >-
     This is a a public Waves Data Services API documentation. The goal of the
@@ -173,11 +173,6 @@ paths:
           required: true
           schema:
             type: string
-        - in: query
-          name: matcher
-          description: 'Matcher address'
-          schema:
-            type: string
       responses:
         '200':
           description: Pair info
@@ -227,11 +222,6 @@ paths:
             type: array
             items: 
               type: boolean
-        - in: query
-          name: matcher
-          description: 'Matcher address'
-          schema:
-            type: string
         - name: limit
           in: query
           description: How many pairs to await in response.
