@@ -2,7 +2,7 @@
 
 **⚠️ This service is currently in /v0. Breaking changes are coming in /v1 (also possible, but not likely, within /v0 releases). Please use with caution.**
 
-This is an API aimed at retrieving data from blockchain quickly and conveniently. We  support public APIs for: 
+This is an API aimed at retrieving data from blockchain quickly and conveniently. We  support public APIs for:
 - Mainnet
   - [https://api.wavesplatform.com/v0/](https://api.wavesplatform.com/v0/)
 - Testnet
@@ -35,6 +35,7 @@ The service uses following environment variables:
 |`PGPASSWORD`||YES|Postgres password|
 |`PGPOOLSIZE`|`20`|NO|Postgres pool size|
 |`LOG_LEVEL`|`info`|NO|Log level `['info','warn','error']`|
+|`DEFAULT_MATCHER`||YES|Default matcher public address|
 
 `PGPOOLSIZE` is used by the `pg-pool` library to determine Postgres connection pool size per NodeJS process instance. A good value depends on your server and db configuration and can be found empirically. You can leave it at the default value to start with.
 
@@ -51,9 +52,9 @@ If you would like to use some other way of setting environment variables, just r
    ```bash
    docker run -p=<port>:3000 --env-file=variables.env wavesplatform/data-service
    ```
-      
+
 A server will start at `localhost:<port>` (used in the `docker run` command). Logs will be handled by Docker. Use any other Docker options if necessary.
-    
+
 When using the container in production, we recommend establishing a Docker logging and restart policy.
 
 ##### NodeJS
@@ -65,9 +66,9 @@ When using the container in production, we recommend establishing a Docker loggi
    ```bash
    export $(cat variables.env | xargs) && NODE_ENV=production node src/index.js
    ```
-      
+
 Server will start at `localhost:PORT` (defaults to 3000). Logs will be directed to stdout.
-    
+
 If you decide to use NodeJS directly (without Docker), we recommend using a process manager, such as `pm2`.
 
 
