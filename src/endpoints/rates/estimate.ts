@@ -1,52 +1,49 @@
+import { ServiceGet, RateGetParams, Rate } from 'types';
 import { select } from '../utils/selectors';
-import { trimmedStringIfDefined } from 'endpoints/utils/parseString';
-import { parseFilterValues } from 'endpoints/_common/filters';
-import { captureErrors } from 'utils/captureErrors';
-import { handleError } from 'utils/handleError';
-import { Context } from 'koa'
-import { RateEstimator } from 'services/rates';
+import { Context } from 'koa';
+import { handleError } from '../../utils/handleError';
+import { captureErrors } from '../../utils/captureErrors';
+import { parseFilterValues } from '../_common/filters';
+import { DEFAULT_NOT_FOUND_MESSAGE } from 'errorHandling';
+import { query as parseQuery } from '../_common/filters/parsers';
 
-export const rateEstimateEndpointFactory = (uri: string,  estimator: RateEstimator) =>
-  {
-    const handler = async (ctx: Context) => {
-      const { fromParams } = select(ctx);
-      const [amountAsset, priceAsset] = fromParams(['amountAsset', 'priceAsset']);
+/**
+ * Endpoint
+ * @name /rates/id1/id2...params
+ */
+const rateEstimateEndpoint = (service: ServiceGet<RateGetParams, Rate>) => async (ctx: Context) => {
+  const { fromParams } = select(ctx);
+  const [id1, id2] = fromParams(['id1', 'id2']);
+  const { matcher } = parseFilterValues({ matcher: parseQuery })(ctx.query);
 
-      const { query } = select(ctx);
+  ctx.eventBus.emit('ENDPOINT_HIT', {
+    url: ctx.originalUrl,
+    resolver: '/pairs/:id1/:id2',
+  });
 
-      const fValues = parseFilterValues({
-        // TODO:
-        matcher: trimmedStringIfDefined,
-      })(query);
+  const rate = await service
+    .get({
+      amountAsset: id1,
+      priceAsset: id2,
+      matcher: matcher || ctx.state.config.defaultMatcher,
+    })
+    .run()
+    .promise();
 
-      if (!fValues.matcher) {
-        fValues.matcher = ctx.state.config.defaultMatcher;
-      }
+  ctx.eventBus.emit('ENDPOINT_RESOLVED', {
+    value: rate,
+  });
 
-      ctx.eventBus.emit('ENDPOINT_HIT', {
-        url: ctx.originalUrl,
-        resolver: uri,
-        query,
-      });
-
-      const results = estimator.get(
-        {
-          amountAsset,
-          priceAsset,
-          matcher: fValues.matcher
-        }
-      )
-
-      ctx.eventBus.emit('ENDPOINT_RESOLVED', {
-        value: results,
-      });
-
-      if (results) {
-        ctx.state.returnValue = results;
-      } else {
-        ctx.status = 404;
-      }
-    }
-
-    return captureErrors(handleError)(handler);
+  rate.matchWith({
+    Just: ({ value }) => (ctx.state.returnValue = value),
+    Nothing: () => {
+      ctx.status = 404;
+      ctx.body = {
+        message: DEFAULT_NOT_FOUND_MESSAGE,
+      };
+    },
+  });
 };
+
+export default (service: ServiceGet<RateGetParams, Rate>) =>
+  captureErrors(handleError)(rateEstimateEndpoint(service));

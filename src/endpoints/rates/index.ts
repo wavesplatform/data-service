@@ -1,24 +1,8 @@
 import * as Router from 'koa-router';
-import { rateEstimateEndpointFactory } from './estimate'
-import { ServiceSearch, Transaction } from 'types';
-import { ExchangeTxsSearchRequest } from 'services/transactions/exchange';
-import { PairCheckService, RateEstimator } from 'services/rates';
+import { ServiceGet, RateGetParams, Rate } from 'types';
+import getEstimateRateHandler from './estimate';
 
-type TxSearch = ServiceSearch<ExchangeTxsSearchRequest, Transaction>
+const subrouter: Router = new Router();
 
-export default function(
-  transactionService: TxSearch,
-  pairChecker: PairCheckService
-): Router {
-  
-  const router = new Router();
-
-  const handler = rateEstimateEndpointFactory(
-    '/rates/:amountAsset/:priceAsset',
-    new RateEstimator(transactionService, pairChecker)
-  );
-
-  router.get('/rates/:amountAsset/:priceAsset', handler);
-  
-  return router;
-}
+export default (rateService: ServiceGet<RateGetParams, Rate>): Router =>
+  subrouter.get("/routes/:id1/:id2", getEstimateRateHandler(rateService))
