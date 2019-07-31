@@ -105,5 +105,6 @@ export const transaction = (data: TransactionInfo | null = null): Transaction =>
 
 
 export type RateGetParams = { amountAsset: string, priceAsset: string, matcher: string }
-export type Rate = Serializable<'BigNumber', string | null>;
-export const rate = (data: BigNumber | null = null): Rate => toSerializable('BigNumber', data === null ? null : data.toString())
+export type RateInfo = { current: BigNumber };
+export type Rate = Serializable<'rate', { current: BigNumber } | null>;
+export const rate = (data: RateInfo | null = null): Rate => toSerializable('rate', data === null ? null : data)

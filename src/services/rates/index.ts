@@ -36,6 +36,18 @@ export const dummyPairCheck: PairCheckService = {
 const max = (data: BigNumber[]): maybe.Maybe<BigNumber> =>
   data.length === 0 ? maybe.empty() : maybe.of(BigNumber.max(...data));
 
+type ExchangeInfo = {
+  price: number,
+  amount: number,
+}
+
+const weightedAverage = (data: ExchangeInfo[]): BigNumber => data.length === 0 ? new BigNumber(0) :
+  BigNumber.sum(
+      ...data.map(({ price, amount }) => new BigNumber(price).mul(amount))
+  ).div(
+    BigNumber.sum(...data.map(({ amount }) => amount))
+  )
+
 export class RateEstimator implements ServiceGet<RateGetParams, Rate> {
   constructor(
     private readonly transactionService: ServiceSearch<ExchangeTxsSearchRequest, Transaction>,    
@@ -44,7 +56,7 @@ export class RateEstimator implements ServiceGet<RateGetParams, Rate> {
 
   get(request: RateGetParams): Task<AppError, maybe.Maybe<Rate>> {
     return this.getRate(request.amountAsset, request.priceAsset, request.matcher)
-      .map(rateValue => maybe.of(rate(rateValue)))
+      .map(rateValue => maybe.of(rate({current: rateValue})))
   }
 
   private countRateFromTransactions([amountAsset, priceAsset, order]: RateRequest, matcher: string): Task<AppError, BigNumber> {
@@ -63,9 +75,7 @@ export class RateEstimator implements ServiceGet<RateGetParams, Rate> {
       .map(
         // TODO: fix any
         transactions => transactions.data.length === 0 ? new BigNumber(0) :
-          BigNumber.sum(
-              ...transactions.data.map((tx: any) => tx.data.price)
-          ).div(transactions.data.length)
+          weightedAverage(transactions.data.map(it => it.data as any as ExchangeInfo))
       )
       .map(
         res => {
