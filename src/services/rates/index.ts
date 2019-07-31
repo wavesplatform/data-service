@@ -1,4 +1,4 @@
-import { BigNumber } from "@waves/bignumber";
+import { BigNumber } from "@waves/data-entities";
 import { Task, waitAll, of } from "folktale/concurrency/task";
 import * as maybe from 'folktale/maybe';
 import * as LRU from 'lru-cache';
@@ -33,6 +33,14 @@ export const dummyPairCheck: PairCheckService = {
   checkPair() { return of(maybe.empty()) }
 }
 
+const sum = (data: Array<BigNumber | number | string>): BigNumber => {
+  if (data.length === 0) {
+    return new BigNumber(0);
+  }
+
+  return data.reduce((acc: BigNumber, x) => acc.plus(x), new BigNumber(0))
+}
+
 const max = (data: BigNumber[]): maybe.Maybe<BigNumber> =>
   data.length === 0 ? maybe.empty() : maybe.of(BigNumber.max(...data));
 
@@ -42,10 +50,10 @@ type ExchangeInfo = {
 }
 
 const weightedAverage = (data: ExchangeInfo[]): BigNumber => data.length === 0 ? new BigNumber(0) :
-  BigNumber.sum(
-      ...data.map(({ price, amount }) => new BigNumber(price).mul(amount))
+  sum(
+    data.map(({ price, amount }) => new BigNumber(price).multipliedBy(amount))
   ).div(
-    BigNumber.sum(...data.map(({ amount }) => amount))
+    sum(data.map(({ amount }) => amount))
   )
 
 export class RateEstimator implements ServiceGet<RateGetParams, Rate> {

@@ -1,7 +1,6 @@
 import { Task } from 'folktale/concurrency/task';
 import { Maybe } from 'folktale/maybe';
-import { BigNumber } from '@waves/bignumber';
-import { Asset as AssetInfo } from '@waves/data-entities';
+import { Asset as AssetInfo, BigNumber } from '@waves/data-entities';
 import { AppError } from '../errorHandling';
 import { toSerializable, Serializable } from './serialization';
 import { Interval, interval, Unit } from './interval';
