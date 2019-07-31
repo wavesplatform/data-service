@@ -5,7 +5,7 @@ import { select } from '../utils/selectors';
 import { captureErrors } from '../../utils/captureErrors';
 import { parseFilterValues } from '../_common/filters';
 import { query as parseQuery } from '../_common/filters/parsers';
-import { AppError } from '../../errorHandling';
+import { handleError } from '../../utils/handleError';
 
 /**
  * Endpoint
@@ -38,24 +38,6 @@ const rateEstimateEndpoint = (service: ServiceGet<RateGetParams, Rate>) => async
     Just: ({ value }) => (ctx.state.returnValue = value),
     Nothing: () => {
       ctx.status = 404;
-    },
-  });
-};
-
-const handleError = ({ ctx, error }: {ctx: Context, error: AppError}) => {
-  ctx.eventBus.emit('ERROR', error);
-  error.matchWith({
-    Db: () => {
-      ctx.status = 500;
-      ctx.body = 'Database Error';
-    },
-    Resolver: () => {
-      ctx.status = 500;
-      ctx.body = 'Error resolving /rates/:id1/:id2';
-    },
-    Validation: () => {
-      ctx.status = 400;
-      ctx.body = `Invalid query, check params, got: ${ctx.querystring}`;
     },
   });
 };
