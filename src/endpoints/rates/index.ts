@@ -6,4 +6,4 @@ import getEstimateRateHandler from './estimate';
 const subrouter: Router = new Router();
 
 export default (rateService: ServiceGet<RateGetParams, Rate>): Router =>
-  subrouter.get("/routes/:id1/:id2", getEstimateRateHandler(rateService))
+  subrouter.get("/rates/:id1/:id2", getEstimateRateHandler(rateService))
