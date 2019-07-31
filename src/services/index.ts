@@ -48,9 +48,7 @@ import * as maybe from 'folktale/maybe';
 
 import { PgDriver } from '../db/driver';
 import { EmitEvent } from './_common/createResolver/types';
-import { ServiceGet, ServiceSearch, Transaction, Serializable } from 'types';
-import { BigNumber } from '@waves/bignumber';
-import { toSerializable } from 'types/serialization';
+import { ServiceGet, ServiceSearch, Transaction, Rate, RateGetParams } from 'types';
 
 export type CommonServiceCreatorDependencies = {
   drivers: { pg: PgDriver };
@@ -62,10 +60,6 @@ export type RateSerivceCreatorDependencies = CommonServiceCreatorDependencies & 
   txService: ServiceSearch<ExchangeTxsSearchRequest, Transaction>,
   pairCheckService: PairCheckService,
 }
-
-export type RateGetParams = { amountAsset: string, priceAsset: string, matcher: string }
-export type Rate = Serializable<'BigNumber', string | null>;
-export const rate = (data: BigNumber | null = null): Rate => toSerializable('BigNumber', data === null ? null : data.toString())
 
 export type ServiceMesh = {
   aliases?: AliasService;
