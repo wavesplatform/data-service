@@ -1,11 +1,10 @@
 import { ServiceGet, RateGetParams, Rate } from 'types';
 import { select } from '../utils/selectors';
 import { Context } from 'koa';
-import { handleError } from '../../utils/handleError';
 import { captureErrors } from '../../utils/captureErrors';
 import { parseFilterValues } from '../_common/filters';
-import { DEFAULT_NOT_FOUND_MESSAGE } from 'errorHandling';
 import { query as parseQuery } from '../_common/filters/parsers';
+import { AppError } from 'errorHandling';
 
 /**
  * Endpoint
@@ -18,7 +17,7 @@ const rateEstimateEndpoint = (service: ServiceGet<RateGetParams, Rate>) => async
 
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
-    resolver: '/pairs/:id1/:id2',
+    resolver: '/rates/:id1/:id2',
   });
 
   const rate = await service
@@ -38,9 +37,24 @@ const rateEstimateEndpoint = (service: ServiceGet<RateGetParams, Rate>) => async
     Just: ({ value }) => (ctx.state.returnValue = value),
     Nothing: () => {
       ctx.status = 404;
-      ctx.body = {
-        message: DEFAULT_NOT_FOUND_MESSAGE,
-      };
+    },
+  });
+};
+
+const handleError = ({ ctx, error }: {ctx: Context, error: AppError}) => {
+  ctx.eventBus.emit('ERROR', error);
+  error.matchWith({
+    Db: () => {
+      ctx.status = 500;
+      ctx.body = 'Database Error';
+    },
+    Resolver: () => {
+      ctx.status = 500;
+      ctx.body = 'Error resolving /rates/:id1/:id2';
+    },
+    Validation: () => {
+      ctx.status = 400;
+      ctx.body = `Invalid query, check params, got: ${ctx.querystring}`;
     },
   });
 };
