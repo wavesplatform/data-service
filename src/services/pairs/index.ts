@@ -1,8 +1,9 @@
-import { Maybe } from 'folktale/maybe';
+import { Maybe, empty } from 'folktale/maybe';
 import { Task, of as taskOf, rejected } from 'folktale/concurrency/task';
 import * as LRU from 'lru-cache';
 import { createOrderPair } from '@waves/assets-pairs-order';
 
+import { DataServiceConfig } from '../../loadConfig';
 import { loadMatcherSettings } from '../../loadMatcherSettings';
 import { AppError, ValidationError } from '../../errorHandling';
 import {
@@ -17,37 +18,32 @@ import {
 } from '../../types';
 import { CommonServiceCreatorDependencies } from '..';
 import { getByIdPreset } from '../presets/pg/getById';
-import { mgetByIdsPreset } from '../presets/pg/mgetByIds';
 import { searchPreset } from '../presets/pg/search';
 
-import * as matchRequestResult from './matchRequestResult';
-import {
-  inputGet,
-  inputMget,
-  inputSearch,
-  result as resultSchema,
-} from './schema';
+import { inputGet, inputSearch, result as resultSchema } from './schema';
 import {
   PairDbResponse,
   transformResult,
   transformResultSearch,
 } from './transformResult';
 import * as sql from './sql';
-import { DataServiceConfig } from 'loadConfig';
 import { IssueTxsService } from '../transactions/issue';
+import { Pair as AssetPair } from './types';
+import mget from './mget';
 
 export type PairsGetRequest = {
-  amountAsset: string;
-  priceAsset: string;
+  pair: AssetPair;
+  matcher: string;
 };
 
-export type PairsMgetRequest = PairsGetRequest[];
+export type PairsMgetRequest = { pairs: AssetPair[]; matcher: string };
 
-export type SearchWithLimitRequest = {
+export type SearchCommonRequest = {
+  matcher: string;
   limit: number;
 };
 
-export type SearchWithMatchExactly = SearchWithLimitRequest & {
+export type SearchWithMatchExactly = SearchCommonRequest & {
   match_exactly?: boolean[];
 };
 
@@ -60,7 +56,7 @@ export type SearchByAssetsRequest = SearchWithMatchExactly & {
 };
 
 export type PairsSearchRequest =
-  | SearchWithLimitRequest
+  | SearchCommonRequest
   | SearchByAssetRequest
   | SearchByAssetsRequest;
 
@@ -102,19 +98,16 @@ export default ({
       resultTypeFactory: pair,
     })({ pg: drivers.pg, emitEvent });
 
-    const mgetPairsByRequest = mgetByIdsPreset<
-      PairsGetRequest,
+    const mgetPairsByRequest = mget<
+      PairsMgetRequest,
       PairDbResponse,
-      any,
+      PairInfo | null,
       Pair
     >({
       name: 'pairs.mget',
       sql: sql.mget,
-      inputSchema: inputMget(orderPair),
-      resultSchema,
       transformResult: transformResult,
-      matchRequestResult: matchRequestResult,
-      resultTypeFactory: pair,
+      typeFactory: pair,
     })({ pg: drivers.pg, emitEvent });
 
     const searchPairsByRequest = searchPreset<
@@ -136,12 +129,12 @@ export default ({
           maybePair =>
             maybePair.matchWith({
               Just: () => taskOf(maybePair),
-              Nothing: () => rejected(new ValidationError('Pair not found')),
+              Nothing: () => taskOf(empty()), // 404
             })
         );
 
         // request asset list
-        const assets = [request.amountAsset, request.priceAsset];
+        const assets = [request.pair.amountAsset, request.pair.priceAsset];
 
         // try to check asset existance through the cache
         const notCached = assets.filter(assetId => !cache.has(assetId));
@@ -170,7 +163,7 @@ export default ({
         const mgetPairsT = mgetPairsByRequest(request);
 
         // request asset list
-        const assets = request.reduce(
+        const assets = request.pairs.reduce(
           (acc: string[], pair) => [...acc, pair.amountAsset, pair.priceAsset],
           []
         );

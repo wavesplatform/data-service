@@ -1,48 +1,71 @@
 import { Matchable } from 'folktale';
+import * as joi from 'joi';
 
 export type ErrorMetaInfo = Record<string, unknown>;
 
 export type ErrorType = keyof AppErrorPattern<any>;
 
-export type ErrorInfo = {
+export type CommonErrorInfo = {
   readonly error: Error;
   readonly type: ErrorType;
+};
+
+export type ErrorInfo = CommonErrorInfo & {
   readonly meta?: ErrorMetaInfo;
 };
 
+export type ValidationErrorInfo = CommonErrorInfo & {
+  readonly meta?: ErrorMetaInfo | joi.ValidationError;
+};
+
 export type AppErrorPattern<C> = {
+  Db: (e: ErrorInfo) => C;
   Init: (e: ErrorInfo) => C;
   Resolver: (e: ErrorInfo) => C;
-  Validation: (e: ErrorInfo) => C;
-  Db: (e: ErrorInfo) => C;
+  Validation: (e: ValidationErrorInfo) => C;
+};
+
+const isJoiError = (err: any): err is joi.ValidationError => {
+  return err && err.isJoi;
 };
 
 const ensureError = (e: Error | string): Error =>
   e instanceof Error ? e : new Error(e);
 
-const createErrorInfo = (
+function createErrorInfo(
   type: ErrorType,
   error: Error,
   meta?: ErrorMetaInfo
-): ErrorInfo => {
-  if (typeof meta !== 'undefined')
+): ErrorInfo;
+function createErrorInfo(
+  type: ErrorType,
+  error: Error,
+  meta?: ErrorMetaInfo | joi.ValidationError
+): ErrorInfo | ValidationErrorInfo;
+function createErrorInfo(
+  type: ErrorType,
+  error: Error,
+  meta?: ErrorMetaInfo | joi.ValidationError
+): ErrorInfo | ValidationErrorInfo {
+  if (isJoiError(meta)) {
     return {
       error,
       type,
       meta,
     };
-  else
+  } else {
     return {
       error,
       type,
+      meta,
     };
-};
+  }
+}
 
 // @todo more specific error types (e.g. resolver error is not informative about what really happened)
-export abstract class AppError implements Matchable, ErrorInfo {
+export abstract class AppError implements Matchable {
   public abstract readonly type: ErrorInfo['type'];
   public abstract readonly error: ErrorInfo['error'];
-  public abstract readonly meta: ErrorInfo['meta'];
 
   public abstract matchWith<C>(pattern: AppErrorPattern<C>): C;
 
@@ -76,10 +99,10 @@ export class InitError extends AppError {
   }
 }
 
-export class ResolverError extends AppError {
+export class ResolverError extends AppError implements ErrorInfo {
   public readonly type = 'Resolver';
   public readonly error: ErrorInfo['error'];
-  public readonly meta: ErrorInfo['meta'];
+  public readonly meta?: ErrorInfo['meta'];
 
   constructor(error: Error | string, meta?: ErrorMetaInfo) {
     super();
@@ -88,14 +111,18 @@ export class ResolverError extends AppError {
   }
 
   public matchWith<C>(pattern: AppErrorPattern<C>): C {
-    return pattern.Resolver(createErrorInfo(this.type, this.error, this.meta));
+    return pattern.Resolver(
+      this.meta === undefined
+        ? createErrorInfo(this.type, this.error)
+        : createErrorInfo(this.type, this.error, this.meta)
+    );
   }
 }
 
-export class DbError extends AppError {
+export class DbError extends AppError implements ErrorInfo {
   public readonly type = 'Db';
   public readonly error: ErrorInfo['error'];
-  public readonly meta: ErrorInfo['meta'];
+  public readonly meta?: ErrorInfo['meta'];
 
   constructor(error: Error | string, meta?: ErrorMetaInfo) {
     super();
@@ -104,19 +131,24 @@ export class DbError extends AppError {
   }
 
   public matchWith<C>(pattern: AppErrorPattern<C>): C {
-    return pattern.Db(createErrorInfo(this.type, this.error, this.meta));
+    return pattern.Db(
+      this.meta === undefined
+        ? createErrorInfo(this.type, this.error)
+        : createErrorInfo(this.type, this.error, this.meta)
+    );
   }
 }
 
 export class ValidationError extends AppError {
   public readonly type = 'Validation';
   public readonly error: ErrorInfo['error'];
-  public readonly meta: ErrorInfo['meta'];
+  public readonly meta?: ErrorInfo['meta'] | joi.ValidationError;
 
-  constructor(error: Error | string, meta?: ErrorMetaInfo) {
+  constructor(error: Error | string, meta?: ErrorInfo['meta']) {
     super();
     this.error = ensureError(error);
-    this.meta = meta;
+    this.meta =
+      meta && meta.error && isJoiError(meta.error) ? meta.error : meta;
   }
 
   public matchWith<C>(pattern: AppErrorPattern<C>): C {

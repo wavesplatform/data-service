@@ -32,7 +32,7 @@ const JoiWithOrderPair = orderPair =>
     ],
   }));
 
-const inputGet = orderPair => {
+const pair = orderPair => {
   if (orderPair) {
     return JoiWithOrderPair(orderPair)
       .object()
@@ -57,7 +57,19 @@ const inputGet = orderPair => {
   }
 };
 
-const inputMget = orderPair => Joi.array().items(inputGet(orderPair));
+const inputGet = orderPair =>
+  Joi.object()
+    .keys({
+      pair: pair(orderPair).required(),
+      matcher: Joi.string().required(),
+    })
+    .required();
+
+const inputMget = orderPair =>
+  Joi.object.keys({
+    pairs: Joi.array().items(pair(orderPair)),
+    matcher: Joi.string().required(),
+  });
 
 const inputSearch = Joi.object()
   .keys({
@@ -68,6 +80,7 @@ const inputSearch = Joi.object()
     match_exactly: Joi.array()
       .items(Joi.boolean(), Joi.boolean())
       .max(2),
+    matcher: Joi.string(),
     limit: Joi.number()
       .min(1)
       .max(limitMaximum),

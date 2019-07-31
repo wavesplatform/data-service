@@ -1,8 +1,8 @@
 import {
   AppError,
+  DbError,
   InitError,
   ResolverError,
-  DbError,
   ValidationError,
   ErrorType,
   ErrorMetaInfo,
