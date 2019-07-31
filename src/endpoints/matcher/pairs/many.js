@@ -27,7 +27,7 @@ const parsePairs = map(
 
 /**
  * Endpoint
- * @name /pairs?pairs[]‌="{asset_id_1}/{asset_id_2}"&pairs[]="{asset_id_1}/{asset_id_2}" ...other params
+ * @name /matcher/:matcher/pairs?pairs[]‌="{asset_id_1}/{asset_id_2}"&pairs[]="{asset_id_1}/{asset_id_2}" ...other params
  */
 const pairsMany = pairsService =>
   createManyMiddleware(

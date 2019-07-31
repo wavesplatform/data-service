@@ -3,21 +3,26 @@ const { select } = require('../../utils/selectors');
 
 /**
  * Endpoint
- * @name /pairs/amountAsset/priceAsset?...params
+ * @name /matcher/:matcher/pairs/amountAsset/priceAsset?...params
  */
 const pairsOneEndpoint = service => async ctx => {
   const { fromParams } = select(ctx);
-  const [amountAsset, priceAsset] = fromParams(['amountAsset', 'priceAsset']);
+  const [matcher, amountAsset, priceAsset] = fromParams([
+    'matcher',
+    'amountAsset',
+    'priceAsset',
+  ]);
 
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
-    resolver: '/pairs/:amountAsset/:priceAsset',
+    resolver: '/matcher/:matcher/pairs/:amountAsset/:priceAsset',
   });
 
   const pair = await service
     .get({
       amountAsset,
       priceAsset,
+      matcher,
     })
     .run()
     .promise();

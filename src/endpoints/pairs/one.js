@@ -14,22 +14,36 @@ const pairsOneEndpoint = service => async ctx => {
     resolver: '/pairs/:amountAsset/:priceAsset',
   });
 
-  const pair = await service
-    .get({
-      amountAsset,
-      priceAsset,
-    })
-    .run()
-    .promise();
+  try {
+    const pair = await service
+      .get({
+        amountAsset,
+        priceAsset,
+      })
+      .run()
+      .promise();
 
-  ctx.eventBus.emit('ENDPOINT_RESOLVED', {
-    value: pair,
-  });
+    ctx.eventBus.emit('ENDPOINT_RESOLVED', {
+      value: pair,
+    });
 
-  pair.matchWith({
-    Just: ({ value }) => (ctx.state.returnValue = value),
-    Nothing: () => (ctx.status = 404),
-  });
+    pair.matchWith({
+      Just: ({ value }) => (ctx.state.returnValue = value),
+      Nothing: () => (ctx.status = 404),
+    });
+  } catch (e) {
+    e.matchWith({
+      DB: () => {
+        throw e;
+      },
+      Resolver: () => {
+        throw e;
+      },
+      Validation: () => {
+        ctx.status = 404;
+      },
+    });
+  }
 };
 
 const handleError = ({ ctx, error }) => {
