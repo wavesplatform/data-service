@@ -2,7 +2,7 @@ import { memoizeWith, always } from 'ramda';
 import {
   PostgresConfig,
   LoggerConfig,
-  loadConfig as loadDataServiceConfig,
+  loadDefaultConfig,
 } from '../../loadConfig';
 
 export type PairsConfig = PostgresConfig &
@@ -12,7 +12,7 @@ export type PairsConfig = PostgresConfig &
   };
 
 const load = (): PairsConfig => ({
-  ...loadDataServiceConfig(),
+  ...loadDefaultConfig(),
   pairsUpdateInterval: process.env.PAIRS_UPDATE_INTERVAL
     ? parseInt(process.env.PAIRS_UPDATE_INTERVAL)
     : 2500,
