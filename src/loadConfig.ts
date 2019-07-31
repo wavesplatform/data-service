@@ -25,8 +25,6 @@ export type MatcherConfig = {
   };
 };
 
-export type DefaultConfig = PostgresConfig & ServerConfig & LoggerConfig;
-
 export type DataServiceConfig = PostgresConfig &
   ServerConfig &
   LoggerConfig &
@@ -55,17 +53,14 @@ const load = (): DataServiceConfig => {
       ? parseInt(process.env.PGPOOLSIZE)
       : 20,
     logLevel: process.env.LOG_LEVEL || 'info',
+
+    matcher: {
+      settingsURL:
+        process.env.MATCHER_SETTINGS_URL ||
+        'https://matcher.wavesplatform.com/matcher/settings',
+      default: process.env.DEFAULT_MATCHER || '',
+    },
   };
 };
-
-const load = (): DataServiceConfig => ({
-  ...loadDefaultConfig(),
-  matcher: {
-    settingsURL:
-      process.env.MATCHER_SETTINGS_URL ||
-      'https://matcher.wavesplatform.com/matcher/settings',
-    default: process.env.DEFAULT_MATCHER || '',
-  },
-});
 
 export const loadConfig = memoizeWith(always('config'), load);

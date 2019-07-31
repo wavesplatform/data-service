@@ -115,10 +115,9 @@ export default (options: DataServiceConfig) => async ({
   const setScriptTxs = createSetScriptTxsService(commonDeps);
   const sponsorshopTxs = createSponsorshopTxsService(commonDeps);
   const transferTxs = createTransferTxsService(commonDeps);
-
-  serviceMesh.rates = commonInitServiceMesh.rates(
+  const rates = createRateService(
     {
-      txService: serviceMesh.transactions.exchangeTxs,
+      txService: exchangeTxs,
       pairCheckService: dummyPairCheck,
         ...commonDeps,
     }
@@ -158,6 +157,7 @@ export default (options: DataServiceConfig) => async ({
     assets,
     candles,
     pairs,
+    rates,
     transactions: {
       all: allTxs,
       genesis: genesisTxs,

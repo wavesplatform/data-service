@@ -1,7 +1,7 @@
 import { compose, pick, map } from 'ramda';
 import { renameKeys } from 'ramda-adjunct';
 import { BigNumber } from '@waves/data-entities';
-import { list, List, pair, Pair, PairInfo } from '../../types';
+import { list, List, pair, Pair } from '../../types';
 
 export type PairDbResponse = {
   amount_asset_id: string;
@@ -43,8 +43,8 @@ const renamePairFields = renameKeys({
 });
 
 /** transformResult :: Object -> Object */
-export const transformResult = compose<object, object, PairInfo>(
-  pickPairFields as any,
+export const transformResult = compose(
+  pickPairFields,
   renamePairFields
 );
 

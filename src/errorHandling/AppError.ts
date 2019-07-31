@@ -11,8 +11,6 @@ export type ErrorInfo = {
 };
 
 export type AppErrorPattern<C> = {
-  Db: (e: ErrorInfo) => C;
-  Init: (e: ErrorInfo) => C;
   Resolver: (e: ErrorInfo) => C;
   Validation: (e: ErrorInfo) => C;
   Db: (e: ErrorInfo) => C;
@@ -39,8 +37,7 @@ const createErrorInfo = (
     };
 };
 
-// @todo more specific error types (e.g. resolver error is not informative about what really happened)
-export abstract class AppError implements Matchable {
+export abstract class AppError implements Matchable, ErrorInfo {
   public abstract readonly type: ErrorInfo['type'];
   public abstract readonly error: ErrorInfo['error'];
   public abstract readonly meta: ErrorInfo['meta'];
@@ -50,9 +47,6 @@ export abstract class AppError implements Matchable {
   public static Db(error: Error | string, meta?: ErrorMetaInfo) {
     return new DbError(error, meta);
   }
-  public static Init(error: Error | string, meta?: ErrorMetaInfo) {
-    return new InitError(error, meta);
-  }
   public static Resolver(error: Error | string, meta?: ErrorMetaInfo) {
     return new ResolverError(error, meta);
   }
@@ -61,23 +55,7 @@ export abstract class AppError implements Matchable {
   }
 }
 
-export class InitError extends AppError {
-  public readonly type = 'Init';
-  public readonly error: ErrorInfo['error'];
-  public readonly meta: ErrorInfo['meta'];
-
-  constructor(error: Error | string, meta?: ErrorMetaInfo) {
-    super();
-    this.error = ensureError(error);
-    this.meta = meta;
-  }
-
-  public matchWith<C>(pattern: AppErrorPattern<C>): C {
-    return pattern.Init(createErrorInfo(this.type, this.error, this.meta));
-  }
-}
-
-export class ResolverError extends AppError implements ErrorInfo {
+export class ResolverError extends AppError {
   public readonly type = 'Resolver';
   public readonly error: ErrorInfo['error'];
   public readonly meta: ErrorInfo['meta'];
