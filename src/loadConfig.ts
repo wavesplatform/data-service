@@ -38,7 +38,7 @@ const envVariables = [
   'DEFAULT_MATCHER',
 ];
 
-export const loadDefaultConfig = (): DefaultConfig => {
+const load = (): DataServiceConfig => {
   // assert all necessary env vars are set
   checkEnv(envVariables);
 
@@ -62,10 +62,5 @@ export const loadDefaultConfig = (): DefaultConfig => {
     },
   };
 };
-
-const load = (): DataServiceConfig => ({
-  ...loadDefaultConfig(),
-  defaultMatcher: guard('DEFAULT_MATCHER', process.env.DEFAULT_MATCHER),
-});
 
 export const loadConfig = memoizeWith(always('config'), load);

@@ -57,14 +57,13 @@ const getMatchExactly = (matchExactly: boolean[] | undefined): boolean[] => {
   }
 };
 
-const query = (pairs: Pair[], matcher: string): string =>
+const query = (pairs: { amountAsset: string; priceAsset: string }[]): string =>
   pg({ t: 'pairs' })
     .select(COLUMNS)
     .whereIn(
       ['t.amount_asset_id', 't.price_asset_id'],
       pairs.map(pair => [pair.amountAsset, pair.priceAsset])
     )
-    .where('matcher', matcher)
     .toString();
 
 const searchAssets = (
@@ -126,11 +125,11 @@ export const search = (req: PairsSearchRequest): string => {
   //                 and prefix search of price asset by asset2
   //                 or amount asset by asset2 and price asset by asset1
 
-  const { matcher, limit } = req;
+  const { limit } = req;
+
   const q = pg({ t: 'pairs' })
     .select(COLUMNS.map(column => `t.${column}`))
     .orderByRaw('volume_waves desc NULLS LAST')
-    .where('matcher', matcher)
     .limit(limit);
 
   if (isSearchByAssetRequest(req)) {
@@ -194,7 +193,6 @@ export const search = (req: PairsSearchRequest): string => {
               'reverse_cte.price_asset_id': 't1.amount_asset_id',
             }
           )
-          .where('matcher', matcher)
       )
       .toString();
   } else {
