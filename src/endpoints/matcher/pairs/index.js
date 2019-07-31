@@ -2,9 +2,9 @@ const Router = require('koa-router');
 
 const subrouter = new Router();
 
+const postToGet = require('../../utils/postToGet');
 const pairsOne = require('./one');
 const pairsMany = require('./many');
-const postToGet = require('../utils/postToGet');
 
 module.exports = pairsService =>
   subrouter

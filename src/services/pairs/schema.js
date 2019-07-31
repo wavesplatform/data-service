@@ -32,20 +32,44 @@ const JoiWithOrderPair = orderPair =>
     ],
   }));
 
-const inputGet = orderPair =>
-  JoiWithOrderPair(orderPair)
-    .object()
-    .keys({
+const pair = orderPair => {
+  if (orderPair) {
+    return JoiWithOrderPair(orderPair)
+      .object()
+      .keys({
+        amountAsset: Joi.string()
+          .base58()
+          .required(),
+        priceAsset: Joi.string()
+          .base58()
+          .required(),
+      })
+      .valid();
+  } else {
+    return Joi.object().keys({
       amountAsset: Joi.string()
         .base58()
         .required(),
       priceAsset: Joi.string()
         .base58()
         .required(),
-    })
-    .valid();
+    });
+  }
+};
 
-const inputMget = orderPair => Joi.array().items(inputGet(orderPair));
+const inputGet = orderPair =>
+  Joi.object()
+    .keys({
+      pair: pair(orderPair).required(),
+      matcher: Joi.string().required(),
+    })
+    .required();
+
+const inputMget = orderPair =>
+  Joi.object.keys({
+    pairs: Joi.array().items(pair(orderPair)),
+    matcher: Joi.string().required(),
+  });
 
 const inputSearch = Joi.object()
   .keys({

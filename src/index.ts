@@ -12,7 +12,6 @@ import createServices from './services';
 import * as injectConfig from './middleware/injectConfig';
 import * as injectEventBus from './middleware/injectEventBus';
 import * as accessLogMiddleware from './middleware/accessLog';
-import * as removeErrorBodyProd from './middleware/removeErrorBodyProd';
 import * as serializer from './middleware/serializer';
 import * as setHeadersMiddleware from './middleware/setHeaders';
 
@@ -38,7 +37,6 @@ createServices(options)({
   emitEvent: name => o => eventBus.emit(name, o),
 }).then(services => {
   app
-    .use(removeErrorBodyProd)
     .use(bodyParser())
     .use(requestId)
     .use(setHeadersMiddleware)

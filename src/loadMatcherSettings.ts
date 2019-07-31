@@ -17,7 +17,7 @@ export const loadMatcherSettings = (
         let rawData = '';
         res.on('data', (chunk: any) => (rawData += chunk));
         res.on('end', () => {
-          const settings = JSON.parse(rawData);
+          const settings: MatcherSettings = JSON.parse(rawData);
           resolver.resolve(settings);
         });
       });

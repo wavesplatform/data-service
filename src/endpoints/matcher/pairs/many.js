@@ -1,13 +1,18 @@
-const { has, defaultTo, map, split, zipObj, compose } = require('ramda');
+const { has, map, split, zipObj, compose } = require('ramda');
 const Maybe = require('folktale/maybe');
 
-const createManyMiddleware = require('../_common/many');
+const { DEFAULT_NOT_FOUND_MESSAGE } = require('../../../errorHandling');
+const { captureErrors } = require('../../../utils/captureErrors');
+const { handleError } = require('../../../utils/handleError');
 
-const { parseArrayQuery } = require('../utils/parseArrayQuery');
-const { parseBool } = require('../utils/parseBool');
-const { limit, query } = require('../_common/filters');
-
-const options = loadConfig();
+const { select } = require('../../utils/selectors');
+const { parseArrayQuery } = require('../../utils/parseArrayQuery');
+const { parseBool } = require('../../utils/parseBool');
+const {
+  parseFilterValues,
+  limit,
+  query: queryFilter,
+} = require('../../_common/filters');
 
 /**
  * @typedef {object} PairRequest
@@ -27,12 +32,33 @@ const parsePairs = map(
   )
 );
 
+const mgetFilterName = 'pairs';
+
+const filterParsers = {
+  pairs: compose(
+    m => m.getOrElse(null),
+    map(parsePairs),
+    Maybe.fromNullable,
+    parseArrayQuery
+  ),
+  search_by_asset: queryFilter,
+  search_by_assets: parseArrayQuery,
+  match_exactly: compose(
+    m => m.getOrElse(undefined),
+    map(map(parseBool)),
+    Maybe.fromNullable,
+    parseArrayQuery
+  ),
+  limit,
+};
+
 /**
  * Endpoint
- * @name /pairs?pairs[]‌="{asset_id_1}/{asset_id_2}"&pairs[]="{asset_id_1}/{asset_id_2}" ...other params
+ * @name /matcher/:matcher/pairs?pairs[]‌="{asset_id_1}/{asset_id_2}"&pairs[]="{asset_id_1}/{asset_id_2}" ...other params
  */
 const pairsManyEndpoint = service => async ctx => {
-  const { query } = select(ctx);
+  const { fromParams, query } = select(ctx);
+  const [matcher] = fromParams(['matcher']);
   const fValues = parseFilterValues(filterParsers)(query);
 
   ctx.eventBus.emit('ENDPOINT_HIT', {
@@ -46,7 +72,7 @@ const pairsManyEndpoint = service => async ctx => {
     // mget hit
     if (service.mget) {
       results = await service
-        .mget({ pairs: fValues.pairs, matcher: fValues.matcher })
+        .mget({ pairs: fValues.pairs, matcher })
         .run()
         .promise();
     } else {
@@ -60,7 +86,7 @@ const pairsManyEndpoint = service => async ctx => {
     // search hit
     if (service.search) {
       results = await service
-        .search(fValues)
+        .search({ matcher, ...fValues })
         .run()
         .promise();
     } else {

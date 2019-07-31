@@ -1,5 +1,7 @@
 import {
   AppError,
+  DbError,
+  InitError,
   ResolverError,
   DbError,
   ValidationError,
@@ -16,6 +18,12 @@ export const toAppError: CurriedFunction3<
 > = curryN(3, (type: ErrorType, meta: ErrorMetaInfo, err: Error) =>
   AppError[type](err, meta)
 );
+
+export const toInitError: CurriedFunction2<
+  ErrorMetaInfo,
+  Error,
+  InitError
+> = toAppError('Init') as any;
 
 export const toResolverError: CurriedFunction2<
   ErrorMetaInfo,

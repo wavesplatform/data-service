@@ -119,7 +119,6 @@ export const sql = ({
   matcher,
 }: CandlesSearchRequest): string => {
   // should always be valid after validation
-  console.log('inter ', inter);
   const paramsInterval = interval(inter).unsafeGet();
 
   const ts = new Date(trunc(paramsInterval.unit, timeEnd));
