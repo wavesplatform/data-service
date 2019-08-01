@@ -1,4 +1,5 @@
 import { identity } from 'ramda';
+import { TOrderPair } from '@waves/assets-pairs-order';
 
 import { mget } from '../_common/createResolver';
 import { ServicePresetInitOptions } from '../presets/types';
@@ -18,11 +19,13 @@ export default <
   Result extends Serializable<string, any>
 >({
   name,
+  orderPair,
   sql,
   transformResult,
   typeFactory,
 }: {
   name: string;
+  orderPair: TOrderPair | null;
   sql: (req: Request) => string;
   transformResult: (
     results: ResponseRaw,
@@ -38,7 +41,7 @@ export default <
       ResponseTransformed,
       Result
     >(typeFactory)(transformResult),
-    validateInput: validateInput(inputMget, name),
+    validateInput: validateInput(inputMget(orderPair), name),
     validateResult: validateResult<ResponseRaw>(resultSchema, name),
     dbQuery: mgetPairs<Request, ResponseRaw, Pair>({
       name,

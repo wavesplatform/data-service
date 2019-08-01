@@ -1,6 +1,6 @@
 import { propEq, compose } from 'ramda';
 
-import { CommonServiceCreatorDependencies } from '../..';
+import { CommonServiceDependencies } from '../..';
 import {
   transaction,
   TransactionInfo,
@@ -43,7 +43,7 @@ export type AliasTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
-}: CommonServiceCreatorDependencies): AliasTxsService => {
+}: CommonServiceDependencies): AliasTxsService => {
   return {
     get: getByIdPreset<string, AliasTxDbResponse, TransactionInfo, Transaction>(
       {

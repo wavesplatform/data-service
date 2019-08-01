@@ -14,7 +14,7 @@ import {
   Service,
   TransactionInfo,
 } from '../../types';
-import { CommonServiceCreatorDependencies } from '..';
+import { CommonServiceDependencies } from '..';
 import { getByIdPreset } from '../presets/pg/getById';
 import { searchPreset } from '../presets/pg/search';
 
@@ -58,7 +58,7 @@ export type PairsSearchRequest =
   | SearchByAssetRequest
   | SearchByAssetsRequest;
 
-export type PairsServiceCreatorDependencies = CommonServiceCreatorDependencies & {
+export type PairsServiceCreatorDependencies = CommonServiceDependencies & {
   options: DataServiceConfig;
 };
 
@@ -105,6 +105,7 @@ export default ({
       Pair
     >({
       name: 'pairs.mget',
+      orderPair,
       sql: sql.mget,
       transformResult: transformResult,
       typeFactory: pair,

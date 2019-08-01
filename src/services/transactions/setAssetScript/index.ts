@@ -1,6 +1,6 @@
 import { propEq, compose } from 'ramda';
 
-import { CommonServiceCreatorDependencies } from '../..';
+import { CommonServiceDependencies } from '../..';
 import {
   transaction,
   TransactionInfo,
@@ -45,7 +45,7 @@ export type SetAssetScriptTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
-}: CommonServiceCreatorDependencies): SetAssetScriptTxsService => {
+}: CommonServiceDependencies): SetAssetScriptTxsService => {
   return {
     get: getByIdPreset<
       string,

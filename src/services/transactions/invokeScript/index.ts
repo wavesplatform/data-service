@@ -1,6 +1,6 @@
 import { compose, identity } from 'ramda';
 
-import { CommonServiceCreatorDependencies } from '../..';
+import { CommonServiceDependencies } from '../..';
 import {
   transaction,
   TransactionInfo,
@@ -44,7 +44,7 @@ export type InvokeScriptTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
-}: CommonServiceCreatorDependencies): InvokeScriptTxsService => {
+}: CommonServiceDependencies): InvokeScriptTxsService => {
   return {
     get: get<string, string, RawInvokeScriptTx, Transaction>({
       transformInput: identity,

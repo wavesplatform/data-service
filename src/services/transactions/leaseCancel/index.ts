@@ -1,6 +1,6 @@
 import { propEq, compose } from 'ramda';
 
-import { CommonServiceCreatorDependencies } from '../..';
+import { CommonServiceDependencies } from '../..';
 import {
   transaction,
   TransactionInfo,
@@ -46,7 +46,7 @@ export type LeaseCancelTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
-}: CommonServiceCreatorDependencies): LeaseCancelTxsService => {
+}: CommonServiceDependencies): LeaseCancelTxsService => {
   return {
     get: getByIdPreset<
       string,

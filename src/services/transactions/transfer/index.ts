@@ -1,7 +1,7 @@
 import { propEq, compose } from 'ramda';
 import { BigNumber } from '@waves/data-entities';
 
-import { CommonServiceCreatorDependencies } from '../..';
+import { CommonServiceDependencies } from '../..';
 import {
   transaction,
   TransactionInfo,
@@ -50,7 +50,7 @@ export type TransferTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
-}: CommonServiceCreatorDependencies): TransferTxsService => {
+}: CommonServiceDependencies): TransferTxsService => {
   return {
     get: getByIdPreset<
       string,

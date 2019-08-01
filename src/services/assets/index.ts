@@ -2,7 +2,7 @@ import { propEq } from 'ramda';
 
 import { asset, Asset, AssetInfo, List, Service } from '../../types';
 
-import { CommonServiceCreatorDependencies } from '..';
+import { CommonServiceDependencies } from '..';
 
 // presets
 import { getByIdPreset } from '../presets/pg/getById';
@@ -38,7 +38,7 @@ export type AssetsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
-}: CommonServiceCreatorDependencies): AssetsService => {
+}: CommonServiceDependencies): AssetsService => {
   return {
     get: getByIdPreset<string, AssetDbResponse, AssetInfo, Asset>({
       name: 'assets.get',

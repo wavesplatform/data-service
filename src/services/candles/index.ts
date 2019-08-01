@@ -2,7 +2,7 @@ import { searchPreset } from '../presets/pg/search';
 
 import { Candle, CandleInfo, List, ServiceSearch } from '../../types';
 
-import { CommonServiceCreatorDependencies } from '..';
+import { CommonServiceDependencies } from '..';
 
 import { sql } from './sql';
 import { inputSearch, output } from './schema';
@@ -22,7 +22,7 @@ export type CandlesService = ServiceSearch<CandlesSearchRequest, Candle>;
 export default ({
   drivers,
   emitEvent,
-}: CommonServiceCreatorDependencies): CandlesService => {
+}: CommonServiceDependencies): CandlesService => {
   return {
     search: searchPreset<
       CandlesSearchRequest,

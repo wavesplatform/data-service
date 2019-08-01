@@ -15,7 +15,7 @@ import {
   identity,
   evolve,
 } from 'ramda';
-import { CommonServiceCreatorDependencies } from '../..';
+import { CommonServiceDependencies } from '../..';
 import {
   List,
   Transaction,
@@ -84,7 +84,7 @@ export type AllTxsService = Service<
 // request by (id, timestamp) instead of just id
 // to ensure correct tx response even if
 // id is duplicated (happens in payment, alias txs)
-export default (deps: CommonServiceCreatorDependencies) => (
+export default (deps: CommonServiceDependencies) => (
   txsServices: AllTxsServiceDep
 ): AllTxsService => {
   const commonTxData = commonData(deps);

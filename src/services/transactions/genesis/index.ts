@@ -1,7 +1,7 @@
 import { propEq, compose, Omit } from 'ramda';
 import { BigNumber } from '@waves/data-entities';
 
-import { CommonServiceCreatorDependencies } from '../..';
+import { CommonServiceDependencies } from '../..';
 import {
   transaction,
   TransactionInfo,
@@ -45,7 +45,7 @@ export type GenesisTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
-}: CommonServiceCreatorDependencies): GenesisTxsService => {
+}: CommonServiceDependencies): GenesisTxsService => {
   return {
     get: getByIdPreset<
       string,

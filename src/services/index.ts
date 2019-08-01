@@ -49,7 +49,7 @@ import createTransferTxsService, {
   TransferTxsService,
 } from './transactions/transfer';
 
-export type CommonServiceCreatorDependencies = {
+export type CommonServiceDependencies = {
   drivers: {
     pg: PgDriver;
   };

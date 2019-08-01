@@ -6,7 +6,7 @@ import {
   Transaction,
   Service,
 } from '../../../types';
-import { CommonServiceCreatorDependencies } from '../..';
+import { CommonServiceDependencies } from '../..';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
 import { getByIdPreset } from '../../presets/pg/getById';
@@ -48,7 +48,7 @@ export type ReissueTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
-}: CommonServiceCreatorDependencies): ReissueTxsService => {
+}: CommonServiceDependencies): ReissueTxsService => {
   return {
     get: getByIdPreset<
       string,

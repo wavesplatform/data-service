@@ -9,7 +9,7 @@ import {
   List,
 } from '../../types';
 
-import { CommonServiceCreatorDependencies } from '..';
+import { CommonServiceDependencies } from '..';
 import { transformResults as transformSearch } from '../presets/pg/search/transformResult';
 
 import * as sql from './data/sql';
@@ -27,7 +27,7 @@ export type AliasService = ServiceGet<string, Alias> &
 export default ({
   drivers,
   emitEvent,
-}: CommonServiceCreatorDependencies): AliasService => {
+}: CommonServiceDependencies): AliasService => {
   return {
     get: getByIdPreset<string, AliasDbResponse, AliasInfo, Alias>({
       name: 'aliases.get',

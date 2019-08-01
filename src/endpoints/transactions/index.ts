@@ -36,7 +36,7 @@ const createOptions = (
 
 const transactionsEndpointsConfig = (
   services: ServiceMesh['transactions']
-): { [url: string]: TxServiceParams } => ({
+): { [url: string]: TxEndpointParams } => ({
   '/transactions/all': {
     service: services.all,
     options: createOptions(),
@@ -126,12 +126,12 @@ const transactionsEndpointsConfig = (
   },
 });
 
-type TxServiceParams = {
+type TxEndpointParams = {
   service: Service<any, any, any, Serializable<string, any>>;
-  options: TxServiceOptions;
+  options: TxEndpointOptions;
 };
 
-type TxServiceOptions = {
+type TxEndpointOptions = {
   filterParsers?: any; // { [param: string]: (param: string) => any }, but { ids: (strOrArr: any) => any } does not assign (ids does not assign)
   parseFiltersFn?: (query: string) => Record<string, any>;
   mgetFilterName?: string;
@@ -139,8 +139,8 @@ type TxServiceOptions = {
 
 export default (txsServices: ServiceMesh['transactions']) =>
   compose<
-    Record<string, TxServiceParams>,
-    [string, TxServiceParams][],
+    Record<string, TxEndpointParams>,
+    [string, TxEndpointParams][],
     Router<any, any>
   >(
     reduce(

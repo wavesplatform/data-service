@@ -19,46 +19,46 @@ const pairsOneEndpoint = service => async ctx => {
     resolver: '/pairs/:amountAsset/:priceAsset',
   });
 
-  await service
-    .get({
-      pair: {
-        amountAsset,
-        priceAsset,
-      },
-      matcher: matcher || ctx.state.config.defaultMatcher,
-    })
-    .map(pair => {
-      ctx.eventBus.emit('ENDPOINT_RESOLVED', {
-        value: pair,
-      });
+  try {
+    const pair = await service
+      .get({
+        pair: {
+          amountAsset,
+          priceAsset,
+        },
+        matcher: matcher || ctx.state.config.defaultMatcher,
+      })
+      .run()
+      .promise();
 
-      pair.matchWith({
-        Just: ({ value }) => {
-          ctx.state.returnValue = value;
-        },
-        Nothing: () => {
-          ctx.status = 404;
-          ctx.body = {
-            message: DEFAULT_NOT_FOUND_MESSAGE,
-          };
-        },
-      });
-    })
-    .mapRejected(e => {
-      e.matchWith({
-        DB: () => {
-          throw e;
-        },
-        Resolver: () => {
-          throw e;
-        },
-        Validation: () => {
-          ctx.status = 404;
-        },
-      });
-    })
-    .run()
-    .promise();
+    ctx.eventBus.emit('ENDPOINT_RESOLVED', {
+      value: pair,
+    });
+
+    pair.matchWith({
+      Just: ({ value }) => {
+        ctx.state.returnValue = value;
+      },
+      Nothing: () => {
+        ctx.status = 404;
+        ctx.body = {
+          message: DEFAULT_NOT_FOUND_MESSAGE,
+        };
+      },
+    });
+  } catch (e) {
+    e.matchWith({
+      DB: () => {
+        throw e;
+      },
+      Resolver: () => {
+        throw e;
+      },
+      Validation: () => {
+        ctx.status = 404;
+      },
+    });
+  }
 };
 
 module.exports = service =>
