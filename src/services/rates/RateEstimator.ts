@@ -65,10 +65,6 @@ export default class RateEstimator {
     private readonly pairChecker: PairCheckService
   ) {}
 
-  estimate(request: AssetIdsPair, matcher: string): Task<AppError, BigNumber> {
-    return this.getRate(request.amountAsset, request.priceAsset, matcher)
-  }
-
   private countRateFromTransactions([amountAsset, priceAsset, order]: RateRequest, matcher: string): Task<AppError, Maybe<BigNumber>> {
     return this.transactionService.search(
       {
@@ -122,7 +118,7 @@ export default class RateEstimator {
     return results.chain(tasks => firstTask((val: BigNumber) => val.isPositive(), tasks))
   }
 
-  private getRate(amountAsset: string, priceAsset: string, matcher: string): Task<AppError, BigNumber> {
+  estimate({ amountAsset, priceAsset }: AssetIdsPair, matcher: string): Task<AppError, BigNumber> {
     if (amountAsset === priceAsset) {
       return taskOf(new BigNumber(1));
     }
