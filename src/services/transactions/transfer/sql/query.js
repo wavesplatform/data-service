@@ -16,7 +16,7 @@ const columns = {
   recipient: 't.recipient',
   fee_asset: 't.fee_asset',
   attachment: 't.attachment',
-  generated_id: 't.generated_id',
+  uid: 't.uid',
 };
 
 const decimals = alias =>
@@ -57,7 +57,7 @@ const select = pg({ t: 'txs_4' }).select([
   'recipient',
   'fee_asset',
   'attachment',
-  'generated_id',
+  'uid',
 ]);
 
 module.exports = {

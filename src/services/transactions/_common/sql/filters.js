@@ -8,11 +8,11 @@ const sender = where('sender');
 const timeStart = where('time_stamp', '>=');
 const timeEnd = where('time_stamp', '<=');
 
-const sort = s => q => q.clone().orderBy('generated_id', s);
+const sort = s => q => q.clone().orderBy('uid', s);
 
-const after = ({ generated_id, sort }) => q => {
+const after = ({ uid, sort }) => q => {
   const comparator = sort === 'desc' ? '<' : '>';
-  return q.clone().where('generated_id', comparator, generated_id);
+  return q.clone().where('uid', comparator, uid);
 };
 
 module.exports = {

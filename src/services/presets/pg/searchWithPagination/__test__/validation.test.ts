@@ -12,7 +12,7 @@ import {
 import { PgDriver } from '../../../../../db/driver';
 import { SortOrder } from '../../../../_common/pagination/cursor';
 
-const mockTxs: ResponseRaw[] = [{ generated_id: 1 }, { generated_id: 2 }];
+const mockTxs: ResponseRaw[] = [{ uid: 1 }, { uid: 2 }];
 
 type Request = WithSortOrder &
   WithLimit & {
@@ -21,7 +21,7 @@ type Request = WithSortOrder &
   };
 
 type ResponseRaw = {
-  generated_id: number;
+  uid: number;
 };
 
 const service = searchWithPaginationPreset<

@@ -21,7 +21,7 @@ const transformTxInfo = compose(
     sender_public_key: 'senderPublicKey',
     time_stamp: 'timestamp',
   }),
-  omit(['generated_id'])
+  omit(['uid'])
 );
 
 module.exports = transformTxInfo;

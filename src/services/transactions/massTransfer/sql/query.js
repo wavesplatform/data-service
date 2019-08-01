@@ -56,7 +56,7 @@ const columns = {
   sender_public_key: 'sender_public_key',
   asset_id: 'txs.asset_id',
   attachment: 'attachment',
-  generated_id: 'generated_id',
+  uid: 'uid',
 };
 
 const withTransfersDecimalsAndGrouping = pipe(

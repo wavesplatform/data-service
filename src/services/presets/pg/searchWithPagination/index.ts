@@ -25,7 +25,7 @@ export type RequestWithCursor<
 };
 
 export type BaseResponse = {
-  generated_id: number;
+  uid: number;
   [key: string]: any;
 };
 

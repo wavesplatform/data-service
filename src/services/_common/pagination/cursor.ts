@@ -10,12 +10,12 @@ const isSortOrder = (s: string): s is SortOrder =>
   s === SortOrder.Ascending || s === SortOrder.Descending;
 
 export type Cursor = {
-  generated_id: number;
+  uid: number;
   sort: SortOrder;
 };
 
 export const encode = (cursor: Cursor): string =>
-  Buffer.from(`${cursor.generated_id}::${cursor.sort}`).toString('base64');
+  Buffer.from(`${cursor.uid}::${cursor.sort}`).toString('base64');
 
 export const decode = (cursor: string): Result<ValidationError, Cursor> => {
   const data = Buffer.from(cursor, 'base64')
@@ -45,8 +45,8 @@ export const decode = (cursor: string): Result<ValidationError, Cursor> => {
           );
         }
       })
-      .map(([generated_id, sort]) => ({
-        generated_id: parseInt(generated_id),
+      .map(([uid, sort]) => ({
+        uid: parseInt(uid),
         sort,
       }))
   );

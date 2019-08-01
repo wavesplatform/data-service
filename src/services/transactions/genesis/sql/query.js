@@ -11,7 +11,7 @@ const select = pg({ t: 'txs_1' }).select({
   fee: 't.fee',
   recipient: 't.recipient',
   amount: pg.raw('t.amount * 10^(-8)'),
-  generated_id: 't.generated_id',
+  uid: 't.uid',
 });
 
 module.exports = { select };

@@ -12,7 +12,7 @@ const select = pg({ t: 'txs_9' }).select({
   sender: 't.sender',
   sender_public_key: 't.sender_public_key',
   lease_id: 't.lease_id',
-  generated_id: 't.generated_id',
+  uid: 't.uid',
 });
 
 module.exports = { select };

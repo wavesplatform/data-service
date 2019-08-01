@@ -12,7 +12,7 @@ const columns = {
   tx_type: 't.tx_type',
   tx_version: 't.tx_version',
 
-  generated_id: 't.generated_id',
+  uid: 't.uid',
 
   sender: 't.sender',
   sender_public_key: 't.sender_public_key',

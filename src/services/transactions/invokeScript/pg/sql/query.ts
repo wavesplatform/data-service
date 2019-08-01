@@ -12,7 +12,7 @@ const columnsWithoutFeeAndPaymentAssetId = [
   'tx_version',
   'sender',
   'sender_public_key',
-  'generated_id',
+  'uid',
 
   // type-specific
   'dapp',

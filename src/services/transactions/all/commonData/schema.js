@@ -12,7 +12,7 @@ const result = Joi.object().keys({
   id: Joi.string()
     .base58()
     .required(),
-  generated_id: Joi.number().required(),
+  uid: Joi.number().required(),
 });
 
 const inputSearch = Joi.object()
