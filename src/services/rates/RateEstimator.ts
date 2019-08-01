@@ -134,25 +134,26 @@ export default class RateEstimator {
       return taskOf(new BigNumber(1));
     }
 
-    if (amountAsset === WavesId || priceAsset === WavesId) {
-      return this.getActualRate(amountAsset, priceAsset, matcher).map(res => res.getOrElse(new BigNumber(0)));
-    } else {
-      return firstTask(
-        (val: BigNumber) => val.isPositive(),
-        [
-          this.getActualRate(amountAsset, priceAsset, matcher),        
-          waitAll(
-            [
-              this.getActualRate(amountAsset, WavesId, matcher),
-              this.getActualRate(priceAsset, WavesId, matcher)
-            ]
-          ).map(([rate1, rate2]) => maybeMap2(
-            (rate1, rate2) => rate2.eq(0) ? new BigNumber(0) : rate1.div(rate2),
-            rate1,
-            rate2
-          ))
-        ]
-      ).map(res => res.getOrElse(new BigNumber(0)))
+    const allRateTasks: Task<AppError, Maybe<BigNumber>>[] = [
+      this.getActualRate(amountAsset, priceAsset, matcher)
+    ]
+
+    if (amountAsset !== WavesId && priceAsset !== WavesId) {
+      allRateTasks.push(
+        waitAll(
+          [
+            this.getActualRate(amountAsset, WavesId, matcher),
+            this.getActualRate(priceAsset, WavesId, matcher)
+          ]
+        ).map(([rate1, rate2]) => maybeMap2(
+          (rate1, rate2) => rate2.eq(0) ? new BigNumber(0) : rate1.div(rate2),
+          rate1,
+          rate2
+        ))
+      )
     }
+
+    return firstTask((val: BigNumber) => val.isPositive(), allRateTasks)
+      .map(res => res.getOrElse(new BigNumber(0)))
   }
 }
