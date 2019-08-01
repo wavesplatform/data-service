@@ -125,7 +125,7 @@ export default ({
 
     return {
       get: (request: PairsGetRequest) => {
-        const getPairT = getPairByRequest(request).chain<AppError, Maybe<Pair>>(
+        const getPair = getPairByRequest(request).chain<AppError, Maybe<Pair>>(
           maybePair =>
             maybePair.matchWith({
               Just: () => taskOf(maybePair),
@@ -141,7 +141,7 @@ export default ({
 
         if (notCached.length === 0) {
           // both of assets are cached
-          return getPairT;
+          return getPair;
         } else {
           return issueTxs.mget(notCached).chain(list => {
             const found = list.data
@@ -154,13 +154,13 @@ export default ({
               return rejected(new ValidationError(new Error('Check pair')));
             } else {
               found.forEach(tx => cache.set(tx.id, true));
-              return getPairT;
+              return getPair;
             }
           });
         }
       },
       mget: (request: PairsMgetRequest) => {
-        const mgetPairsT = mgetPairsByRequest(request);
+        const mgetPairs = mgetPairsByRequest(request);
 
         // request asset list
         const assets = request.pairs.reduce(
@@ -173,7 +173,7 @@ export default ({
 
         if (notCached.length === 0) {
           // all of assets are in cache
-          return mgetPairsT;
+          return mgetPairs;
         } else {
           return issueTxs.mget(notCached).chain(list => {
             const found = list.data
@@ -186,7 +186,7 @@ export default ({
               return rejected(new ValidationError(new Error('Check pairs')));
             } else {
               found.forEach(tx => cache.set(tx.id, true));
-              return mgetPairsT;
+              return mgetPairs;
             }
           });
         }

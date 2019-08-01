@@ -27,6 +27,7 @@ const commonTxFilters = {
 };
 
 // common options
+// @todo make types better
 const createOptions = (
   specificFilters?: Record<string, (param: string) => any>
 ) => ({
@@ -112,7 +113,7 @@ const transactionsEndpointsConfig = (
     options: createOptions({ script: identity }),
   },
   '/transactions/sponsorship': {
-    service: services.sponsorshop,
+    service: services.sponsorship,
     options: createOptions(),
   },
   '/transactions/set-asset-script': {
@@ -126,7 +127,7 @@ const transactionsEndpointsConfig = (
 });
 
 type TxServiceParams = {
-  service: Service<Serializable<string, any>>;
+  service: Service<any, any, any, Serializable<string, any>>;
   options: TxServiceOptions;
 };
 
