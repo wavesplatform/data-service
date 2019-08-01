@@ -15,8 +15,6 @@ const {
   query: queryFilter,
 } = require('../_common/filters');
 
-const createService = require('../../services/pairs');
-
 const options = loadConfig();
 
 /**
@@ -56,7 +54,7 @@ const filterParsers = {
   ),
   matcher: compose(
     queryFilter,
-    defaultTo(options.defaultMatcher)
+    defaultTo(options.matcher.defaultMatcherAddress)
   ),
   limit,
 };
@@ -65,20 +63,7 @@ const filterParsers = {
  * Endpoint
  * @name /pairs?pairs[]‌="{asset_id_1}/{asset_id_2}"&pairs[]="{asset_id_1}/{asset_id_2}" ...other params
  */
-const pairsManyEndpoint = async ctx => {
-  const s = createService({
-    drivers: ctx.state.drivers,
-    emitEvent: ctx.eventBus.emit,
-  });
-
-  if (!s.mget && !s.search) {
-    ctx.status = 404;
-    ctx.body = {
-      message: DEFAULT_NOT_FOUND_MESSAGE,
-    };
-    return;
-  }
-
+const pairsManyEndpoint = service => async ctx => {
   const { query } = select(ctx);
   const fValues = parseFilterValues(filterParsers)(query);
 
@@ -91,8 +76,8 @@ const pairsManyEndpoint = async ctx => {
   let results;
   if (has(mgetFilterName, fValues)) {
     // mget hit
-    if (s.mget) {
-      results = await s
+    if (service.mget) {
+      results = await service
         .mget({ pairs: fValues.pairs, matcher: fValues.matcher })
         .run()
         .promise();
@@ -105,8 +90,8 @@ const pairsManyEndpoint = async ctx => {
     }
   } else {
     // search hit
-    if (s.search) {
-      results = await s
+    if (service.search) {
+      results = await service
         .search(fValues)
         .run()
         .promise();
@@ -133,4 +118,5 @@ const pairsManyEndpoint = async ctx => {
   }
 };
 
-module.exports = captureErrors(handleError)(pairsManyEndpoint);
+module.exports = service =>
+  captureErrors(handleError)(pairsManyEndpoint(service));

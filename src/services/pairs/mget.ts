@@ -1,4 +1,5 @@
 import { identity } from 'ramda';
+import { TOrderPair } from '@waves/assets-pairs-order';
 
 import { mget } from '../_common/createResolver';
 import { ServicePresetInitOptions } from '../presets/types';
@@ -7,40 +8,40 @@ import { validateInput, validateResult } from '../presets/validation';
 import { transformResults as transformResultsFn } from './transformResults';
 
 import { inputMget, result as resultSchema } from './schema';
-import { mgetPairs } from './pg';
+import { mgetPairs } from './mgetPairs';
 import * as matchRequestResult from './matchRequestResult';
 import { Pair, MgetRequest } from './types';
 
-export default <Request extends MgetRequest, ResponseRaw, ResponseTransformed>({
+export default <
+  Request extends MgetRequest,
+  ResponseRaw,
+  ResponseTransformed,
+  Result extends Serializable<string, any>
+>({
   name,
+  orderPair,
   sql,
   transformResult,
   typeFactory,
 }: {
   name: string;
+  orderPair: TOrderPair | null;
   sql: (req: Request) => string;
   transformResult: (
     results: ResponseRaw,
     request?: Request
   ) => ResponseTransformed;
-  typeFactory: (
-    d?: ResponseTransformed | undefined
-  ) => Serializable<string, ResponseTransformed>;
+  typeFactory: (d?: ResponseTransformed | undefined) => Result;
 }) => ({ pg, emitEvent }: ServicePresetInitOptions) =>
-  mget<
-    Request,
-    Request,
-    ResponseRaw,
-    List<Serializable<string, ResponseTransformed>>
-  >({
+  mget<Request, Request, ResponseRaw, List<Result>>({
     transformInput: identity,
     transformResult: transformResultsFn<
       Request,
       ResponseRaw,
       ResponseTransformed,
-      Serializable<string, ResponseTransformed>
+      Result
     >(typeFactory)(transformResult),
-    validateInput: validateInput(inputMget, name),
+    validateInput: validateInput(inputMget(orderPair), name),
     validateResult: validateResult<ResponseRaw>(resultSchema, name),
     dbQuery: mgetPairs<Request, ResponseRaw, Pair>({
       name,

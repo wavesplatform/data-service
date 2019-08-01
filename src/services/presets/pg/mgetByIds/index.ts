@@ -8,7 +8,12 @@ import { validateInput, validateResult } from '../../validation';
 import { transformResults as transformResultsFn } from './transformResult';
 import { getData } from './pg';
 
-export const mgetByIdsPreset = <Id, ResponseRaw, ResponseTransformed>({
+export const mgetByIdsPreset = <
+  Id,
+  ResponseRaw,
+  ResponseTransformed,
+  Result extends Serializable<string, ResponseTransformed | null>
+>({
   name,
   sql,
   inputSchema,
@@ -20,9 +25,7 @@ export const mgetByIdsPreset = <Id, ResponseRaw, ResponseTransformed>({
   name: string;
   inputSchema: SchemaLike;
   resultSchema: SchemaLike;
-  resultTypeFactory: (
-    t?: ResponseTransformed
-  ) => Serializable<string, ResponseTransformed>;
+  resultTypeFactory: (t?: ResponseTransformed) => Result;
   transformResult: (
     response: ResponseRaw,
     request?: Id[]
@@ -30,18 +33,13 @@ export const mgetByIdsPreset = <Id, ResponseRaw, ResponseTransformed>({
   sql: (r: Id[]) => string;
   matchRequestResult: (req: Id[], res: ResponseRaw) => boolean;
 }) => ({ pg, emitEvent }: ServicePresetInitOptions) =>
-  mget<
-    Id[],
-    Id[],
-    ResponseRaw,
-    List<Serializable<string, ResponseTransformed>>
-  >({
+  mget<Id[], Id[], ResponseRaw, List<Result>>({
     transformInput: identity,
     transformResult: transformResultsFn<
       Id[],
       ResponseRaw,
       ResponseTransformed,
-      Serializable<string, ResponseTransformed>
+      Result
     >(resultTypeFactory)(transformResult),
     validateInput: validateInput(inputSchema, name),
     validateResult: validateResult<ResponseRaw>(resultSchema, name),

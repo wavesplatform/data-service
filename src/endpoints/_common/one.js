@@ -5,12 +5,7 @@ const { select } = require('../utils/selectors');
 
 const createGetMiddleware = (url, service) => {
   return captureErrors(handleError)(async ctx => {
-    const s = service({
-      drivers: ctx.state.drivers,
-      emitEvent: ctx.eventBus.emit,
-    });
-
-    if (!s.get) {
+    if (!service.get) {
       ctx.status = 404;
       ctx.body = {
         message: DEFAULT_NOT_FOUND_MESSAGE,
@@ -26,7 +21,7 @@ const createGetMiddleware = (url, service) => {
       id,
     });
 
-    const x = await s
+    const x = await service
       .get(id)
       .run()
       .promise();

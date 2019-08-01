@@ -6,6 +6,12 @@ import {
 export const handleError = ({ ctx, error }: { ctx: any; error: AppError }) => {
   ctx.eventBus.emit('ERROR', error);
   error.matchWith({
+    Init: () => {
+      ctx.status = 500;
+      ctx.body = {
+        message: DEFAULT_INTERNAL_SERVER_ERROR_MESSAGE,
+      };
+    },
     Db: () => {
       ctx.status = 500;
       ctx.body = {

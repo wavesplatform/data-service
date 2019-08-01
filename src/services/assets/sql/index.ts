@@ -10,13 +10,13 @@ const getAssetIndex = (asset_id: string) =>
     .column('rn')
     .where('asset_id', asset_id);
 
-export const mget = (ids: number[]): string =>
+export const mget = (ids: string[]): string =>
   pg('assets')
     .select(columns)
     .whereIn('asset_id', ids)
     .toString();
 
-export const get = (id: number): string => mget([id]);
+export const get = (id: string): string => mget([id]);
 
 export const search = ({
   ticker,

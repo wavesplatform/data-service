@@ -1,6 +1,7 @@
 import { AppError, AppErrorPattern, ErrorInfo } from './AppError';
 
 const errorTypes: (keyof AppErrorPattern<any>)[] = [
+  'Init',
   'Resolver',
   'Db',
   'Validation',
@@ -10,6 +11,7 @@ const throwFn = () => {
   throw new Error('Should not happen');
 };
 const throwPattern: AppErrorPattern<never> = {
+  Init: throwFn,
   Resolver: throwFn,
   Validation: throwFn,
   Db: throwFn,

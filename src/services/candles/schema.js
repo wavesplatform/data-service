@@ -142,7 +142,8 @@ const customJoi = Joi.extend(joi => ({
   ],
 }));
 
-const inputSearch = Joi.object()
+const inputSearch = customJoi
+  .object()
   .keys({
     amountAsset: Joi.string()
       .base58()
@@ -150,13 +151,14 @@ const inputSearch = Joi.object()
     priceAsset: Joi.string()
       .base58()
       .required(),
-    params: customJoi
-      .object()
-      .period({
-        limit: 1440,
-        allow: ['1d', '12h', '6h', '3h', '1h', '30m', '15m', '5m', '1m'],
-      })
-      .required(),
+    timeStart: Joi.date().required(),
+    timeEnd: Joi.date().required(),
+    interval: Joi.string().required(),
+    matcher: Joi.string(),
+  })
+  .period({
+    limit: 1440,
+    allow: ['1d', '12h', '6h', '3h', '1h', '30m', '15m', '5m', '1m'],
   })
   .required();
 
@@ -168,8 +170,7 @@ const output = Joi.object().keys({
   price_asset_id: Joi.string()
     .base58()
     .required(),
-  matcher: Joi.string()
-    .base58(),
+  matcher: Joi.string().base58(),
   max_height: Joi.number()
     .integer()
     .required(),

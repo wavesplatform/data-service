@@ -4,8 +4,10 @@ describe('sql query from pairs', () => {
   it('should get one pair', () => {
     expect(
       get({
-        amountAsset: '111',
-        priceAsset: '222',
+        pair: {
+          amountAsset: '111',
+          priceAsset: '222',
+        },
         matcher: '333',
       })
     ).toMatchSnapshot();
@@ -15,15 +17,17 @@ describe('sql query from pairs', () => {
     expect(
       mget({
         pairs: [
-        {
-          amountAsset: '111',
-          priceAsset: '222',
-        },
-        {
-          amountAsset: '333',
-          priceAsset: '444',
-        },
-      ], matcher: '555'})
+          {
+            amountAsset: '111',
+            priceAsset: '222',
+          },
+          {
+            amountAsset: '333',
+            priceAsset: '444',
+          },
+        ],
+        matcher: '555',
+      })
     ).toMatchSnapshot();
   });
 

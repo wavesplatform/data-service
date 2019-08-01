@@ -10,9 +10,7 @@ import {
 
 import { PgDriver } from '../../../db/driver';
 
-export type EmitEvent = {
-  (name: string): <A>(object: A) => void;
-};
+export type EmitEvent = (name: string) => <A>(object: A) => void;
 
 export type Validate<Error, Value> = (value: Value) => Result<Error, Value>;
 
@@ -82,7 +80,7 @@ export type SearchResolverDependencies<
   ) => ResTransformed;
 };
 
-export type RuntimeResolverDependenties = {
+export type ResolverDependencies = {
   db: PgDriver;
   emitEvent?: EmitEvent;
 };

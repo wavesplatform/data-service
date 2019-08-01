@@ -2,29 +2,74 @@ const Joi = require('../../utils/validation/joi');
 
 const limitMaximum = 1000;
 
-const inputGet = Joi.object().keys({
-  amountAsset: Joi.string()
-    .base58()
-    .required(),
-  priceAsset: Joi.string()
-    .base58()
-    .required(),
-  matcher: Joi.string(),
-});
+const JoiWithOrderPair = orderPair =>
+  Joi.extend(joi => ({
+    base: joi.object(),
+    name: 'object',
+    language: {
+      pair: 'in pair {{amountAsset}}/{{priceAsset}} is incorrect.',
+    },
+    rules: [
+      {
+        name: 'valid',
+        validate(_, value, state, options) {
+          const validAmountAsset = orderPair(
+            value.amountAsset,
+            value.priceAsset
+          )[0];
+          if (value.amountAsset !== validAmountAsset) {
+            return this.createError(
+              'object.pair',
+              { amountAsset: value.amountAsset, priceAsset: value.priceAsset },
+              state,
+              options,
+              { label: 'Asset order' }
+            );
+          }
+          return value;
+        },
+      },
+    ],
+  }));
 
-const inputMget = Joi.object().keys({
-  pairs: Joi.array().items(
-    Joi.object().keys({
+const pair = orderPair => {
+  if (orderPair) {
+    return JoiWithOrderPair(orderPair)
+      .object()
+      .keys({
+        amountAsset: Joi.string()
+          .base58()
+          .required(),
+        priceAsset: Joi.string()
+          .base58()
+          .required(),
+      })
+      .valid();
+  } else {
+    return Joi.object().keys({
       amountAsset: Joi.string()
         .base58()
         .required(),
       priceAsset: Joi.string()
         .base58()
         .required(),
+    });
+  }
+};
+
+const inputGet = orderPair =>
+  Joi.object()
+    .keys({
+      pair: pair(orderPair).required(),
+      matcher: Joi.string().required(),
     })
-  ),
-  matcher: Joi.string(),
-});
+    .required();
+
+const inputMget = orderPair =>
+  Joi.object().keys({
+    pairs: Joi.array().items(pair(orderPair)),
+    matcher: Joi.string().required(),
+  });
 
 const inputSearch = Joi.object()
   .keys({
