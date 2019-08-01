@@ -19,9 +19,6 @@ const sum = (data: Array<BigNumber | number | string>): maybe.Maybe<BigNumber> =
   return maybe.of(data.reduce((acc: BigNumber, x) => acc.plus(x), new BigNumber(0)));
 }
 
-// const max = (data: BigNumber[]): maybe.Maybe<BigNumber> =>
-//   data.length === 0 ? maybe.empty() : maybe.of(BigNumber.max(...data));
-
 const firstTask = <L, R>(pred: (val: R) => boolean, tasks: Array<Task<L, maybe.Maybe<R>>>): Task<L, maybe.Maybe<R>> =>
   tasks.length === 0 ? taskOf(maybe.empty()) : tasks.reduce(
     (acc: Task<L, maybe.Maybe<R>>, nextTask: Task<L, maybe.Maybe<R>>) =>
@@ -46,7 +43,7 @@ const weightedAverage = (data: ExchangeInfo[]): maybe.Maybe<BigNumber> => data.l
   ).chain(
     sum1 => sum(data.map(({ amount }) => amount))
       .filter(it => !it.isZero())
-      .map(sum2 => sum1.div(sum2))      
+      .map(sum2 => sum1.div(sum2))
   )
 
 const maybeMap2 = <T1, T2, R>(fn: (v1: T1, v2: T2) => R, v1: maybe.Maybe<T1>, v2: maybe.Maybe<T2>): maybe.Maybe<R> =>
@@ -124,19 +121,27 @@ export default class RateEstimator {
   private getRate(amountAsset: string, priceAsset: string, matcher: string): Task<AppError, BigNumber> {
     if (amountAsset === priceAsset) {
       return taskOf(new BigNumber(1));
-    } if (amountAsset === WavesId || priceAsset === WavesId) {
+    }
+
+    if (amountAsset === WavesId || priceAsset === WavesId) {
       return this.getActualRate(amountAsset, priceAsset, matcher).map(res => res.getOrElse(new BigNumber(0)));
     } else {
-      return waitAll(
+      return firstTask(
+        (val: BigNumber) => val.isPositive(),
         [
-          this.getActualRate(amountAsset, WavesId, matcher),
-          this.getActualRate(priceAsset, WavesId, matcher)
+          this.getActualRate(amountAsset, priceAsset, matcher),        
+          waitAll(
+            [
+              this.getActualRate(amountAsset, WavesId, matcher),
+              this.getActualRate(priceAsset, WavesId, matcher)
+            ]
+          ).map(([rate1, rate2]) => maybeMap2(
+            (rate1, rate2) => rate2.eq(0) ? new BigNumber(0) : rate1.div(rate2),
+            rate1,
+            rate2
+          ))
         ]
-      ).map(([rate1, rate2]) => maybeMap2(
-        (rate1, rate2) => rate2.eq(0) ? new BigNumber(0) : rate1.div(rate2),
-        rate1,
-        rate2
-      ).getOrElse(new BigNumber(0)));
+      ).map(res => res.getOrElse(new BigNumber(0)))
     }
   }
 }
