@@ -23,7 +23,7 @@ import {
   GetResolverDependencies,
   MgetResolverDependencies,
   SearchResolverDependencies,
-  RuntimeResolverDependenties,
+  ResolverDependencies,
   Validate,
 } from './types';
 
@@ -70,10 +70,9 @@ const getResolver = <
     ResponseRaw,
     ResponseTransformed
   >
-) => ({
-  db,
-  emitEvent = () => () => undefined,
-}: RuntimeResolverDependenties) => (request: RequestRaw) =>
+) => ({ db, emitEvent = () => () => undefined }: ResolverDependencies) => (
+  request: RequestRaw
+) =>
   createResolver<
     RequestRaw,
     RequestTransformed,
@@ -101,10 +100,9 @@ const mgetResolver = <
     ResponseRaw,
     ResponseTransformed
   >
-) => ({
-  db,
-  emitEvent = () => () => undefined,
-}: RuntimeResolverDependenties) => (request: RequestRaw) =>
+) => ({ db, emitEvent = () => () => undefined }: ResolverDependencies) => (
+  request: RequestRaw
+) =>
   createResolver<
     RequestRaw,
     RequestTransformed,
@@ -132,10 +130,9 @@ const searchResolver = <
     ResponseRaw,
     ResponseTransformed
   >
-) => ({
-  db,
-  emitEvent = () => () => undefined,
-}: RuntimeResolverDependenties) => (request: RequestRaw) =>
+) => ({ db, emitEvent = () => () => undefined }: ResolverDependencies) => (
+  request: RequestRaw
+) =>
   createResolver<
     RequestRaw,
     RequestTransformed,

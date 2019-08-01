@@ -80,7 +80,7 @@ export type SearchResolverDependencies<
   ) => ResTransformed;
 };
 
-export type RuntimeResolverDependenties = {
+export type ResolverDependencies = {
   db: PgDriver;
   emitEvent?: EmitEvent;
 };
