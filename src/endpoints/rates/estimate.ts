@@ -27,9 +27,8 @@ const parsePairs = map(
 
 const filterParsers = {
   pairs: compose(
-    m => m.getOrElse(null),
-    map(parsePairs),
-    maybe.fromNullable,
+    (val: maybe.Maybe<string[]>) => val.map(parsePairs).getOrElse(null),
+    (val: string[] | undefined): maybe.Maybe<string[]> => maybe.fromNullable(val),
     parseArrayQuery
   ),
   matcher: compose(
