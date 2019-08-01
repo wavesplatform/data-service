@@ -57,7 +57,9 @@ enum RateOrder {
   Straight, Inverted
 }
 
-type RateRequest = [string, string, RateOrder];
+type RateRequest = {
+  amountAsset: string, priceAsset: string, order: RateOrder
+}
 
 export default class RateEstimator {
   constructor(
@@ -65,7 +67,7 @@ export default class RateEstimator {
     private readonly pairChecker: PairCheckService
   ) {}
 
-  private countRateFromTransactions([amountAsset, priceAsset, order]: RateRequest, matcher: string): Task<AppError, Maybe<BigNumber>> {
+  private countRateFromTransactions({ amountAsset, priceAsset, order }: RateRequest, matcher: string): Task<AppError, Maybe<BigNumber>> {
     return this.transactionService.search(
       {
         amountAsset,
@@ -99,10 +101,19 @@ export default class RateEstimator {
         (res: Maybe<[string, string]>): RateRequest[] => res.matchWith(
           {
             Just: ({ value: [actualFrom, actualTo] }) =>
-              [[actualFrom, actualTo, from === actualFrom ? RateOrder.Straight : RateOrder.Inverted] as RateRequest],
+              [
+                {
+                  amountAsset: actualFrom,
+                  priceAsset: actualTo,
+                  order: from === actualFrom ? RateOrder.Straight : RateOrder.Inverted
+                }
+              ],
             
             Nothing: () =>
-              [[from, to, RateOrder.Straight] as RateRequest, [to, from, RateOrder.Inverted] as RateRequest]
+              [
+                { amountAsset: from, priceAsset: to, order: RateOrder.Straight },
+                { amountAsset: to, priceAsset: from, order: RateOrder.Inverted }
+              ]
           }
         )
       )
