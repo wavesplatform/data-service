@@ -1,7 +1,7 @@
 import { Task, waitAll, of as taskOf } from "folktale/concurrency/task";
 import * as maybe from 'folktale/maybe';
 import { BigNumber } from "@waves/data-entities";
-import { map, always } from 'ramda';
+import { map, always, tap } from 'ramda';
 
 import { AssetIdsPair, Transaction, ServiceSearch } from "../../types";
 import { ExchangeTxsSearchRequest } from "../transactions/exchange";
@@ -9,9 +9,11 @@ import { SortOrder } from "../_common";
 import { PairCheckService } from '../rates';
 import { AppError } from "../../errorHandling";
 
+type Maybe<T> = maybe.Maybe<T>;
+
 const WavesId: string = 'WAVES';
 
-const sum = (data: Array<BigNumber | number | string>): maybe.Maybe<BigNumber> => {
+const sum = (data: Array<BigNumber | number | string>): Maybe<BigNumber> => {
   if (data.length === 0) {
     return maybe.empty();
   }
@@ -19,34 +21,36 @@ const sum = (data: Array<BigNumber | number | string>): maybe.Maybe<BigNumber> =
   return maybe.of(data.reduce((acc: BigNumber, x) => acc.plus(x), new BigNumber(0)));
 }
 
-const firstTask = <L, R>(pred: (val: R) => boolean, tasks: Array<Task<L, maybe.Maybe<R>>>): Task<L, maybe.Maybe<R>> =>
+const firstTask = <L, R>(pred: (val: R) => boolean, tasks: Array<Task<L, Maybe<R>>>): Task<L, Maybe<R>> =>
   tasks.length === 0 ? taskOf(maybe.empty()) : tasks.reduce(
-    (acc: Task<L, maybe.Maybe<R>>, nextTask: Task<L, maybe.Maybe<R>>) =>
+    (acc: Task<L, Maybe<R>>, nextTask: Task<L, Maybe<R>>) =>
       acc.chain(
-        (value: maybe.Maybe<R>) => value.filter(pred).matchWith(
+        (value: Maybe<R>) => value.filter(pred).matchWith(
           {
             Nothing: always(nextTask),
             Just: ({ value }) => taskOf(maybe.of(value))
           }
         )
       ).map(res => res.filter(pred))
-  )  
+  )
 
 type ExchangeInfo = {
   price: number,
   amount: number,
 }
 
-const weightedAverage = (data: ExchangeInfo[]): maybe.Maybe<BigNumber> => data.length === 0 ? maybe.empty() :
-  sum(
-    data.map(({ price, amount }) => new BigNumber(price).multipliedBy(amount))
-  ).chain(
-    sum1 => sum(data.map(({ amount }) => amount))
-      .filter(it => !it.isZero())
-      .map(sum2 => sum1.div(sum2))
-  )
+const weightedAverage = (data: ExchangeInfo[]): Maybe<BigNumber> => data.length === 0 ? maybe.empty() :
+  maybeMap2(
+    (sum1, sum2) => sum1.div(sum2),
+    sum(
+      data.map(({ price, amount }) => new BigNumber(price).multipliedBy(amount))
+    ),
+    sum(
+      data.map(({ amount }) => amount)
+    ).filter(it => !it.isZero())    
+  );
 
-const maybeMap2 = <T1, T2, R>(fn: (v1: T1, v2: T2) => R, v1: maybe.Maybe<T1>, v2: maybe.Maybe<T2>): maybe.Maybe<R> =>
+const maybeMap2 = <T1, T2, R>(fn: (v1: T1, v2: T2) => R, v1: Maybe<T1>, v2: Maybe<T2>): Maybe<R> =>
   v1.chain(v1 => v2.map(v2 => fn(v1, v2)))
 
 enum RateOrder {
@@ -65,7 +69,7 @@ export default class RateEstimator {
     return this.getRate(request.amountAsset, request.priceAsset, matcher)
   }
 
-  private countRateFromTransactions([amountAsset, priceAsset, order]: RateRequest, matcher: string): Task<AppError, maybe.Maybe<BigNumber>> {
+  private countRateFromTransactions([amountAsset, priceAsset, order]: RateRequest, matcher: string): Task<AppError, Maybe<BigNumber>> {
     return this.transactionService.search(
       {
         amountAsset,
@@ -96,7 +100,7 @@ export default class RateEstimator {
   private getRateCandidates(from: string, to: string, matcher: string): Task<AppError, RateRequest[]> {
     return this.pairChecker.checkPair(matcher, [from, to])
       .map(
-        (res: maybe.Maybe<[string, string]>): RateRequest[] => res.matchWith(
+        (res: Maybe<[string, string]>): RateRequest[] => res.matchWith(
           {
             Just: ({ value: [actualFrom, actualTo] }) =>
               [[actualFrom, actualTo, from === actualFrom ? RateOrder.Straight : RateOrder.Inverted] as RateRequest],
@@ -108,7 +112,7 @@ export default class RateEstimator {
       )
   }
   
-  private getActualRate(from: string, to: string, matcher: string): Task<AppError, maybe.Maybe<BigNumber>> {
+  private getActualRate(from: string, to: string, matcher: string): Task<AppError, Maybe<BigNumber>> {
     const candidates: Task<AppError, RateRequest[]> = this.getRateCandidates(from, to, matcher)
 
     const results = candidates.map(
