@@ -46,7 +46,7 @@ import createRateService, { PairCheckService, dummyPairCheck } from './rates'
 
 import { PgDriver } from '../db/driver';
 import { EmitEvent } from './_common/createResolver/types';
-import { ServiceGet, ServiceSearch, Transaction, Rate, RateGetParams } from 'types';
+import { ServiceMget, ServiceSearch, Transaction, Rate, RateMGetParams } from 'types';
 
 export type CommonServiceCreatorDependencies = {
   drivers: { pg: PgDriver };
@@ -63,7 +63,7 @@ export type ServiceMesh = {
   assets: AssetsService;
   candles: CandlesService;
   pairs: PairsService;
-  rates: ServiceGet<RateGetParams, Rate>;
+  rates: ServiceMget<RateMGetParams, Rate>;
   transactions: {
     all: AllTxsService;
     alias: AliasTxsService;

@@ -23,6 +23,6 @@ export default (serviceMesh: ServiceMesh) =>
     .use(pairs(serviceMesh.pairs).routes())
     .use(transactions(serviceMesh.transactions).routes())
     // TODO: possibly make services non optional in service mesh
-    .use(rates(serviceMesh.rates!).routes())
+    .use(rates(serviceMesh.rates).routes())
     .get('/version', version)
     .get('/', root);

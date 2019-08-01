@@ -102,8 +102,16 @@ export type Transaction = Serializable<'transaction', TransactionInfo | null>;
 export const transaction = (data: TransactionInfo | null = null): Transaction =>
   toSerializable('transaction', data);
 
+export type AssetIdsPair = {
+  amountAsset: string,
+  priceAsset: string
+}
 
-export type RateGetParams = { amountAsset: string, priceAsset: string, matcher: string }
-export type RateInfo = { current: BigNumber };
-export type Rate = Serializable<'rate', { current: BigNumber } | null>;
+export type RateMGetParams = {
+  pairs: AssetIdsPair[],
+  matcher: string,
+}
+
+export type RateInfo = { current: BigNumber, amountAsset: string, priceAsset: string };
+export type Rate = Serializable<'rate', RateInfo | null>;
 export const rate = (data: RateInfo | null = null): Rate => toSerializable('rate', data === null ? null : data)
