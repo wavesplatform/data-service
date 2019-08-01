@@ -6,9 +6,7 @@ import {
   TransactionInfo,
   Transaction,
   List,
-  ServiceGet,
-  ServiceMget,
-  ServiceSearch,
+  Service,
 } from '../../../types';
 
 import { WithLimit, WithSortOrder } from '../../_common';
@@ -54,9 +52,12 @@ type DataTxDbResponse = RawTx & {
   data: DataEntry[];
 };
 
-export type DataTxsService = ServiceGet<string, Transaction> &
-  ServiceMget<string[], Transaction> &
-  ServiceSearch<DataTxsSearchRequest, Transaction>;
+export type DataTxsService = Service<
+  string,
+  string[],
+  DataTxsSearchRequest,
+  Transaction
+>;
 
 export default ({
   drivers: { pg },

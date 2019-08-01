@@ -1,14 +1,6 @@
 import { propEq } from 'ramda';
 
-import {
-  asset,
-  Asset,
-  AssetInfo,
-  List,
-  ServiceGet,
-  ServiceMget,
-  ServiceSearch,
-} from '../../types';
+import { asset, Asset, AssetInfo, List, Service } from '../../types';
 
 import { CommonServiceCreatorDependencies } from '..';
 
@@ -36,9 +28,12 @@ type AssetsSearchRequest = {
   limit: number;
 };
 
-export type AssetsService = ServiceGet<string, Asset> &
-  ServiceMget<string[], Asset> &
-  ServiceSearch<AssetsSearchRequest, Asset>;
+export type AssetsService = Service<
+  string,
+  string[],
+  AssetsSearchRequest,
+  Asset
+>;
 
 export default ({
   drivers: { pg },

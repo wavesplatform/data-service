@@ -6,9 +6,7 @@ import {
   transaction,
   TransactionInfo,
   Transaction,
-  ServiceGet,
-  ServiceMget,
-  ServiceSearch,
+  Service,
 } from '../../../types';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
@@ -43,9 +41,12 @@ type MassTransferTxDbResponse = RawTx & {
   amounts: BigNumber[];
 };
 
-export type MassTransferTxsService = ServiceGet<string, Transaction> &
-  ServiceMget<string[], Transaction> &
-  ServiceSearch<MassTransferTxsSearchRequest, Transaction>;
+export type MassTransferTxsService = Service<
+  string,
+  string[],
+  MassTransferTxsSearchRequest,
+  Transaction
+>;
 
 export default ({
   drivers: { pg },

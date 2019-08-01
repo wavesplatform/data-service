@@ -6,9 +6,7 @@ import {
   transaction,
   TransactionInfo,
   Transaction,
-  ServiceGet,
-  ServiceMget,
-  ServiceSearch,
+  Service,
 } from '../../../types';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
@@ -37,9 +35,12 @@ type GenesisTxDbResponse = Omit<RawTx, 'sender'> & {
   recipient: string;
 };
 
-export type GenesisTxsService = ServiceGet<string, Transaction> &
-  ServiceMget<string[], Transaction> &
-  ServiceSearch<GenesisTxsSearchRequest, Transaction>;
+export type GenesisTxsService = Service<
+  string,
+  string[],
+  GenesisTxsSearchRequest,
+  Transaction
+>;
 
 export default ({
   drivers: { pg },

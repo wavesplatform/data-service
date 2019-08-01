@@ -4,9 +4,7 @@ import {
   transaction,
   TransactionInfo,
   Transaction,
-  ServiceGet,
-  ServiceMget,
-  ServiceSearch,
+  Service,
 } from '../../../types';
 import { CommonServiceCreatorDependencies } from '../..';
 import { WithLimit, WithSortOrder } from '../../_common';
@@ -39,9 +37,12 @@ type BurnTxDbResponse = RawTx & {
   amount: string;
 };
 
-export type BurnTxsService = ServiceGet<string, Transaction> &
-  ServiceMget<string[], Transaction> &
-  ServiceSearch<BurnTxsSearchRequest, Transaction>;
+export type BurnTxsService = Service<
+  string,
+  string[],
+  BurnTxsSearchRequest,
+  Transaction
+>;
 
 export default ({
   drivers: { pg },

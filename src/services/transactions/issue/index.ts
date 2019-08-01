@@ -5,9 +5,7 @@ import {
   transaction,
   TransactionInfo,
   Transaction,
-  ServiceGet,
-  ServiceMget,
-  ServiceSearch,
+  Service,
 } from '../../../types';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
@@ -40,9 +38,12 @@ type IssueTxDbResponse = RawTx & {
   amount: string;
 };
 
-export type IssueTxsService = ServiceGet<string, Transaction> &
-  ServiceMget<string[], Transaction> &
-  ServiceSearch<IssueTxsSearchRequest, Transaction>;
+export type IssueTxsService = Service<
+  string,
+  string[],
+  IssueTxsSearchRequest,
+  Transaction
+>;
 
 export default ({
   drivers: { pg },

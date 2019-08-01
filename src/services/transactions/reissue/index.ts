@@ -4,9 +4,7 @@ import {
   transaction,
   TransactionInfo,
   Transaction,
-  ServiceGet,
-  ServiceMget,
-  ServiceSearch,
+  Service,
 } from '../../../types';
 import { CommonServiceCreatorDependencies } from '../..';
 import { WithLimit, WithSortOrder } from '../../_common';
@@ -40,9 +38,12 @@ type ReissueTxDbResponse = RawTx & {
   reissuable: string;
 };
 
-export type ReissueTxsService = ServiceGet<string, Transaction> &
-  ServiceMget<string[], Transaction> &
-  ServiceSearch<ReissueTxsSearchRequest, Transaction>;
+export type ReissueTxsService = Service<
+  string,
+  string[],
+  ReissueTxsSearchRequest,
+  Transaction
+>;
 
 export default ({
   drivers: { pg },

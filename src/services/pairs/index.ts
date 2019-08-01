@@ -11,9 +11,7 @@ import {
   PairInfo,
   Pair,
   List,
-  ServiceGet,
-  ServiceMget,
-  ServiceSearch,
+  Service,
   TransactionInfo,
 } from '../../types';
 import { CommonServiceCreatorDependencies } from '..';
@@ -64,10 +62,12 @@ export type PairsServiceCreatorDependencies = CommonServiceCreatorDependencies &
   options: DataServiceConfig;
 };
 
-export type PairsService =
-  | ServiceGet<PairsGetRequest, Pair>
-  | ServiceMget<PairsMgetRequest, Pair>
-  | ServiceSearch<PairsSearchRequest, Pair>;
+export type PairsService = Service<
+  PairsGetRequest,
+  PairsMgetRequest,
+  PairsSearchRequest,
+  Pair
+>;
 
 export default ({
   drivers,

@@ -6,9 +6,7 @@ import {
   transaction,
   TransactionInfo,
   Transaction,
-  ServiceGet,
-  ServiceMget,
-  ServiceSearch,
+  Service,
 } from '../../../types';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
@@ -37,9 +35,12 @@ type SponsorshipTxDbResponse = RawTx & {
   min_sponsored_asset_fee: BigNumber;
 };
 
-export type SponsorshipTxsService = ServiceGet<string, Transaction> &
-  ServiceMget<string[], Transaction> &
-  ServiceSearch<SponsorshipTxsSearchRequest, Transaction>;
+export type SponsorshipTxsService = Service<
+  string,
+  string[],
+  SponsorshipTxsSearchRequest,
+  Transaction
+>;
 
 export default ({
   drivers: { pg },

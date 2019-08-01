@@ -47,10 +47,9 @@ export type Service<
   MgetRequest,
   SearchRequest,
   T extends Serializable<string, any>
-> =
-  | ServiceGet<GetRequest, T>
-  | ServiceMget<MgetRequest, T>
-  | ServiceSearch<SearchRequest, T>;
+> = ServiceGet<GetRequest, T> &
+  ServiceMget<MgetRequest, T> &
+  ServiceSearch<SearchRequest, T>;
 
 export { AssetInfo };
 export type Asset = Serializable<'asset', AssetInfo | null>;

@@ -5,9 +5,7 @@ import {
   transaction,
   TransactionInfo,
   Transaction,
-  ServiceGet,
-  ServiceMget,
-  ServiceSearch,
+  Service,
 } from '../../../types';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
@@ -38,9 +36,12 @@ type LeaseCancelTxDbResponse = RawTx & {
   lease_id: string;
 };
 
-export type LeaseCancelTxsService = ServiceGet<string, Transaction> &
-  ServiceMget<string[], Transaction> &
-  ServiceSearch<LeaseCancelTxsSearchRequest, Transaction>;
+export type LeaseCancelTxsService = Service<
+  string,
+  string[],
+  LeaseCancelTxsSearchRequest,
+  Transaction
+>;
 
 export default ({
   drivers: { pg },

@@ -5,9 +5,7 @@ import {
   transaction,
   TransactionInfo,
   Transaction,
-  ServiceGet,
-  ServiceMget,
-  ServiceSearch,
+  Service,
 } from '../../../types';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
@@ -37,9 +35,12 @@ type SetAssetScriptTxDbResponse = RawTx & {
   script: string;
 };
 
-export type SetAssetScriptTxsService = ServiceGet<string, Transaction> &
-  ServiceMget<string[], Transaction> &
-  ServiceSearch<SetAssetScriptTxsSearchRequest, Transaction>;
+export type SetAssetScriptTxsService = Service<
+  string,
+  string[],
+  SetAssetScriptTxsSearchRequest,
+  Transaction
+>;
 
 export default ({
   drivers: { pg },
