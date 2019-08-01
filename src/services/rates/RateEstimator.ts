@@ -1,7 +1,7 @@
 import { Task, waitAll, of as taskOf } from "folktale/concurrency/task";
 import * as maybe from 'folktale/maybe';
 import { BigNumber } from "@waves/data-entities";
-import { map, always, tap } from 'ramda';
+import { map, always } from 'ramda';
 
 import { AssetIdsPair, Transaction, ServiceSearch } from "../../types";
 import { ExchangeTxsSearchRequest } from "../transactions/exchange";
