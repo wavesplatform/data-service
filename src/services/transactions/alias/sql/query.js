@@ -9,6 +9,7 @@ const columnsWithoutFee = [
   'signature',
   'proofs',
   'tx_version',
+  'uid',
   // 'fee',
   'sender',
   'sender_public_key',

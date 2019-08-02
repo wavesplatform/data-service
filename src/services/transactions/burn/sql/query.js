@@ -12,6 +12,7 @@ const select = pg({ t: 'txs_6' })
     fee: pg.raw('t.fee * 10^(-8)'),
     sender: 't.sender',
     sender_public_key: 't.sender_public_key',
+    uid: 't.uid',
 
     asset_id: 't.asset_id',
     amount: pg.raw('t.amount * 10^(-asset_decimals.decimals)'),

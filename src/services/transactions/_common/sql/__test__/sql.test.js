@@ -24,8 +24,7 @@ describe('Sql builder', () => {
         sql.search({
           ...filterValues,
           after: {
-            timestamp: 'timestamp',
-            id: 'id',
+            uid: 10,
             sortDirection: 'sortDirection',
           },
         })

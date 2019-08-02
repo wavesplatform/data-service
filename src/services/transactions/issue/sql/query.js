@@ -18,6 +18,7 @@ const select = pg({ t: 'txs_3' }).select({
   quantity: pg.raw('t.quantity * 10^(-t.decimals)'),
   reissuable: 't.reissuable',
   script: 't.script',
+  uid: 't.uid',
 });
 
 module.exports = { select };

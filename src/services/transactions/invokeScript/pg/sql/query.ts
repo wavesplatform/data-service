@@ -12,6 +12,8 @@ const columnsWithoutFeeAndPaymentAssetId = [
   'tx_version',
   'sender',
   'sender_public_key',
+  'uid',
+
   // type-specific
   'dapp',
   'function_name',
@@ -55,5 +57,7 @@ export const select = pg
   .from({ txs })
   .leftJoin({ p_dec: 'asset_decimals' }, 'p_dec.asset_id', 'txs.asset_id');
 
-export const composeQuery = (filteringQ: knex.QueryBuilder): knex.QueryBuilder =>
+export const composeQuery = (
+  filteringQ: knex.QueryBuilder
+): knex.QueryBuilder =>
   select.clone().whereIn('id', pg.select('id').from({ filtered: filteringQ }));

@@ -13,6 +13,7 @@ const select = pg({ t: 'txs_8' }).select({
   sender_public_key: 't.sender_public_key',
   amount: pg.raw('t.amount * 10^(-8)'),
   recipient: 't.recipient',
+  uid: 't.uid',
 });
 
 module.exports = { select };

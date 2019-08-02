@@ -1,6 +1,5 @@
 import { Result, Error as error, Ok as ok } from 'folktale/result';
 import { ValidationError } from '../../../errorHandling';
-import { parseDate } from '../../../utils/parseDate';
 
 export enum SortOrder {
   Ascending = 'asc',
@@ -11,15 +10,12 @@ const isSortOrder = (s: string): s is SortOrder =>
   s === SortOrder.Ascending || s === SortOrder.Descending;
 
 export type Cursor = {
-  timestamp: Date;
-  id: string;
+  uid: number;
   sort: SortOrder;
 };
 
 export const encode = (cursor: Cursor): string =>
-  Buffer.from(
-    `${cursor.timestamp.toISOString()}::${cursor.id}::${cursor.sort}`
-  ).toString('base64');
+  Buffer.from(`${cursor.uid}::${cursor.sort}`).toString('base64');
 
 export const decode = (cursor: string): Result<ValidationError, Cursor> => {
   const data = Buffer.from(cursor, 'base64')
@@ -33,29 +29,25 @@ export const decode = (cursor: string): Result<ValidationError, Cursor> => {
     ok<ValidationError, string[]>(data)
       // validate length
       .chain(d =>
-        d.length > 2
+        d.length === 2
           ? ok<ValidationError, string[]>(d)
-          : error<ValidationError, string[]>(err('Cursor length <3'))
+          : error<ValidationError, string[]>(
+              err('Cursor length not equal to 2')
+            )
       )
-      .chain(d =>
-        parseDate(d[0])
-          .mapError(e => err())
-          // validate sort order 'asc' | 'desc'
-          .chain(date => {
-            const s = d[2];
-            if (isSortOrder(s)) {
-              return ok<ValidationError, [Date, SortOrder]>([date, s]);
-            } else {
-              return error<ValidationError, [Date, SortOrder]>(
-                err('Sort is not valid')
-              );
-            }
-          })
-          .map(([date, sort]) => ({
-            timestamp: date,
-            id: d[1],
-            sort,
-          }))
-      )
+      .chain(d => {
+        const s = d[1];
+        if (isSortOrder(s)) {
+          return ok<ValidationError, [string, SortOrder]>([d[0], s]);
+        } else {
+          return error<ValidationError, [string, SortOrder]>(
+            err('Sort is not valid')
+          );
+        }
+      })
+      .map(([uid, sort]) => ({
+        uid: parseInt(uid),
+        sort,
+      }))
   );
 };

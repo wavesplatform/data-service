@@ -17,8 +17,7 @@ const makeCursorFromResponse = <
   response: ResponseTransformed
 ): string =>
   encode({
-    timestamp: response.data.timestamp,
-    id: response.data.id,
+    uid: response.data.uid,
     sort: request.sort,
   });
 

@@ -25,8 +25,7 @@ export type RequestWithCursor<
 };
 
 export type BaseResponse = {
-  timestamp: Date;
-  id: string;
+  uid: number;
   [key: string]: any;
 };
 
