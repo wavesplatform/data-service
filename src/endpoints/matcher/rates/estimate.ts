@@ -1,21 +1,18 @@
 import { Context } from 'koa';
-import { map, compose, split, defaultTo } from 'ramda';
+import { map, compose, split } from 'ramda';
 import * as maybe from 'folktale/maybe';
 
-import { ServiceMget, Rate, RateMGetParams } from '../../types';
-import { select } from '../utils/selectors';
-import { captureErrors } from '../../utils/captureErrors';
+import { ServiceMget, Rate, RateMGetParams } from '../../../types';
+import { select } from '../../utils/selectors';
+import { captureErrors } from '../../../utils/captureErrors';
 import {
   parseFilterValues,
-  query as queryFilter
-} from '../_common/filters';
+} from '../../_common/filters';
 
-import { handleError } from '../../utils/handleError';
-import { parseArrayQuery } from '../utils/parseArrayQuery';
-import { loadConfig } from '../../loadConfig';
-import { DEFAULT_NOT_FOUND_MESSAGE } from '../../errorHandling';
-
-const options = loadConfig();
+import { handleError } from '../../../utils/handleError';
+import { parseArrayQuery } from '../../utils/parseArrayQuery';
+import { DEFAULT_NOT_FOUND_MESSAGE } from '../../../errorHandling';
+import { dateOrNull } from 'utils/parseDate';
 
 const parsePairs = map(
   compose(
@@ -30,10 +27,7 @@ const filterParsers = {
     (val: string[] | undefined): maybe.Maybe<string[]> => maybe.fromNullable(val),
     parseArrayQuery
   ),
-  matcher: compose(
-    queryFilter,
-    defaultTo(options.matcher.defaultMatcherAddress)
-  ),
+  date: dateOrNull,
 };
 
 /**
@@ -41,7 +35,8 @@ const filterParsers = {
  * @name /rates?pairs[]‌="{asset_id_1}/{asset_id_2}"&pairs[]="{asset_id_1}/{asset_id_2}" ...other params
  */
 const rateEstimateEndpoint = (service: ServiceMget<RateMGetParams, Rate>) => async (ctx: Context) => {
-  const { query } = select(ctx);
+  const { fromParams, query } = select(ctx);
+  const [matcher] = fromParams(['matcher']);
   const fValues = parseFilterValues(filterParsers)(query);
 
   ctx.eventBus.emit('ENDPOINT_HIT', {
@@ -51,7 +46,7 @@ const rateEstimateEndpoint = (service: ServiceMget<RateMGetParams, Rate>) => asy
   });
 
   const results = await service
-    .mget({ pairs: fValues.pairs, matcher: fValues.matcher })
+    .mget({ pairs: fValues.pairs, matcher, date: fValues.date || new Date() })
     .run()
     .promise();
 

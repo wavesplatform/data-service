@@ -114,6 +114,7 @@ export type AssetIdsPair = {
 export type RateMGetParams = {
   pairs: AssetIdsPair[],
   matcher: string,
+  date: Date,
 }
 
 export type RateInfo = { current: BigNumber, amountAsset: string, priceAsset: string };

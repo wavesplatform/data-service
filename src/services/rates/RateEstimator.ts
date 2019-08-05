@@ -67,7 +67,7 @@ export default class RateEstimator {
     private readonly pairChecker: PairCheckService
   ) {}
 
-  private countRateFromTransactions({ amountAsset, priceAsset, order }: RateRequest, matcher: string): Task<AppError, Maybe<BigNumber>> {
+  private countRateFromTransactions({ amountAsset, priceAsset, order }: RateRequest, matcher: string, date: Date): Task<AppError, Maybe<BigNumber>> {
     return this.transactionService.search(
       {
         amountAsset,
@@ -76,7 +76,7 @@ export default class RateEstimator {
         matcher,
         sender: matcher,
         timeStart: new Date(0),
-        timeEnd: new Date(),
+        timeEnd: date,
         sort: SortOrder.Descending,
       }
     )
@@ -119,31 +119,31 @@ export default class RateEstimator {
       )
   }
   
-  private getActualRate(from: string, to: string, matcher: string): Task<AppError, Maybe<BigNumber>> {
+  private getActualRate(from: string, to: string, matcher: string, date: Date): Task<AppError, Maybe<BigNumber>> {
     const candidates: Task<AppError, RateRequest[]> = this.getRateCandidates(from, to, matcher)
 
     const results = candidates.map(
-      data => map(request => this.countRateFromTransactions(request, matcher), data)
+      data => map(request => this.countRateFromTransactions(request, matcher, date), data)
     )
 
     return results.chain(tasks => firstTask((val: BigNumber) => val.isPositive(), tasks))
   }
 
-  estimate({ amountAsset, priceAsset }: AssetIdsPair, matcher: string): Task<AppError, BigNumber> {
+  estimate({ amountAsset, priceAsset }: AssetIdsPair, matcher: string, date: Date): Task<AppError, BigNumber> {
     if (amountAsset === priceAsset) {
       return taskOf(new BigNumber(1));
     }
 
     const allRateTasks: Task<AppError, Maybe<BigNumber>>[] = [
-      this.getActualRate(amountAsset, priceAsset, matcher)
+      this.getActualRate(amountAsset, priceAsset, matcher, date)
     ]
 
     if (amountAsset !== WavesId && priceAsset !== WavesId) {
       allRateTasks.push(
         waitAll(
           [
-            this.getActualRate(amountAsset, WavesId, matcher),
-            this.getActualRate(priceAsset, WavesId, matcher)
+            this.getActualRate(amountAsset, WavesId, matcher, date),
+            this.getActualRate(priceAsset, WavesId, matcher, date)
           ]
         ).map(([rate1, rate2]) => maybeMap2(
           (rate1, rate2) => rate2.eq(0) ? new BigNumber(0) : rate1.div(rate2),

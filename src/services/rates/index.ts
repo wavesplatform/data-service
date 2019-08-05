@@ -37,14 +37,14 @@ export default function({
 
   const estimator = new RateEstimator(txService, pairCheckService)
 
-  const get = (pair: AssetIdsPair, matcher: string): Task<AppError, RateInfo> => {
+  const get = (pair: AssetIdsPair, matcher: string, date: Date): Task<AppError, RateInfo> => {
     const key = toCacheKey(pair, matcher);
 
     if (cache.has(key)) {
       return of(cache.get(key)!)
     }
 
-    return estimator.estimate(pair, matcher)
+    return estimator.estimate(pair, matcher, date)
       .map(res => ({ current: res, ...pair }))
       .map(
         tap(
@@ -57,7 +57,7 @@ export default function({
     mget(request: RateMGetParams) {
       return waitAll(
         map(          
-          item => get(item, request.matcher).map(rate),
+          item => get(item, request.matcher, request.date).map(rate),
           request.pairs          
         )
       ).map(list)

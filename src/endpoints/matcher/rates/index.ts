@@ -1,6 +1,6 @@
 import * as Router from 'koa-router';
 
-import { ServiceMget, Rate, RateMGetParams } from '../../types';
+import { ServiceMget, Rate, RateMGetParams } from '../../../types';
 import getEstimateRateHandler from './estimate';
 
 const subrouter: Router = new Router();
