@@ -46,7 +46,7 @@ const rateEstimateEndpoint = (service: ServiceMget<RateMGetParams, Rate>) => asy
   });
 
   const results = await service
-    .mget({ pairs: fValues.pairs, matcher, date: fValues.date || new Date() })
+    .mget({ pairs: fValues.pairs, matcher, date: maybe.fromNullable(fValues.date) })
     .run()
     .promise();
 

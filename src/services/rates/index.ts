@@ -3,7 +3,7 @@ import * as maybe from 'folktale/maybe';
 import * as LRU from 'lru-cache';
 import { map } from 'ramda';
 
-import { ServiceMget, Rate, rate, AssetIdsPair, RateMGetParams, RateInfo, list } from "../../types";
+import { ServiceMget, Rate, rate, RateMGetParams, RateGetParams, RateInfo, list } from "../../types";
 import { tap } from "../../utils/tap";
 import { AppError } from "../../errorHandling";
 import { RateSerivceCreatorDependencies } from '../../services';
@@ -17,11 +17,41 @@ export const dummyPairCheck: PairCheckService = {
   checkPair() { return of(maybe.empty()) }
 }
 
-const toCacheKey = (params: AssetIdsPair, matcher: string): string =>
-  [matcher, params.amountAsset, params.priceAsset].join("::");
-
 const CACHE_AGE_MILLIS = 5000;
 const CACHE_SIZE = 100000;
+
+function maybeInverted<T, R>(data: maybe.Maybe<T>, val: R): maybe.Maybe<R> {
+  return data.matchWith(
+    {
+      Just: () => maybe.empty(),
+      Nothing: () => maybe.of(val)
+    }
+  )
+}
+
+function cached<K, In, Out>(
+  get: (data: In) => Task<AppError, Out>,
+  cache: LRU<K, Out>,
+  keyFn: (data: In) => maybe.Maybe<K>,
+): (data: In) => Task<AppError, Out> {
+  return (data: In) => keyFn(data).matchWith(
+    {
+      Just: ({ value }) => {
+        if (cache.has(value)) {
+          return of(cache.get(value)!)
+        }
+
+        return get(data)
+          .map(
+            tap(
+              res => cache.set(value, res)
+            )
+          );
+      },
+      Nothing: () => get(data)
+    }
+  )  
+}
 
 export default function({
   txService,
@@ -37,27 +67,27 @@ export default function({
 
   const estimator = new RateEstimator(txService, pairCheckService)
 
-  const get = (pair: AssetIdsPair, matcher: string, date: Date): Task<AppError, RateInfo> => {
-    const key = toCacheKey(pair, matcher);
+  const get = cached<string, RateGetParams, RateInfo>(
+    ({ pair, matcher, date }: RateGetParams): Task<AppError, RateInfo> =>
+      estimator.estimate(
+        pair, matcher, date.getOrElse(new Date())
+      ).map(
+        res => ({ current: res, ...pair })
+      ),
 
-    if (cache.has(key)) {
-      return of(cache.get(key)!)
-    }
+    cache,
 
-    return estimator.estimate(pair, matcher, date)
-      .map(res => ({ current: res, ...pair }))
-      .map(
-        tap(
-          res => cache.set(key, res)
-        )
-      );
-  }
+    (params: RateGetParams) => maybeInverted<Date, string>(
+      params.date,
+      [params.matcher, params.pair.amountAsset, params.pair.priceAsset].join("::")
+    ),
+  )
   
   return {
     mget(request: RateMGetParams) {
       return waitAll(
         map(          
-          item => get(item, request.matcher, request.date).map(rate),
+          pair => get({ pair, matcher: request.matcher, date: request.date }).map(rate),
           request.pairs          
         )
       ).map(list)
