@@ -15,17 +15,15 @@ import {
   identity,
   evolve,
 } from 'ramda';
-import { CommonServiceCreatorDependencies } from '../..';
+import { CommonServiceDependencies } from '../..';
 import {
   List,
   Transaction,
   NotNullTransaction,
   TransactionInfo,
-  ServiceGet,
-  ServiceMget,
-  ServiceSearch,
+  Service,
 } from '../../../types';
-import { AppError, ResolverError } from '../../../errorHandling';
+import { AppError } from '../../../errorHandling';
 
 import { CommonFilters } from '../_common/types';
 
@@ -52,22 +50,22 @@ import { InvokeScriptTxsService } from '../invokeScript';
 const getData = prop('data');
 
 type AllTxsServiceDep = {
-  1?: GenesisTxsService;
-  2?: PaymentTxsService;
-  3?: IssueTxsService;
-  4?: TransferTxsService;
-  5?: ReissueTxsService;
-  6?: BurnTxsService;
-  7?: ExchangeTxsService;
-  8?: LeaseTxsService;
-  9?: LeaseCancelTxsService;
-  10?: AliasTxsService;
-  11?: MassTransferTxsService;
-  12?: DataTxsService;
-  13?: SetScriptTxsService;
-  14?: SponsorshipTxsService;
-  15?: SetAssetScriptTxsService;
-  16?: InvokeScriptTxsService;
+  1: GenesisTxsService;
+  2: PaymentTxsService;
+  3: IssueTxsService;
+  4: TransferTxsService;
+  5: ReissueTxsService;
+  6: BurnTxsService;
+  7: ExchangeTxsService;
+  8: LeaseTxsService;
+  9: LeaseCancelTxsService;
+  10: AliasTxsService;
+  11: MassTransferTxsService;
+  12: DataTxsService;
+  13: SetScriptTxsService;
+  14: SponsorshipTxsService;
+  15: SetAssetScriptTxsService;
+  16: InvokeScriptTxsService;
 };
 
 type AllTxsSearchRequest = RequestWithCursor<
@@ -75,15 +73,18 @@ type AllTxsSearchRequest = RequestWithCursor<
   string
 >;
 
-export type AllTxsService = ServiceGet<string, Transaction> &
-  ServiceMget<string[], Transaction> &
-  ServiceSearch<AllTxsSearchRequest, Transaction>;
+export type AllTxsService = Service<
+  string,
+  string[],
+  AllTxsSearchRequest,
+  Transaction
+>;
 
 // @todo
 // request by (id, timestamp) instead of just id
 // to ensure correct tx response even if
 // id is duplicated (happens in payment, alias txs)
-export default (deps: CommonServiceCreatorDependencies) => (
+export default (deps: CommonServiceDependencies) => (
   txsServices: AllTxsServiceDep
 ): AllTxsService => {
   const commonTxData = commonData(deps);
@@ -132,14 +133,7 @@ export default (deps: CommonServiceCreatorDependencies) => (
       tuples: [keyof AllTxsServiceDep, { id: string; type: string }[]][]
     ): Task.Task<AppError, List<Transaction>>[] =>
       tuples.map(([type, txs]) => {
-        const service = txsServices[type];
-        if (service) {
-          return service.mget(txs.map(prop('id')));
-        } else {
-          return Task.rejected(
-            new ResolverError(new Error(`TxsService[${type}] not initialized`))
-          );
-        }
+        return txsServices[type].mget(txs.map(prop('id')));
       }),
     Task.waitAll,
     (t: Task.Task<AppError, List<NotNullTransaction>[]>) =>
@@ -163,13 +157,9 @@ export default (deps: CommonServiceCreatorDependencies) => (
             (m: Maybe.Maybe<TransactionInfo>) =>
               m.matchWith({
                 Just: ({ value }: { value: TransactionInfo }) => {
-                  const service =
-                    txsServices[value.type as keyof AllTxsServiceDep];
-                  if (service) {
-                    return service.get(id);
-                  } else {
-                    return Task.of(Maybe.empty());
-                  }
+                  return txsServices[value.type as keyof AllTxsServiceDep].get(
+                    id
+                  );
                 },
                 Nothing: () => Task.of(Maybe.empty()),
               })

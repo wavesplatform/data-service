@@ -1,14 +1,12 @@
 import { propEq, compose, Omit } from 'ramda';
 import { BigNumber } from '@waves/data-entities';
 
-import { CommonServiceCreatorDependencies } from '../..';
+import { CommonServiceDependencies } from '../..';
 import {
   transaction,
   TransactionInfo,
   Transaction,
-  ServiceGet,
-  ServiceMget,
-  ServiceSearch,
+  Service,
 } from '../../../types';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
@@ -37,14 +35,17 @@ type GenesisTxDbResponse = Omit<RawTx, 'sender'> & {
   recipient: string;
 };
 
-export type GenesisTxsService = ServiceGet<string, Transaction> &
-  ServiceMget<string[], Transaction> &
-  ServiceSearch<GenesisTxsSearchRequest, Transaction>;
+export type GenesisTxsService = Service<
+  string,
+  string[],
+  GenesisTxsSearchRequest,
+  Transaction
+>;
 
 export default ({
   drivers: { pg },
   emitEvent,
-}: CommonServiceCreatorDependencies): GenesisTxsService => {
+}: CommonServiceDependencies): GenesisTxsService => {
   return {
     get: getByIdPreset<
       string,

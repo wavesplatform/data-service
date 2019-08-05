@@ -4,11 +4,9 @@ import {
   transaction,
   TransactionInfo,
   Transaction,
-  ServiceGet,
-  ServiceMget,
-  ServiceSearch,
+  Service,
 } from '../../../types';
-import { CommonServiceCreatorDependencies } from '../..';
+import { CommonServiceDependencies } from '../..';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
 import { getByIdPreset } from '../../presets/pg/getById';
@@ -40,14 +38,17 @@ type ReissueTxDbResponse = RawTx & {
   reissuable: string;
 };
 
-export type ReissueTxsService = ServiceGet<string, Transaction> &
-  ServiceMget<string[], Transaction> &
-  ServiceSearch<ReissueTxsSearchRequest, Transaction>;
+export type ReissueTxsService = Service<
+  string,
+  string[],
+  ReissueTxsSearchRequest,
+  Transaction
+>;
 
 export default ({
   drivers: { pg },
   emitEvent,
-}: CommonServiceCreatorDependencies): ReissueTxsService => {
+}: CommonServiceDependencies): ReissueTxsService => {
   return {
     get: getByIdPreset<
       string,

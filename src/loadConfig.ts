@@ -21,7 +21,7 @@ export type ServerConfig = {
 export type MatcherConfig = {
   matcher: {
     settingsURL: string;
-    default: string;
+    defaultMatcherAddress: string;
   };
 };
 
@@ -64,7 +64,7 @@ const load = (): DataServiceConfig => ({
     settingsURL:
       process.env.MATCHER_SETTINGS_URL ||
       'https://matcher.wavesplatform.com/matcher/settings',
-    default: process.env.DEFAULT_MATCHER || '',
+    defaultMatcherAddress: process.env.DEFAULT_MATCHER || '',
   },
 });
 

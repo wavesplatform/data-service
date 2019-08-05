@@ -1,13 +1,11 @@
 import { propEq, compose } from 'ramda';
 
-import { CommonServiceCreatorDependencies } from '../..';
+import { CommonServiceDependencies } from '../..';
 import {
   transaction,
   TransactionInfo,
   Transaction,
-  ServiceGet,
-  ServiceMget,
-  ServiceSearch,
+  Service,
 } from '../../../types';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
@@ -36,14 +34,17 @@ type SetScriptTxDbResponse = RawTx & {
   script: string;
 };
 
-export type SetScriptTxsService = ServiceGet<string, Transaction> &
-  ServiceMget<string[], Transaction> &
-  ServiceSearch<SetScriptTxsSearchRequest, Transaction>;
+export type SetScriptTxsService = Service<
+  string,
+  string[],
+  SetScriptTxsSearchRequest,
+  Transaction
+>;
 
 export default ({
   drivers: { pg },
   emitEvent,
-}: CommonServiceCreatorDependencies): SetScriptTxsService => {
+}: CommonServiceDependencies): SetScriptTxsService => {
   return {
     get: getByIdPreset<
       string,

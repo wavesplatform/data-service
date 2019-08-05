@@ -27,6 +27,7 @@ const commonTxFilters = {
 };
 
 // common options
+// @todo make types better
 const createOptions = (
   specificFilters?: Record<string, (param: string) => any>
 ) => ({
@@ -35,7 +36,7 @@ const createOptions = (
 
 const transactionsEndpointsConfig = (
   services: ServiceMesh['transactions']
-): { [url: string]: TxServiceParams } => ({
+): { [url: string]: EndpointDependencies } => ({
   '/transactions/all': {
     service: services.all,
     options: createOptions(),
@@ -112,7 +113,7 @@ const transactionsEndpointsConfig = (
     options: createOptions({ script: identity }),
   },
   '/transactions/sponsorship': {
-    service: services.sponsorshop,
+    service: services.sponsorship,
     options: createOptions(),
   },
   '/transactions/set-asset-script': {
@@ -125,12 +126,12 @@ const transactionsEndpointsConfig = (
   },
 });
 
-type TxServiceParams = {
-  service: Service<Serializable<string, any>>;
-  options: TxServiceOptions;
+type EndpointDependencies = {
+  service: Service<any, any, any, Serializable<string, any>>;
+  options: EndpointOptions;
 };
 
-type TxServiceOptions = {
+type EndpointOptions = {
   filterParsers?: any; // { [param: string]: (param: string) => any }, but { ids: (strOrArr: any) => any } does not assign (ids does not assign)
   parseFiltersFn?: (query: string) => Record<string, any>;
   mgetFilterName?: string;
@@ -138,8 +139,8 @@ type TxServiceOptions = {
 
 export default (txsServices: ServiceMesh['transactions']) =>
   compose<
-    Record<string, TxServiceParams>,
-    [string, TxServiceParams][],
+    Record<string, EndpointDependencies>,
+    [string, EndpointDependencies][],
     Router<any, any>
   >(
     reduce(

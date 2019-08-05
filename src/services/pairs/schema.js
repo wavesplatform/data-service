@@ -66,7 +66,7 @@ const inputGet = orderPair =>
     .required();
 
 const inputMget = orderPair =>
-  Joi.object.keys({
+  Joi.object().keys({
     pairs: Joi.array().items(pair(orderPair)),
     matcher: Joi.string().required(),
   });

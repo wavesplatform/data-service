@@ -1,14 +1,12 @@
 import { compose, identity } from 'ramda';
 
-import { CommonServiceCreatorDependencies } from '../..';
+import { CommonServiceDependencies } from '../..';
 import {
   transaction,
   TransactionInfo,
   Transaction,
   List,
-  ServiceGet,
-  ServiceMget,
-  ServiceSearch,
+  Service,
 } from '../../../types';
 import { get, mget, search } from '../../_common/createResolver';
 import { CommonFilters } from '../_common/types';
@@ -36,14 +34,17 @@ type InvokeScriptTxsSearchRequest = CommonFilters &
     function: string;
   }>;
 
-export type InvokeScriptTxsService = ServiceGet<string, Transaction> &
-  ServiceMget<string[], Transaction> &
-  ServiceSearch<InvokeScriptTxsSearchRequest, Transaction>;
+export type InvokeScriptTxsService = Service<
+  string,
+  string[],
+  InvokeScriptTxsSearchRequest,
+  Transaction
+>;
 
 export default ({
   drivers: { pg },
   emitEvent,
-}: CommonServiceCreatorDependencies): InvokeScriptTxsService => {
+}: CommonServiceDependencies): InvokeScriptTxsService => {
   return {
     get: get<string, string, RawInvokeScriptTx, Transaction>({
       transformInput: identity,

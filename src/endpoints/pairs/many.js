@@ -54,7 +54,7 @@ const filterParsers = {
   ),
   matcher: compose(
     queryFilter,
-    defaultTo(options.defaultMatcher)
+    defaultTo(options.matcher.defaultMatcherAddress)
   ),
   limit,
 };

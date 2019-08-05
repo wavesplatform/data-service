@@ -1,14 +1,12 @@
 import { propEq, compose } from 'ramda';
 import { BigNumber } from '@waves/data-entities';
 
-import { CommonServiceCreatorDependencies } from '../..';
+import { CommonServiceDependencies } from '../..';
 import {
   transaction,
   TransactionInfo,
   Transaction,
-  ServiceGet,
-  ServiceMget,
-  ServiceSearch,
+  Service,
 } from '../../../types';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
@@ -43,14 +41,17 @@ type MassTransferTxDbResponse = RawTx & {
   amounts: BigNumber[];
 };
 
-export type MassTransferTxsService = ServiceGet<string, Transaction> &
-  ServiceMget<string[], Transaction> &
-  ServiceSearch<MassTransferTxsSearchRequest, Transaction>;
+export type MassTransferTxsService = Service<
+  string,
+  string[],
+  MassTransferTxsSearchRequest,
+  Transaction
+>;
 
 export default ({
   drivers: { pg },
   emitEvent,
-}: CommonServiceCreatorDependencies): MassTransferTxsService => {
+}: CommonServiceDependencies): MassTransferTxsService => {
   return {
     get: getByIdPreset<
       string,

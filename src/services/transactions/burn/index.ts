@@ -4,11 +4,9 @@ import {
   transaction,
   TransactionInfo,
   Transaction,
-  ServiceGet,
-  ServiceMget,
-  ServiceSearch,
+  Service,
 } from '../../../types';
-import { CommonServiceCreatorDependencies } from '../..';
+import { CommonServiceDependencies } from '../..';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
 import { getByIdPreset } from '../../presets/pg/getById';
@@ -39,14 +37,17 @@ type BurnTxDbResponse = RawTx & {
   amount: string;
 };
 
-export type BurnTxsService = ServiceGet<string, Transaction> &
-  ServiceMget<string[], Transaction> &
-  ServiceSearch<BurnTxsSearchRequest, Transaction>;
+export type BurnTxsService = Service<
+  string,
+  string[],
+  BurnTxsSearchRequest,
+  Transaction
+>;
 
 export default ({
   drivers: { pg },
   emitEvent,
-}: CommonServiceCreatorDependencies): BurnTxsService => {
+}: CommonServiceDependencies): BurnTxsService => {
   return {
     get: getByIdPreset<string, BurnTxDbResponse, TransactionInfo, Transaction>({
       name: 'transactions.burn.get',

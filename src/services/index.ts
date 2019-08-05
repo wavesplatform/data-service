@@ -1,3 +1,10 @@
+import { Task } from 'folktale/concurrency/task';
+
+import { PgDriver } from '../db/driver';
+import { AppError } from '../errorHandling';
+import { DataServiceConfig } from '../loadConfig';
+
+import { EmitEvent } from './_common/createResolver/types';
 import createAliasesService, { AliasService } from './aliases';
 import createAssetsService, { AssetsService } from './assets';
 import createCandlesService, { CandlesService } from './candles';
@@ -35,7 +42,7 @@ import createSetAssetScriptTxsService, {
 import createSetScriptTxsService, {
   SetScriptTxsService,
 } from './transactions/setScript';
-import createSponsorshopTxsService, {
+import createSponsorshipTxsService, {
   SponsorshipTxsService,
 } from './transactions/sponsorship';
 import createTransferTxsService, {
@@ -48,8 +55,10 @@ import { PgDriver } from '../db/driver';
 import { EmitEvent } from './_common/createResolver/types';
 import { ServiceMget, ServiceSearch, Transaction, Rate, RateMGetParams } from 'types';
 
-export type CommonServiceCreatorDependencies = {
-  drivers: { pg: PgDriver };
+export type CommonServiceDependencies = {
+  drivers: {
+    pg: PgDriver;
+  };
   emitEvent: EmitEvent;
 };
 
@@ -80,17 +89,24 @@ export type ServiceMesh = {
     reissue: ReissueTxsService;
     setAssetScript: SetAssetScriptTxsService;
     setScript: SetScriptTxsService;
-    sponsorshop: SponsorshipTxsService;
+    sponsorship: SponsorshipTxsService;
     transfer: TransferTxsService;
   };
 };
 
-export default (options: DataServiceConfig) => async ({
-  drivers,
+export default ({
+  options,
+  pgDriver,
   emitEvent,
-}: CommonServiceCreatorDependencies) => {
+}: {
+  options: DataServiceConfig;
+  pgDriver: PgDriver;
+  emitEvent: EmitEvent;
+}): Task<AppError, ServiceMesh> => {
   const commonDeps = {
-    drivers,
+    drivers: {
+      pg: pgDriver,
+    },
     emitEvent,
   };
 
@@ -113,7 +129,7 @@ export default (options: DataServiceConfig) => async ({
   const reissueTxs = createReissueTxsService(commonDeps);
   const setAssetScriptTxs = createSetAssetScriptTxsService(commonDeps);
   const setScriptTxs = createSetScriptTxsService(commonDeps);
-  const sponsorshopTxs = createSponsorshopTxsService(commonDeps);
+  const sponsorshipTxs = createSponsorshipTxsService(commonDeps);
   const transferTxs = createTransferTxsService(commonDeps);
   const rates = createRateService(
     {
@@ -139,44 +155,40 @@ export default (options: DataServiceConfig) => async ({
     11: massTransferTxs,
     12: dataTxs,
     13: setScriptTxs,
-    14: sponsorshopTxs,
+    14: sponsorshipTxs,
     15: setAssetScriptTxs,
     16: invokeScriptTxs,
   });
 
   // pairs service
-  const pairs = await createPairsService({
+  return createPairsService({
     ...commonDeps,
     options,
-  })({ issueTxs })
-    .run()
-    .promise();
-
-  const serviceMesh: ServiceMesh = {
-    aliases,
-    assets,
-    candles,
-    pairs,
-    rates,
-    transactions: {
-      all: allTxs,
-      genesis: genesisTxs,
-      payment: paymentTxs,
-      issue: issueTxs,
-      transfer: transferTxs,
-      reissue: reissueTxs,
-      burn: burnTxs,
-      exchange: exchangeTxs,
-      lease: leaseTxs,
-      leaseCancel: leaseCancelTxs,
-      alias: aliasTxs,
-      massTransfer: massTransferTxs,
-      data: dataTxs,
-      setScript: setScriptTxs,
-      sponsorshop: sponsorshopTxs,
-      setAssetScript: setAssetScriptTxs,
-      invokeScript: invokeScriptTxs,
-    },
-  };
-  return serviceMesh;
+  })({ issueTxs }).map(pairs => {
+    return {
+      aliases,
+      assets,
+      candles,
+      pairs,
+      transactions: {
+        all: allTxs,
+        genesis: genesisTxs,
+        payment: paymentTxs,
+        issue: issueTxs,
+        transfer: transferTxs,
+        reissue: reissueTxs,
+        burn: burnTxs,
+        exchange: exchangeTxs,
+        lease: leaseTxs,
+        leaseCancel: leaseCancelTxs,
+        alias: aliasTxs,
+        massTransfer: massTransferTxs,
+        data: dataTxs,
+        setScript: setScriptTxs,
+        sponsorship: sponsorshipTxs,
+        setAssetScript: setAssetScriptTxs,
+        invokeScript: invokeScriptTxs,
+      },
+    };
+  });
 };

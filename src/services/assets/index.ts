@@ -1,16 +1,8 @@
 import { propEq } from 'ramda';
 
-import {
-  asset,
-  Asset,
-  AssetInfo,
-  List,
-  ServiceGet,
-  ServiceMget,
-  ServiceSearch,
-} from '../../types';
+import { asset, Asset, AssetInfo, List, Service } from '../../types';
 
-import { CommonServiceCreatorDependencies } from '..';
+import { CommonServiceDependencies } from '..';
 
 // presets
 import { getByIdPreset } from '../presets/pg/getById';
@@ -36,14 +28,17 @@ type AssetsSearchRequest = {
   limit: number;
 };
 
-export type AssetsService = ServiceGet<string, Asset> &
-  ServiceMget<string[], Asset> &
-  ServiceSearch<AssetsSearchRequest, Asset>;
+export type AssetsService = Service<
+  string,
+  string[],
+  AssetsSearchRequest,
+  Asset
+>;
 
 export default ({
   drivers: { pg },
   emitEvent,
-}: CommonServiceCreatorDependencies): AssetsService => {
+}: CommonServiceDependencies): AssetsService => {
   return {
     get: getByIdPreset<string, AssetDbResponse, AssetInfo, Asset>({
       name: 'assets.get',

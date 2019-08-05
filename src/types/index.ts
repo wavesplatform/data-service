@@ -42,10 +42,14 @@ export type ServiceSearch<
   ) => Task<AppError, List<ResponseTransformed>>;
 };
 
-export type Service<T extends Serializable<string, any>> =
-  | ServiceGet<any, T>
-  | ServiceMget<any, T>
-  | ServiceSearch<any, T>;
+export type Service<
+  GetRequest,
+  MgetRequest,
+  SearchRequest,
+  Response extends Serializable<string, any>
+> = ServiceGet<GetRequest, Response> &
+  ServiceMget<MgetRequest, Response> &
+  ServiceSearch<SearchRequest, Response>;
 
 export { AssetInfo };
 export type Asset = Serializable<'asset', AssetInfo | null>;

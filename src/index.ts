@@ -28,29 +28,37 @@ const eventBus = createEventBus();
 createAndSubscribeLogger({ options, eventBus });
 const requestId = createRequestId({ expose: 'X-Request-Id', header: false });
 
+// @todo add the test sql query for the db availability checking
 const pgDriver = createPgDriver(options);
 
-createServices(options)({
-  drivers: {
-    pg: pgDriver,
-  },
+createServices({
+  options,
+  pgDriver,
   emitEvent: name => o => eventBus.emit(name, o),
-}).then(services => {
-  app
-    .use(bodyParser())
-    .use(requestId)
-    .use(setHeadersMiddleware)
-    .use(injectEventBus(eventBus))
-    .use(accessLogMiddleware)
-    .use(serializer)
-    .use(injectConfig('defaultMatcher', options.matcher.default))
-    .use(router(services).routes())
-    .listen(options.port);
+})
+  .map(services => {
+    return app
+      .use(bodyParser())
+      .use(requestId)
+      .use(setHeadersMiddleware)
+      .use(injectEventBus(eventBus))
+      .use(accessLogMiddleware)
+      .use(serializer)
+      .use(
+        injectConfig('defaultMatcher', options.matcher.defaultMatcherAddress)
+      )
+      .use(router(services).routes());
+  })
+  .run()
+  .listen({
+    onResolved: app => {
+      app.listen(options.port);
 
-  if (process.env.NODE_ENV === 'development') {
-    // eslint-disable-next-line
-    console.log(
-      chalk.yellow(`App has started on http://localhost:${options.port}/`)
-    );
-  }
-});
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line
+        console.log(
+          chalk.yellow(`App has started on http://localhost:${options.port}/`)
+        );
+      }
+    },
+  });

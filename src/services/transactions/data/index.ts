@@ -1,14 +1,12 @@
 import { identity, compose } from 'ramda';
 
-import { CommonServiceCreatorDependencies } from '../..';
+import { CommonServiceDependencies } from '../..';
 import {
   transaction,
   TransactionInfo,
   Transaction,
   List,
-  ServiceGet,
-  ServiceMget,
-  ServiceSearch,
+  Service,
 } from '../../../types';
 
 import { WithLimit, WithSortOrder } from '../../_common';
@@ -54,14 +52,17 @@ type DataTxDbResponse = RawTx & {
   data: DataEntry[];
 };
 
-export type DataTxsService = ServiceGet<string, Transaction> &
-  ServiceMget<string[], Transaction> &
-  ServiceSearch<DataTxsSearchRequest, Transaction>;
+export type DataTxsService = Service<
+  string,
+  string[],
+  DataTxsSearchRequest,
+  Transaction
+>;
 
 export default ({
   drivers: { pg },
   emitEvent,
-}: CommonServiceCreatorDependencies): DataTxsService => {
+}: CommonServiceDependencies): DataTxsService => {
   return {
     get: get<string, string, DataTxDbResponse, Transaction>({
       transformInput: identity,

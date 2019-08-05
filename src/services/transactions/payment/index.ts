@@ -4,11 +4,9 @@ import {
   transaction,
   TransactionInfo,
   Transaction,
-  ServiceGet,
-  ServiceMget,
-  ServiceSearch,
+  Service,
 } from '../../../types';
-import { CommonServiceCreatorDependencies } from '../..';
+import { CommonServiceDependencies } from '../..';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
 import { getByIdPreset } from '../../presets/pg/getById';
@@ -36,14 +34,17 @@ type PaymentTxDbResponse = RawTx & {
   amount: string;
 };
 
-export type PaymentTxsService = ServiceGet<string, Transaction> &
-  ServiceMget<string[], Transaction> &
-  ServiceSearch<PaymentTxsSearchRequest, Transaction>;
+export type PaymentTxsService = Service<
+  string,
+  string[],
+  PaymentTxsSearchRequest,
+  Transaction
+>;
 
 export default ({
   drivers: { pg },
   emitEvent,
-}: CommonServiceCreatorDependencies): PaymentTxsService => {
+}: CommonServiceDependencies): PaymentTxsService => {
   return {
     get: getByIdPreset<
       string,

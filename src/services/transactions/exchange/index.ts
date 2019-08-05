@@ -5,11 +5,9 @@ import {
   transaction,
   TransactionInfo,
   Transaction,
-  ServiceGet,
-  ServiceMget,
-  ServiceSearch,
+  Service,
 } from '../../../types';
-import { CommonServiceCreatorDependencies } from '../..';
+import { CommonServiceDependencies } from '../..';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
 import { getByIdPreset } from '../../presets/pg/getById';
@@ -71,14 +69,17 @@ export type ExchangeTxDbResponse = RawTx & {
   o2_matcher_fee_asset_id: string;
 };
 
-export type ExchangeTxsService = ServiceGet<string, Transaction> &
-  ServiceMget<string[], Transaction> &
-  ServiceSearch<ExchangeTxsSearchRequest, Transaction>;
+export type ExchangeTxsService = Service<
+  string,
+  string[],
+  ExchangeTxsSearchRequest,
+  Transaction
+>;
 
 export default ({
   drivers: { pg },
   emitEvent,
-}: CommonServiceCreatorDependencies): ExchangeTxsService => {
+}: CommonServiceDependencies): ExchangeTxsService => {
   return {
     get: getByIdPreset<
       string,

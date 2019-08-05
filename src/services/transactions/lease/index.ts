@@ -1,14 +1,12 @@
 import { propEq, compose } from 'ramda';
 import { BigNumber } from '@waves/data-entities';
 
-import { CommonServiceCreatorDependencies } from '../..';
+import { CommonServiceDependencies } from '../..';
 import {
   transaction,
   TransactionInfo,
   Transaction,
-  ServiceGet,
-  ServiceMget,
-  ServiceSearch,
+  Service,
 } from '../../../types';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
@@ -40,14 +38,17 @@ type LeaseTxDbResponse = RawTx & {
   recipient: string;
 };
 
-export type LeaseTxsService = ServiceGet<string, Transaction> &
-  ServiceMget<string[], Transaction> &
-  ServiceSearch<LeaseTxsSearchRequest, Transaction>;
+export type LeaseTxsService = Service<
+  string,
+  string[],
+  LeaseTxsSearchRequest,
+  Transaction
+>;
 
 export default ({
   drivers: { pg },
   emitEvent,
-}: CommonServiceCreatorDependencies): LeaseTxsService => {
+}: CommonServiceDependencies): LeaseTxsService => {
   return {
     get: getByIdPreset<string, LeaseTxDbResponse, TransactionInfo, Transaction>(
       {
