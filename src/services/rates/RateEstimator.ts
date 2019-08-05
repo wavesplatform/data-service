@@ -9,8 +9,6 @@ import { SortOrder } from "../_common";
 import { PairCheckService } from '../rates';
 import { AppError } from "../../errorHandling";
 
-// type Maybe<T> = maybe.Maybe<T>;
-
 const WavesId: string = 'WAVES';
 
 const sum = (data: Array<BigNumber | number | string>): Maybe<BigNumber> => {
