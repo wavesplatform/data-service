@@ -1,5 +1,5 @@
 import { Task, waitAll, of as taskOf } from "folktale/concurrency/task";
-import * as maybe from 'folktale/maybe';
+import { Maybe, of as maybeOf, empty as maybeEmpty } from 'folktale/maybe';
 import { BigNumber } from "@waves/data-entities";
 import { map, always } from 'ramda';
 
@@ -9,26 +9,26 @@ import { SortOrder } from "../_common";
 import { PairCheckService } from '../rates';
 import { AppError } from "../../errorHandling";
 
-type Maybe<T> = maybe.Maybe<T>;
+// type Maybe<T> = maybe.Maybe<T>;
 
 const WavesId: string = 'WAVES';
 
 const sum = (data: Array<BigNumber | number | string>): Maybe<BigNumber> => {
   if (data.length === 0) {
-    return maybe.empty();
+    return maybeEmpty();
   }
 
-  return maybe.of(data.reduce((acc: BigNumber, x) => acc.plus(x), new BigNumber(0)));
+  return maybeOf(data.reduce((acc: BigNumber, x) => acc.plus(x), new BigNumber(0)));
 }
 
 const firstTask = <L, R>(pred: (val: R) => boolean, tasks: Array<Task<L, Maybe<R>>>): Task<L, Maybe<R>> =>
-  tasks.length === 0 ? taskOf(maybe.empty()) : tasks.reduce(
+  tasks.length === 0 ? taskOf(maybeEmpty()) : tasks.reduce(
     (acc: Task<L, Maybe<R>>, nextTask: Task<L, Maybe<R>>) =>
       acc.chain(
         (value: Maybe<R>) => value.filter(pred).matchWith(
           {
             Nothing: always(nextTask),
-            Just: ({ value }) => taskOf(maybe.of(value))
+            Just: ({ value }) => taskOf(maybeOf(value))
           }
         )
       ).map(res => res.filter(pred))
@@ -39,7 +39,7 @@ type ExchangeInfo = {
   amount: number,
 }
 
-const weightedAverage = (data: ExchangeInfo[]): Maybe<BigNumber> => data.length === 0 ? maybe.empty() :
+const weightedAverage = (data: ExchangeInfo[]): Maybe<BigNumber> => data.length === 0 ? maybeEmpty() :
   maybeMap2(
     (sum1, sum2) => sum1.div(sum2),
     sum(

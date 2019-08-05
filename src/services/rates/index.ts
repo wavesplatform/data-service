@@ -1,5 +1,5 @@
 import { Task, waitAll, of } from "folktale/concurrency/task";
-import * as maybe from 'folktale/maybe';
+import { Maybe, empty as maybeEmpty, of as maybeOf } from 'folktale/maybe';
 import * as LRU from 'lru-cache';
 import { map } from 'ramda';
 
@@ -10,21 +10,21 @@ import { RateSerivceCreatorDependencies } from '../../services';
 import RateEstimator from './RateEstimator';
 
 export interface PairCheckService {
-  checkPair(matcher: string, pair: [string, string]): Task<AppError, maybe.Maybe<[string, string]>>
+  checkPair(matcher: string, pair: [string, string]): Task<AppError, Maybe<[string, string]>>
 }
 
 export const dummyPairCheck: PairCheckService = {
-  checkPair() { return of(maybe.empty()) }
+  checkPair() { return of(maybeEmpty()) }
 }
 
 const CACHE_AGE_MILLIS = 5000;
 const CACHE_SIZE = 100000;
 
-function maybeInverted<T, R>(data: maybe.Maybe<T>, val: R): maybe.Maybe<R> {
+function maybeInverted<T, R>(data: Maybe<T>, val: R): Maybe<R> {
   return data.matchWith(
     {
-      Just: () => maybe.empty(),
-      Nothing: () => maybe.of(val)
+      Just: () => maybeEmpty(),
+      Nothing: () => maybeOf(val)
     }
   )
 }
@@ -32,7 +32,7 @@ function maybeInverted<T, R>(data: maybe.Maybe<T>, val: R): maybe.Maybe<R> {
 function cached<K, In, Out>(
   get: (data: In) => Task<AppError, Out>,
   cache: LRU<K, Out>,
-  keyFn: (data: In) => maybe.Maybe<K>,
+  keyFn: (data: In) => Maybe<K>,
 ): (data: In) => Task<AppError, Out> {
   return (data: In) => keyFn(data).matchWith(
     {
