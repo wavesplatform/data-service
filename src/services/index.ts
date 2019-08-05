@@ -1,10 +1,6 @@
 import { Task } from 'folktale/concurrency/task';
 
-import { PgDriver } from '../db/driver';
 import { AppError } from '../errorHandling';
-import { DataServiceConfig } from '../loadConfig';
-
-import { EmitEvent } from './_common/createResolver/types';
 import createAliasesService, { AliasService } from './aliases';
 import createAssetsService, { AssetsService } from './assets';
 import createCandlesService, { CandlesService } from './candles';
@@ -62,7 +58,7 @@ export type CommonServiceDependencies = {
   emitEvent: EmitEvent;
 };
 
-export type RateSerivceCreatorDependencies = CommonServiceCreatorDependencies & {
+export type RateSerivceCreatorDependencies = CommonServiceDependencies & {
   txService: ServiceSearch<ExchangeTxsSearchRequest, Transaction>,
   pairCheckService: PairCheckService,
 }
@@ -170,6 +166,7 @@ export default ({
       assets,
       candles,
       pairs,
+      rates,
       transactions: {
         all: allTxs,
         genesis: genesisTxs,

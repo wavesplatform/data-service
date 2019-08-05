@@ -32,7 +32,7 @@ const filterParsers = {
   ),
   matcher: compose(
     queryFilter,
-    defaultTo(options.matcher.default)
+    defaultTo(options.matcher.defaultMatcherAddress)
   ),
 };
 
