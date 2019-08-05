@@ -11,8 +11,8 @@ import {
 
 import { handleError } from '../../../utils/handleError';
 import { parseArrayQuery } from '../../utils/parseArrayQuery';
+import { dateOrNull } from '../../../utils/parseDate';
 import { DEFAULT_NOT_FOUND_MESSAGE } from '../../../errorHandling';
-import { dateOrNull } from 'utils/parseDate';
 
 const parsePairs = map(
   compose(
