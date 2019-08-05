@@ -114,13 +114,13 @@ export type AssetIdsPair = {
 export type RateMGetParams = {
   pairs: AssetIdsPair[],
   matcher: string,
-  date: Maybe<Date>,
+  timestamp: Maybe<Date>,
 }
 
 export type RateGetParams = {
   pair: AssetIdsPair,
   matcher: string,
-  date: Maybe<Date>
+  timestamp: Maybe<Date>
 }
 
 export type RateInfo = { current: BigNumber, amountAsset: string, priceAsset: string };

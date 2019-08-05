@@ -68,9 +68,9 @@ export default function({
   const estimator = new RateEstimator(txService, pairCheckService)
 
   const get = cached<string, RateGetParams, RateInfo>(
-    ({ pair, matcher, date }: RateGetParams): Task<AppError, RateInfo> =>
+    ({ pair, matcher, timestamp }: RateGetParams): Task<AppError, RateInfo> =>
       estimator.estimate(
-        pair, matcher, date.getOrElse(new Date())
+        pair, matcher, timestamp.getOrElse(new Date())
       ).map(
         res => ({ current: res, ...pair })
       ),
@@ -78,7 +78,7 @@ export default function({
     cache,
 
     (params: RateGetParams) => maybeInverted<Date, string>(
-      params.date,
+      params.timestamp,
       [params.matcher, params.pair.amountAsset, params.pair.priceAsset].join("::")
     ),
   )
@@ -87,7 +87,7 @@ export default function({
     mget(request: RateMGetParams) {
       return waitAll(
         map(          
-          pair => get({ pair, matcher: request.matcher, date: request.date }).map(rate),
+          pair => get({ pair, matcher: request.matcher, timestamp: request.timestamp }).map(rate),
           request.pairs          
         )
       ).map(list)

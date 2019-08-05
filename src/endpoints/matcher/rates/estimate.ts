@@ -27,7 +27,7 @@ const filterParsers = {
     (val: string[] | undefined): maybe.Maybe<string[]> => maybe.fromNullable(val),
     parseArrayQuery
   ),
-  date: dateOrNull,
+  timestamp: dateOrNull,
 };
 
 /**
@@ -46,7 +46,7 @@ const rateEstimateEndpoint = (service: ServiceMget<RateMGetParams, Rate>) => asy
   });
 
   const results = await service
-    .mget({ pairs: fValues.pairs, matcher, date: maybe.fromNullable(fValues.date) })
+    .mget({ pairs: fValues.pairs, matcher, timestamp: maybe.fromNullable(fValues.timestamp) })
     .run()
     .promise();
 
