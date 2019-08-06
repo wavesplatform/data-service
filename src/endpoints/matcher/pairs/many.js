@@ -1,7 +1,6 @@
 const { has, map, split, zipObj, compose } = require('ramda');
 const Maybe = require('folktale/maybe');
 
-const { DEFAULT_NOT_FOUND_MESSAGE } = require('../../../errorHandling');
 const { captureErrors } = require('../../../utils/captureErrors');
 const { handleError } = require('../../../utils/handleError');
 
@@ -77,9 +76,6 @@ const pairsManyEndpoint = service => async ctx => {
         .promise();
     } else {
       ctx.status = 404;
-      ctx.body = {
-        message: DEFAULT_NOT_FOUND_MESSAGE,
-      };
       return;
     }
   } else {
@@ -91,9 +87,6 @@ const pairsManyEndpoint = service => async ctx => {
         .promise();
     } else {
       ctx.status = 404;
-      ctx.body = {
-        message: DEFAULT_NOT_FOUND_MESSAGE,
-      };
       return;
     }
   }
@@ -106,9 +99,6 @@ const pairsManyEndpoint = service => async ctx => {
     ctx.state.returnValue = results;
   } else {
     ctx.status = 404;
-    ctx.body = {
-      message: DEFAULT_NOT_FOUND_MESSAGE,
-    };
   }
 };
 

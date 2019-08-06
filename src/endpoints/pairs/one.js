@@ -1,4 +1,3 @@
-const { DEFAULT_NOT_FOUND_MESSAGE } = require('../../errorHandling');
 const { captureErrors } = require('../../utils/captureErrors');
 const { handleError } = require('../../utils/handleError');
 const { parseFilterValues } = require('../_common/filters');
@@ -41,9 +40,6 @@ const pairsOneEndpoint = service => async ctx => {
       },
       Nothing: () => {
         ctx.status = 404;
-        ctx.body = {
-          message: DEFAULT_NOT_FOUND_MESSAGE,
-        };
       },
     });
   } catch (e) {
@@ -56,9 +52,6 @@ const pairsOneEndpoint = service => async ctx => {
       },
       Validation: () => {
         ctx.status = 404;
-        ctx.body = {
-          message: DEFAULT_NOT_FOUND_MESSAGE,
-        };
       },
     });
   }
