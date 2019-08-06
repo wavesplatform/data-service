@@ -56,6 +56,9 @@ const pairsOneEndpoint = service => async ctx => {
       },
       Validation: () => {
         ctx.status = 404;
+        ctx.body = {
+          message: DEFAULT_NOT_FOUND_MESSAGE,
+        };
       },
     });
   }

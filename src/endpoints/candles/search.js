@@ -1,5 +1,6 @@
 const { identity } = require('ramda');
 
+const { DEFAULT_NOT_FOUND_MESSAGE } = require('../../errorHandling');
 const { captureErrors } = require('../../utils/captureErrors');
 const { handleError } = require('../../utils/handleError');
 const { select } = require('../utils/selectors');
@@ -53,6 +54,9 @@ const candlesSearch = service => async ctx => {
     ctx.state.returnValue = results;
   } else {
     ctx.status = 404;
+    ctx.body = {
+      message: DEFAULT_NOT_FOUND_MESSAGE,
+    };
   }
 };
 
