@@ -12,7 +12,6 @@ import {
 import { handleError } from '../../../utils/handleError';
 import { parseArrayQuery } from '../../utils/parseArrayQuery';
 import { dateOrNull } from '../../../utils/parseDate';
-import { DEFAULT_NOT_FOUND_MESSAGE } from '../../../errorHandling';
 
 const parsePairs = map(
   compose(
@@ -58,9 +57,6 @@ const rateEstimateEndpoint = (service: ServiceMget<RateMgetParams, Rate>) => asy
     ctx.state.returnValue = results;
   } else {
     ctx.status = 404;
-    ctx.body = {
-      message: DEFAULT_NOT_FOUND_MESSAGE,
-    };
   }
 };
 

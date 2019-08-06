@@ -1,6 +1,5 @@
 const { has } = require('ramda');
 
-const { DEFAULT_NOT_FOUND_MESSAGE } = require('../../errorHandling');
 const { captureErrors } = require('../../utils/captureErrors');
 const { handleError } = require('../../utils/handleError');
 const { select } = require('../utils/selectors');
@@ -15,9 +14,6 @@ const createManyMiddleware = (
   return captureErrors(handleError)(async ctx => {
     if (!service.mget && !service.search) {
       ctx.status = 404;
-      ctx.body = {
-        message: DEFAULT_NOT_FOUND_MESSAGE,
-      };
       return;
     }
 
@@ -42,9 +38,6 @@ const createManyMiddleware = (
           .promise();
       } else {
         ctx.status = 404;
-        ctx.body = {
-          message: DEFAULT_NOT_FOUND_MESSAGE,
-        };
         return;
       }
     } else {
@@ -56,9 +49,6 @@ const createManyMiddleware = (
           .promise();
       } else {
         ctx.status = 404;
-        ctx.body = {
-          message: DEFAULT_NOT_FOUND_MESSAGE,
-        };
         return;
       }
     }
@@ -71,9 +61,6 @@ const createManyMiddleware = (
       ctx.state.returnValue = results;
     } else {
       ctx.status = 404;
-      ctx.body = {
-        message: DEFAULT_NOT_FOUND_MESSAGE,
-      };
     }
   });
 };
