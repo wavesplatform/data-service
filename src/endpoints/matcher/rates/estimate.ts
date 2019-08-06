@@ -2,7 +2,7 @@ import { Context } from 'koa';
 import { map, compose, split } from 'ramda';
 import * as maybe from 'folktale/maybe';
 
-import { ServiceMget, Rate, RateMGetParams } from '../../../types';
+import { ServiceMget, Rate, RateMgetParams } from '../../../types';
 import { select } from '../../utils/selectors';
 import { captureErrors } from '../../../utils/captureErrors';
 import {
@@ -34,7 +34,7 @@ const filterParsers = {
  * Endpoint
  * @name /rates?pairs[]‌="{asset_id_1}/{asset_id_2}"&pairs[]="{asset_id_1}/{asset_id_2}" ...other params
  */
-const rateEstimateEndpoint = (service: ServiceMget<RateMGetParams, Rate>) => async (ctx: Context) => {
+const rateEstimateEndpoint = (service: ServiceMget<RateMgetParams, Rate>) => async (ctx: Context) => {
   const { fromParams, query } = select(ctx);
   const [matcher] = fromParams(['matcher']);
   const fValues = parseFilterValues(filterParsers)(query);
@@ -64,5 +64,5 @@ const rateEstimateEndpoint = (service: ServiceMget<RateMGetParams, Rate>) => asy
   }
 };
 
-export default (service: ServiceMget<RateMGetParams, Rate>) =>
+export default (service: ServiceMget<RateMgetParams, Rate>) =>
   captureErrors(handleError)(rateEstimateEndpoint(service));

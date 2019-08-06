@@ -82,7 +82,7 @@ export default class RateEstimator {
     private readonly pairChecker: PairCheckService
   ) {}
 
-  private countRateFromTransactions({ amountAsset, priceAsset, order }: RateRequest, matcher: string, date: Date): Task<AppError, Maybe<BigNumber>> {
+  private countRateFromTransactions({ amountAsset, priceAsset, order }: RateRequest, matcher: string, timestamp: Date): Task<AppError, Maybe<BigNumber>> {
     return this.transactionService.search(
       {
         amountAsset,
@@ -91,7 +91,7 @@ export default class RateEstimator {
         matcher,
         sender: matcher,
         timeStart: new Date(0),
-        timeEnd: date,
+        timeEnd: timestamp,
         sort: SortOrder.Descending,
       }
     )
@@ -110,55 +110,55 @@ export default class RateEstimator {
       )
   }
 
-  private getRateCandidates(from: string, to: string, matcher: string): Task<AppError, RateRequest[]> {
-    return this.pairChecker.checkPair(matcher, [from, to])
+  private getRateCandidates(asset1: string, asset2: string, matcher: string): Task<AppError, RateRequest[]> {
+    return this.pairChecker.checkPair(matcher, [asset1, asset2])
       .map(
         (res: Maybe<[string, string]>): RateRequest[] => res.matchWith(
           {
-            Just: ({ value: [actualFrom, actualTo] }) =>
+            Just: ({ value: [amountAsset, priceAsset] }) =>
               [
                 {
-                  amountAsset: actualFrom,
-                  priceAsset: actualTo,
-                  order: from === actualFrom ? RateOrder.Straight : RateOrder.Inverted
+                  amountAsset,
+                  priceAsset,
+                  order: asset1 === amountAsset ? RateOrder.Straight : RateOrder.Inverted
                 }
               ],
             
             Nothing: () =>
               [
-                { amountAsset: from, priceAsset: to, order: RateOrder.Straight },
-                { amountAsset: to, priceAsset: from, order: RateOrder.Inverted }
+                { amountAsset: asset1, priceAsset: asset2, order: RateOrder.Straight },
+                { amountAsset: asset2, priceAsset: asset1, order: RateOrder.Inverted }
               ]
           }
         )
       )
   }
   
-  private getActualRate(from: string, to: string, matcher: string, date: Date): Task<AppError, Maybe<BigNumber>> {
-    const candidates: Task<AppError, RateRequest[]> = this.getRateCandidates(from, to, matcher)
+  private getActualRate(asset1: string, asset2: string, matcher: string, timestamp: Date): Task<AppError, Maybe<BigNumber>> {
+    const candidates: Task<AppError, RateRequest[]> = this.getRateCandidates(asset1, asset2, matcher)
 
     const results = candidates.map(
-      data => map(request => this.countRateFromTransactions(request, matcher, date), data)
+      data => map(request => this.countRateFromTransactions(request, matcher, timestamp), data)
     )
 
     return results.chain(tasks => firstPositive(tasks))
   }
 
-  estimate({ amountAsset, priceAsset }: AssetIdsPair, matcher: string, date: Date): Task<AppError, BigNumber> {
+  estimate({ amountAsset, priceAsset }: AssetIdsPair, matcher: string, timestamp: Date): Task<AppError, BigNumber> {
     if (amountAsset === priceAsset) {
       return taskOf(new BigNumber(1));
     }
 
     const allRateTasks: Task<AppError, Maybe<BigNumber>>[] = [
-      this.getActualRate(amountAsset, priceAsset, matcher, date)
+      this.getActualRate(amountAsset, priceAsset, matcher, timestamp)
     ]
 
     if (amountAsset !== WavesId && priceAsset !== WavesId) {
       allRateTasks.push(
         waitAll(
           [
-            this.getActualRate(amountAsset, WavesId, matcher, date),
-            this.getActualRate(priceAsset, WavesId, matcher, date)
+            this.getActualRate(amountAsset, WavesId, matcher, timestamp),
+            this.getActualRate(priceAsset, WavesId, matcher, timestamp)
           ]
         ).map(([rate1, rate2]) => maybeMap2(
           (rate1, rate2) => rate2.eq(0) ? new BigNumber(0) : rate1.div(rate2),

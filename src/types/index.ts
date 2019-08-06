@@ -111,7 +111,7 @@ export type AssetIdsPair = {
   priceAsset: string
 }
 
-export type RateMGetParams = {
+export type RateMgetParams = {
   pairs: AssetIdsPair[],
   matcher: string,
   timestamp: Maybe<Date>,

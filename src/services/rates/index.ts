@@ -1,9 +1,9 @@
 import { Task, waitAll, of } from "folktale/concurrency/task";
-import { Maybe, empty as maybeEmpty, of as maybeOf } from 'folktale/maybe';
+import { Maybe, empty as maybeEmpty } from 'folktale/maybe';
 import * as LRU from 'lru-cache';
-import { map } from 'ramda';
+import { map, always } from 'ramda';
 
-import { ServiceMget, Rate, rate, RateMGetParams, RateGetParams, RateInfo, list } from "../../types";
+import { ServiceMget, Rate, rate, RateMgetParams, RateGetParams, RateInfo, list } from "../../types";
 import { tap } from "../../utils/tap";
 import { AppError } from "../../errorHandling";
 import { RateSerivceCreatorDependencies } from '../../services';
@@ -20,43 +20,48 @@ export const dummyPairCheck: PairCheckService = {
 const CACHE_AGE_MILLIS = 5000;
 const CACHE_SIZE = 100000;
 
-function maybeInverted<T, R>(data: Maybe<T>, val: R): Maybe<R> {
+function maybeIsNone<T>(data: Maybe<T>): boolean {
   return data.matchWith(
     {
-      Just: () => maybeEmpty(),
-      Nothing: () => maybeOf(val)
+      Just: always(false),
+      Nothing: always(true)
     }
   )
 }
 
+type CacheParams<K, In, Out> = {
+  cache: LRU<K, Out>,
+  keyFn: (data: In) => K,
+  shouldCache: (data: In) => boolean  
+}
 function cached<K, In, Out>(
   get: (data: In) => Task<AppError, Out>,
-  cache: LRU<K, Out>,
-  keyFn: (data: In) => Maybe<K>,
+  { cache, keyFn, shouldCache }: CacheParams<K, In, Out>
 ): (data: In) => Task<AppError, Out> {
-  return (data: In) => keyFn(data).matchWith(
-    {
-      Just: ({ value }) => {
-        if (cache.has(value)) {
-          return of(cache.get(value)!)
-        }
+  return (data: In) => {
+    if (shouldCache(data)) {
+      const key = keyFn(data);
 
-        return get(data)
-          .map(
-            tap(
-              res => cache.set(value, res)
-            )
-          );
-      },
-      Nothing: () => get(data)
+      if (cache.has(key)) {
+        return of(cache.get(key)!)
+      }
+
+      return get(data)
+        .map(
+          tap(
+            res => cache.set(key, res)
+          )
+        );      
+    } else {
+      return get(data)
     }
-  )  
+  }
 }
 
 export default function({
   txService,
   pairCheckService
-}: RateSerivceCreatorDependencies): ServiceMget<RateMGetParams, Rate> {
+}: RateSerivceCreatorDependencies): ServiceMget<RateMgetParams, Rate> {
 
   const cache = new LRU<string, RateInfo>(
     {
@@ -75,16 +80,15 @@ export default function({
         res => ({ current: res, ...pair })
       ),
 
-    cache,
-
-    (params: RateGetParams) => maybeInverted<Date, string>(
-      params.timestamp,
-      [params.matcher, params.pair.amountAsset, params.pair.priceAsset].join("::")
-    ),
+    {
+      cache,
+      keyFn: params => [params.matcher, params.pair.amountAsset, params.pair.priceAsset].join("::"),
+      shouldCache: params => maybeIsNone(params.timestamp)
+    }
   )
   
   return {
-    mget(request: RateMGetParams) {
+    mget(request: RateMgetParams) {
       return waitAll(
         map(          
           pair => get({ pair, matcher: request.matcher, timestamp: request.timestamp }).map(rate),
