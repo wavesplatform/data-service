@@ -18,7 +18,7 @@ export default (serviceMesh: ServiceMesh) =>
     .use(aliases(serviceMesh.aliases).routes())
     .use(assets(serviceMesh.assets).routes())
     .use(candles(serviceMesh.candles).routes())
-    .use(matcher(serviceMesh.pairs).routes())
+    .use(matcher(serviceMesh.pairs, serviceMesh.rates).routes())
     .use(pairs(serviceMesh.pairs).routes())
     .use(transactions(serviceMesh.transactions).routes())
     .get('/version', version)

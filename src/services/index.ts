@@ -1,10 +1,6 @@
 import { Task } from 'folktale/concurrency/task';
 
-import { PgDriver } from '../db/driver';
 import { AppError } from '../errorHandling';
-import { DataServiceConfig } from '../loadConfig';
-
-import { EmitEvent } from './_common/createResolver/types';
 import createAliasesService, { AliasService } from './aliases';
 import createAssetsService, { AssetsService } from './assets';
 import createCandlesService, { CandlesService } from './candles';
@@ -14,7 +10,7 @@ import createAliasTxsService, { AliasTxsService } from './transactions/alias';
 import createBurnTxsService, { BurnTxsService } from './transactions/burn';
 import createDataTxsService, { DataTxsService } from './transactions/data';
 import createExchangeTxsService, {
-  ExchangeTxsService,
+  ExchangeTxsService, ExchangeTxsSearchRequest,
 } from './transactions/exchange';
 import createGenesisTxsService, {
   GenesisTxsService,
@@ -48,6 +44,12 @@ import createSponsorshipTxsService, {
 import createTransferTxsService, {
   TransferTxsService,
 } from './transactions/transfer';
+import { DataServiceConfig } from '../loadConfig';
+import createRateService, { PairOrderingService, dummyPairOrdering } from './rates'
+
+import { PgDriver } from '../db/driver';
+import { EmitEvent } from './_common/createResolver/types';
+import { ServiceMget, ServiceSearch, Transaction, Rate, RateMgetParams } from 'types';
 
 export type CommonServiceDependencies = {
   drivers: {
@@ -56,11 +58,17 @@ export type CommonServiceDependencies = {
   emitEvent: EmitEvent;
 };
 
+export type RateSerivceCreatorDependencies = CommonServiceDependencies & {
+  txService: ServiceSearch<ExchangeTxsSearchRequest, Transaction>,
+  pairOrderingService: PairOrderingService,
+}
+
 export type ServiceMesh = {
   aliases: AliasService;
   assets: AssetsService;
   candles: CandlesService;
   pairs: PairsService;
+  rates: ServiceMget<RateMgetParams, Rate>;
   transactions: {
     all: AllTxsService;
     alias: AliasTxsService;
@@ -119,6 +127,13 @@ export default ({
   const setScriptTxs = createSetScriptTxsService(commonDeps);
   const sponsorshipTxs = createSponsorshipTxsService(commonDeps);
   const transferTxs = createTransferTxsService(commonDeps);
+  const rates = createRateService(
+    {
+      txService: exchangeTxs,
+      pairOrderingService: dummyPairOrdering,
+        ...commonDeps,
+    }
+  )
 
   // specific init services
   // all txs service
@@ -151,6 +166,7 @@ export default ({
       assets,
       candles,
       pairs,
+      rates,
       transactions: {
         all: allTxs,
         genesis: genesisTxs,
