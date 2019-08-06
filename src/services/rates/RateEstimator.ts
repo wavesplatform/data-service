@@ -1,13 +1,15 @@
-import { Task, waitAll, of as taskOf } from "folktale/concurrency/task";
+import { Task, waitAll, of as taskOf,  } from "folktale/concurrency/task";
 import { Maybe, of as maybeOf, empty as maybeEmpty } from 'folktale/maybe';
 import { BigNumber } from "@waves/data-entities";
-import { map, always } from 'ramda';
+import { map } from 'ramda';
 
 import { AssetIdsPair, Transaction, ServiceSearch } from "../../types";
 import { ExchangeTxsSearchRequest } from "../transactions/exchange";
 import { SortOrder } from "../_common";
 import { PairCheckService } from '../rates';
 import { AppError } from "../../errorHandling";
+import { Monoid } from "../../types/monoid";
+import { concatAll } from "../../utils/fp";
 
 const WavesId: string = 'WAVES';
 
@@ -19,18 +21,33 @@ const sum = (data: Array<BigNumber | number | string>): Maybe<BigNumber> => {
   return maybeOf(data.reduce((acc: BigNumber, x) => acc.plus(x), new BigNumber(0)));
 }
 
-const firstTask = <L, R>(pred: (val: R) => boolean, tasks: Array<Task<L, Maybe<R>>>): Task<L, Maybe<R>> =>
-  tasks.length === 0 ? taskOf(maybeEmpty()) : tasks.reduce(
-    (acc: Task<L, Maybe<R>>, nextTask: Task<L, Maybe<R>>) =>
-      acc.chain(
-        (value: Maybe<R>) => value.filter(pred).matchWith(
+/**
+   returns a monoid to select first task satisfying predicate, left to right. 
+   Short circuits tasks execution on valid left
+*/
+function anyTaskSatisfying<L, R>(pred: (val: R) => boolean): Monoid<Task<L, Maybe<R>>> {
+  return {
+    empty: taskOf(maybeEmpty()),
+    concat: (a: Task<L, Maybe<R>>, b: Task<L, Maybe<R>>) =>
+      a.chain(
+        value => value.filter(pred).matchWith(
           {
-            Nothing: always(nextTask),
+            Nothing: () => b.map(res => res.filter(pred)),
             Just: ({ value }) => taskOf(maybeOf(value))
           }
         )
-      ).map(res => res.filter(pred))
+      )
+  }
+}
+
+/**
+   returns first task to yield the posifive BigNumber value
+*/
+const firstPositive = concatAll<Task<AppError, Maybe<BigNumber>>>(
+  anyTaskSatisfying(
+    (val: BigNumber) => val.isPositive()
   )
+);
 
 type ExchangeInfo = {
   price: number,
@@ -124,7 +141,7 @@ export default class RateEstimator {
       data => map(request => this.countRateFromTransactions(request, matcher, date), data)
     )
 
-    return results.chain(tasks => firstTask((val: BigNumber) => val.isPositive(), tasks))
+    return results.chain(tasks => firstPositive(tasks))
   }
 
   estimate({ amountAsset, priceAsset }: AssetIdsPair, matcher: string, date: Date): Task<AppError, BigNumber> {
@@ -151,7 +168,7 @@ export default class RateEstimator {
       )
     }
 
-    return firstTask((val: BigNumber) => val.isPositive(), allRateTasks)
+    return firstPositive(allRateTasks)
       .map(res => res.getOrElse(new BigNumber(0)))
   }
 }
