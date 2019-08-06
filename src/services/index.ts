@@ -45,7 +45,7 @@ import createTransferTxsService, {
   TransferTxsService,
 } from './transactions/transfer';
 import { DataServiceConfig } from '../loadConfig';
-import createRateService, { PairCheckService, dummyPairCheck } from './rates'
+import createRateService, { PairOrderingService, dummyPairOrdering } from './rates'
 
 import { PgDriver } from '../db/driver';
 import { EmitEvent } from './_common/createResolver/types';
@@ -60,7 +60,7 @@ export type CommonServiceDependencies = {
 
 export type RateSerivceCreatorDependencies = CommonServiceDependencies & {
   txService: ServiceSearch<ExchangeTxsSearchRequest, Transaction>,
-  pairCheckService: PairCheckService,
+  pairOrderingService: PairOrderingService,
 }
 
 export type ServiceMesh = {
@@ -130,7 +130,7 @@ export default ({
   const rates = createRateService(
     {
       txService: exchangeTxs,
-      pairCheckService: dummyPairCheck,
+      pairOrderingService: dummyPairOrdering,
         ...commonDeps,
     }
   )

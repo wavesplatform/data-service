@@ -6,7 +6,7 @@ import { map } from 'ramda';
 import { AssetIdsPair, Transaction, ServiceSearch } from "../../types";
 import { ExchangeTxsSearchRequest } from "../transactions/exchange";
 import { SortOrder } from "../_common";
-import { PairCheckService } from '../rates';
+import { PairOrderingService } from '../rates';
 import { AppError } from "../../errorHandling";
 import { Monoid } from "../../types/monoid";
 import { concatAll } from "../../utils/fp";
@@ -79,7 +79,7 @@ type RateRequest = {
 export default class RateEstimator {
   constructor(
     private readonly transactionService: ServiceSearch<ExchangeTxsSearchRequest, Transaction>,    
-    private readonly pairChecker: PairCheckService
+    private readonly pairOrderingService: PairOrderingService
   ) {}
 
   private countRateFromTransactions({ amountAsset, priceAsset, order }: RateRequest, matcher: string, timestamp: Date): Task<AppError, Maybe<BigNumber>> {
@@ -111,7 +111,7 @@ export default class RateEstimator {
   }
 
   private getRateCandidates(asset1: string, asset2: string, matcher: string): Task<AppError, RateRequest[]> {
-    return this.pairChecker.checkPair(matcher, [asset1, asset2])
+    return this.pairOrderingService.getCorrectOrder(matcher, [asset1, asset2])
       .map(
         (res: Maybe<[string, string]>): RateRequest[] => res.matchWith(
           {

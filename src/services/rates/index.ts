@@ -9,12 +9,12 @@ import { AppError } from "../../errorHandling";
 import { RateSerivceCreatorDependencies } from '../../services';
 import RateEstimator from './RateEstimator';
 
-export interface PairCheckService {
-  checkPair(matcher: string, pair: [string, string]): Task<AppError, Maybe<[string, string]>>
+export interface PairOrderingService {
+  getCorrectOrder(matcher: string, pair: [string, string]): Task<AppError, Maybe<[string, string]>>
 }
 
-export const dummyPairCheck: PairCheckService = {
-  checkPair() { return of(maybeEmpty()) }
+export const dummyPairOrdering: PairOrderingService = {
+  getCorrectOrder() { return of(maybeEmpty()) }
 }
 
 const CACHE_AGE_MILLIS = 5000;
@@ -60,7 +60,7 @@ function cached<K, In, Out>(
 
 export default function({
   txService,
-  pairCheckService
+  pairOrderingService
 }: RateSerivceCreatorDependencies): ServiceMget<RateMgetParams, Rate> {
 
   const cache = new LRU<string, RateInfo>(
@@ -70,7 +70,7 @@ export default function({
     }
   );
 
-  const estimator = new RateEstimator(txService, pairCheckService)
+  const estimator = new RateEstimator(txService, pairOrderingService)
 
   const get = cached<string, RateGetParams, RateInfo>(
     ({ pair, matcher, timestamp }: RateGetParams): Task<AppError, RateInfo> =>
