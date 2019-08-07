@@ -36,7 +36,11 @@ const pairsOneEndpoint = service => async ctx => {
 
     pair.matchWith({
       Just: ({ value }) => {
-        ctx.state.returnValue = value;
+        if (value.data === null) {
+          ctx.status = 404;
+        } else {
+          ctx.state.returnValue = value;
+        }
       },
       Nothing: () => {
         ctx.status = 404;

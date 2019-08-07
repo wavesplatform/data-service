@@ -1,4 +1,4 @@
-import { Maybe, empty } from 'folktale/maybe';
+import { Maybe, of as maybeOf } from 'folktale/maybe';
 import { Task, of as taskOf, rejected } from 'folktale/concurrency/task';
 import * as LRU from 'lru-cache';
 import { createOrderPair } from '@waves/assets-pairs-order';
@@ -130,7 +130,7 @@ export default ({
           maybePair =>
             maybePair.matchWith({
               Just: () => taskOf(maybePair),
-              Nothing: () => taskOf(empty()), // 404
+              Nothing: () => taskOf(maybeOf(pair())),
             })
         );
 
