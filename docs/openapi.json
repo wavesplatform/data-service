@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "version": "0.23.0",
+    "version": "0.24.0",
     "title": "Waves Data Service",
     "description": "This is a a public Waves Data Services API documentation. The goal of the API is to provide a simple and convenient way to get data from Waves blockchain."
   },
@@ -34,6 +34,10 @@
     {
       "name": "info",
       "description": "Service info: version, etc."
+    },
+    {
+      "name": "matcher",
+      "description": "Candles, pairs and other trading endpoints"
     }
   ],
   "paths": {
@@ -712,7 +716,7 @@
           "transactions"
         ],
         "summary": "Get a list of payment transactions by applying filters",
-        "operationId": "searchTxsPayment",
+        "operationId": "searchTxsSend",
         "parameters": [
           {
             "in": "query",
@@ -2940,6 +2944,149 @@
         "responses": {
           "200": {
             "description": "API current version"
+          }
+        }
+      }
+    },
+    "/matcher/{matcher}/pairs/{amountAsset}/{priceAsset}": {
+      "get": {
+        "tags": [
+          "matcher"
+        ],
+        "summary": "Get pair info by amount and price assets",
+        "operationId": "matcherGetPair",
+        "parameters": [
+          {
+            "name": "matcher",
+            "in": "path",
+            "description": "Matcher address",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "amountAsset",
+            "in": "path",
+            "description": "Asset ID of the amount asset",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "priceAsset",
+            "in": "path",
+            "description": "Asset ID of the price asset",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pair info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Pair"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Throws whether assets order in pair is incorrect"
+          }
+        }
+      }
+    },
+    "/matcher/{matcher}/pairs": {
+      "get": {
+        "tags": [
+          "matcher"
+        ],
+        "summary": "1) Get list of pairs info by serialized pairs list; 2) Get all list of pairs info by limit (sort by volume in WAVES)",
+        "operationId": "matcherGetPairsListAll",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matcher",
+            "description": "Matcher address",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pairs",
+            "in": "query",
+            "description": "`{amountAsset}/{priceAsset}` strings list",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "in": "query",
+            "name": "search_by_asset",
+            "description": "For searching pairs, that have the `search_by_asset` in asset names, tickers, id of one asset of the pair.",
+            "required": false,
+            "example": "bitc",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "search_by_assets",
+            "description": "For searching pairs, that have the `search_by_asset` in asset names, tickers, id of one asset of the pair.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "in": "query",
+            "name": "match_exactly",
+            "description": "Whether to search assets of pairs exactly or not. Parameter position is corresponds to asset position.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "boolean"
+              }
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "How many pairs to await in response.",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of Pairs info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListOfPair"
+                }
+              }
+            }
           }
         }
       }
