@@ -1,7 +1,7 @@
 const { compose, omit, zipWith, __, assoc, pipe } = require('ramda');
 const { renameKeys } = require('ramda-adjunct');
 
-const transformTxInfo = require('../_common/transformTxInfo');
+const { transformTxInfo } = require('../_common/transformTxInfo');
 
 /** addZippedTransfers ::
  * TxInfo -> TxInfoWithTransfers */
