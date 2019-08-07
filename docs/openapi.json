@@ -3001,6 +3001,67 @@
         }
       }
     },
+    
+    "/matcher/{matcher}/rates": {
+      "get": {
+        "tags": [
+          "matcher"
+        ],
+        "summary": "Estimate assets relative assets rate for asset pairs at specific time",
+        "operationId": "estimateRetes",
+        "parameters": [
+          {
+            "name": "matcher",
+            "in": "path",
+            "description": "Matcher address",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pairs",
+            "in": "query",
+            "description": "`{amountAsset}/{priceAsset}` strings list",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "in": "query",
+            "name": "timestamp",
+            "description": "Time to estimate the rates at. Defaults to now.",
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pair info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListOfRates"
+                }
+              }
+            }
+          }
+        }
+      }
+    },    
     "/matcher/{matcher}/pairs": {
       "get": {
         "tags": [
@@ -4333,6 +4394,52 @@
             }
           }
         }
+      },
+      "Rate": {
+        "type": "object",
+        "required": [
+          "__type",
+          "data"
+        ],
+        "properties": {
+          "__type": {
+            "type": "string",
+            "example": "rate"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "amountAsset": {
+                "type": "string"
+              },
+              "priceAsset": {
+                "type": "string"
+              },
+              "current": {
+                "type": "number"
+              }
+            }
+          }
+        }        
+      },
+      "ListOfRates": {
+        "type": "object",
+        "required": [
+          "__type",
+          "data"
+        ],
+        "properties": {
+          "__type": {
+            "type": "string",
+            "example": "list"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Rate"
+            }
+          }
+        }        
       },
       "ListOfAlias": {
         "type": "object",
