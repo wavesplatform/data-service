@@ -8,25 +8,25 @@ export const handleError = ({ ctx, error }: { ctx: any; error: AppError }) => {
   error.matchWith({
     Init: () => {
       ctx.status = 500;
-      ctx.body = {
+      ctx.state.returnValue = {
         message: DEFAULT_INTERNAL_SERVER_ERROR_MESSAGE,
       };
     },
     Db: () => {
       ctx.status = 500;
-      ctx.body = {
+      ctx.state.returnValue = {
         message: DEFAULT_INTERNAL_SERVER_ERROR_MESSAGE,
       };
     },
     Resolver: () => {
       ctx.status = 500;
-      ctx.body = {
+      ctx.state.returnValue = {
         message: DEFAULT_INTERNAL_SERVER_ERROR_MESSAGE,
       };
     },
     Validation: errorInfo => {
       ctx.status = 400;
-      ctx.body = {
+      ctx.state.returnValue = {
         message: 'Validation Error',
         meta:
           errorInfo.meta !== undefined
