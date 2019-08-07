@@ -1796,40 +1796,6 @@ paths:
       responses:
         '200':
           description: API current version
-  '/matcher/{matcher}/pairs/{amountAsset}/{priceAsset}':
-    get:
-      tags:
-        - matcher
-      summary: Get pair info by amount and price assets
-      operationId: matcherGetPair
-      parameters:
-        - name: matcher
-          in: path
-          description: Matcher address
-          required: true
-          schema:
-            type: string
-        - name: amountAsset
-          in: path
-          description: Asset ID of the amount asset
-          required: true
-          schema:
-            type: string
-        - name: priceAsset
-          in: path
-          description: Asset ID of the price asset
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Pair info
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Pair'
-        '400':
-          description: Throws whether assets order in pair is incorrect
   '/matcher/{matcher}/rates':
     get:
       tags:
@@ -1865,7 +1831,41 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ListOfRates'
+                $ref: '#/components/schemas/ListOfRates'                
+  '/matcher/{matcher}/pairs/{amountAsset}/{priceAsset}':
+    get:
+      tags:
+        - matcher
+      summary: Get pair info by amount and price assets
+      operationId: matcherGetPair
+      parameters:
+        - name: matcher
+          in: path
+          description: Matcher address
+          required: true
+          schema:
+            type: string
+        - name: amountAsset
+          in: path
+          description: Asset ID of the amount asset
+          required: true
+          schema:
+            type: string
+        - name: priceAsset
+          in: path
+          description: Asset ID of the price asset
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Pair info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pair'
+        '400':
+          description: Throws whether assets order in pair is incorrect
   '/matcher/{matcher}/pairs':
     get:
       tags:
