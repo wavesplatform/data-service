@@ -20,12 +20,14 @@ export default <
 >({
   name,
   orderPair,
+  defaultMatcherAddress,
   sql,
   transformResult,
   typeFactory,
 }: {
   name: string;
   orderPair: TOrderPair | null;
+  defaultMatcherAddress: string;
   sql: (req: Request) => string;
   transformResult: (
     results: ResponseRaw,
@@ -41,7 +43,10 @@ export default <
       ResponseTransformed,
       Result
     >(typeFactory)(transformResult),
-    validateInput: validateInput(inputMget(orderPair), name),
+    validateInput: validateInput(
+      inputMget({ orderPair, defaultMatcherAddress }),
+      name
+    ),
     validateResult: validateResult<ResponseRaw>(resultSchema, name),
     dbQuery: mgetPairs<Request, ResponseRaw, Pair>({
       name,

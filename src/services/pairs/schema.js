@@ -57,17 +57,25 @@ const pair = orderPair => {
   }
 };
 
-const inputGet = orderPair =>
+const inputGet = ({ orderPair, defaultMatcherAddress }) =>
   Joi.object()
     .keys({
-      pair: pair(orderPair).required(),
+      pair: Joi.when('matcher', {
+        is: defaultMatcherAddress,
+        then: pair(orderPair),
+        otherWise: pair(null),
+      }).required(),
       matcher: Joi.string().required(),
     })
     .required();
 
-const inputMget = orderPair =>
+const inputMget = ({ orderPair, defaultMatcherAddress }) =>
   Joi.object().keys({
-    pairs: Joi.array().items(pair(orderPair)),
+    pairs: Joi.when('matcher', {
+      is: defaultMatcherAddress,
+      then: Joi.array().items(pair(orderPair)),
+      otherWise: Joi.array().items(pair(null)),
+    }),
     matcher: Joi.string().required(),
   });
 

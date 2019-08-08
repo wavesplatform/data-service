@@ -92,7 +92,10 @@ export default ({
     >({
       name: 'pairs.get',
       sql: sql.get,
-      inputSchema: inputGet(orderPair),
+      inputSchema: inputGet({
+        orderPair,
+        defaultMatcherAddress: options.matcher.defaultMatcherAddress,
+      }),
       resultSchema,
       transformResult: transformResult,
       resultTypeFactory: pair,
@@ -106,6 +109,7 @@ export default ({
     >({
       name: 'pairs.mget',
       orderPair,
+      defaultMatcherAddress: options.matcher.defaultMatcherAddress,
       sql: sql.mget,
       transformResult: transformResult,
       typeFactory: pair,
