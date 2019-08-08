@@ -92,7 +92,12 @@ export default ({
     >({
       name: 'pairs.get',
       sql: sql.get,
-      inputSchema: inputGet(orderPair),
+      // @todo simplify, when async pair validator will be ready
+      // https://jira.wavesplatform.com/browse/DATA-998
+      inputSchema: inputGet({
+        orderPair,
+        defaultMatcherAddress: options.matcher.defaultMatcherAddress,
+      }),
       resultSchema,
       transformResult: transformResult,
       resultTypeFactory: pair,
@@ -106,6 +111,7 @@ export default ({
     >({
       name: 'pairs.mget',
       orderPair,
+      defaultMatcherAddress: options.matcher.defaultMatcherAddress,
       sql: sql.mget,
       transformResult: transformResult,
       typeFactory: pair,
