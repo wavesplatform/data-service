@@ -92,6 +92,8 @@ export default ({
     >({
       name: 'pairs.get',
       sql: sql.get,
+      // @todo simplify, when async pair validator will be ready
+      // https://jira.wavesplatform.com/browse/DATA-998
       inputSchema: inputGet({
         orderPair,
         defaultMatcherAddress: options.matcher.defaultMatcherAddress,

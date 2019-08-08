@@ -44,6 +44,8 @@ export default <
       Result
     >(typeFactory)(transformResult),
     validateInput: validateInput(
+      // @todo simplify, when async pair validator will be ready
+      // https://jira.wavesplatform.com/browse/DATA-998
       inputMget({ orderPair, defaultMatcherAddress }),
       name
     ),
