@@ -82,7 +82,6 @@ const transactionsEndpointsConfig = (
       amountAsset: identity,
       priceAsset: identity,
       orderId: query,
-      orderSender: query,
     }),
   },
   '/transactions/lease': {
