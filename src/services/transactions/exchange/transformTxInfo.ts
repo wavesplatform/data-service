@@ -32,7 +32,7 @@ const createOrder = (prefix: string) => <T extends Record<string, any>>({
     },
     orderType,
     price,
-    orderSender: sender,
+    sender,
     amount,
     timestamp,
     expiration,

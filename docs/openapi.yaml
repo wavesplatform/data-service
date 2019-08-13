@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 0.23.0
+  version: 0.23.1
   title: Waves Data Service
   description: This is a a public Waves Data Services API documentation. The goal of the API is to provide a simple and convenient way to get data from Waves blockchain.
 servers:
@@ -885,17 +885,12 @@ paths:
           schema:
             type: string
         - in: query
-          name: sender
-          description: Address of a matcher which sent the transaction
-          schema:
-            type: string
-        - in: query
           name: orderId
           description: Id of order related to the transaction
           schema:
             type: string
         - in: query
-          name: orderSender
+          name: sender
           description: Address of a trader-participant in a transaction — an ORDER sender
           schema:
             type: string

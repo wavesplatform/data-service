@@ -29,7 +29,6 @@ export type ExchangeTxsSearchRequest = RequestWithCursor<
   Partial<{
     matcher: string;
     orderId: string;
-    orderSender: string;
     amountAsset: string;
     priceAsset: string;
   }>;
