@@ -35,11 +35,7 @@ export const txs = pg({ t: 'txs_16' })
   .leftJoin({ a: 'txs_16_args' }, 'a.tx_id', 't.id')
   .leftJoin({ p: 'txs_16_payment' }, 'p.tx_id', 't.id');
 
-export const fSelect = pg
-  .select('id')
-  .min({ time_stamp: 'time_stamp' })
-  .from('txs_16')
-  .groupBy('id');
+export const fSelect = pg.select('id').from('txs_16');
 
 export const select = pg
   .select(columnsWithoutFeeAndPaymentAssetId)
@@ -55,5 +51,7 @@ export const select = pg
   .from({ txs })
   .leftJoin({ p_dec: 'asset_decimals' }, 'p_dec.asset_id', 'txs.asset_id');
 
-export const composeQuery = (filteringQ: knex.QueryBuilder): knex.QueryBuilder =>
+export const composeQuery = (
+  filteringQ: knex.QueryBuilder
+): knex.QueryBuilder =>
   select.clone().whereIn('id', pg.select('id').from({ filtered: filteringQ }));
