@@ -35,7 +35,7 @@ export const handleError = ({ ctx, error }: { ctx: any; error: AppError }) => {
                   message: error.message,
                 }))
               : errorInfo.meta
-            : undefined,
+            : errorInfo.error.message,
       };
     },
   });

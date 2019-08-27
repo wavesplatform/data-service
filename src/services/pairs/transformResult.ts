@@ -1,4 +1,4 @@
-import { compose, pick, map } from 'ramda';
+import { compose, map, pick } from 'ramda';
 import { renameKeys } from 'ramda-adjunct';
 import { BigNumber } from '@waves/data-entities';
 import { list, List, pair, Pair, PairInfo } from '../../types';

@@ -1,4 +1,4 @@
-import { Maybe, of as maybeOf } from 'folktale/maybe';
+import { Maybe, of as maybeOf, empty } from 'folktale/maybe';
 import { Task, of as taskOf, rejected } from 'folktale/concurrency/task';
 import * as LRU from 'lru-cache';
 import { createOrderPair } from '@waves/assets-pairs-order';
@@ -158,7 +158,7 @@ export default ({
               );
 
             if (found.length < notCached.length) {
-              return rejected(new ValidationError(new Error('Check pair')));
+              return taskOf(empty());
             } else {
               found.forEach(tx => cache.set(tx.id, true));
               return getPair;
@@ -189,10 +189,17 @@ export default ({
                 (t: TransactionInfo | null): t is TransactionInfo => t !== null
               );
 
+            found.forEach(tx => cache.set(tx.id, true));
+
             if (found.length < notCached.length) {
-              return rejected(new ValidationError(new Error('Check pairs')));
+              return rejected(
+                new ValidationError(
+                  new Error(
+                    'At least one pair is incorrect (some asset may not exist)'
+                  )
+                )
+              );
             } else {
-              found.forEach(tx => cache.set(tx.id, true));
               return mgetPairs;
             }
           });
