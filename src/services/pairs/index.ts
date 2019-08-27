@@ -110,7 +110,7 @@ export default ({
       Pair
     >({
       name: 'pairs.mget',
-      orderPair,
+      orderPair: null,  // just for backward compatibility (it's fixed in v1)
       defaultMatcherAddress: options.matcher.defaultMatcherAddress,
       sql: sql.mget,
       transformResult: transformResult,
@@ -189,12 +189,8 @@ export default ({
                 (t: TransactionInfo | null): t is TransactionInfo => t !== null
               );
 
-            if (found.length < notCached.length) {
-              return rejected(new ValidationError(new Error('Check pairs')));
-            } else {
-              found.forEach(tx => cache.set(tx.id, true));
-              return mgetPairs;
-            }
+            found.forEach(tx => cache.set(tx.id, true));
+            return mgetPairs;
           });
         }
       },
