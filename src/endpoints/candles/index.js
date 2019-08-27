@@ -4,7 +4,7 @@ const subrouter = Router();
 
 const candlesSearch = require('./search');
 
-subrouter.get('/candles/:amountAsset/:priceAsset', candlesSearch);
-subrouter.get('/candles/:amountAsset', candlesSearch);
-
-module.exports = subrouter;
+module.exports = candlesService =>
+  subrouter
+    .get('/candles/:amountAsset/:priceAsset', candlesSearch(candlesService))
+    .get('/candles/:amountAsset', candlesSearch(candlesService));

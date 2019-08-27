@@ -1,6 +1,14 @@
 import * as knex from 'knex';
 import { compose } from 'ramda';
 import { escapeForTsQuery, prepareForLike } from '../../utils/db';
+import { Pair } from './types';
+import {
+  PairsGetRequest,
+  PairsMgetRequest,
+  PairsSearchRequest,
+  SearchByAssetRequest,
+  SearchByAssetsRequest,
+} from '.';
 
 const pg = knex({ client: 'pg' });
 
@@ -18,29 +26,8 @@ const COLUMNS = [
   'volume_waves',
 ];
 
-type SearchWithLimitRequest = {
-  limit: number;
-};
-
-type SearchWithMatchExactly = SearchWithLimitRequest & {
-  match_exactly?: boolean[];
-};
-
-type SearchByAssetRequest = SearchWithMatchExactly & {
-  search_by_asset: string;
-};
-
-type SearchByAssetsRequest = SearchWithMatchExactly & {
-  search_by_assets: [string, string];
-};
-
-type SearchRequest =
-  | SearchWithLimitRequest
-  | SearchByAssetRequest
-  | SearchByAssetsRequest;
-
 const isSearchByAssetRequest = (
-  searchByAssetRequest: SearchRequest
+  searchByAssetRequest: PairsSearchRequest
 ): searchByAssetRequest is SearchByAssetRequest => {
   return (
     typeof searchByAssetRequest === 'object' &&
@@ -50,7 +37,7 @@ const isSearchByAssetRequest = (
 };
 
 const isSearchByAssetsRequest = (
-  searchByAssetRequest: SearchRequest
+  searchByAssetRequest: PairsSearchRequest
 ): searchByAssetRequest is SearchByAssetsRequest => {
   return (
     typeof searchByAssetRequest === 'object' &&
@@ -73,13 +60,14 @@ const getMatchExactly = (matchExactly: boolean[] | undefined): boolean[] => {
   }
 };
 
-const query = (pairs: { amountAsset: string; priceAsset: string }[]): string =>
+const query = (pairs: Pair[], matcher: string): string =>
   pg({ t: 'pairs' })
     .select(COLUMNS)
     .whereIn(
       ['t.amount_asset_id', 't.price_asset_id'],
       pairs.map(pair => [pair.amountAsset, pair.priceAsset])
     )
+    .where('matcher', matcher)
     .toString();
 
 const searchAssets = (
@@ -130,22 +118,19 @@ const searchAssets = (
     );
 };
 
-export const get = (pair: {
-  amountAsset: string;
-  priceAsset: string;
-}): string => query([pair]);
-export const mget = query;
-export const search = (req: SearchRequest): string => {
+export const get = (r: PairsGetRequest): string => query([r.pair], r.matcher);
+export const mget = (r: PairsMgetRequest): string => query(r.pairs, r.matcher);
+export const search = (req: PairsSearchRequest): string => {
   // asset - prefix search of amount or price assets
   // asset1/asset2 - prefix search of amount asset by asset1
   //                 and prefix search of price asset by asset2
   //                 or amount asset by asset2 and price asset by asset1
 
-  const { limit } = req;
-
+  const { matcher, limit } = req;
   const q = pg({ t: 'pairs' })
     .select(COLUMNS.map(column => `t.${column}`))
     .orderByRaw('volume_waves desc NULLS LAST')
+    .where('matcher', matcher)
     .limit(limit);
 
   if (isSearchByAssetRequest(req)) {
@@ -209,6 +194,7 @@ export const search = (req: SearchRequest): string => {
               'reverse_cte.price_asset_id': 't1.amount_asset_id',
             }
           )
+          .where('matcher', matcher)
       )
       .toString();
   } else {

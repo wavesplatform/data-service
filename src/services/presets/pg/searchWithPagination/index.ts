@@ -2,37 +2,19 @@ import { SchemaLike } from 'joi';
 
 import { search } from '../../../_common/createResolver';
 import { validateInput, validateResult } from '../../validation';
+import { Serializable, List } from '../../../../types';
+import { ServicePresetInitOptions } from '../../../presets/types';
+import { WithSortOrder, WithLimit } from '../../../_common';
+import { Cursor, RequestWithCursor } from '../../../_common/pagination';
 import { transformInput } from './transformInput';
 import { transformResults } from './transformResult';
-import { Serializable, List } from '../../../../types';
 import { getData } from './pg';
-import { ServicePresetInitOptions } from '../../../presets/types';
-import { Cursor, SortOrder } from 'services/_common/pagination/cursor';
-
-export type WithSortOrder = {
-  sort: SortOrder;
-};
-
-export type WithLimit = {
-  limit: number;
-};
-
-export type RequestWithCursor<
-  Request extends WithSortOrder,
-  CursorType
-> = Request & {
-  after?: CursorType;
-};
-
-export type BaseResponse = {
-  uid: number;
-  [key: string]: any;
-};
 
 export const searchWithPaginationPreset = <
   Request extends WithSortOrder & WithLimit,
   ResponseRaw,
-  ResponseTransformed extends Serializable<string, BaseResponse>
+  ResponseTransformed,
+  Result extends Serializable<string, ResponseTransformed | null>
 >({
   name,
   sql,
@@ -47,13 +29,13 @@ export const searchWithPaginationPreset = <
   transformResult: (
     response: ResponseRaw,
     request?: RequestWithCursor<Request, Cursor>
-  ) => ResponseTransformed;
+  ) => Result;
 }) => ({ pg, emitEvent }: ServicePresetInitOptions) =>
   search<
     RequestWithCursor<Request, string>,
     RequestWithCursor<Request, Cursor>,
     ResponseRaw,
-    List<ResponseTransformed>
+    List<Result>
   >({
     transformInput,
     transformResult: transformResults(transformResult),

@@ -8,7 +8,7 @@ const { matchRequestsResults } = require('../../../../utils/db/index');
 const transformResult = require('./transformResult');
 const sql = require('./sql');
 
-module.exports = {
+const pg = {
   get: pg => id =>
     pg
       .any(sql.get(id))
@@ -32,8 +32,10 @@ module.exports = {
       .map(transformResult)
       .mapRejected(
         toDbError({
-          toDbError: 'transactions.data.many',
+          request: 'transactions.data.many',
           params: filters,
         })
       ),
 };
+
+module.exports = { pg };

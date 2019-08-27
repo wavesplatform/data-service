@@ -2,7 +2,7 @@ import { memoizeWith, always } from 'ramda';
 import {
   PostgresConfig,
   LoggerConfig,
-  loadConfig as loadDataServiceConfig,
+  loadDefaultConfig,
 } from '../../loadConfig';
 
 export type CandlesConfig = PostgresConfig &
@@ -14,7 +14,7 @@ export type CandlesConfig = PostgresConfig &
   };
 
 const load = (): CandlesConfig => ({
-  ...loadDataServiceConfig(),
+  ...loadDefaultConfig(),
   candlesUpdateInterval: process.env.CANDLES_UPDATE_INTERVAL
     ? parseInt(process.env.CANDLES_UPDATE_INTERVAL)
     : 2500,

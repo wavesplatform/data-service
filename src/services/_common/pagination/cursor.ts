@@ -1,10 +1,6 @@
 import { Result, Error as error, Ok as ok } from 'folktale/result';
 import { ValidationError } from '../../../errorHandling';
-
-export enum SortOrder {
-  Ascending = 'asc',
-  Descending = 'desc',
-}
+import { SortOrder } from '../';
 
 const isSortOrder = (s: string): s is SortOrder =>
   s === SortOrder.Ascending || s === SortOrder.Descending;

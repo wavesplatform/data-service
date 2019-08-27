@@ -1,16 +1,17 @@
 import { of as task } from 'folktale/concurrency/task';
-import { always, identity } from 'ramda';
+import { always, T } from 'ramda';
 
 import { parseDate } from '../../../../../utils/parseDate';
 import { Joi } from '../../../../../utils/validation';
-import { searchWithPaginationPreset, WithSortOrder, WithLimit } from '..';
-import commonFilterSchemas from '../commonFilterSchemas';
 import {
   Serializable,
   toSerializable,
 } from '../../../../../types/serialization';
 import { PgDriver } from '../../../../../db/driver';
-import { SortOrder } from '../../../../_common/pagination/cursor';
+import { SortOrder, WithSortOrder, WithLimit } from '../../../../_common';
+import { searchWithPaginationPreset } from '..';
+import commonFilterSchemas from '../commonFilterSchemas';
+import { AppError } from './../../../../../errorHandling';
 
 const mockTxs: ResponseRaw[] = [{ uid: 1 }, { uid: 2 }];
 
@@ -27,7 +28,8 @@ type ResponseRaw = {
 const service = searchWithPaginationPreset<
   Request,
   ResponseRaw,
-  Serializable<string, ResponseRaw>
+  ResponseRaw,
+  Serializable<string, ResponseRaw | null>
 >({
   name: 'some_name',
   sql: () => '',
@@ -37,7 +39,7 @@ const service = searchWithPaginationPreset<
     toSerializable<'tx', ResponseRaw>('tx', response),
 })({
   pg: { any: filters => task(mockTxs) } as PgDriver,
-  emitEvent: always(identity),
+  emitEvent: always(T),
 });
 
 const assertValidationError = (done: jest.DoneCallback, v: Request) =>
@@ -45,7 +47,7 @@ const assertValidationError = (done: jest.DoneCallback, v: Request) =>
     .run()
     .promise()
     .then(() => done('Wrong branch, error'))
-    .catch(e => {
+    .catch((e: AppError) => {
       expect(e.type).toBe('Validation');
       done();
     });
@@ -85,7 +87,7 @@ describe('searchWithPagination preset validation', () => {
       })
         .run()
         .listen({
-          onResolved: x => {
+          onResolved: (x: Serializable<string, any>) => {
             expect(x.__type).toBe('list');
             done();
           },

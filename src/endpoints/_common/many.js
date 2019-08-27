@@ -1,6 +1,7 @@
 const { has } = require('ramda');
 
 const { captureErrors } = require('../../utils/captureErrors');
+const { handleError } = require('../../utils/handleError');
 const { select } = require('../utils/selectors');
 
 const { parseFilterValues } = require('./filters');
@@ -10,31 +11,8 @@ const createManyMiddleware = (
   url,
   service
 ) => {
-  const handleError = ({ ctx, error }) => {
-    ctx.eventBus.emit('ERROR', error);
-    error.matchWith({
-      Db: () => {
-        ctx.status = 500;
-        ctx.body = 'Database Error';
-      },
-      Resolver: () => {
-        ctx.status = 500;
-        ctx.body = `Error resolving ${url}`;
-      },
-      Validation: () => {
-        ctx.status = 400;
-        ctx.body = `Invalid query, check params, got: ${ctx.querystring}`;
-      },
-    });
-  };
-
   return captureErrors(handleError)(async ctx => {
-    const s = service({
-      drivers: ctx.state.drivers,
-      emitEvent: ctx.eventBus.emit,
-    });
-
-    if (!s.mget && !s.search) {
+    if (!service.mget && !service.search) {
       ctx.status = 404;
       return;
     }
@@ -53,8 +31,8 @@ const createManyMiddleware = (
     let results;
     if (has(mgetFilterName, fValues)) {
       // mget hit
-      if (s.mget) {
-        results = await s
+      if (service.mget) {
+        results = await service
           .mget(fValues[mgetFilterName])
           .run()
           .promise();
@@ -64,8 +42,8 @@ const createManyMiddleware = (
       }
     } else {
       // search hit
-      if (s.search) {
-        results = await s
+      if (service.search) {
+        results = await service
           .search(fValues)
           .run()
           .promise();

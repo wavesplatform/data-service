@@ -1,58 +1,65 @@
-const createService = require('../../services/pairs');
-const { select } = require('../utils/selectors');
 const { captureErrors } = require('../../utils/captureErrors');
+const { handleError } = require('../../utils/handleError');
+const { parseFilterValues } = require('../_common/filters');
+const { query: parseQuery } = require('../_common/filters/parsers');
+const { select } = require('../utils/selectors');
 
 /**
  * Endpoint
- * @name /pairs/id1/id2?...params
+ * @name /pairs/amountAsset/priceAsset?...params
  */
-const pairsOneEndpoint = async ctx => {
-  const { fromParams } = select(ctx);
-  const [id1, id2] = fromParams(['id1', 'id2']);
+const pairsOneEndpoint = service => async ctx => {
+  const { fromParams, query } = select(ctx);
+  const [amountAsset, priceAsset] = fromParams(['amountAsset', 'priceAsset']);
+  const { matcher } = parseFilterValues({ matcher: parseQuery })(query);
 
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
-    resolver: '/pairs/:id1/:id2',
+    resolver: '/pairs/:amountAsset/:priceAsset',
   });
 
-  const service = createService({
-    drivers: ctx.state.drivers,
-    emitEvent: ctx.eventBus.emit,
-  });
+  try {
+    const pair = await service
+      .get({
+        pair: {
+          amountAsset,
+          priceAsset,
+        },
+        matcher: matcher || ctx.state.config.defaultMatcher,
+      })
+      .run()
+      .promise();
 
-  const pair = await service
-    .get({
-      amountAsset: id1,
-      priceAsset: id2,
-    })
-    .run()
-    .promise();
+    ctx.eventBus.emit('ENDPOINT_RESOLVED', {
+      value: pair,
+    });
 
-  ctx.eventBus.emit('ENDPOINT_RESOLVED', {
-    value: pair,
-  });
-
-  pair.matchWith({
-    Just: ({ value }) => (ctx.state.returnValue = value),
-    Nothing: () => (ctx.status = 404),
-  });
+    pair.matchWith({
+      Just: ({ value }) => {
+        if (value.data === null) {
+          ctx.status = 404;
+        } else {
+          ctx.state.returnValue = value;
+        }
+      },
+      Nothing: () => {
+        ctx.status = 404;
+      },
+    });
+  } catch (e) {
+    e.matchWith({
+      DB: () => {
+        throw e;
+      },
+      Resolver: () => {
+        throw e;
+      },
+      Validation: () => {
+        ctx.status = 404;
+      },
+    });
+  }
 };
 
-const handleError = ({ ctx, error }) => {
-  ctx.eventBus.emit('ERROR', error);
-  error.matchWith({
-    Db: () => {
-      ctx.status = 500;
-      ctx.body = 'Database Error';
-    },
-    Resolver: () => {
-      ctx.status = 500;
-      ctx.body = 'Error resolving /pairs/:id1/:id2';
-    },
-    Validation: () => {
-      ctx.status = 400;
-      ctx.body = `Invalid query, check params, got: ${ctx.querystring}`;
-    },
-  });
-};
-module.exports = captureErrors(handleError)(pairsOneEndpoint);
+module.exports = service =>
+  captureErrors(handleError)(pairsOneEndpoint(service));

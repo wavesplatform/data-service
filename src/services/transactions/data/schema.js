@@ -1,7 +1,8 @@
 const Joi = require('../../../utils/validation/joi');
 
 const commonFields = require('../_common/commonFieldsSchemas');
-const commonFilters = require('../../presets/pg/searchWithPagination/commonFilterSchemas').default;
+const commonFilters = require('../../presets/pg/searchWithPagination/commonFilterSchemas')
+  .default;
 
 const CORRECT_TYPE = Joi.string().valid([
   'integer',
@@ -34,7 +35,6 @@ const result = Joi.object().keys({
 const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
-    sender: Joi.string(),
     key: Joi.string(),
     type: CORRECT_TYPE,
     value: Joi.when('type', {

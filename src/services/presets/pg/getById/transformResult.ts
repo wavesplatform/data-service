@@ -8,7 +8,7 @@ export const transformResults = <
   ResponseTransformed,
   Result extends Serializable<string, any>
 >(
-  typeFactory: (d?: ResponseTransformed) => Result
+  typeFactory: (d: ResponseTransformed) => Result
 ) => (
   transformDbResponse: (
     results: ResponseRaw,

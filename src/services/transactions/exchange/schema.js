@@ -57,10 +57,8 @@ const inputSearch = Joi.object()
 
     matcher: Joi.string(),
     orderId: Joi.string(),
-    sender: Joi.string(),
     amountAsset: Joi.string().base58(),
     priceAsset: Joi.string().base58(),
-    orderSender: Joi.string(),
   })
   .required();
 
