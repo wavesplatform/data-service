@@ -7,7 +7,7 @@ const { BigNumber } = require('@waves/data-entities');
 
 const parseValue = (type, value) => {
   if (type === 'boolean') return parseBool(value);
-  else if (type === 'integer') return new BigNumber(value);
+  else if (type === 'integer' && !isNil(value)) return new BigNumber(value);
   else return value;
 };
 
