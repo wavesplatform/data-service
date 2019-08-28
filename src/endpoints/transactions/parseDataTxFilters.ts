@@ -9,7 +9,7 @@ type DataType = 'binary' | 'boolean' | 'integer' | 'string';
 
 type ParseValueRequest = {
   type: DataType;
-  value?: any;
+  value?: string;
 };
 
 const parseValue = ({ type, value }: ParseValueRequest) => {
