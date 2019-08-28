@@ -1,14 +1,12 @@
 import { reject, isNil } from 'ramda';
+import { BigNumber } from '@waves/data-entities';
 import { parseDate } from '../../utils/parseDate';
 import { parseBool } from '../utils/parseBool';
 import { parseArrayQuery } from '../utils/parseArrayQuery';
-
-import { BigNumber } from '@waves/data-entities';
-
-type DataType = 'binary' | 'boolean' | 'integer' | 'string';
+import { DataTxEntryType } from '../../types';
 
 type ParseValueRequest = {
-  type: DataType;
+  type: DataTxEntryType;
   value?: string;
 };
 
@@ -37,7 +35,7 @@ export const parseFilters = ({
   limit: string;
   sort: string;
   key: string;
-  type: DataType;
+  type: DataTxEntryType;
   value: string;
   after: string;
 }) =>

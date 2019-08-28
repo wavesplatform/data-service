@@ -1,6 +1,7 @@
 import { identity, compose } from 'ramda';
 
 import { CommonServiceDependencies } from '../..';
+import { DataTxEntryType } from '../../../types';
 import {
   transaction,
   TransactionInfo,
@@ -38,13 +39,13 @@ type DataTxsSearchRequest = CommonFilters &
   WithLimit &
   Partial<{
     key: string;
-    type: string;
+    type: DataTxEntryType;
     value: string;
   }>;
 
 type DataEntry = {
   key: string;
-  type: string;
+  type: DataTxEntryType;
   value: string;
 };
 

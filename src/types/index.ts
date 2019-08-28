@@ -96,6 +96,7 @@ export const pair = (data: PairInfo | null = null): Pair =>
   toSerializable('pair', data);
 
 // @todo TransactionInfo
+export type DataTxEntryType = 'binary' | 'boolean' | 'integer' | 'string';
 export type TransactionInfo = {
   id: string;
   type: number;
