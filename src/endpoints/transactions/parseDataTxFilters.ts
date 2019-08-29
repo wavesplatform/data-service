@@ -5,16 +5,26 @@ import { parseBool } from '../utils/parseBool';
 import { parseArrayQuery } from '../utils/parseArrayQuery';
 import { DataTxEntryType } from '../../types';
 
-type ParseValueRequest = {
-  type: DataTxEntryType;
-  value?: string;
-};
+type ParseValueResult = boolean | BigNumber | string | undefined;
 
-const parseValue = ({ type, value }: ParseValueRequest) => {
+function parseValue(type: 'boolean', vs: string): boolean;
+function parseValue(type: 'integer', vs: string): BigNumber;
+function parseValue(type: 'binary' | 'string', vs: string): string;
+function parseValue(
+  type: DataTxEntryType | undefined,
+  vu: undefined
+): undefined;
+function parseValue(
+  type: DataTxEntryType | undefined,
+  vu: string | undefined
+): ParseValueResult;
+
+function parseValue(type?: DataTxEntryType, value?: string): ParseValueResult {
+  if (type === undefined || value === undefined) return undefined;
   if (type === 'boolean') return parseBool(value);
-  else if (type === 'integer' && !isNil(value)) return new BigNumber(value);
+  else if (type === 'integer') return new BigNumber(value);
   else return value;
-};
+}
 
 export const parseFilters = ({
   ids,
@@ -29,15 +39,15 @@ export const parseFilters = ({
   after,
 }: {
   ids?: string | string[];
-  timeStart: string;
-  timeEnd: string;
-  sender: string;
+  timeStart?: string;
+  timeEnd?: string;
+  sender?: string;
   limit: string;
   sort: string;
-  key: string;
-  type: DataTxEntryType;
-  value: string;
-  after: string;
+  key?: string;
+  type?: DataTxEntryType;
+  value?: string;
+  after?: string;
 }) =>
   reject(isNil, {
     ids: ids && parseArrayQuery(ids),
@@ -48,6 +58,6 @@ export const parseFilters = ({
     sender,
     key,
     type,
-    value: parseValue({ type, value }),
+    value: parseValue(type, value),
     after,
   });
