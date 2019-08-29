@@ -15,7 +15,7 @@ const pg = {
       .map(transformResult)
       .map(head)
       .map(Maybe.fromNullable)
-      .mapRejected(toDbError({ request: 'transactions.data.one', params: id })),
+      .mapRejected(toDbError({ request: 'transactions.data.get', params: id })),
 
   mget: pg => ids =>
     pg
@@ -23,7 +23,7 @@ const pg = {
       .map(transformResult)
       .map(matchRequestsResults(propEq('id'), ids))
       .mapRejected(
-        toDbError({ request: 'transactions.data.one', params: ids })
+        toDbError({ request: 'transactions.data.mget', params: ids })
       ),
 
   search: pg => filters =>
@@ -32,7 +32,7 @@ const pg = {
       .map(transformResult)
       .mapRejected(
         toDbError({
-          request: 'transactions.data.many',
+          request: 'transactions.data.search',
           params: filters,
         })
       ),
