@@ -96,7 +96,7 @@ export const addMissingCandles = curry(
     const res = merge({}, candlesGroupedByTime);
     for (
       let it = ceil(interval, timeStart);
-      it < end;
+      it <= end;
       it = floor(interval, add(interval, it))
     ) {
       const cur = truncToMinutes(it);
