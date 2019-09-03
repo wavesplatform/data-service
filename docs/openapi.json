@@ -1442,6 +1442,14 @@
         "parameters": [
           {
             "in": "query",
+            "name": "sender",
+            "description": "Address of a matcher which sent the transaction",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
             "name": "matcher",
             "description": "Address of a matcher which sent the transaction",
             "schema": {
@@ -1458,7 +1466,7 @@
           },
           {
             "in": "query",
-            "name": "sender",
+            "name": "orderSender",
             "description": "Address of a trader-participant in a transaction — an ORDER sender",
             "schema": {
               "type": "string"

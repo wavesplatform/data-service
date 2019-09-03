@@ -8,18 +8,12 @@ const selectIdsWhereRecipient = recipient =>
 
 const select = pg('txs_11');
 const renameToTxs = q => pg({ txs: q.clone() });
-const transfers = pg('txs_11_transfers').select([
-  'recipient',
-  'amount',
-  'tx_id',
-  'position_in_tx',
-]);
-const withTransfers = q =>
-  q.clone().join({ tfs: transfers }, 'tfs.tx_id', '=', 'txs.id');
 
-const decimals = pg('asset_decimals');
+const withTransfers = q =>
+  q.clone().join({ tfs: 'txs_11_transfers' }, 'tfs.tx_id', '=', 'txs.id');
+
 const withDecimals = q =>
-  q.clone().join({ ad: decimals }, 'ad.asset_id', '=', 'txs.asset_id');
+  q.clone().join({ ad: 'asset_decimals' }, 'ad.asset_id', '=', 'txs.asset_id');
 
 const withGrouping = q =>
   q
@@ -36,15 +30,16 @@ const withGrouping = q =>
       'sender',
       'sender_public_key',
       'txs.asset_id',
-      'attachment'
+      'attachment',
+      'uid'
     );
 
 const columns = {
   id: 'txs.id',
   fee: pg.raw('(fee * 10^(-8)) :: DOUBLE PRECISION'),
-  recipients: pg.raw('array_agg(recipient order by position_in_tx)'),
+  recipients: pg.raw('array_agg(tfs.recipient order by tfs.position_in_tx)'),
   amounts: pg.raw(
-    'array_agg (amount * 10^(-ad.decimals) :: double precision order by position_in_tx)'
+    'array_agg (tfs.amount * 10^(-ad.decimals) :: double precision order by tfs.position_in_tx)'
   ),
   height: 'height',
   tx_type: 'tx_type',
@@ -56,7 +51,6 @@ const columns = {
   sender_public_key: 'sender_public_key',
   asset_id: 'txs.asset_id',
   attachment: 'attachment',
-  uid: 'uid',
 };
 
 const withTransfersDecimalsAndGrouping = pipe(

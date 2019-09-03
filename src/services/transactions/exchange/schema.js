@@ -6,7 +6,9 @@ const commonFilters = require('../../presets/pg/searchWithPagination/commonFilte
 
 const orderTypes = prefix => ({
   [`${prefix}_id`]: Joi.string().required(),
-  [`${prefix}_version`]: Joi.string().required().allow(null),
+  [`${prefix}_version`]: Joi.string()
+    .required()
+    .allow(null),
   [`${prefix}_type`]: Joi.string().required(),
   [`${prefix}_sender`]: Joi.string().required(),
   [`${prefix}_sender_public_key`]: Joi.string().required(),
@@ -59,6 +61,7 @@ const inputSearch = Joi.object()
     orderId: Joi.string(),
     amountAsset: Joi.string().base58(),
     priceAsset: Joi.string().base58(),
+    orderSender: Joi.string(),
   })
   .required();
 

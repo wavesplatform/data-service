@@ -31,6 +31,7 @@ export type ExchangeTxsSearchRequest = RequestWithCursor<
     orderId: string;
     amountAsset: string;
     priceAsset: string;
+    orderSender: string;
   }>;
 
 export type ExchangeTxDbResponse = RawTx & {
