@@ -1,5 +1,11 @@
 const createSql = require('../../_common/sql/index');
 
-const { select } = require('./query');
+const { select, fSelect } = require('./query');
 
-module.exports = createSql({ query: select });
+const queryAfterFilters = {
+  get: fSelect,
+  mget: fSelect,
+  search: fSelect,
+};
+
+module.exports = createSql({ query: select, queryAfterFilters });

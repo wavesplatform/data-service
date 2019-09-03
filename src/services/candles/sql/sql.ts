@@ -181,7 +181,12 @@ export const sql = ({
 export const assetDecimals = (asset: string): string =>
   pg('asset_decimals')
     .select('decimals')
-    .where('asset_id', asset)
+    .whereIn('asset_uid', function() {
+      this.select('uid')
+        .from('assets_map')
+        .where('asset_id', asset)
+        .limit(1);
+    })
     .toString();
 
 module.exports = {

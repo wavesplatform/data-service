@@ -1,43 +1,48 @@
 const pg = require('knex')({ client: 'pg' });
 
-const columnsWithoutSatoshi = [
-  // common
-  'height',
-  'tx_type',
-  'id',
-  'time_stamp',
-  'signature',
-  'proofs',
-  'tx_version',
-  // 'fee',
-  'sender',
-  'sender_public_key',
-
-  // type-specific
-  'recipient',
-  // satoshi
-];
-
-const select = pg({ t: 'txs_2' })
-  .select(columnsWithoutSatoshi)
-  .select({
-    fee: pg.raw('fee * 10^(-8)'),
-    amount: pg.raw('amount * 10^(-8)'),
-  });
+const select = pg({ t: 'txs_2' }).select('*');
 
 const withFirstOnly = q =>
   pg
-    .select([...columnsWithoutSatoshi, 'fee', 'amount'])
+    .select({
+      // common
+      height: 't.height',
+      tx_type: 't.tx_type',
+      id: 'txs.id',
+      time_stamp: 't.time_stamp',
+      signature: 't.signature',
+      proofs: 't.proofs',
+      tx_version: 't.tx_version',
+      fee: pg.raw('t.fee * 10^(-8)'),
+      sender: 'addrm.address',
+      sender_public_key: 'addrm.public_key',
+
+      // type-specific
+      amount: pg.raw('t.amount * 10^(-8)'),
+      recipient: pg.raw(
+        'coalesce(recipient_alias.alias, recipient_addrm.address)'
+      ),
+    })
     .from({
-      counted: pg
+      t: pg
         .select('*')
         .select({
-          rn: pg.raw(
-            'row_number() over (partition by id order by time_stamp asc)'
-          ),
+          rn: pg.raw('row_number() over (partition by tuid order by tuid asc)'),
         })
         .from({ t: q.clone() }),
     })
-    .where('rn', '=', 1);
+    .where('rn', '=', 1)
+    .leftJoin('txs', 'txs.uid', 't.tuid')
+    .leftJoin({ addrm: 'addresses_map' }, 'addrm.uid', 't.sender_uid')
+    .leftJoin(
+      { recipient_addrm: 'addresses_map' },
+      'recipient_addrm.uid',
+      't.recipient_uid'
+    )
+    .leftJoin(
+      { recipient_alias: 'txs_10' },
+      'recipient_alias.tuid',
+      't.recipient_alias_uid'
+    );
 
 module.exports = { select, withFirstOnly };

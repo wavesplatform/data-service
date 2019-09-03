@@ -96,7 +96,9 @@ const transactionsEndpointsConfig = (
   },
   '/transactions/alias': {
     service: services.alias,
-    options: createOptions(),
+    options: createOptions({
+      alias: identity,
+    }),
   },
   '/transactions/mass-transfer': {
     service: services.massTransfer,

@@ -3,7 +3,8 @@ const pg = require('knex')({ client: 'pg' });
 const { compose, omit, keys } = require('ramda');
 
 const columns = {
-  id: 't.id',
+  tuid: 't.tuid',
+  id: 'txs.id',
   time_stamp: 't.time_stamp',
   height: 't.height',
   signature: 't.signature',
@@ -12,11 +13,11 @@ const columns = {
   tx_type: 't.tx_type',
   tx_version: 't.tx_version',
 
-  sender: 't.sender',
-  sender_public_key: 't.sender_public_key',
+  sender: 'addrm.address',
+  sender_public_key: 'addrm.public_key',
 
-  amount_asset: 't.amount_asset',
-  price_asset: 't.price_asset',
+  amount_asset: pg.raw("o1.order->'assetPair'->>'amountAsset'"),
+  price_asset: pg.raw("o1.order->'assetPair'->>'priceAsset'"),
 
   // satoshi
   price: pg.raw('t.price'),
@@ -26,37 +27,49 @@ const columns = {
   sell_matcher_fee: pg.raw('t.sell_matcher_fee * 10^(-8)'),
   buy_matcher_fee: pg.raw('t.buy_matcher_fee * 10^(-8)'),
 
-  o1_id: pg.raw("order1->>'id'"),
-  o1_version: pg.raw("order1->>'version'"),
-  o1_time_stamp: pg.raw("text_timestamp_cast(order1->>'timestamp')"),
-  o1_expiration: pg.raw("text_timestamp_cast(order1->>'expiration')"),
-  o1_signature: pg.raw("order1->>'signature'"),
-  o1_sender: pg.raw("order1->>'sender'"),
-  o1_sender_public_key: pg.raw("order1->>'senderPublicKey'"),
-  o1_type: pg.raw("order1->>'orderType'"),
-  o1_price: pg.raw("(order1->>'price')::double precision"),
-  o1_amount: pg.raw("(order1->>'amount')::double precision"),
-  o1_matcher_fee: pg.raw("(order1->>'matcherFee')::double precision * 10^(-8)"),
-  o1_matcher_fee_asset_id: pg.raw("order1->>'matcherFeeAssetId'"),
+  o1_id: pg.raw("o1.order->>'id'"),
+  o1_version: pg.raw("o1.order->>'version'"),
+  o1_time_stamp: pg.raw("text_timestamp_cast(o1.order->>'timestamp')"),
+  o1_expiration: pg.raw("text_timestamp_cast(o1.order->>'expiration')"),
+  o1_signature: pg.raw("o1.order->>'signature'"),
+  o1_sender: pg.raw("o1.order->>'sender'"),
+  o1_sender_public_key: pg.raw("o1.order->>'senderPublicKey'"),
+  o1_type: pg.raw("o1.order->>'orderType'"),
+  o1_price: pg.raw("(o1.order->>'price')::double precision"),
+  o1_amount: pg.raw("(o1.order->>'amount')::double precision"),
+  o1_matcher_fee: pg.raw(
+    "(o1.order->>'matcherFee')::double precision * 10^(-8)"
+  ),
+  o1_matcher_fee_asset_id: pg.raw("o1.order->>'matcherFeeAssetId'"),
 
-  o2_id: pg.raw("order2->>'id'"),
-  o2_version: pg.raw("order2->>'version'"),
-  o2_time_stamp: pg.raw("text_timestamp_cast(order2->>'timestamp')"),
-  o2_expiration: pg.raw("text_timestamp_cast(order2->>'expiration')"),
-  o2_signature: pg.raw("order2->>'signature'"),
-  o2_sender: pg.raw("order2->>'sender'"),
-  o2_sender_public_key: pg.raw("order2->>'senderPublicKey'"),
-  o2_type: pg.raw("order2->>'orderType'"),
-  o2_price: pg.raw("(order2->>'price')::double precision"),
-  o2_amount: pg.raw("(order2->>'amount')::double precision"),
-  o2_matcher_fee: pg.raw("(order2->>'matcherFee')::double precision * 10^(-8)"),
-  o2_matcher_fee_asset_id: pg.raw("order2->>'matcherFeeAssetId'"),
+  o2_id: pg.raw("o2.order->>'id'"),
+  o2_version: pg.raw("o2.order->>'version'"),
+  o2_time_stamp: pg.raw("text_timestamp_cast(o2.order->>'timestamp')"),
+  o2_expiration: pg.raw("text_timestamp_cast(o2.order->>'expiration')"),
+  o2_signature: pg.raw("o2.order->>'signature'"),
+  o2_sender: pg.raw("o2.order->>'sender'"),
+  o2_sender_public_key: pg.raw("o2.order->>'senderPublicKey'"),
+  o2_type: pg.raw("o2.order->>'orderType'"),
+  o2_price: pg.raw("(o2.order->>'price')::double precision"),
+  o2_amount: pg.raw("(o2.order->>'amount')::double precision"),
+  o2_matcher_fee: pg.raw(
+    "(o2.order->>'matcherFee')::double precision * 10^(-8)"
+  ),
+  o2_matcher_fee_asset_id: pg.raw("o2.order->>'matcherFeeAssetId'"),
 };
 
-const select = pg({ t: 'txs_7' }).select(columns);
+// filters would be applied on this
+const select = pg({ t: 'txs_7' }).select('*');
 
 const withDecimals = q =>
-  pg({ t: q })
+  pg({
+    t: pg({ t: q })
+      .columns(columns)
+      .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tuid')
+      .leftJoin({ addrm: 'addresses_map' }, 'addrm.uid', 't.sender_uid')
+      .leftJoin({ o1: 'orders' }, 'o1.uid', 't.order1_uid')
+      .leftJoin({ o2: 'orders' }, 'o2.uid', 't.order2_uid'),
+  })
     .columns(
       compose(
         keys,
@@ -71,20 +84,21 @@ const withDecimals = q =>
       )(columns)
     )
     .columns({
-      price: pg.raw('t.price * 10^(-8 - p_dec.decimals + a_dec.decimals)'),
-      amount: pg.raw('t.amount * 10^(-a_dec.decimals)'),
+      price: pg.raw(
+        't.price * 10^(-8 - coalesce(p_dec.decimals, 8) + coalesce(a_dec.decimals, 8))'
+      ),
+      amount: pg.raw('t.amount * 10^(-coalesce(a_dec.decimals, 8))'),
       o1_price: pg.raw(
-        't.o1_price * 10^(-8 - p_dec.decimals + a_dec.decimals)'
+        't.o1_price * 10^(-8 - coalesce(p_dec.decimals, 8) + coalesce(a_dec.decimals, 8))'
       ),
-      o1_amount: pg.raw('t.o1_amount * 10^(-a_dec.decimals)'),
+      o1_amount: pg.raw('t.o1_amount * 10^(-coalesce(a_dec.decimals, 8))'),
       o2_price: pg.raw(
-        't.o2_price * 10^(-8 - p_dec.decimals + a_dec.decimals)'
+        't.o2_price * 10^(-8 - coalesce(p_dec.decimals, 8) + coalesce(a_dec.decimals, 8))'
       ),
-      o2_amount: pg.raw('t.o2_amount * 10^(-a_dec.decimals)'),
+      o2_amount: pg.raw('t.o2_amount * 10^(-coalesce(a_dec.decimals, 8))'),
     })
-    .select()
-    .innerJoin({ a_dec: 'asset_decimals' }, 't.amount_asset', 'a_dec.asset_id')
-    .innerJoin({ p_dec: 'asset_decimals' }, 't.price_asset', 'p_dec.asset_id');
+    .leftJoin({ a_dec: 'asset_decimals' }, 'amount_asset', 'a_dec.asset_id')
+    .leftJoin({ p_dec: 'asset_decimals' }, 'price_asset', 'p_dec.asset_id');
 
 module.exports = {
   select,
