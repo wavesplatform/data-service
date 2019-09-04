@@ -19,27 +19,47 @@ const pairsOneEndpoint = service => async ctx => {
     resolver: '/matcher/:matcher/pairs/:amountAsset/:priceAsset',
   });
 
-  const pair = await service
-    .get({
-      pair: {
-        amountAsset,
-        priceAsset,
+  try {
+    const pair = await service
+      .get({
+        pair: {
+          amountAsset,
+          priceAsset,
+        },
+        matcher,
+      })
+      .run()
+      .promise();
+
+    ctx.eventBus.emit('ENDPOINT_RESOLVED', {
+      value: pair,
+    });
+
+    pair.matchWith({
+      Just: ({ value }) => {
+        if (value.data === null) {
+          ctx.status = 404;
+        } else {
+          ctx.state.returnValue = value;
+        }
       },
-      matcher,
-    })
-    .run()
-    .promise();
-
-  ctx.eventBus.emit('ENDPOINT_RESOLVED', {
-    value: pair,
-  });
-
-  pair.matchWith({
-    Just: ({ value }) => (ctx.state.returnValue = value),
-    Nothing: () => {
-      ctx.status = 404;
-    },
-  });
+      Nothing: () => {
+        ctx.status = 404;
+      },
+    });
+  } catch (e) {
+    e.matchWith({
+      DB: () => {
+        throw e;
+      },
+      Resolver: () => {
+        throw e;
+      },
+      Validation: () => {
+        ctx.status = 404;
+      },
+    });
+  }
 };
 module.exports = service =>
   captureErrors(handleError)(pairsOneEndpoint(service));
