@@ -1,4 +1,7 @@
-import { of as taskOf } from 'folktale/concurrency/task';
+import {
+  of as taskOf,
+  rejected as taskRejected,
+} from 'folktale/concurrency/task';
 import { of as maybeOf, Maybe } from 'folktale/maybe';
 import { Ok, Error as error } from 'folktale/result';
 import { identity } from 'ramda';
@@ -10,7 +13,7 @@ import {
 } from '../../../../errorHandling/';
 
 import { mget } from '..';
-import { Validate } from '../types';
+import { ValidateSync, ValidateAsync } from '../types';
 import { PgDriver } from '../../../../db/driver';
 
 const ids = [
@@ -20,9 +23,9 @@ const ids = [
 const errorMessage = 'Bad value';
 
 // mock validation
-const inputOk = (s: string[]) => Ok<ValidationError, string[]>(s);
+const inputOk = (s: string[]) => taskOf<ValidationError, string[]>(s);
 const inputError = (s: string[]) =>
-  error<ValidationError, string[]>(AppError.Validation(errorMessage));
+  taskRejected<ValidationError, string[]>(AppError.Validation(errorMessage));
 const resultOk = (s: string) => Ok<ResolverError, string>(s);
 const resultError = (s: string) =>
   error<ResolverError, string>(AppError.Resolver(errorMessage));
@@ -40,8 +43,8 @@ const commonConfig = {
 };
 
 const createMockResolver = (
-  validateInput: Validate<ValidationError, string[]>,
-  validateResult: Validate<ResolverError, string>
+  validateInput: ValidateAsync<ValidationError, string[]>,
+  validateResult: ValidateSync<ResolverError, string>
 ) =>
   mget<string[], string[], string, (string | null)[]>({
     ...commonConfig,

@@ -24,7 +24,8 @@ import {
   MgetResolverDependencies,
   SearchResolverDependencies,
   ResolverDependencies,
-  Validate,
+  ValidateSync,
+  ValidateAsync,
 } from './types';
 
 const createResolver = <
@@ -33,10 +34,10 @@ const createResolver = <
   ResponseRaw,
   ResponseTransformed
 >(
-  validateInput: Validate<ValidationError, RequestRaw>,
+  validateInput: ValidateAsync<ValidationError, RequestRaw>,
   transformInput: (r: RequestRaw) => RequestTransformed,
   getData: (r: RequestTransformed) => Task<DbError, ResponseRaw>,
-  validateAllResults: Validate<ResolverError, ResponseRaw>,
+  validateAllResults: ValidateSync<ResolverError, ResponseRaw>,
   transformAllResults: (
     response: ResponseRaw,
     request: RequestRaw
@@ -45,8 +46,7 @@ const createResolver = <
   request: RequestRaw
 ): Task<AppError, ResponseTransformed> =>
   taskOf<never, RequestRaw>(request)
-    .map(validateInput)
-    .chain(resultToTask)
+    .chain(validateInput)
     .map(tap(emitEvent('INPUT_VALIDATION_OK')))
     .map(transformInput)
     .map(tap(emitEvent('TRANSFORM_INPUT_OK')))

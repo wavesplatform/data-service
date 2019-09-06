@@ -12,7 +12,8 @@ import { PgDriver } from '../../../db/driver';
 
 export type EmitEvent = (name: string) => <A>(object: A) => void;
 
-export type Validate<Error, Value> = (value: Value) => Result<Error, Value>;
+export type ValidateSync<Error, Value> = (value: Value) => Result<Error, Value>;
+export type ValidateAsync<Error, Value> = (value: Value) => Task<Error, Value>;
 
 type CommonResolverDependencies<
   ReqRaw,
@@ -20,9 +21,9 @@ type CommonResolverDependencies<
   ResRaw,
   ResTransformed
 > = {
-  validateInput: Validate<ValidationError, ReqRaw>;
+  validateInput: ValidateAsync<ValidationError, ReqRaw>;
   transformInput: (r: ReqRaw) => ReqTransformed;
-  validateResult: Validate<ResolverError, ResRaw>;
+  validateResult: ValidateSync<ResolverError, ResRaw>;
 };
 
 export type GetResolverDependencies<
