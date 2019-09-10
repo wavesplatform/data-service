@@ -6,7 +6,7 @@ import { Maybe,
        } from 'folktale/maybe';
 
 import { BigNumber } from "@waves/data-entities";
-import { // map,
+import {
   uniqWith,
   complement,
   always,
@@ -18,13 +18,10 @@ import { // map,
 
 import { tap } from "../../utils/tap";
 import * as LRU from 'lru-cache';
-import { AssetIdsPair,// , Transaction, ServiceSearch
-RateInfo
-       } from "../../types";
+import { AssetIdsPair, RateInfo } from "../../types";
 import { AppError, DbError } from "../../errorHandling";
 // import { Monoid } from "../../types/monoid";
 // import { concatAll } from "../../utils/fp";
-// import { timeStart } from "utils/time";
 import { PgDriver } from "db/driver";
 
 import * as knex from 'knex'
@@ -90,7 +87,7 @@ function lookupRate(pair: AssetIdsPair, lookup: RateLookupTable): Maybe<RateInfo
       priceAsset: pair.priceAsset,
       current: lookup[pair.amountAsset][pair.priceAsset]
     }
-  } else if (path([pair.amountAsset, pair.priceAsset], lookup) !== undefined) {
+  } else if (path([pair.priceAsset, pair.amountAsset], lookup) !== undefined) {
     res = {
       amountAsset: pair.priceAsset,
       priceAsset: pair.amountAsset,
@@ -204,7 +201,7 @@ export default class RateEstimator {
   estimate(assets: AssetIdsPair[], matcher: string, timestamp: Maybe<Date>): Task<AppError, ReqAndRes<AssetIdsPair, RateInfo>[]> {
 
     const cache = wrapCache(this.lru, matcher, maybeIsSome(timestamp))
-
+    
     const cacheAll = (items: RateInfo[]) => items.forEach(it => cache.put(it, it.current))
     
     const [eq, uneq] = partition(it => it.amountAsset === it.priceAsset, assets)
@@ -265,7 +262,8 @@ export default class RateEstimator {
       tap(cacheAll)
     ).map(
       data => toLookupTable(data.concat(eqRates).concat(cachedRates))
-    ).map(
+    ).map(tap(console.log))
+      .map(
       lookupTable => assets.map(
         idsPair => (
           {
