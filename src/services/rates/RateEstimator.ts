@@ -78,30 +78,32 @@ function safeDivide(n1: BigNumber, n2: BigNumber): Maybe<BigNumber> {
 
 const inv = (n: BigNumber) => safeDivide(new BigNumber(1), n)
 
-function lookupRate(pair: AssetIdsPair, lookup: RateLookupTable): Maybe<RateInfo> {
-  let res: RateInfo;
-  
-  if (path([pair.amountAsset, pair.priceAsset], lookup) !== undefined) {
-    res = {
-      amountAsset: pair.amountAsset,
-      priceAsset: pair.priceAsset,
-      current: lookup[pair.amountAsset][pair.priceAsset]
-    }
-  } else if (path([pair.priceAsset, pair.amountAsset], lookup) !== undefined) {
-    res = {
-      amountAsset: pair.priceAsset,
-      priceAsset: pair.amountAsset,
-      current: inv(lookup[pair.priceAsset][pair.amountAsset]).getOrElse(new BigNumber(0))
-    }
-  } else {
-    if (pair.amountAsset === WavesId || pair.priceAsset === WavesId) {
-      return maybeEmpty()
-    }
+function getFromLookupTable(lookup: RateLookupTable, pair: AssetIdsPair, flipped: boolean): Maybe<RateInfo> {
+  const lookupData = flipped ? flip(pair) : pair
 
-    return lookupThroughWaves(pair, lookup)
-  }
+  return fromNullable(path([lookupData.amountAsset, lookupData.priceAsset], lookup))
+    .map((rate: BigNumber) => flipped ? inv(rate).getOrElse(new BigNumber(0)) : rate)
+    .map(
+      rate => (
+        {
+          current: rate,
+            ...lookupData           
+        }
+      )
+    )
+}
 
-  return maybeOf(res)
+const pairHasWaves = (pair: AssetIdsPair): boolean => pair.priceAsset === WavesId || pair.amountAsset === WavesId;
+
+function lookupRate(pair: AssetIdsPair, lookupTable: RateLookupTable): Maybe<RateInfo> {
+  const lookup = (pair: AssetIdsPair, flipped: boolean) => getFromLookupTable(lookupTable, pair, flipped)
+
+  return lookup(pair, false)
+    .orElse(
+      () => lookup(pair, true)
+    ).orElse(
+      () => maybeOf(pair).filter(complement(pairHasWaves)).chain(pair => lookupThroughWaves(pair, lookupTable))
+    )
 }
 
 function lookupThroughWaves(pair: AssetIdsPair, lookup: RateLookupTable): Maybe<RateInfo> {
@@ -165,9 +167,11 @@ type RateCache = {
   get: (pair: AssetIdsPair) => Maybe<BigNumber>
 }
 
-function wrapCache(cache: LRU<string, BigNumber>, matcher: string, muted: boolean = false): RateCache {
+function wrapCache(cache: LRU<string, BigNumber>, matcher: string, params: { muted: boolean }): RateCache {
   const keyFn = (pair: AssetIdsPair): string =>
     `${matcher}::${pair.amountAsset}::${pair.priceAsset}`
+
+  const muted = params.muted
   
   return {
     has: (pair: AssetIdsPair) => !muted && (cache.has(keyFn(pair)) || cache.has(keyFn(flip(pair)))),
@@ -200,7 +204,7 @@ export default class RateEstimator {
 
   estimate(assets: AssetIdsPair[], matcher: string, timestamp: Maybe<Date>): Task<AppError, ReqAndRes<AssetIdsPair, RateInfo>[]> {
 
-    const cache = wrapCache(this.lru, matcher, maybeIsSome(timestamp))
+    const cache = wrapCache(this.lru, matcher, { muted: maybeIsSome(timestamp) })
     
     const cacheAll = (items: RateInfo[]) => items.forEach(it => cache.put(it, it.current))
     
