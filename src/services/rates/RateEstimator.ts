@@ -1,174 +1,189 @@
-import { Task, waitAll, of as taskOf,  } from "folktale/concurrency/task";
-import { Maybe, of as maybeOf, empty as maybeEmpty } from 'folktale/maybe';
+import { Task } from "folktale/concurrency/task";
+import { Maybe,
+         of as maybeOf,
+         empty as maybeEmpty,
+       } from 'folktale/maybe';
+
 import { BigNumber } from "@waves/data-entities";
-import { map } from 'ramda';
+import { // map,
+  identity,
+  always,
+  map,
+  path,
+  chain,
+  flatten} from 'ramda';
 
-import { AssetIdsPair, Transaction, ServiceSearch } from "../../types";
-import { ExchangeTxsSearchRequest } from "../transactions/exchange";
-import { SortOrder } from "../_common";
-import { PairOrderingService } from '../rates';
+import { tap } from "../../utils/tap";
+import * as LRU from 'lru-cache';
+import { AssetIdsPair,// , Transaction, ServiceSearch
+RateInfo
+       } from "../../types";
+// import { ExchangeTxsSearchRequest } from "../transactions/exchange";
+// import { SortOrder } from "../_common";
+// import { PairOrderingService } from '../rates';
 import { AppError } from "../../errorHandling";
-import { Monoid } from "../../types/monoid";
-import { concatAll } from "../../utils/fp";
+// import { Monoid } from "../../types/monoid";
+// import { concatAll } from "../../utils/fp";
+// import { timeStart } from "utils/time";
+import { PgDriver } from "db/driver";
 
-const WavesId: string = 'WAVES';
+import * as knex from 'knex'
 
-const sum = (data: Array<BigNumber | number | string>): Maybe<BigNumber> => {
-  if (data.length === 0) {
-    return maybeEmpty();
-  }
+import makeSql from './sql'
 
-  return maybeOf(data.reduce((acc: BigNumber, x) => acc.plus(x), new BigNumber(0)));
+const pg = knex({ client: 'pg' });
+
+// const WavesId: string = 'WAVES';
+
+type ReqAndRes<TReq, TRes> = {
+  req: TReq,
+  res: Maybe<TRes>
 }
 
-/**
-   returns a monoid to select first task satisfying predicate, left to right. 
-   Short circuits tasks execution on valid left
-*/
-function anyTaskSatisfying<L, R>(pred: (val: R) => boolean): Monoid<Task<L, Maybe<R>>> {
-  return {
-    empty: taskOf(maybeEmpty()),
-    concat: (a: Task<L, Maybe<R>>, b: Task<L, Maybe<R>>) =>
-      a.chain(
-        value => value.filter(pred).matchWith(
-          {
-            Nothing: () => b.map(res => res.filter(pred)),
-            Just: ({ value }) => taskOf(maybeOf(value))
-          }
-        )
-      )
-  }
-}
-
-/**
-   returns first task to yield the posifive BigNumber value
-*/
-const firstPositive = concatAll<Task<AppError, Maybe<BigNumber>>>(
-  anyTaskSatisfying(
-    (val: BigNumber) => val.isPositive()
+function maybeIsNone<T>(data: Maybe<T>): boolean {
+  return data.matchWith(
+    {
+      Just: always(false),
+      Nothing: always(true)
+    }
   )
-);
-
-type ExchangeInfo = {
-  price: number,
-  amount: number,
 }
-
-const weightedAverage = (data: ExchangeInfo[]): Maybe<BigNumber> => data.length === 0 ? maybeEmpty() :
-  maybeMap2(
-    (sum1, sum2) => sum1.div(sum2),
-    sum(
-      data.map(({ price, amount }) => new BigNumber(price).multipliedBy(amount))
-    ),
-    sum(
-      data.map(({ amount }) => amount)
-    ).filter(it => !it.isZero())    
-  );
 
 const maybeMap2 = <T1, T2, R>(fn: (v1: T1, v2: T2) => R, v1: Maybe<T1>, v2: Maybe<T2>): Maybe<R> =>
   v1.chain(v1 => v2.map(v2 => fn(v1, v2)))
 
-enum RateOrder {
-  Straight, Inverted
+type RateLookupTable = {
+  [amountAsset: string]: {
+    [priceAsset: string]: BigNumber
+  }
+};
+
+function toLookupTable(data: RateInfo[]): RateLookupTable {
+  return data.reduce(
+    (acc, item) => {
+      if (!(item.amountAsset in acc)) {
+        acc[item.amountAsset] = {}
+      }
+
+      acc[item.amountAsset][item.priceAsset] = item.current;
+
+      return acc
+    },
+    {} as RateLookupTable
+  )
 }
 
-type RateRequest = {
-  amountAsset: string, priceAsset: string, order: RateOrder
+function safeDivide(n1: BigNumber, n2: BigNumber): Maybe<BigNumber> {
+  return maybeOf(n2).filter(it => !it.isZero()).map(it => n1.div(it))
+}
+
+const inv = (n: BigNumber) => safeDivide(new BigNumber(1), n)
+
+function lookupRate(pair: AssetIdsPair, lookup: RateLookupTable): Maybe<RateInfo> {
+  // TODO: refactor
+  console.log("LOOKING UP PAIR, ", pair)
+  
+  let res: RateInfo;
+  
+  if (path([pair.amountAsset, pair.priceAsset], lookup) !== undefined) {
+    res = {
+      amountAsset: pair.amountAsset,
+      priceAsset: pair.priceAsset,
+      current: lookup[pair.amountAsset][pair.priceAsset]
+    }
+  } else if (path([pair.amountAsset, pair.priceAsset], lookup) !== undefined) {
+    res = {
+      amountAsset: pair.priceAsset,
+      priceAsset: pair.amountAsset,
+      current: inv(lookup[pair.priceAsset][pair.amountAsset]).getOrElse(new BigNumber(0))
+    }
+  } else {
+    console.log("NONE")
+    return maybeEmpty()
+  }
+
+  console.log("MAYBE", res)
+  return maybeOf(res)
+}
+
+function lookupThroughWaves(pair: AssetIdsPair, lookup: RateLookupTable): Maybe<RateInfo> {
+  return maybeMap2(
+    (info1, info2) => safeDivide(info1.current, info2.current),
+    lookupRate(
+      {
+        amountAsset: pair.amountAsset,
+        priceAsset: 'WAVES'
+      },
+      lookup
+    ),
+    lookupRate(
+      {
+        amountAsset: pair.priceAsset,
+        priceAsset: 'WAVES'
+      },
+      lookup
+    )
+  ).map(rate => (
+    {
+      amountAsset: pair.amountAsset,
+      priceAsset: pair.priceAsset,
+      current: rate.getOrElse(new BigNumber(0))
+    }
+  ))
 }
 
 export default class RateEstimator {
   constructor(
-    private readonly transactionService: ServiceSearch<ExchangeTxsSearchRequest, Transaction>,    
-    private readonly pairOrderingService: PairOrderingService
+    // private readonly pairOrderingService: PairOrderingService,
+    private readonly cache: LRU<string, BigNumber>,
+    private readonly pgp: PgDriver
   ) {}
 
-  private countRateFromTransactions({ amountAsset, priceAsset, order }: RateRequest, matcher: string, timestamp: Date): Task<AppError, Maybe<BigNumber>> {
-    return this.transactionService.search(
-      {
-        amountAsset,
-        priceAsset,
-        limit: 5,
-        matcher,
-        sender: matcher,
-        timeStart: new Date(0),
-        timeEnd: timestamp,
-        sort: SortOrder.Descending,
-      }
-    )
-      .map(
-        // TODO: fix any
-        transactions => weightedAverage(transactions.data.map(it => it.data as any as ExchangeInfo))
-      )
-      .map(
-        res => {
-          if (order === RateOrder.Straight) {
-            return res;
+  estimate(assets: AssetIdsPair[], matcher: string, timestamp: Maybe<Date>): Task<AppError, ReqAndRes<AssetIdsPair, RateInfo>[]> {
+    const keyFn = (item: {amountAsset: string, priceAsset: string}): string =>
+      `${matcher}::${item.amountAsset}::${item.priceAsset}`
+
+    const tuples = chain(it => [
+      [it.amountAsset, it.priceAsset],
+      [it.priceAsset, it.amountAsset],
+      [it.amountAsset, 'WAVES'],
+      ['WAVES', it.amountAsset],
+      [it.priceAsset, 'WAVES'],
+      ['WAVES', it.priceAsset]
+    ], assets);
+
+    // TODO: retrieve cached
+    // TODO: retrieve it/it == 1
+
+    const sql = pg.raw(makeSql(tuples.length), [matcher, ...flatten(tuples)])
+
+    console.log(sql.toString())
+
+    const cacheFn: (data: RateInfo[]) => void =
+      maybeIsNone(timestamp) ? data => data.forEach(item => this.cache.set(keyFn(item), item.current)) : identity;
+
+    return this.pgp.many(sql.toString()).map(
+      (result: any[]): RateInfo[] =>  map(
+        (it: any): RateInfo => {
+          return {
+            amountAsset: it.amount_asset_id,
+            priceAsset: it.price_asset_id,
+            current: it.weighted_average_price
           }
-
-          return res.map(value => value.isZero() ? value : new BigNumber(1).div(value))
-        }
-      )
-  }
-
-  private getRateCandidates(asset1: string, asset2: string, matcher: string): Task<AppError, RateRequest[]> {
-    return this.pairOrderingService.getCorrectOrder(matcher, [asset1, asset2])
-      .map(
-        (res: Maybe<[string, string]>): RateRequest[] => res.matchWith(
+        }, result)
+    ).map(
+      tap(cacheFn)
+    ).map(
+      data => toLookupTable(data)
+    ).map(
+      lookupTable => assets.map(
+        idsPair => (
           {
-            Just: ({ value: [amountAsset, priceAsset] }) =>
-              [
-                {
-                  amountAsset,
-                  priceAsset,
-                  order: asset1 === amountAsset ? RateOrder.Straight : RateOrder.Inverted
-                }
-              ],
-            
-            Nothing: () =>
-              [
-                { amountAsset: asset1, priceAsset: asset2, order: RateOrder.Straight },
-                { amountAsset: asset2, priceAsset: asset1, order: RateOrder.Inverted }
-              ]
+            req: idsPair,
+            res: lookupRate(idsPair, lookupTable).or(lookupThroughWaves(idsPair, lookupTable))
           }
         )
       )
-  }
-  
-  private getActualRate(asset1: string, asset2: string, matcher: string, timestamp: Date): Task<AppError, Maybe<BigNumber>> {
-    const candidates: Task<AppError, RateRequest[]> = this.getRateCandidates(asset1, asset2, matcher)
-
-    const results = candidates.map(
-      data => map(request => this.countRateFromTransactions(request, matcher, timestamp), data)
     )
-
-    return results.chain(tasks => firstPositive(tasks))
-  }
-
-  estimate({ amountAsset, priceAsset }: AssetIdsPair, matcher: string, timestamp: Date): Task<AppError, BigNumber> {
-    if (amountAsset === priceAsset) {
-      return taskOf(new BigNumber(1));
-    }
-
-    const allRateTasks: Task<AppError, Maybe<BigNumber>>[] = [
-      this.getActualRate(amountAsset, priceAsset, matcher, timestamp)
-    ]
-
-    if (amountAsset !== WavesId && priceAsset !== WavesId) {
-      allRateTasks.push(
-        waitAll(
-          [
-            this.getActualRate(amountAsset, WavesId, matcher, timestamp),
-            this.getActualRate(priceAsset, WavesId, matcher, timestamp)
-          ]
-        ).map(([rate1, rate2]) => maybeMap2(
-          (rate1, rate2) => rate2.eq(0) ? new BigNumber(0) : rate1.div(rate2),
-          rate1,
-          rate2
-        ))
-      )
-    }
-
-    return firstPositive(allRateTasks)
-      .map(res => res.getOrElse(new BigNumber(0)))
   }
 }
