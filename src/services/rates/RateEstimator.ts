@@ -195,6 +195,50 @@ function wrapCache(cache: LRU<string, BigNumber>, matcher: string, params: { mut
 const pairsEq = (pair1: AssetIdsPair, pair2: AssetIdsPair): boolean =>
   pair1.amountAsset === pair2.amountAsset && pair1.priceAsset === pair2.priceAsset
 
+type PairsForRequest = {
+  preCount: RateInfo[],
+  toBeRequested: AssetIdsPair[]
+}
+
+const partitionByPreCount = (cache: RateCache, assets: AssetIdsPair[]): PairsForRequest => {
+
+  const [eq, uneq] = partition(it => it.amountAsset === it.priceAsset, assets)
+
+  const allPairsToRequest = uniqWith(
+    pairsEq,
+    chain(it => requestData(it), uneq)
+  )
+
+  const [cached, uncached] = partition(
+    it => cache.has(it),
+    allPairsToRequest
+  )
+
+  const cachedRates: RateInfo[] = cached.map(
+    pair => (
+      {
+        amountAsset: pair.amountAsset,
+        priceAsset: pair.priceAsset,
+        current: cache.get(pair).getOrElse(new BigNumber(0))
+      }
+    )
+  )
+
+  const eqRates: RateInfo[] = eq.map(
+    (pair) => (
+      {
+        current: new BigNumber(1),
+          ...pair
+      }
+    )
+  )
+
+  return {
+    preCount: cachedRates.concat(eqRates),
+    toBeRequested: uncached
+  }
+}
+
 export default class RateEstimator {
   constructor(
     // private readonly pairOrderingService: PairOrderingService,
@@ -207,45 +251,16 @@ export default class RateEstimator {
     const cache = wrapCache(this.lru, matcher, { muted: maybeIsSome(timestamp) })
     
     const cacheAll = (items: RateInfo[]) => items.forEach(it => cache.put(it, it.current))
-    
-    const [eq, uneq] = partition(it => it.amountAsset === it.priceAsset, assets)
 
-    const allPairsToRequest = uniqWith(
-      pairsEq,
-      chain(it => requestData(it), uneq)
-    )
+    const { preCount, toBeRequested } = partitionByPreCount(cache, assets)
 
-    const [cached, uncached] = partition(
-      it => cache.has(it),
-      allPairsToRequest
-    )
+    const pairsSqlParams = chain(it => [it.amountAsset, it.priceAsset], toBeRequested)
 
-    const cachedRates: RateInfo[] = cached.map(
-      pair => (
-        {
-          amountAsset: pair.amountAsset,
-          priceAsset: pair.priceAsset,
-          current: cache.get(pair).getOrElse(new BigNumber(0))
-        }
-      )
-    )
-
-    const eqRates: RateInfo[] = eq.map(
-      (pair) => (
-        {
-          current: new BigNumber(1),
-          ...pair
-        }
-      )
-    )
-
-    const pairsSqlParams = chain(it => [it.amountAsset, it.priceAsset],uncached)
-
-    const sql = pg.raw(makeSql(uncached.length), [timestamp.getOrElse(new Date()), matcher, ...pairsSqlParams])
+    const sql = pg.raw(makeSql(toBeRequested.length), [ timestamp.getOrElse(new Date()), matcher, ...pairsSqlParams ])
 
     // console.log(sql.toString())
 
-    const dbTask: Task<DbError, any[]> = uncached.length === 0 ? taskOf([]) : this.pgp.any(sql.toString());
+    const dbTask: Task<DbError, any[]> = toBeRequested.length === 0 ? taskOf([]) : this.pgp.any(sql.toString());
 
     return dbTask.map(
       (result: any[]): RateInfo[] =>  map(
@@ -259,7 +274,7 @@ export default class RateEstimator {
     ).map(
       tap(cacheAll)
     ).map(
-      data => toLookupTable(data.concat(eqRates).concat(cachedRates))
+      data => toLookupTable(data.concat(preCount))
     ).map(
       lookupTable => assets.map(
         idsPair => (
