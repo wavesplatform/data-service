@@ -15,7 +15,8 @@ select
 		amount_asset_id = p.amount_asset_id
 		and price_asset_id = p.price_asset_id
 		and matcher = p.matcher
-		and interval_in_secs = 60
+	        and interval_in_secs = 60
+                and time_start < ?
 	order by
 		time_start desc
 	limit 5) as wap
@@ -30,7 +31,7 @@ from
 		candles
 	where
 		interval_in_secs = 86400
-		and matcher = ?
+	        and matcher = ?
 		and (amount_asset_id,
 		     price_asset_id) in (${repeat('(?, ?)', tuplesCount)})
 	order by

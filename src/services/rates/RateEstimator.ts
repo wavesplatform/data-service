@@ -1,4 +1,4 @@
-import { Task } from "folktale/concurrency/task";
+import { Task, of as taskOf } from "folktale/concurrency/task";
 import { Maybe,
          of as maybeOf,
          empty as maybeEmpty,
@@ -11,6 +11,7 @@ import { // map,
   map,
   path,
   chain,
+  partition,
   flatten} from 'ramda';
 
 import { tap } from "../../utils/tap";
@@ -18,10 +19,7 @@ import * as LRU from 'lru-cache';
 import { AssetIdsPair,// , Transaction, ServiceSearch
 RateInfo
        } from "../../types";
-// import { ExchangeTxsSearchRequest } from "../transactions/exchange";
-// import { SortOrder } from "../_common";
-// import { PairOrderingService } from '../rates';
-import { AppError } from "../../errorHandling";
+import { AppError, DbError } from "../../errorHandling";
 // import { Monoid } from "../../types/monoid";
 // import { concatAll } from "../../utils/fp";
 // import { timeStart } from "utils/time";
@@ -33,7 +31,7 @@ import makeSql from './sql'
 
 const pg = knex({ client: 'pg' });
 
-// const WavesId: string = 'WAVES';
+const WavesId: string = 'WAVES';
 
 type ReqAndRes<TReq, TRes> = {
   req: TReq,
@@ -80,9 +78,6 @@ function safeDivide(n1: BigNumber, n2: BigNumber): Maybe<BigNumber> {
 const inv = (n: BigNumber) => safeDivide(new BigNumber(1), n)
 
 function lookupRate(pair: AssetIdsPair, lookup: RateLookupTable): Maybe<RateInfo> {
-  // TODO: refactor
-  console.log("LOOKING UP PAIR, ", pair)
-  
   let res: RateInfo;
   
   if (path([pair.amountAsset, pair.priceAsset], lookup) !== undefined) {
@@ -98,11 +93,13 @@ function lookupRate(pair: AssetIdsPair, lookup: RateLookupTable): Maybe<RateInfo
       current: inv(lookup[pair.priceAsset][pair.amountAsset]).getOrElse(new BigNumber(0))
     }
   } else {
-    console.log("NONE")
-    return maybeEmpty()
+    if (pair.amountAsset === WavesId || pair.priceAsset === WavesId) {
+      return maybeEmpty()
+    }
+
+    return lookupThroughWaves(pair, lookup)
   }
 
-  console.log("MAYBE", res)
   return maybeOf(res)
 }
 
@@ -112,14 +109,14 @@ function lookupThroughWaves(pair: AssetIdsPair, lookup: RateLookupTable): Maybe<
     lookupRate(
       {
         amountAsset: pair.amountAsset,
-        priceAsset: 'WAVES'
+        priceAsset: WavesId
       },
       lookup
     ),
     lookupRate(
       {
         amountAsset: pair.priceAsset,
-        priceAsset: 'WAVES'
+        priceAsset: WavesId
       },
       lookup
     )
@@ -140,29 +137,60 @@ export default class RateEstimator {
   ) {}
 
   estimate(assets: AssetIdsPair[], matcher: string, timestamp: Maybe<Date>): Task<AppError, ReqAndRes<AssetIdsPair, RateInfo>[]> {
-    const keyFn = (item: {amountAsset: string, priceAsset: string}): string =>
-      `${matcher}::${item.amountAsset}::${item.priceAsset}`
+
+    const keyFn = (amountAsset: string, priceAsset: string): string =>
+      `${matcher}::${amountAsset}::${priceAsset}`
+
+    const [eq, uneq] = partition(it => it.amountAsset === it.priceAsset, assets)
 
     const tuples = chain(it => [
       [it.amountAsset, it.priceAsset],
       [it.priceAsset, it.amountAsset],
-      [it.amountAsset, 'WAVES'],
-      ['WAVES', it.amountAsset],
-      [it.priceAsset, 'WAVES'],
-      ['WAVES', it.priceAsset]
-    ], assets);
+      [it.amountAsset, WavesId],
+      [WavesId, it.amountAsset],
+      [it.priceAsset, WavesId],
+      [WavesId, it.priceAsset]
+    ], uneq);
+
+    const [cached, uncached] = partition(
+      it => this.cache.has(keyFn(it[0], it[1])),
+      tuples
+    )
+
+    const cachedRates: RateInfo[] = cached.map(
+      ([amountAsset, priceAsset]) => (
+        {
+          amountAsset,
+          priceAsset,
+          current: this.cache.get(keyFn(amountAsset, priceAsset))!!
+        }
+      )
+    )
+
+    const eqRates: RateInfo[] = eq.map(
+      (pair) => (
+        {
+          current: new BigNumber(1),
+          ...pair
+        }
+      )
+    )
+
+    console.log("CACHED: ", cached)
 
     // TODO: retrieve cached
     // TODO: retrieve it/it == 1
 
-    const sql = pg.raw(makeSql(tuples.length), [matcher, ...flatten(tuples)])
+    const sql = pg.raw(makeSql(uncached.length), [timestamp.getOrElse(new Date()), matcher, ...flatten(uncached)])
 
     console.log(sql.toString())
 
     const cacheFn: (data: RateInfo[]) => void =
-      maybeIsNone(timestamp) ? data => data.forEach(item => this.cache.set(keyFn(item), item.current)) : identity;
+      maybeIsNone(timestamp) ? data => data.forEach(item => this.cache.set(keyFn(item.amountAsset, item.priceAsset), item.current)) : identity;
 
-    return this.pgp.many(sql.toString()).map(
+    const dbTask: Task<DbError, any[]> = uncached.length === 0 ? taskOf([]) : this.pgp.many(sql.toString());
+
+    return dbTask.map(
       (result: any[]): RateInfo[] =>  map(
         (it: any): RateInfo => {
           return {
@@ -174,13 +202,15 @@ export default class RateEstimator {
     ).map(
       tap(cacheFn)
     ).map(
-      data => toLookupTable(data)
+      data => toLookupTable(data.concat(eqRates).concat(cachedRates))
+    ).map(
+      tap(console.log)
     ).map(
       lookupTable => assets.map(
         idsPair => (
           {
             req: idsPair,
-            res: lookupRate(idsPair, lookupTable).or(lookupThroughWaves(idsPair, lookupTable))
+            res: lookupRate(idsPair, lookupTable)
           }
         )
       )
