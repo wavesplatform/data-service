@@ -175,16 +175,19 @@ function wrapCache(cache: LRU<string, BigNumber>, matcher: string, muted: boolea
   return {
     has: (pair: AssetIdsPair) => !muted && (cache.has(keyFn(pair)) || cache.has(keyFn(flip(pair)))),
     put: (pair: AssetIdsPair, rate: BigNumber) => {
-      console.log("CAHING:: muted?", muted, "data: ", pair, rate)
-      
       if (!muted) {
         cache.set(keyFn(pair), rate)
       }
     },
-    get: (pair: AssetIdsPair) => muted ? maybeEmpty() :
-      fromNullable(cache.get(keyFn(pair))).or(
-        fromNullable(cache.get(keyFn(flip(pair)))).chain(res => inv(res))
-    )
+    get: (pair: AssetIdsPair) => {
+      if (muted) {
+        return maybeEmpty()
+      } else {
+        return fromNullable(cache.get(keyFn(pair))).orElse(
+          () => fromNullable(cache.get(keyFn(flip(pair)))).chain(inv)
+        )
+      }
+    }
   }
 }
 
@@ -200,8 +203,6 @@ export default class RateEstimator {
 
   estimate(assets: AssetIdsPair[], matcher: string, timestamp: Maybe<Date>): Task<AppError, ReqAndRes<AssetIdsPair, RateInfo>[]> {
 
-    console.log("REQUEST: ", assets)
-
     const cache = wrapCache(this.lru, matcher, maybeIsSome(timestamp))
 
     const cacheAll = (items: RateInfo[]) => items.forEach(it => cache.put(it, it.current))
@@ -215,7 +216,7 @@ export default class RateEstimator {
       chain(it => requestData(it), uneq)
     )
 
-    console.log("ALL PAIRS TO REQUEST:", allPairsToRequest.length, allPairsToRequest)
+    console.log("ALL PAIRS TO REQUEST:", allPairsToRequest.length)
 
     const [cached, uncached] = partition(
       it => cache.has(it),
@@ -232,6 +233,8 @@ export default class RateEstimator {
       )
     )
 
+    console.log("UNCACHED:::", uncached)
+
     const eqRates: RateInfo[] = eq.map(
       (pair) => (
         {
@@ -247,7 +250,7 @@ export default class RateEstimator {
 
     console.log(sql.toString())
 
-    const dbTask: Task<DbError, any[]> = uncached.length === 0 ? taskOf([]) : this.pgp.many(sql.toString());
+    const dbTask: Task<DbError, any[]> = uncached.length === 0 ? taskOf([]) : this.pgp.any(sql.toString());
 
     return dbTask.map(
       (result: any[]): RateInfo[] =>  map(
@@ -273,8 +276,10 @@ export default class RateEstimator {
       )
     ).map(
       tap(
-        results => results.forEach(
-          reqAndRes => cache.put(reqAndRes.req, reqAndRes.res.map(it => it.current).getOrElse(new BigNumber(0)))
+        data => data.forEach(
+          reqAndRes => reqAndRes.res.map(
+            tap(res => cache.put(reqAndRes.req, res.current))
+          )
         )
       )
     )
