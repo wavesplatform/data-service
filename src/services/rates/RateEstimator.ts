@@ -1,18 +1,20 @@
 import { Task, of as taskOf } from "folktale/concurrency/task";
 import { Maybe,
+         fromNullable,
          of as maybeOf,
          empty as maybeEmpty,
        } from 'folktale/maybe';
 
 import { BigNumber } from "@waves/data-entities";
 import { // map,
-  identity,
+  uniqWith,
+  complement,
   always,
   map,
   path,
   chain,
   partition,
-  flatten} from 'ramda';
+} from 'ramda';
 
 import { tap } from "../../utils/tap";
 import * as LRU from 'lru-cache';
@@ -38,7 +40,7 @@ type ReqAndRes<TReq, TRes> = {
   res: Maybe<TRes>
 }
 
-function maybeIsNone<T>(data: Maybe<T>): boolean {
+const maybeIsNone = <T>(data: Maybe<T>) => {
   return data.matchWith(
     {
       Just: always(false),
@@ -46,6 +48,8 @@ function maybeIsNone<T>(data: Maybe<T>): boolean {
     }
   )
 }
+
+const maybeIsSome = complement(maybeIsNone)
 
 const maybeMap2 = <T1, T2, R>(fn: (v1: T1, v2: T2) => R, v1: Maybe<T1>, v2: Maybe<T2>): Maybe<R> =>
   v1.chain(v1 => v2.map(v2 => fn(v1, v2)))
@@ -129,40 +133,101 @@ function lookupThroughWaves(pair: AssetIdsPair, lookup: RateLookupTable): Maybe<
   ))
 }
 
+function flip(pair: AssetIdsPair): AssetIdsPair {
+  return {
+    amountAsset: pair.priceAsset,
+    priceAsset: pair.amountAsset
+  }
+}
+
+function requestData(pair: AssetIdsPair): AssetIdsPair[] {
+  if (pair.amountAsset === WavesId || pair.priceAsset === WavesId) {
+    return [pair, flip(pair)]
+  }
+
+  const wavesL: AssetIdsPair = {
+    amountAsset: pair.amountAsset,
+    priceAsset: WavesId
+  }
+
+  const wavesR: AssetIdsPair = {
+    amountAsset: pair.priceAsset,
+    priceAsset: WavesId
+  }
+
+  return [
+    pair, flip(pair),
+    wavesL, flip(wavesL),
+    wavesR, flip(wavesR)
+  ]
+}
+
+type RateCache = {
+  has: (pair: AssetIdsPair) => boolean,
+  put: (pair: AssetIdsPair, rate: BigNumber) => void,
+  get: (pair: AssetIdsPair) => Maybe<BigNumber>
+}
+
+function wrapCache(cache: LRU<string, BigNumber>, matcher: string, muted: boolean = false): RateCache {
+  const keyFn = (pair: AssetIdsPair): string =>
+    `${matcher}::${pair.amountAsset}::${pair.priceAsset}`
+  
+  return {
+    has: (pair: AssetIdsPair) => !muted && (cache.has(keyFn(pair)) || cache.has(keyFn(flip(pair)))),
+    put: (pair: AssetIdsPair, rate: BigNumber) => {
+      console.log("CAHING:: muted?", muted, "data: ", pair, rate)
+      
+      if (!muted) {
+        cache.set(keyFn(pair), rate)
+      }
+    },
+    get: (pair: AssetIdsPair) => muted ? maybeEmpty() :
+      fromNullable(cache.get(keyFn(pair))).or(
+        fromNullable(cache.get(keyFn(flip(pair)))).chain(res => inv(res))
+    )
+  }
+}
+
+const pairsEq = (pair1: AssetIdsPair, pair2: AssetIdsPair): boolean =>
+  pair1.amountAsset === pair2.amountAsset && pair1.priceAsset === pair2.priceAsset
+
 export default class RateEstimator {
   constructor(
     // private readonly pairOrderingService: PairOrderingService,
-    private readonly cache: LRU<string, BigNumber>,
+    private readonly lru: LRU<string, BigNumber>,
     private readonly pgp: PgDriver
   ) {}
 
   estimate(assets: AssetIdsPair[], matcher: string, timestamp: Maybe<Date>): Task<AppError, ReqAndRes<AssetIdsPair, RateInfo>[]> {
 
-    const keyFn = (amountAsset: string, priceAsset: string): string =>
-      `${matcher}::${amountAsset}::${priceAsset}`
+    console.log("REQUEST: ", assets)
 
+    const cache = wrapCache(this.lru, matcher, maybeIsSome(timestamp))
+
+    const cacheAll = (items: RateInfo[]) => items.forEach(it => cache.put(it, it.current))
+    
     const [eq, uneq] = partition(it => it.amountAsset === it.priceAsset, assets)
 
-    const tuples = chain(it => [
-      [it.amountAsset, it.priceAsset],
-      [it.priceAsset, it.amountAsset],
-      [it.amountAsset, WavesId],
-      [WavesId, it.amountAsset],
-      [it.priceAsset, WavesId],
-      [WavesId, it.priceAsset]
-    ], uneq);
+    console.log("UNEQ LEN: ", uneq.length)
+
+    const allPairsToRequest = uniqWith(
+      pairsEq,
+      chain(it => requestData(it), uneq)
+    )
+
+    console.log("ALL PAIRS TO REQUEST:", allPairsToRequest.length, allPairsToRequest)
 
     const [cached, uncached] = partition(
-      it => this.cache.has(keyFn(it[0], it[1])),
-      tuples
+      it => cache.has(it),
+      allPairsToRequest
     )
 
     const cachedRates: RateInfo[] = cached.map(
-      ([amountAsset, priceAsset]) => (
+      pair => (
         {
-          amountAsset,
-          priceAsset,
-          current: this.cache.get(keyFn(amountAsset, priceAsset))!!
+          amountAsset: pair.amountAsset,
+          priceAsset: pair.priceAsset,
+          current: cache.get(pair).getOrElse(new BigNumber(0))
         }
       )
     )
@@ -176,17 +241,11 @@ export default class RateEstimator {
       )
     )
 
-    console.log("CACHED: ", cached)
+    const pairsSqlParams = chain(it => [it.amountAsset, it.priceAsset],uncached)
 
-    // TODO: retrieve cached
-    // TODO: retrieve it/it == 1
-
-    const sql = pg.raw(makeSql(uncached.length), [timestamp.getOrElse(new Date()), matcher, ...flatten(uncached)])
+    const sql = pg.raw(makeSql(uncached.length), [timestamp.getOrElse(new Date()), matcher, ...pairsSqlParams])
 
     console.log(sql.toString())
-
-    const cacheFn: (data: RateInfo[]) => void =
-      maybeIsNone(timestamp) ? data => data.forEach(item => this.cache.set(keyFn(item.amountAsset, item.priceAsset), item.current)) : identity;
 
     const dbTask: Task<DbError, any[]> = uncached.length === 0 ? taskOf([]) : this.pgp.many(sql.toString());
 
@@ -200,11 +259,9 @@ export default class RateEstimator {
           }
         }, result)
     ).map(
-      tap(cacheFn)
+      tap(cacheAll)
     ).map(
       data => toLookupTable(data.concat(eqRates).concat(cachedRates))
-    ).map(
-      tap(console.log)
     ).map(
       lookupTable => assets.map(
         idsPair => (
@@ -212,6 +269,12 @@ export default class RateEstimator {
             req: idsPair,
             res: lookupRate(idsPair, lookupTable)
           }
+        )
+      )
+    ).map(
+      tap(
+        results => results.forEach(
+          reqAndRes => cache.put(reqAndRes.req, reqAndRes.res.map(it => it.current).getOrElse(new BigNumber(0)))
         )
       )
     )
