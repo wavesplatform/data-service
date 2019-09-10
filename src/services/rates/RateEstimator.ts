@@ -206,14 +206,10 @@ export default class RateEstimator {
     
     const [eq, uneq] = partition(it => it.amountAsset === it.priceAsset, assets)
 
-    console.log("UNEQ LEN: ", uneq.length)
-
     const allPairsToRequest = uniqWith(
       pairsEq,
       chain(it => requestData(it), uneq)
     )
-
-    console.log("ALL PAIRS TO REQUEST:", allPairsToRequest.length)
 
     const [cached, uncached] = partition(
       it => cache.has(it),
@@ -230,8 +226,6 @@ export default class RateEstimator {
       )
     )
 
-    console.log("UNCACHED:::", uncached)
-
     const eqRates: RateInfo[] = eq.map(
       (pair) => (
         {
@@ -245,7 +239,7 @@ export default class RateEstimator {
 
     const sql = pg.raw(makeSql(uncached.length), [timestamp.getOrElse(new Date()), matcher, ...pairsSqlParams])
 
-    console.log(sql.toString())
+    // console.log(sql.toString())
 
     const dbTask: Task<DbError, any[]> = uncached.length === 0 ? taskOf([]) : this.pgp.any(sql.toString());
 
@@ -262,8 +256,7 @@ export default class RateEstimator {
       tap(cacheAll)
     ).map(
       data => toLookupTable(data.concat(eqRates).concat(cachedRates))
-    ).map(tap(console.log))
-      .map(
+    ).map(
       lookupTable => assets.map(
         idsPair => (
           {
