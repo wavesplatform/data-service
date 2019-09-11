@@ -200,9 +200,9 @@ type PairsForRequest = {
   toBeRequested: AssetIdsPair[]
 }
 
-const partitionByPreCount = (cache: RateCache, assets: AssetIdsPair[]): PairsForRequest => {
+const partitionByPreCount = (cache: RateCache, pairs: AssetIdsPair[]): PairsForRequest => {
 
-  const [eq, uneq] = partition(it => it.amountAsset === it.priceAsset, assets)
+  const [eq, uneq] = partition(it => it.amountAsset === it.priceAsset, pairs)
 
   const allPairsToRequest = uniqWith(
     pairsEq,
@@ -246,13 +246,13 @@ export default class RateEstimator {
     private readonly pgp: PgDriver
   ) {}
 
-  estimate(assets: AssetIdsPair[], matcher: string, timestamp: Maybe<Date>): Task<AppError, ReqAndRes<AssetIdsPair, RateInfo>[]> {
+  estimate(pairs: AssetIdsPair[], matcher: string, timestamp: Maybe<Date>): Task<AppError, ReqAndRes<AssetIdsPair, RateInfo>[]> {
 
     const cache = wrapCache(this.lru, matcher, { muted: maybeIsSome(timestamp) })
     
     const cacheAll = (items: RateInfo[]) => items.forEach(it => cache.put(it, it.current))
 
-    const { preCount, toBeRequested } = partitionByPreCount(cache, assets)
+    const { preCount, toBeRequested } = partitionByPreCount(cache, pairs)
 
     const pairsSqlParams = chain(it => [it.amountAsset, it.priceAsset], toBeRequested)
 
@@ -276,7 +276,7 @@ export default class RateEstimator {
     ).map(
       data => toLookupTable(data.concat(preCount))
     ).map(
-      lookupTable => assets.map(
+      lookupTable => pairs.map(
         idsPair => (
           {
             req: idsPair,
