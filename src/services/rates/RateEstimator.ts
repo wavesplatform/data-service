@@ -4,27 +4,28 @@ import { Maybe, of as maybeOf } from 'folktale/maybe';
 import { identity } from 'ramda';
 
 import { tap } from "../../utils/tap";
-import { AssetIdsPair, RateInfo } from "../../types";
+import { AssetIdsPair, RateInfo, RateMgetParams } from "../../types";
 import { AppError, DbError } from "../../errorHandling";
 
 import { partitionByPreCount, AsyncGet } from './repo';
 import  RateCache, { RateCacheKey } from './repo/impl/RateCache';
 import RateInfoLookup from './repo/impl/RateInfoLookup'
 import { maybeIsNone } from "./util";
-import { RemoteRequestParams } from "./repo/impl/RemoteRateRepo";
 
 type ReqAndRes<TReq, TRes> = {
   req: TReq,
   res: Maybe<TRes>
 }
 
-export default class RateEstimator {
+export default class RateEstimator implements AsyncGet<RateMgetParams, ReqAndRes<AssetIdsPair, RateInfo>[], AppError> {
   constructor(
     private readonly cache: RateCache,
-    private readonly remoteGet: AsyncGet<RemoteRequestParams, RateInfo[], DbError>
+    private readonly remoteGet: AsyncGet<RateMgetParams, RateInfo[], DbError>
   ) { }
 
-  estimate(pairs: AssetIdsPair[], matcher: string, timestamp: Maybe<Date>): Task<AppError, ReqAndRes<AssetIdsPair, RateInfo>[]> {
+  get(request: RateMgetParams): Task<AppError, ReqAndRes<AssetIdsPair, RateInfo>[]> {
+    const { pairs, timestamp, matcher } = request
+    
     const shouldCache = maybeIsNone(timestamp)
 
     const getCacheKey = (pair: AssetIdsPair): Maybe<RateCacheKey> =>

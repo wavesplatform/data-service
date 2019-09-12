@@ -24,18 +24,21 @@ export default function({
   drivers
 }: RateSerivceCreatorDependencies): ServiceMget<RateMgetParams, Rate> {
 
-  const lru = new LRU<string, BigNumber>(
-    {
-      max: CACHE_SIZE,
-      maxAge: CACHE_AGE_MILLIS,
-    }
-  );
-
-  const estimator = new RateEstimator(new RateCache(lru), new RemoteRateRepo(drivers.pg))
+  const estimator = new RateEstimator(
+    new RateCache(
+      new LRU<string, BigNumber>(
+        {
+          max: CACHE_SIZE,
+          maxAge: CACHE_AGE_MILLIS,
+        }
+      )      
+    ),
+    new RemoteRateRepo(drivers.pg)
+  )
   
   return {
     mget(request: RateMgetParams) {
-      return estimator.estimate(request.pairs, request.matcher, request.timestamp)
+      return estimator.get(request)
         .map(data => data.map(
           item => rate(
             {
