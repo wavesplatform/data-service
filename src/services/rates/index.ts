@@ -6,6 +6,7 @@ import { ServiceMget, Rate, RateMgetParams, list, rate } from "../../types";
 import { AppError } from "../../errorHandling";
 import { RateSerivceCreatorDependencies } from '../../services';
 import RateEstimator from './RateEstimator';
+import RemoteRateRepo from './repo/impl/RemoteRateRepo';
 import RateCache from './repo/impl/RateCache'
 
 export interface PairOrderingService {
@@ -30,7 +31,7 @@ export default function({
     }
   );
 
-  const estimator = new RateEstimator(new RateCache(lru), drivers.pg)
+  const estimator = new RateEstimator(new RateCache(lru), new RemoteRateRepo(drivers.pg))
   
   return {
     mget(request: RateMgetParams) {

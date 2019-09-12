@@ -5,6 +5,7 @@ import { AssetIdsPair, RateInfo } from '../../../types';
 import { BigNumber } from '@waves/data-entities';
 import { pairIsSymmetric,pairsEq, generatePossibleRequestItems } from '../data'
 import RateCache, { RateCacheKey } from './impl/RateCache';
+import { Task } from "folktale/concurrency/task";
 
 export type ReadOnlyRepo<K, V> = {
   has: (key: K) => boolean,
@@ -13,6 +14,10 @@ export type ReadOnlyRepo<K, V> = {
 
 export type Repo<K, V> = ReadOnlyRepo<K, V> & {
   put: (key: K, value: V) => void
+}
+
+export type AsyncGet<Req, Res, Error> = {
+  get(req: Req): Task<Error, Res>
 }
 
 export type PairsForRequest = {
