@@ -5,11 +5,7 @@ import { matchRequestsResults } from '../../utils/db';
 import { toDbError, DbError } from '../../errorHandling';
 import { MgetRequest } from './types';
 
-export const mgetPairs = <
-  Request extends MgetRequest,
-  ResponseRaw,
-  Id = string
->({
+export const mgetPairsPg = <Request extends MgetRequest, ResponseRaw, Id>({
   matchRequestResult,
   name,
   sql,

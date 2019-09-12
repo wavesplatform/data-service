@@ -67,8 +67,11 @@ export type ServiceMesh = {
   aliases: AliasService;
   assets: AssetsService;
   candles: CandlesService;
+  matcher: {
+    pairs: PairsService;
+    rates: ServiceMget<RateMgetParams, Rate>;
+  },
   pairs: PairsService;
-  rates: ServiceMget<RateMgetParams, Rate>;
   transactions: {
     all: AllTxsService;
     alias: AliasTxsService;
@@ -98,7 +101,7 @@ export default ({
   options: DataServiceConfig;
   pgDriver: PgDriver;
   emitEvent: EmitEvent;
-}): Task<AppError, ServiceMesh> => {
+}): Task<AppError, ServiceMesh> => {  
   const commonDeps = {
     drivers: {
       pg: pgDriver,
