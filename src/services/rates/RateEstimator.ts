@@ -9,7 +9,6 @@ import { BigNumber } from "@waves/data-entities";
 import {
   uniqWith,
   complement,
-  always,
   map,
   path,
   chain,
@@ -20,13 +19,11 @@ import { tap } from "../../utils/tap";
 import * as LRU from 'lru-cache';
 import { AssetIdsPair, RateInfo } from "../../types";
 import { AppError, DbError } from "../../errorHandling";
-// import { Monoid } from "../../types/monoid";
-// import { concatAll } from "../../utils/fp";
 import { PgDriver } from "db/driver";
-
 import * as knex from 'knex'
 
 import makeSql from './sql'
+import { inv, maybeMap2, safeDivide, maybeIsSome }  from './util'
 
 const pg = knex({ client: 'pg' });
 
@@ -36,20 +33,6 @@ type ReqAndRes<TReq, TRes> = {
   req: TReq,
   res: Maybe<TRes>
 }
-
-const maybeIsNone = <T>(data: Maybe<T>) => {
-  return data.matchWith(
-    {
-      Just: always(false),
-      Nothing: always(true)
-    }
-  )
-}
-
-const maybeIsSome = complement(maybeIsNone)
-
-const maybeMap2 = <T1, T2, R>(fn: (v1: T1, v2: T2) => R, v1: Maybe<T1>, v2: Maybe<T2>): Maybe<R> =>
-  v1.chain(v1 => v2.map(v2 => fn(v1, v2)))
 
 type RateLookupTable = {
   [amountAsset: string]: {
@@ -71,12 +54,6 @@ function toLookupTable(data: RateInfo[]): RateLookupTable {
     {} as RateLookupTable
   )
 }
-
-function safeDivide(n1: BigNumber, n2: BigNumber): Maybe<BigNumber> {
-  return maybeOf(n2).filter(it => !it.isZero()).map(it => n1.div(it))
-}
-
-const inv = (n: BigNumber) => safeDivide(new BigNumber(1), n)
 
 function getFromLookupTable(lookup: RateLookupTable, pair: AssetIdsPair, flipped: boolean): Maybe<RateInfo> {
   const lookupData = flipped ? flip(pair) : pair
@@ -201,7 +178,6 @@ type PairsForRequest = {
 }
 
 const partitionByPreCount = (cache: RateCache, pairs: AssetIdsPair[]): PairsForRequest => {
-
   const [eq, uneq] = partition(it => it.amountAsset === it.priceAsset, pairs)
 
   const allPairsToRequest = uniqWith(
@@ -241,7 +217,6 @@ const partitionByPreCount = (cache: RateCache, pairs: AssetIdsPair[]): PairsForR
 
 export default class RateEstimator {
   constructor(
-    // private readonly pairOrderingService: PairOrderingService,
     private readonly lru: LRU<string, BigNumber>,
     private readonly pgp: PgDriver
   ) {}
