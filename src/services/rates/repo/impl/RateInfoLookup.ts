@@ -3,7 +3,7 @@ import { Maybe, of as maybeOf, fromNullable } from 'folktale/maybe';
 import { path, complement } from 'ramda';
 
 import { AssetIdsPair, RateInfo } from "../../../../types";
-import { ReadOnlyRepo } from '../../repo';
+import { ReadOnlyCache } from '../../repo';
 import { WavesId, flip, pairHasWaves } from '../../data';
 import { maybeIsSome, maybeMap2, inv, safeDivide } from '../../util';
 
@@ -13,7 +13,8 @@ type RateLookupTable = {
   }
 };
 
-export default class RateInfoLookup implements ReadOnlyRepo<AssetIdsPair, RateInfo> {
+// @todo add comment — what logic is here?
+export default class RateInfoLookup implements ReadOnlyCache<AssetIdsPair, RateInfo> {
   private readonly lookupTable: RateLookupTable;
 
   constructor(data: RateInfo[]) {
