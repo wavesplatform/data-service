@@ -13,7 +13,13 @@ type RateLookupTable = {
   }
 };
 
-// @todo add comment — what logic is here?
+/*
+   find rate data from RateLookupTable using the following strategy:
+   
+   lookup(amountAsset, priceAsset) || ( lookup(amountAsset, waves) / lookup(priceAsset, waves) }
+   
+   where lookup = getFromTable(asset1, asset2) || 1 / getFromtable(asset2, asset1)   
+*/
 export default class RateInfoLookup implements ReadOnlyCache<AssetIdsPair, RateInfo> {
   private readonly lookupTable: RateLookupTable;
 
