@@ -1,66 +1,11 @@
-import { Maybe,
-         fromNullable,
-         of as maybeOf,
-       } from 'folktale/maybe';
-import { path, complement } from 'ramda';
-import * as LRU from 'lru-cache';
-import { AssetIdsPair, RateInfo } from '../../types';
 import { BigNumber } from '@waves/data-entities';
-import { inv, safeDivide, maybeMap2, maybeIsSome } from './util';
-import { flip, WavesId, pairHasWaves } from './data'
-import { tap } from "../../utils/tap";
+import { Maybe, of as maybeOf, fromNullable } from 'folktale/maybe';
+import { path, complement } from 'ramda';
 
-export type ReadOnlyRepo<K, V> = {
-  has: (key: K) => boolean,
-  get: (key: K) => Maybe<V>
-}
-
-export type Repo<K, V> = ReadOnlyRepo<K, V> & {
-  put: (key: K, value: V) => void
-}
-
-export type RateCacheKey = {
-  pair: AssetIdsPair,
-  matcher: string
-}
-
-const keyFn = (matcher: string) => (pair: AssetIdsPair): string => {
-  return `${matcher}::${pair.amountAsset}::${pair.priceAsset}`
-}
-  
-export class RateCache implements Repo<Maybe<RateCacheKey>, BigNumber> {
-  constructor(
-    private readonly lru: LRU<string, BigNumber>
-  ) {}
-  
-  has(key: Maybe<RateCacheKey>): boolean {
-    return key.map(
-      key => {
-        const getKey = keyFn(key.matcher)
-        
-        return this.lru.has(getKey(key.pair)) || this.lru.has(getKey(flip(key.pair)))
-      }
-    ).getOrElse(false)
-  }
-  
-  put(key: Maybe<RateCacheKey>, rate: BigNumber) {
-    key.map(
-      tap(key => this.lru.set(keyFn(key.matcher)(key.pair), rate))
-    )
-  }
-  
-  get(key: Maybe<RateCacheKey>) {
-    return key.chain(
-      key => {
-        const getKey = keyFn(key.matcher)
-        
-        return fromNullable(this.lru.get(getKey(key.pair))).orElse(
-          () => fromNullable(this.lru.get(getKey(flip(key.pair)))).chain(inv)
-        )
-      }
-    )
-  }  
-}
+import { AssetIdsPair, RateInfo } from "../../../../types";
+import { ReadOnlyRepo } from '../../repo';
+import { WavesId, flip, pairHasWaves } from '../../data';
+import { maybeIsSome, maybeMap2, inv, safeDivide } from '../../util';
 
 type RateLookupTable = {
   [amountAsset: string]: {
@@ -68,7 +13,7 @@ type RateLookupTable = {
   }
 };
 
-export class RateInfoLookup implements ReadOnlyRepo<AssetIdsPair, RateInfo> {
+export default class RateInfoLookup implements ReadOnlyRepo<AssetIdsPair, RateInfo> {
   private readonly lookupTable: RateLookupTable;
 
   constructor(data: RateInfo[]) {

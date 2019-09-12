@@ -6,6 +6,7 @@ import { ServiceMget, Rate, RateMgetParams, list, rate } from "../../types";
 import { AppError } from "../../errorHandling";
 import { RateSerivceCreatorDependencies } from '../../services';
 import RateEstimator from './RateEstimator';
+import RateCache from './repo/impl/RateCache'
 
 export interface PairOrderingService {
   getCorrectOrder(matcher: string, pair: [string, string]): Task<AppError, Maybe<[string, string]>>
@@ -22,14 +23,14 @@ export default function({
   drivers
 }: RateSerivceCreatorDependencies): ServiceMget<RateMgetParams, Rate> {
 
-  const cache = new LRU<string, BigNumber>(
+  const lru = new LRU<string, BigNumber>(
     {
       max: CACHE_SIZE,
       maxAge: CACHE_AGE_MILLIS,
     }
   );
 
-  const estimator = new RateEstimator(cache, drivers.pg)
+  const estimator = new RateEstimator(new RateCache(lru), drivers.pg)
   
   return {
     mget(request: RateMgetParams) {
