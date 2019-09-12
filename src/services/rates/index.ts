@@ -19,8 +19,6 @@ const CACHE_AGE_MILLIS = 5 * 60 * 1000; // 5 minutes
 const CACHE_SIZE = 100000;
 
 export default function({
-  txService,
-  pairOrderingService,
   drivers
 }: RateSerivceCreatorDependencies): ServiceMget<RateMgetParams, Rate> {
 

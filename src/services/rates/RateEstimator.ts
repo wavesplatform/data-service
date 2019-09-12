@@ -1,16 +1,12 @@
 import { Task, of as taskOf } from "folktale/concurrency/task";
-import { Maybe,
-         fromNullable,
-         of as maybeOf,
-         empty as maybeEmpty,
-       } from 'folktale/maybe';
+import { Maybe } from 'folktale/maybe';
 
 import { BigNumber } from "@waves/data-entities";
 import {
+  always,
+  identity,
   uniqWith,
-  complement,
   map,
-  path,
   chain,
   partition,
 } from 'ramda';
@@ -22,98 +18,15 @@ import { AppError, DbError } from "../../errorHandling";
 import { PgDriver } from "db/driver";
 import * as knex from 'knex'
 
-import makeSql from './sql'
-import { inv, maybeMap2, safeDivide, maybeIsSome }  from './util'
+import makeSql from './sql';
+import { RateCache, RateInfoLookup, RateCacheKey } from './repo';
+import { WavesId, pairIsSymmetric, flip } from './data';
 
 const pg = knex({ client: 'pg' });
-
-const WavesId: string = 'WAVES';
 
 type ReqAndRes<TReq, TRes> = {
   req: TReq,
   res: Maybe<TRes>
-}
-
-type RateLookupTable = {
-  [amountAsset: string]: {
-    [priceAsset: string]: BigNumber
-  }
-};
-
-function toLookupTable(data: RateInfo[]): RateLookupTable {
-  return data.reduce(
-    (acc, item) => {
-      if (!(item.amountAsset in acc)) {
-        acc[item.amountAsset] = {}
-      }
-
-      acc[item.amountAsset][item.priceAsset] = item.current;
-
-      return acc
-    },
-    {} as RateLookupTable
-  )
-}
-
-function getFromLookupTable(lookup: RateLookupTable, pair: AssetIdsPair, flipped: boolean): Maybe<RateInfo> {
-  const lookupData = flipped ? flip(pair) : pair
-
-  return fromNullable(path([lookupData.amountAsset, lookupData.priceAsset], lookup))
-    .map((rate: BigNumber) => flipped ? inv(rate).getOrElse(new BigNumber(0)) : rate)
-    .map(
-      rate => (
-        {
-          current: rate,
-            ...lookupData           
-        }
-      )
-    )
-}
-
-const pairHasWaves = (pair: AssetIdsPair): boolean => pair.priceAsset === WavesId || pair.amountAsset === WavesId;
-
-function lookupRate(pair: AssetIdsPair, lookupTable: RateLookupTable): Maybe<RateInfo> {
-  const lookup = (pair: AssetIdsPair, flipped: boolean) => getFromLookupTable(lookupTable, pair, flipped)
-
-  return lookup(pair, false)
-    .orElse(
-      () => lookup(pair, true)
-    ).orElse(
-      () => maybeOf(pair).filter(complement(pairHasWaves)).chain(pair => lookupThroughWaves(pair, lookupTable))
-    )
-}
-
-function lookupThroughWaves(pair: AssetIdsPair, lookup: RateLookupTable): Maybe<RateInfo> {
-  return maybeMap2(
-    (info1, info2) => safeDivide(info1.current, info2.current),
-    lookupRate(
-      {
-        amountAsset: pair.amountAsset,
-        priceAsset: WavesId
-      },
-      lookup
-    ),
-    lookupRate(
-      {
-        amountAsset: pair.priceAsset,
-        priceAsset: WavesId
-      },
-      lookup
-    )
-  ).map(rate => (
-    {
-      amountAsset: pair.amountAsset,
-      priceAsset: pair.priceAsset,
-      current: rate.getOrElse(new BigNumber(0))
-    }
-  ))
-}
-
-function flip(pair: AssetIdsPair): AssetIdsPair {
-  return {
-    amountAsset: pair.priceAsset,
-    priceAsset: pair.amountAsset
-  }
 }
 
 function requestData(pair: AssetIdsPair): AssetIdsPair[] {
@@ -138,36 +51,30 @@ function requestData(pair: AssetIdsPair): AssetIdsPair[] {
   ]
 }
 
-type RateCache = {
-  has: (pair: AssetIdsPair) => boolean,
-  put: (pair: AssetIdsPair, rate: BigNumber) => void,
-  get: (pair: AssetIdsPair) => Maybe<BigNumber>
-}
+// function wrapCache(cache: LRU<string, BigNumber>, matcher: string, params: { muted: boolean }): RateCache<BigNumber> {
+//   const keyFn = (pair: AssetIdsPair): string =>
+//     `${matcher}::${pair.amountAsset}::${pair.priceAsset}`
 
-function wrapCache(cache: LRU<string, BigNumber>, matcher: string, params: { muted: boolean }): RateCache {
-  const keyFn = (pair: AssetIdsPair): string =>
-    `${matcher}::${pair.amountAsset}::${pair.priceAsset}`
-
-  const muted = params.muted
+//   const muted = params.muted
   
-  return {
-    has: (pair: AssetIdsPair) => !muted && (cache.has(keyFn(pair)) || cache.has(keyFn(flip(pair)))),
-    put: (pair: AssetIdsPair, rate: BigNumber) => {
-      if (!muted) {
-        cache.set(keyFn(pair), rate)
-      }
-    },
-    get: (pair: AssetIdsPair) => {
-      if (muted) {
-        return maybeEmpty()
-      } else {
-        return fromNullable(cache.get(keyFn(pair))).orElse(
-          () => fromNullable(cache.get(keyFn(flip(pair)))).chain(inv)
-        )
-      }
-    }
-  }
-}
+//   return {
+//     has: (pair: AssetIdsPair) => !muted && (cache.has(keyFn(pair)) || cache.has(keyFn(flip(pair)))),
+//     put: (pair: AssetIdsPair, rate: BigNumber) => {
+//       if (!muted) {
+//         cache.set(keyFn(pair), rate)
+//       }
+//     },
+//     get: (pair: AssetIdsPair) => {
+//       if (muted) {
+//         return maybeEmpty()
+//       } else {
+//         return fromNullable(cache.get(keyFn(pair))).orElse(
+//           () => fromNullable(cache.get(keyFn(flip(pair)))).chain(inv)
+//         )
+//       }
+//     }
+//   }
+// }
 
 const pairsEq = (pair1: AssetIdsPair, pair2: AssetIdsPair): boolean =>
   pair1.amountAsset === pair2.amountAsset && pair1.priceAsset === pair2.priceAsset
@@ -177,8 +84,8 @@ type PairsForRequest = {
   toBeRequested: AssetIdsPair[]
 }
 
-const partitionByPreCount = (cache: RateCache, pairs: AssetIdsPair[]): PairsForRequest => {
-  const [eq, uneq] = partition(it => it.amountAsset === it.priceAsset, pairs)
+const partitionByPreCount = (cache: RateCache, pairs: AssetIdsPair[], getCacheKey: (pair: AssetIdsPair) => Maybe<RateCacheKey>): PairsForRequest => {
+  const [eq, uneq] = partition(pairIsSymmetric, pairs)
 
   const allPairsToRequest = uniqWith(
     pairsEq,
@@ -186,7 +93,9 @@ const partitionByPreCount = (cache: RateCache, pairs: AssetIdsPair[]): PairsForR
   )
 
   const [cached, uncached] = partition(
-    it => cache.has(it),
+    it => cache.has(
+      getCacheKey(it)
+    ),
     allPairsToRequest
   )
 
@@ -195,7 +104,9 @@ const partitionByPreCount = (cache: RateCache, pairs: AssetIdsPair[]): PairsForR
       {
         amountAsset: pair.amountAsset,
         priceAsset: pair.priceAsset,
-        current: cache.get(pair).getOrElse(new BigNumber(0))
+        current: cache.get(
+          getCacheKey(pair)
+        ).getOrElse(new BigNumber(0))
       }
     )
   )
@@ -216,18 +127,30 @@ const partitionByPreCount = (cache: RateCache, pairs: AssetIdsPair[]): PairsForR
 }
 
 export default class RateEstimator {
+  private readonly cache: RateCache
+  
   constructor(
-    private readonly lru: LRU<string, BigNumber>,
+    lru: LRU<string, BigNumber>,
     private readonly pgp: PgDriver
-  ) {}
+  ) {
+
+    this.cache = new RateCache(lru)
+  }
 
   estimate(pairs: AssetIdsPair[], matcher: string, timestamp: Maybe<Date>): Task<AppError, ReqAndRes<AssetIdsPair, RateInfo>[]> {
+    const shouldCache = timestamp.map(always(false)).filter(identity)
 
-    const cache = wrapCache(this.lru, matcher, { muted: maybeIsSome(timestamp) })
+    const getCacheKey = (pair: AssetIdsPair): Maybe<RateCacheKey> => shouldCache.map(() => (
+      {
+        pair, matcher
+      }
+    ))
     
-    const cacheAll = (items: RateInfo[]) => items.forEach(it => cache.put(it, it.current))
-
-    const { preCount, toBeRequested } = partitionByPreCount(cache, pairs)
+    const cacheAll = (items: RateInfo[]) => items.forEach(
+      it => this.cache.put(getCacheKey(it), it.current)
+    )
+    
+    const { preCount, toBeRequested } = partitionByPreCount(this.cache, pairs, getCacheKey)
 
     const pairsSqlParams = chain(it => [it.amountAsset, it.priceAsset], toBeRequested)
 
@@ -249,13 +172,13 @@ export default class RateEstimator {
     ).map(
       tap(cacheAll)
     ).map(
-      data => toLookupTable(data.concat(preCount))
+      data => new RateInfoLookup(data.concat(preCount))
     ).map(
-      lookupTable => pairs.map(
+      lookup => pairs.map(
         idsPair => (
           {
             req: idsPair,
-            res: lookupRate(idsPair, lookupTable)
+            res: lookup.get(idsPair)
           }
         )
       )
@@ -263,7 +186,7 @@ export default class RateEstimator {
       tap(
         data => data.forEach(
           reqAndRes => reqAndRes.res.map(
-            tap(res => cache.put(reqAndRes.req, res.current))
+            tap(res => this.cache.put(getCacheKey(reqAndRes.req), res.current))
           )
         )
       )

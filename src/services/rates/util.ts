@@ -26,7 +26,7 @@ export const maybeMap2 = <T1, T2, R>(fn: (v1: T1, v2: T2) => R, v1: Maybe<T1>, v
 
 export type Deconstruct<T, Components> = (value: T) => Components
 
-export const isSymmetric = <T, P>(byFn: Deconstruct<T, [P, P]>, item: T) => {
+export const isSymmetric = <T, P>(byFn: Deconstruct<T, [P, P]>) => (item: T) => {
   const [p1, p2] = byFn(item)
 
   return p1 === p2
