@@ -4,7 +4,7 @@ import { partition, chain, uniqWith } from 'ramda';
 import { AssetIdsPair, RateInfo } from '../../../types';
 import { BigNumber } from '@waves/data-entities';
 import { pairIsSymmetric,pairsEq, generatePossibleRequestItems } from '../data'
-import RateCache, { RateCacheKey } from './impl/RateCache';
+import { RateCacheKey } from './impl/RateCache';
 import { Task } from "folktale/concurrency/task";
 
 export type ReadOnlyRepo<K, V> = {
@@ -25,44 +25,48 @@ export type PairsForRequest = {
   toBeRequested: AssetIdsPair[]
 }
 
-export const partitionByPreCount = (cache: RateCache, pairs: AssetIdsPair[], getCacheKey: (pair: AssetIdsPair) => Maybe<RateCacheKey>): PairsForRequest => {
-  const [eq, uneq] = partition(pairIsSymmetric, pairs)
+export const partitionByPreCount = (
+  cache: Repo<Maybe<RateCacheKey>, BigNumber>,
+  pairs: AssetIdsPair[],
+  getCacheKey: (pair: AssetIdsPair) => Maybe<RateCacheKey>): PairsForRequest => {
+    
+    const [eq, uneq] = partition(pairIsSymmetric, pairs)
 
-  const allPairsToRequest = uniqWith(
-    pairsEq,
-    chain(it => generatePossibleRequestItems(it), uneq)
-  )
-
-  const [cached, uncached] = partition(
-    it => cache.has(
-      getCacheKey(it)
-    ),
-    allPairsToRequest
-  )
-
-  const cachedRates: RateInfo[] = cached.map(
-    pair => (
-      {
-        amountAsset: pair.amountAsset,
-        priceAsset: pair.priceAsset,
-        current: cache.get(
-          getCacheKey(pair)
-        ).getOrElse(new BigNumber(0))
-      }
+    const allPairsToRequest = uniqWith(
+      pairsEq,
+      chain(it => generatePossibleRequestItems(it), uneq)
     )
-  )
 
-  const eqRates: RateInfo[] = eq.map(
-    (pair) => (
-      {
-        current: new BigNumber(1),
-          ...pair
-      }
+    const [cached, uncached] = partition(
+      it => cache.has(
+        getCacheKey(it)
+      ),
+      allPairsToRequest
     )
-  )
 
-  return {
-    preCount: cachedRates.concat(eqRates),
-    toBeRequested: uncached
+    const cachedRates: RateInfo[] = cached.map(
+      pair => (
+        {
+          amountAsset: pair.amountAsset,
+          priceAsset: pair.priceAsset,
+          current: cache.get(
+            getCacheKey(pair)
+          ).getOrElse(new BigNumber(0))
+        }
+      )
+    )
+
+    const eqRates: RateInfo[] = eq.map(
+      (pair) => (
+        {
+          current: new BigNumber(1),
+            ...pair
+        }
+      )
+    )
+
+    return {
+      preCount: cachedRates.concat(eqRates),
+      toBeRequested: uncached
+    }
   }
-}

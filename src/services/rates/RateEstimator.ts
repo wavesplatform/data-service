@@ -1,14 +1,14 @@
 import { Task } from "folktale/concurrency/task";
 import { Maybe, of as maybeOf } from 'folktale/maybe';
-
+import { BigNumber } from '@waves/data-entities';
 import { identity } from 'ramda';
 
 import { tap } from "../../utils/tap";
 import { AssetIdsPair, RateInfo, RateMgetParams } from "../../types";
 import { AppError, DbError } from "../../errorHandling";
 
-import { partitionByPreCount, AsyncGet } from './repo';
-import  RateCache, { RateCacheKey } from './repo/impl/RateCache';
+import { partitionByPreCount, AsyncGet, Repo } from './repo';
+import { RateCacheKey } from './repo/impl/RateCache';
 import RateInfoLookup from './repo/impl/RateInfoLookup'
 import { maybeIsNone } from "./util";
 
@@ -19,7 +19,7 @@ type ReqAndRes<TReq, TRes> = {
 
 export default class RateEstimator implements AsyncGet<RateMgetParams, ReqAndRes<AssetIdsPair, RateInfo>[], AppError> {
   constructor(
-    private readonly cache: RateCache,
+    private readonly cache: Repo<Maybe<RateCacheKey>, BigNumber>,
     private readonly remoteGet: AsyncGet<RateMgetParams, RateInfo[], DbError>
   ) { }
 

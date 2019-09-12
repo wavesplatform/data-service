@@ -18,7 +18,7 @@ export const dummyPairOrdering: PairOrderingService = {
 }
 
 const CACHE_AGE_MILLIS = 5 * 60 * 1000; // 5 minutes
-const CACHE_SIZE = 100000;
+const CACHE_SIZE = 200000;
 
 export default function({
   drivers
