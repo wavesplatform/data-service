@@ -39,7 +39,7 @@ export default class RateInfoLookup implements ReadOnlyRepo<AssetIdsPair, RateIn
   }  
   
   private toLookupTable(data: RateInfo[]): RateLookupTable {
-    return data.reduce(
+    return data.reduce<RateLookupTable>(
       (acc, item) => {
         if (!(item.amountAsset in acc)) {
           acc[item.amountAsset] = {}
@@ -49,7 +49,7 @@ export default class RateInfoLookup implements ReadOnlyRepo<AssetIdsPair, RateIn
 
         return acc
       },
-      {} as RateLookupTable
+      {}
     )
   }
 
