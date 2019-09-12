@@ -1,9 +1,8 @@
 import { Task, of as taskOf } from "folktale/concurrency/task";
-import { Maybe } from 'folktale/maybe';
+import { Maybe, of as maybeOf } from 'folktale/maybe';
 
 import { BigNumber } from "@waves/data-entities";
 import {
-  always,
   identity,
   uniqWith,
   map,
@@ -21,6 +20,7 @@ import * as knex from 'knex'
 import makeSql from './sql';
 import { RateCache, RateInfoLookup, RateCacheKey } from './repo';
 import { WavesId, pairIsSymmetric, flip } from './data';
+import { maybeIsNone } from "./util";
 
 const pg = knex({ client: 'pg' });
 
@@ -50,31 +50,6 @@ function requestData(pair: AssetIdsPair): AssetIdsPair[] {
     wavesR, flip(wavesR)
   ]
 }
-
-// function wrapCache(cache: LRU<string, BigNumber>, matcher: string, params: { muted: boolean }): RateCache<BigNumber> {
-//   const keyFn = (pair: AssetIdsPair): string =>
-//     `${matcher}::${pair.amountAsset}::${pair.priceAsset}`
-
-//   const muted = params.muted
-  
-//   return {
-//     has: (pair: AssetIdsPair) => !muted && (cache.has(keyFn(pair)) || cache.has(keyFn(flip(pair)))),
-//     put: (pair: AssetIdsPair, rate: BigNumber) => {
-//       if (!muted) {
-//         cache.set(keyFn(pair), rate)
-//       }
-//     },
-//     get: (pair: AssetIdsPair) => {
-//       if (muted) {
-//         return maybeEmpty()
-//       } else {
-//         return fromNullable(cache.get(keyFn(pair))).orElse(
-//           () => fromNullable(cache.get(keyFn(flip(pair)))).chain(inv)
-//         )
-//       }
-//     }
-//   }
-// }
 
 const pairsEq = (pair1: AssetIdsPair, pair2: AssetIdsPair): boolean =>
   pair1.amountAsset === pair2.amountAsset && pair1.priceAsset === pair2.priceAsset
@@ -138,13 +113,15 @@ export default class RateEstimator {
   }
 
   estimate(pairs: AssetIdsPair[], matcher: string, timestamp: Maybe<Date>): Task<AppError, ReqAndRes<AssetIdsPair, RateInfo>[]> {
-    const shouldCache = timestamp.map(always(false)).filter(identity)
+    const shouldCache = maybeIsNone(timestamp)
 
-    const getCacheKey = (pair: AssetIdsPair): Maybe<RateCacheKey> => shouldCache.map(() => (
-      {
-        pair, matcher
-      }
-    ))
+    const getCacheKey = (pair: AssetIdsPair): Maybe<RateCacheKey> =>
+      maybeOf(shouldCache).filter(identity).map(
+        () => (
+          {
+            pair, matcher
+          })
+      );
     
     const cacheAll = (items: RateInfo[]) => items.forEach(
       it => this.cache.put(getCacheKey(it), it.current)
