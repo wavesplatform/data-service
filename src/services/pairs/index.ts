@@ -1,9 +1,12 @@
-import { identity } from 'ramda';
+import { identity, zip } from 'ramda';
 import { of as taskOf } from 'folktale/concurrency/task';
-import { of as just } from 'folktale/maybe';
+import { of as just, Maybe } from 'folktale/maybe';
+
+import { forEach, isEmpty } from '../../utils/fp/maybeOps';
+import { tap } from '../../utils/tap';
 
 import { ValidationError } from '../../errorHandling';
-import { pair, PairInfo, Pair, List, Service, Cache } from '../../types';
+import { pair, PairInfo, Pair, List, Service, CacheSync } from '../../types';
 import { CommonServiceDependencies } from '..';
 
 // resolver creation and presets
@@ -66,12 +69,14 @@ export type PairsService = Service<
   Pair
 >;
 
+export { create as createCache } from './cache';
+
 export default ({ drivers, emitEvent }: CommonServiceDependencies) => ({
   validatePairs,
   cache,
 }: {
   validatePairs: ValidateAsync<ValidationError, AssetPair[]>;
-  cache: Cache<PairsGetRequest, PairDbResponse>;
+  cache: CacheSync<PairsGetRequest, PairDbResponse>;
 }): PairsService => {
   const get = createGetResolver<
     PairsGetRequest,
@@ -84,36 +89,25 @@ export default ({ drivers, emitEvent }: CommonServiceDependencies) => ({
       validateInput<PairsGetRequest>(inputGet, 'pairs.get')(value).chain(v =>
         validatePairs([v.pair]).map(() => v)
       ),
+
     // cache first
     getData: req =>
-      cache.get(req).chain(maybeRes =>
-        maybeRes.matchWith({
-          Just: ({ value }) => taskOf(just(value)),
-          Nothing: () =>
-            getByIdPg<PairDbResponse, PairsGetRequest>({
-              name: 'pairs.get',
-              sql: sql.get,
-              pg: drivers.pg,
-            })(req).map(maybeResp => {
-              // fill cache
-              maybeResp.matchWith({
-                Just: ({ value }) =>
-                  cache
-                    .set(req, value)
-                    .run()
-                    .listen({ onRejected: () => {} }),
-                Nothing: () => {},
-              });
-              return maybeResp;
-            }),
-        })
-      ),
+      cache.get(req).matchWith({
+        Just: ({ value }) => taskOf(just(value)),
+        Nothing: () =>
+          getByIdPg<PairDbResponse, PairsGetRequest>({
+            name: 'pairs.get',
+            sql: sql.get,
+            pg: drivers.pg,
+          })(req).map(
+            tap(maybeResp => forEach(x => cache.set(req, x), maybeResp))
+          ),
+      }),
     validateResult: validateResult(resultSchema, name),
     transformResult: res => res.map(transformResult).map(pair),
     emitEvent,
   });
 
-  // @todo mget cache
   const mget = createMgetResolver<
     PairsMgetRequest,
     PairsMgetRequest,
@@ -125,12 +119,31 @@ export default ({ drivers, emitEvent }: CommonServiceDependencies) => ({
       validateInput<PairsMgetRequest>(inputMget, 'pairs.mget')(value).chain(v =>
         validatePairs(v.pairs).map(() => v)
       ),
-    getData: mgetPairsPg({
-      name: 'pairs.mget',
-      sql: sql.mget,
-      matchRequestResult,
-      pg: drivers.pg,
-    }),
+    getData: request => {
+      let results: Array<Maybe<PairDbResponse>> = request.pairs.map(p =>
+        cache.get({
+          pair: p,
+          matcher: request.matcher,
+        })
+      );
+
+      const notCachedPairsIndexes = results.filter(isEmpty).map((_, i) => i);
+
+      return mgetPairsPg({
+        name: 'pairs.mget',
+        sql: sql.mget,
+        matchRequestResult,
+        pg: drivers.pg,
+      })({
+        pairs: notCachedPairsIndexes.map(i => request.pairs[i]),
+        matcher: request.matcher,
+      }).map(pairsFromDb => {
+        zip(pairsFromDb, notCachedPairsIndexes).forEach(
+          ([pair, i]) => (results[i] = pair)
+        );
+        return results;
+      });
+    },
     validateResult: validateResult(resultSchema, name),
     transformResult: transformResultMget,
     emitEvent,

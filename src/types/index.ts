@@ -6,7 +6,7 @@ import { toSerializable, Serializable } from './serialization';
 import { Interval, interval, Unit } from './interval';
 import { List, list } from './list';
 
-export { Cache } from './cache';
+export { CacheSync } from './cache';
 
 export { List, list };
 export { Interval, interval, Unit };

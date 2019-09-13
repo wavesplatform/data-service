@@ -1,15 +1,20 @@
-import { Task } from 'folktale/concurrency/task';
+import { Task, of as taskOf } from 'folktale/concurrency/task';
 
 import { AppError } from '../errorHandling';
 import createAliasesService, { AliasService } from './aliases';
 import createAssetsService, { AssetsService } from './assets';
 import createCandlesService, { CandlesService } from './candles';
-import createPairsService, { PairsService } from './pairs';
+import createPairsService, {
+  createCache as createPairsCache,
+  PairsService,
+} from './pairs';
 import createAllTxsService, { AllTxsService } from './transactions/all';
 import createAliasTxsService, { AliasTxsService } from './transactions/alias';
 import createBurnTxsService, { BurnTxsService } from './transactions/burn';
 import createDataTxsService, { DataTxsService } from './transactions/data';
-import createExchangeTxsService, { ExchangeTxsService } from './transactions/exchange';
+import createExchangeTxsService, {
+  ExchangeTxsService,
+} from './transactions/exchange';
 import createGenesisTxsService, {
   GenesisTxsService,
 } from './transactions/genesis';
@@ -43,7 +48,10 @@ import createTransferTxsService, {
   TransferTxsService,
 } from './transactions/transfer';
 import { DataServiceConfig } from '../loadConfig';
-import createRateService, { PairOrderingService, dummyPairOrdering } from './rates'
+import createRateService, {
+  PairOrderingService,
+  dummyPairOrdering,
+} from './rates';
 
 import { PgDriver } from '../db/driver';
 import { EmitEvent } from './_common/createResolver/types';
@@ -57,8 +65,8 @@ export type CommonServiceDependencies = {
 };
 
 export type RateSerivceCreatorDependencies = CommonServiceDependencies & {
-  pairOrderingService: PairOrderingService,
-}
+  pairOrderingService: PairOrderingService;
+};
 
 export type ServiceMesh = {
   aliases: AliasService;
@@ -67,7 +75,7 @@ export type ServiceMesh = {
   matcher: {
     pairs: PairsService;
     rates: ServiceMget<RateMgetParams, Rate>;
-  },
+  };
   pairs: PairsService;
   transactions: {
     all: AllTxsService;
@@ -98,74 +106,87 @@ export default ({
   options: DataServiceConfig;
   pgDriver: PgDriver;
   emitEvent: EmitEvent;
-}): Task<AppError, ServiceMesh> => {  
-  const commonDeps = {
-    drivers: {
-      pg: pgDriver,
-    },
-    emitEvent,
-  };
+}): Task<AppError, ServiceMesh> =>
+  // @todo async init whatever is necessary
+  taskOf<AppError, any>({
+    validatePairsOrSomething: (x: any) => taskOf(x),
+  }).map(({ validatePairsOrSomething }) => {
+    // caches
+    const pairsCache = createPairsCache(1000, 5000);
+    // const assetsCache =
 
-  // common init services
-  const aliases = createAliasesService(commonDeps);
-  const assets = createAssetsService(commonDeps);
-  const candles = createCandlesService(commonDeps);
+    const commonDeps = {
+      drivers: {
+        pg: pgDriver,
+      },
+      emitEvent,
+    };
 
-  const aliasTxs = createAliasTxsService(commonDeps);
-  const burnTxs = createBurnTxsService(commonDeps);
-  const dataTxs = createDataTxsService(commonDeps);
-  const exchangeTxs = createExchangeTxsService(commonDeps);
-  const genesisTxs = createGenesisTxsService(commonDeps);
-  const invokeScriptTxs = createInvokeScriptTxsService(commonDeps);
-  const issueTxs = createIssueTxsService(commonDeps);
-  const leaseTxs = createLeaseTxsService(commonDeps);
-  const leaseCancelTxs = createLeaseCancelTxsService(commonDeps);
-  const massTransferTxs = createMassTransferTxsService(commonDeps);
-  const paymentTxs = createPaymentTxsService(commonDeps);
-  const reissueTxs = createReissueTxsService(commonDeps);
-  const setAssetScriptTxs = createSetAssetScriptTxsService(commonDeps);
-  const setScriptTxs = createSetScriptTxsService(commonDeps);
-  const sponsorshipTxs = createSponsorshipTxsService(commonDeps);
-  const transferTxs = createTransferTxsService(commonDeps);
-  const rates = createRateService(
-    {
+    // common init services
+    const aliases = createAliasesService(commonDeps);
+    const assets = createAssetsService(commonDeps);
+    const candles = createCandlesService(commonDeps);
+
+    const aliasTxs = createAliasTxsService(commonDeps);
+    const burnTxs = createBurnTxsService(commonDeps);
+    const dataTxs = createDataTxsService(commonDeps);
+    const exchangeTxs = createExchangeTxsService(commonDeps);
+    const genesisTxs = createGenesisTxsService(commonDeps);
+    const invokeScriptTxs = createInvokeScriptTxsService(commonDeps);
+    const issueTxs = createIssueTxsService(commonDeps);
+    const leaseTxs = createLeaseTxsService(commonDeps);
+    const leaseCancelTxs = createLeaseCancelTxsService(commonDeps);
+    const massTransferTxs = createMassTransferTxsService(commonDeps);
+    const paymentTxs = createPaymentTxsService(commonDeps);
+    const reissueTxs = createReissueTxsService(commonDeps);
+    const setAssetScriptTxs = createSetAssetScriptTxsService(commonDeps);
+    const setScriptTxs = createSetScriptTxsService(commonDeps);
+    const sponsorshipTxs = createSponsorshipTxsService(commonDeps);
+    const transferTxs = createTransferTxsService(commonDeps);
+    const rates = createRateService({
       pairOrderingService: dummyPairOrdering,
-        ...commonDeps,
-    }
-  )
+      ...commonDeps,
+    });
 
-  // specific init services
-  // all txs service
-  const allTxs = createAllTxsService(commonDeps)({
-    1: genesisTxs,
-    2: paymentTxs,
-    3: issueTxs,
-    4: transferTxs,
-    5: reissueTxs,
-    6: burnTxs,
-    7: exchangeTxs,
-    8: leaseTxs,
-    9: leaseCancelTxs,
-    10: aliasTxs,
-    11: massTransferTxs,
-    12: dataTxs,
-    13: setScriptTxs,
-    14: sponsorshipTxs,
-    15: setAssetScriptTxs,
-    16: invokeScriptTxs,
-  });
+    // pairs service with and without validation
+    // @todo validation
+    const validatePairs = (x: any) => taskOf<any, any>(x);
 
-  // pairs service
-  return createPairsService({
-    ...commonDeps,
-    options,
-  })({ issueTxs }).map(pairs => {
+    const pairsNoAsyncValidation = createPairsService(commonDeps)({
+      cache: pairsCache,
+      validatePairs,
+    });
+    const pairsWithAsyncValidation = createPairsService(commonDeps)({
+      cache: pairsCache,
+      validatePairs,
+    });
+
+    // specific init services
+    // all txs service
+    const allTxs = createAllTxsService(commonDeps)({
+      1: genesisTxs,
+      2: paymentTxs,
+      3: issueTxs,
+      4: transferTxs,
+      5: reissueTxs,
+      6: burnTxs,
+      7: exchangeTxs,
+      8: leaseTxs,
+      9: leaseCancelTxs,
+      10: aliasTxs,
+      11: massTransferTxs,
+      12: dataTxs,
+      13: setScriptTxs,
+      14: sponsorshipTxs,
+      15: setAssetScriptTxs,
+      16: invokeScriptTxs,
+    });
+
     return {
       aliases,
       assets,
       candles,
-      pairs,
-      rates,
+      pairs: pairsNoAsyncValidation,
       transactions: {
         all: allTxs,
         genesis: genesisTxs,
@@ -185,6 +206,9 @@ export default ({
         setAssetScript: setAssetScriptTxs,
         invokeScript: invokeScriptTxs,
       },
+      matcher: {
+        rates,
+        pairs: pairsWithAsyncValidation,
+      },
     };
   });
-};
