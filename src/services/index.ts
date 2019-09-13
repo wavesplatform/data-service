@@ -115,7 +115,7 @@ export default ({
   PairOrderingServiceImpl.dummy().map(pairOrderingService => {
     // caches
     const ratesCache = new RateCacheImpl(200000, 60000); // 1 minute
-    const pairsCache = createPairsCache(1000, 51000);
+    const pairsCache = createPairsCache(1000, 5000);
     // const assetsCache =
 
     const commonDeps = {
