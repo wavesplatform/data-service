@@ -2,8 +2,7 @@ import { BigNumber } from '@waves/data-entities';
 import { Maybe, of as maybeOf, fromNullable } from 'folktale/maybe';
 import { path, complement } from 'ramda';
 
-import { AssetIdsPair, RateInfo } from '../../../../types';
-import { ReadOnlyCache } from '../../repo';
+import { AssetIdsPair, RateInfo, CacheSync } from '../../../../types';
 import { WavesId, flip, pairHasWaves } from '../../data';
 import { inv, safeDivide } from '../../util';
 import { isDefined, map2 } from '../../../../utils/fp/maybeOps';
@@ -22,7 +21,7 @@ type RateLookupTable = {
    where lookup = getFromTable(asset1, asset2) || 1 / getFromtable(asset2, asset1)   
 */
 export default class RateInfoLookup
-  implements ReadOnlyCache<AssetIdsPair, RateInfo> {
+  implements Omit<CacheSync<AssetIdsPair, RateInfo>, 'set'> {
   private readonly lookupTable: RateLookupTable;
 
   constructor(data: RateInfo[]) {
@@ -64,7 +63,7 @@ export default class RateInfoLookup
   ): Maybe<RateInfo> {
     const lookupData = flipped ? flip(pair) : pair;
 
-    return fromNullable(
+    return fromNullable<BigNumber>(
       path([lookupData.amountAsset, lookupData.priceAsset], this.lookupTable)
     )
       .map((rate: BigNumber) =>

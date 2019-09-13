@@ -48,14 +48,17 @@ import createTransferTxsService, {
   TransferTxsService,
 } from './transactions/transfer';
 import { DataServiceConfig } from '../loadConfig';
-import createRateService, {
+import createRateService, { RateCacheImpl } from './rates';
+
+import {
   PairOrderingService,
-  dummyPairOrdering,
-} from './rates';
+  PairOrderingServiceImpl,
+} from './PairOrderingService';
 
 import { PgDriver } from '../db/driver';
 import { EmitEvent } from './_common/createResolver/types';
 import { ServiceMget, Rate, RateMgetParams } from 'types';
+import { RateCache } from './rates/repo';
 
 export type CommonServiceDependencies = {
   drivers: {
@@ -66,6 +69,7 @@ export type CommonServiceDependencies = {
 
 export type RateSerivceCreatorDependencies = CommonServiceDependencies & {
   pairOrderingService: PairOrderingService;
+  cache: RateCache;
 };
 
 export type ServiceMesh = {
@@ -108,11 +112,10 @@ export default ({
   emitEvent: EmitEvent;
 }): Task<AppError, ServiceMesh> =>
   // @todo async init whatever is necessary
-  taskOf<AppError, any>({
-    validatePairsOrSomething: (x: any) => taskOf(x),
-  }).map(({ validatePairsOrSomething }) => {
+  PairOrderingServiceImpl.dummy().map(pairOrderingService => {
     // caches
-    const pairsCache = createPairsCache(1000, 5000);
+    const ratesCache = new RateCacheImpl(200000, 60000); // 1 minute
+    const pairsCache = createPairsCache(1000, 51000);
     // const assetsCache =
 
     const commonDeps = {
@@ -144,7 +147,8 @@ export default ({
     const sponsorshipTxs = createSponsorshipTxsService(commonDeps);
     const transferTxs = createTransferTxsService(commonDeps);
     const rates = createRateService({
-      pairOrderingService: dummyPairOrdering,
+      cache: ratesCache,
+      pairOrderingService,
       ...commonDeps,
     });
 

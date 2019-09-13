@@ -1,42 +1,16 @@
-import { Task, of } from 'folktale/concurrency/task';
-import { Maybe, empty as maybeEmpty } from 'folktale/maybe';
-import * as LRU from 'lru-cache';
 import { BigNumber } from '@waves/data-entities';
 import { ServiceMget, Rate, RateMgetParams, list, rate } from '../../types';
-import { AppError } from '../../errorHandling';
 import { RateSerivceCreatorDependencies } from '../../services';
 import RateEstimator from './RateEstimator';
 import RemoteRateRepo from './repo/impl/RemoteRateRepo';
-import RateCache from './repo/impl/RateCache';
 
-export interface PairOrderingService {
-  getCorrectOrder(
-    matcher: string,
-    pair: [string, string]
-  ): Task<AppError, Maybe<[string, string]>>;
-}
-
-export const dummyPairOrdering: PairOrderingService = {
-  getCorrectOrder() {
-    return of(maybeEmpty());
-  },
-};
-
-const CACHE_AGE_MILLIS = 5 * 60 * 1000; // 5 minutes
-const CACHE_SIZE = 200000;
+export { default as RateCacheImpl } from './repo/impl/RateCache';
 
 export default function({
   drivers,
+  cache,
 }: RateSerivceCreatorDependencies): ServiceMget<RateMgetParams, Rate> {
-  const estimator = new RateEstimator(
-    new RateCache(
-      new LRU<string, BigNumber>({
-        max: CACHE_SIZE,
-        maxAge: CACHE_AGE_MILLIS,
-      })
-    ),
-    new RemoteRateRepo(drivers.pg)
-  );
+  const estimator = new RateEstimator(cache, new RemoteRateRepo(drivers.pg));
 
   return {
     mget(request: RateMgetParams) {

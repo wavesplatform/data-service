@@ -40,7 +40,7 @@
     "nodemon": "^1.18.8",
     "ts-jest": "^23.10.5",
     "ts-node": "^7.0.1",
-    "typescript": "^3.2.2"
+    "typescript": "^3.6.3"
   },
   "dependencies": {
     "@koa/cors": "^2.2.3",
