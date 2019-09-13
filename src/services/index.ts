@@ -9,9 +9,7 @@ import createAllTxsService, { AllTxsService } from './transactions/all';
 import createAliasTxsService, { AliasTxsService } from './transactions/alias';
 import createBurnTxsService, { BurnTxsService } from './transactions/burn';
 import createDataTxsService, { DataTxsService } from './transactions/data';
-import createExchangeTxsService, {
-  ExchangeTxsService, ExchangeTxsSearchRequest,
-} from './transactions/exchange';
+import createExchangeTxsService, { ExchangeTxsService } from './transactions/exchange';
 import createGenesisTxsService, {
   GenesisTxsService,
 } from './transactions/genesis';
@@ -49,7 +47,7 @@ import createRateService, { PairOrderingService, dummyPairOrdering } from './rat
 
 import { PgDriver } from '../db/driver';
 import { EmitEvent } from './_common/createResolver/types';
-import { ServiceMget, ServiceSearch, Transaction, Rate, RateMgetParams } from 'types';
+import { ServiceMget, Rate, RateMgetParams } from 'types';
 
 export type CommonServiceDependencies = {
   drivers: {
@@ -59,7 +57,6 @@ export type CommonServiceDependencies = {
 };
 
 export type RateSerivceCreatorDependencies = CommonServiceDependencies & {
-  txService: ServiceSearch<ExchangeTxsSearchRequest, Transaction>,
   pairOrderingService: PairOrderingService,
 }
 
@@ -132,7 +129,6 @@ export default ({
   const transferTxs = createTransferTxsService(commonDeps);
   const rates = createRateService(
     {
-      txService: exchangeTxs,
       pairOrderingService: dummyPairOrdering,
         ...commonDeps,
     }

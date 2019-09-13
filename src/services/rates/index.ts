@@ -1,100 +1,58 @@
-import { Task, waitAll, of } from "folktale/concurrency/task";
+import { Task, of } from 'folktale/concurrency/task';
 import { Maybe, empty as maybeEmpty } from 'folktale/maybe';
 import * as LRU from 'lru-cache';
-import { map, always } from 'ramda';
-
-import { ServiceMget, Rate, rate, RateMgetParams, RateGetParams, RateInfo, list } from "../../types";
-import { tap } from "../../utils/tap";
-import { AppError } from "../../errorHandling";
+import { BigNumber } from '@waves/data-entities';
+import { ServiceMget, Rate, RateMgetParams, list, rate } from '../../types';
+import { AppError } from '../../errorHandling';
 import { RateSerivceCreatorDependencies } from '../../services';
 import RateEstimator from './RateEstimator';
+import RemoteRateRepo from './repo/impl/RemoteRateRepo';
+import RateCache from './repo/impl/RateCache';
 
 export interface PairOrderingService {
-  getCorrectOrder(matcher: string, pair: [string, string]): Task<AppError, Maybe<[string, string]>>
+  getCorrectOrder(
+    matcher: string,
+    pair: [string, string]
+  ): Task<AppError, Maybe<[string, string]>>;
 }
 
 export const dummyPairOrdering: PairOrderingService = {
-  getCorrectOrder() { return of(maybeEmpty()) }
-}
+  getCorrectOrder() {
+    return of(maybeEmpty());
+  },
+};
 
-const CACHE_AGE_MILLIS = 5000;
-const CACHE_SIZE = 100000;
-
-function maybeIsNone<T>(data: Maybe<T>): boolean {
-  return data.matchWith(
-    {
-      Just: always(false),
-      Nothing: always(true)
-    }
-  )
-}
-
-type CacheParams<K, In, Out> = {
-  cache: LRU<K, Out>,
-  keyFn: (data: In) => K,
-  shouldCache: (data: In) => boolean  
-}
-function cached<K, In, Out>(
-  get: (data: In) => Task<AppError, Out>,
-  { cache, keyFn, shouldCache }: CacheParams<K, In, Out>
-): (data: In) => Task<AppError, Out> {
-  return (data: In) => {
-    if (shouldCache(data)) {
-      const key = keyFn(data);
-
-      if (cache.has(key)) {
-        return of(cache.get(key)!)
-      }
-
-      return get(data)
-        .map(
-          tap(
-            res => cache.set(key, res)
-          )
-        );      
-    } else {
-      return get(data)
-    }
-  }
-}
+const CACHE_AGE_MILLIS = 5 * 60 * 1000; // 5 minutes
+const CACHE_SIZE = 200000;
 
 export default function({
-  txService,
-  pairOrderingService
+  drivers,
 }: RateSerivceCreatorDependencies): ServiceMget<RateMgetParams, Rate> {
-
-  const cache = new LRU<string, RateInfo>(
-    {
-      max: CACHE_SIZE,
-      maxAge: CACHE_AGE_MILLIS,
-    }
+  const estimator = new RateEstimator(
+    new RateCache(
+      new LRU<string, BigNumber>({
+        max: CACHE_SIZE,
+        maxAge: CACHE_AGE_MILLIS,
+      })
+    ),
+    new RemoteRateRepo(drivers.pg)
   );
 
-  const estimator = new RateEstimator(txService, pairOrderingService)
-
-  const get = cached<string, RateGetParams, RateInfo>(
-    ({ pair, matcher, timestamp }: RateGetParams): Task<AppError, RateInfo> =>
-      estimator.estimate(
-        pair, matcher, timestamp.getOrElse(new Date())
-      ).map(
-        res => ({ current: res, ...pair })
-      ),
-
-    {
-      cache,
-      keyFn: params => [params.matcher, params.pair.amountAsset, params.pair.priceAsset].join("::"),
-      shouldCache: params => maybeIsNone(params.timestamp)
-    }
-  )
-  
   return {
     mget(request: RateMgetParams) {
-      return waitAll(
-        map(          
-          pair => get({ pair, matcher: request.matcher, timestamp: request.timestamp }).map(rate),
-          request.pairs          
+      return estimator
+        .mget(request)
+        .map(data =>
+          data.map(item =>
+            rate({
+              current: item.res
+                .map(it => it.current)
+                .getOrElse(new BigNumber(0)),
+              ...item.req,
+            })
+          )
         )
-      ).map(list)
-    }
-  }
+        .map(list);
+    },
+  };
 }
