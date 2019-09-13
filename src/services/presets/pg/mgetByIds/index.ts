@@ -43,9 +43,11 @@ export const mgetByIdsPreset = <
     >(resultTypeFactory)(transformResult),
     validateInput: validateInput(inputSchema, name),
     validateResult: validateResult<ResponseRaw>(resultSchema, name),
-    dbQuery: getData<ResponseRaw, Id>({
+    getData: getData<ResponseRaw, Id>({
       name,
       sql,
       matchRequestResult,
+      pg,
     }),
-  })({ db: pg, emitEvent });
+    emitEvent,
+  });

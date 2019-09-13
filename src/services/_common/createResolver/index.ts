@@ -23,7 +23,6 @@ import {
   GetResolverDependencies,
   MgetResolverDependencies,
   SearchResolverDependencies,
-  ResolverDependencies,
   ValidateSync,
   ValidateAsync,
 } from './types';
@@ -70,9 +69,7 @@ const getResolver = <
     ResponseRaw,
     ResponseTransformed
   >
-) => ({ db, emitEvent = () => () => undefined }: ResolverDependencies) => (
-  request: RequestRaw
-) =>
+) => (request: RequestRaw) =>
   createResolver<
     RequestRaw,
     RequestTransformed,
@@ -81,10 +78,10 @@ const getResolver = <
   >(
     dependencies.validateInput,
     dependencies.transformInput,
-    dependencies.dbQuery(db),
+    dependencies.getData,
     applyValidation.get(dependencies.validateResult),
     result => dependencies.transformResult(result, request),
-    emitEvent,
+    dependencies.emitEvent,
     request
   );
 
@@ -100,9 +97,7 @@ const mgetResolver = <
     ResponseRaw,
     ResponseTransformed
   >
-) => ({ db, emitEvent = () => () => undefined }: ResolverDependencies) => (
-  request: RequestRaw
-) =>
+) => (request: RequestRaw) =>
   createResolver<
     RequestRaw,
     RequestTransformed,
@@ -111,10 +106,10 @@ const mgetResolver = <
   >(
     dependencies.validateInput,
     dependencies.transformInput,
-    dependencies.dbQuery(db),
+    dependencies.getData,
     applyValidation.mget(dependencies.validateResult),
     result => dependencies.transformResult(result, request),
-    emitEvent,
+    dependencies.emitEvent,
     request
   );
 
@@ -130,9 +125,7 @@ const searchResolver = <
     ResponseRaw,
     ResponseTransformed
   >
-) => ({ db, emitEvent = () => () => undefined }: ResolverDependencies) => (
-  request: RequestRaw
-) =>
+) => (request: RequestRaw) =>
   createResolver<
     RequestRaw,
     RequestTransformed,
@@ -141,14 +134,14 @@ const searchResolver = <
   >(
     dependencies.validateInput,
     dependencies.transformInput,
-    dependencies.dbQuery(db),
+    dependencies.getData,
     applyValidation.search(dependencies.validateResult),
     result =>
       dependencies.transformResult(
         result,
         dependencies.transformInput(request)
       ),
-    emitEvent,
+    dependencies.emitEvent,
     request
   );
 

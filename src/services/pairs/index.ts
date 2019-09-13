@@ -1,5 +1,5 @@
 import { identity } from 'ramda';
-import { of as taskOf, rejected } from 'folktale/concurrency/task';
+import { of as taskOf } from 'folktale/concurrency/task';
 import { of as just } from 'folktale/maybe';
 
 import { ValidationError } from '../../errorHandling';
@@ -59,7 +59,12 @@ export type PairsSearchRequest =
   | SearchByAssetRequest
   | SearchByAssetsRequest;
 
-const cacheKeyFromPair = (p: AssetPair): string => p.amountAsset + p.priceAsset;
+export type PairsService = Service<
+  PairsGetRequest,
+  PairsMgetRequest,
+  PairsSearchRequest,
+  Pair
+>;
 
 export default ({ drivers, emitEvent }: CommonServiceDependencies) => ({
   validatePairs,
@@ -67,7 +72,7 @@ export default ({ drivers, emitEvent }: CommonServiceDependencies) => ({
 }: {
   validatePairs: ValidateAsync<ValidationError, AssetPair[]>;
   cache: Cache<PairsGetRequest, PairDbResponse>;
-}): Service<PairsGetRequest, PairsMgetRequest, PairsSearchRequest, Pair> => {
+}): PairsService => {
   const get = createGetResolver<
     PairsGetRequest,
     PairsGetRequest,
@@ -80,7 +85,7 @@ export default ({ drivers, emitEvent }: CommonServiceDependencies) => ({
         validatePairs([v.pair]).map(() => v)
       ),
     // cache first
-    dbQuery: pg => req =>
+    getData: req =>
       cache.get(req).chain(maybeRes =>
         maybeRes.matchWith({
           Just: ({ value }) => taskOf(just(value)),
@@ -88,7 +93,8 @@ export default ({ drivers, emitEvent }: CommonServiceDependencies) => ({
             getByIdPg<PairDbResponse, PairsGetRequest>({
               name: 'pairs.get',
               sql: sql.get,
-            })(pg)(req).map(maybeResp => {
+              pg: drivers.pg,
+            })(req).map(maybeResp => {
               // fill cache
               maybeResp.matchWith({
                 Just: ({ value }) =>
@@ -104,7 +110,8 @@ export default ({ drivers, emitEvent }: CommonServiceDependencies) => ({
       ),
     validateResult: validateResult(resultSchema, name),
     transformResult: res => res.map(transformResult).map(pair),
-  })({ db: drivers.pg, emitEvent });
+    emitEvent,
+  });
 
   // @todo mget cache
   const mget = createMgetResolver<
@@ -118,14 +125,16 @@ export default ({ drivers, emitEvent }: CommonServiceDependencies) => ({
       validateInput<PairsMgetRequest>(inputMget, 'pairs.mget')(value).chain(v =>
         validatePairs(v.pairs).map(() => v)
       ),
-    dbQuery: mgetPairsPg({
+    getData: mgetPairsPg({
       name: 'pairs.mget',
       sql: sql.mget,
       matchRequestResult,
+      pg: drivers.pg,
     }),
     validateResult: validateResult(resultSchema, name),
     transformResult: transformResultMget,
-  })({ db: drivers.pg, emitEvent });
+    emitEvent,
+  });
 
   const search = searchPreset<
     PairsSearchRequest,

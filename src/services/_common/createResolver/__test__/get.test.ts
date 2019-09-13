@@ -29,16 +29,16 @@ const resultError = (s: string) =>
 afterEach(() => jest.clearAllMocks());
 
 describe('Resolver', () => {
-  const commonConfig = {
-    transformInput: identity,
-    transformResult: identity,
-    dbQuery: (driver: PgDriver) => (id: string) =>
-      driver.one<string>(id).map(maybeOf),
-  };
-
   const mockPgDriver: PgDriver = {
     one: (s: string) => taskOf<DbError, string>(s),
   } as PgDriver;
+
+  const commonConfig = {
+    transformInput: identity,
+    transformResult: identity,
+    getData: (id: string) => mockPgDriver.one<string>(id).map(maybeOf),
+    emitEvent: () => () => undefined,
+  };
 
   const createMockResolver = (
     validateInput: ValidateAsync<ValidationError, string>,
@@ -48,7 +48,7 @@ describe('Resolver', () => {
       ...commonConfig,
       validateInput,
       validateResult,
-    })({ db: mockPgDriver });
+    });
 
   it('should return result if all validation pass', done => {
     const goodResolver = createMockResolver(inputOk, resultOk);
@@ -66,11 +66,11 @@ describe('Resolver', () => {
   it('should call db query if everything is ok', done => {
     const spiedDbQuery = jest.spyOn(mockPgDriver, 'one');
 
-    const goodResolver = get({
+    const goodResolver = get<string, string, string, string>({
       ...commonConfig,
       validateInput: inputOk,
       validateResult: resultOk,
-    })({ db: mockPgDriver });
+    });
 
     goodResolver(assetId)
       .run()
@@ -89,11 +89,12 @@ describe('Resolver', () => {
       innerSpy(eventName, payload)
     );
 
-    const goodResolver = get({
+    const goodResolver = get<string, string, string, string>({
       ...commonConfig,
       validateInput: inputOk,
       validateResult: resultOk,
-    })({ db: mockPgDriver, emitEvent: outerSpy });
+      emitEvent: outerSpy,
+    });
 
     goodResolver(assetId)
       .run()
@@ -142,11 +143,11 @@ describe('Resolver', () => {
 
   it('should NOT call db query if input validation fails', done => {
     const spiedDbQuery = jest.spyOn(mockPgDriver, 'one');
-    const badInputResolver = get({
+    const badInputResolver = get<string, string, string, string>({
       ...commonConfig,
       validateInput: inputError,
       validateResult: resultOk,
-    })({ db: mockPgDriver });
+    });
 
     badInputResolver(assetId)
       .run()

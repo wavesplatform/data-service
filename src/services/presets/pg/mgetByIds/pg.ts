@@ -8,11 +8,13 @@ export const getData = <ResponseRaw, Id = string>({
   matchRequestResult,
   name,
   sql,
+  pg,
 }: {
   name: string;
   sql: (req: Id[]) => string;
   matchRequestResult: (req: Id[], res: ResponseRaw) => boolean;
-}) => (pg: PgDriver) => (req: Id[]): Task<DbError, Maybe<ResponseRaw>[]> =>
+  pg: PgDriver;
+}) => (req: Id[]): Task<DbError, Maybe<ResponseRaw>[]> =>
   pg
     .any<ResponseRaw>(sql(req))
     .map(responses => matchRequestsResults(matchRequestResult, req, responses))

@@ -35,5 +35,6 @@ export const searchPreset = <
     transformResult,
     validateInput: validateInput(inputSchema, name),
     validateResult: validateResult(resultSchema, name),
-    dbQuery: getData({ name, sql }),
-  })({ db: pg, emitEvent });
+    getData: getData({ name, sql, pg }),
+    emitEvent,
+  });
