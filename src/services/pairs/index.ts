@@ -87,6 +87,12 @@ export default ({ drivers, emitEvent }: CommonServiceDependencies) => ({
   ) => Task<ValidationError, void>;
   cache: CacheSync<PairsGetRequest, PairDbResponse>;
 }): PairsService => {
+  const SERVICE_NAME = {
+    GET: 'pairs.get',
+    MGET: 'pairs.mget',
+    SEARCH: 'pairs.search',
+  };
+
   const get = createGetResolver<
     PairsGetRequest,
     PairsGetRequest,
@@ -95,8 +101,8 @@ export default ({ drivers, emitEvent }: CommonServiceDependencies) => ({
   >({
     transformInput: identity,
     validateInput: value =>
-      validateInput<PairsGetRequest>(inputGet, 'pairs.get')(value).chain(v =>
-        validatePairs(v.matcher, [v.pair]).map(() => v)
+      validateInput<PairsGetRequest>(inputGet, SERVICE_NAME.GET)(value).chain(
+        v => validatePairs(v.matcher, [v.pair]).map(() => v)
       ),
 
     // cache first
@@ -105,14 +111,14 @@ export default ({ drivers, emitEvent }: CommonServiceDependencies) => ({
         Just: ({ value }) => taskOf(just(value)),
         Nothing: () =>
           getByIdPg<PairDbResponse, PairsGetRequest>({
-            name: 'pairs.get',
+            name: SERVICE_NAME.GET,
             sql: sql.get,
             pg: drivers.pg,
           })(req).map(
             tap(maybeResp => forEach(x => cache.set(req, x), maybeResp))
           ),
       }),
-    validateResult: validateResult(resultSchema, name),
+    validateResult: validateResult(resultSchema, SERVICE_NAME.GET),
     transformResult: res => res.map(transformResult).map(pair),
     emitEvent,
   });
@@ -125,9 +131,9 @@ export default ({ drivers, emitEvent }: CommonServiceDependencies) => ({
   >({
     transformInput: identity,
     validateInput: value =>
-      validateInput<PairsMgetRequest>(inputMget, 'pairs.mget')(value).chain(v =>
-        validatePairs(v.matcher, v.pairs).map(() => v)
-      ),
+      validateInput<PairsMgetRequest>(inputMget, SERVICE_NAME.MGET)(
+        value
+      ).chain(v => validatePairs(v.matcher, v.pairs).map(() => v)),
     getData: request => {
       let results: Array<Maybe<PairDbResponse>> = request.pairs.map(p =>
         cache.get({
@@ -139,7 +145,7 @@ export default ({ drivers, emitEvent }: CommonServiceDependencies) => ({
       const notCachedPairsIndexes = results.filter(isEmpty).map((_, i) => i);
 
       return mgetPairsPg({
-        name: 'pairs.mget',
+        name: SERVICE_NAME.MGET,
         sql: sql.mget,
         matchRequestResult,
         pg: drivers.pg,
@@ -153,7 +159,7 @@ export default ({ drivers, emitEvent }: CommonServiceDependencies) => ({
         return results;
       });
     },
-    validateResult: validateResult(resultSchema, name),
+    validateResult: validateResult(resultSchema, SERVICE_NAME.MGET),
     transformResult: transformResultMget,
     emitEvent,
   });
@@ -164,7 +170,7 @@ export default ({ drivers, emitEvent }: CommonServiceDependencies) => ({
     PairInfo,
     List<Pair>
   >({
-    name: 'pairs.search',
+    name: SERVICE_NAME.SEARCH,
     sql: sql.search,
     inputSchema: inputSearch,
     resultSchema,
