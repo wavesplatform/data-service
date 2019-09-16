@@ -2,7 +2,10 @@ import { Task, of as taskOf } from 'folktale/concurrency/task';
 
 import { AppError } from '../errorHandling';
 import createAliasesService, { AliasService } from './aliases';
-import createAssetsService, { AssetsService } from './assets';
+import createAssetsService, {
+  AssetsService,
+  createCache as createAssetsCache,
+} from './assets';
 import createCandlesService, { CandlesService } from './candles';
 import createPairsService, {
   createCache as createPairsCache,
@@ -116,7 +119,7 @@ export default ({
     // caches
     const ratesCache = new RateCacheImpl(200000, 60000); // 1 minute
     const pairsCache = createPairsCache(1000, 5000);
-    // const assetsCache =
+    const assetsCache = createAssetsCache(10000, 10 * 60 * 1000); // 10 minutes
 
     const commonDeps = {
       drivers: {
@@ -127,7 +130,10 @@ export default ({
 
     // common init services
     const aliases = createAliasesService(commonDeps);
-    const assets = createAssetsService(commonDeps);
+    const assets = createAssetsService({
+      ...commonDeps,
+      cache: assetsCache,
+    });
     const candles = createCandlesService(commonDeps);
 
     const aliasTxs = createAliasTxsService(commonDeps);
@@ -151,11 +157,13 @@ export default ({
       cache: ratesCache,
     });
 
-    const pairsNoAsyncValidation = createPairsService(commonDeps)({
+    const pairsNoAsyncValidation = createPairsService({
+      ...commonDeps,
       cache: pairsCache,
       validatePairs: () => taskOf(undefined),
     });
-    const pairsWithAsyncValidation = createPairsService(commonDeps)({
+    const pairsWithAsyncValidation = createPairsService({
+      ...commonDeps,
       cache: pairsCache,
       validatePairs: validatePairs(assets, pairOrderingService),
     });

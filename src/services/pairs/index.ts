@@ -81,10 +81,12 @@ export type PairsService = Service<
 
 export { create as createCache } from './cache';
 
-export default ({ drivers, emitEvent }: CommonServiceDependencies) => ({
+export default ({
+  drivers,
+  emitEvent,
   validatePairs,
   cache,
-}: {
+}: CommonServiceDependencies & {
   validatePairs: (
     matcher: string,
     pairs: AssetIdsPair[]

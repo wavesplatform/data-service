@@ -13,6 +13,8 @@ export { Interval, interval, Unit };
 
 export { Serializable, FromSerializable } from './serialization';
 
+export { Without, XOR } from './generic';
+
 export const fromMaybe = <A, B>(factory: (a?: A) => B) => (mb: Maybe<A>): B =>
   mb.matchWith({
     Just: ({ value }) => factory(value),
