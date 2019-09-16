@@ -8,7 +8,7 @@ import {
   SearchByAssetRequest,
   SearchByAssetsRequest,
 } from '.';
-import { AssetIdsPair } from 'types';
+import { AssetIdsPair } from '../../types';
 
 const pg = knex({ client: 'pg' });
 

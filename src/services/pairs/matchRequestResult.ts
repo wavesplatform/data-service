@@ -1,5 +1,5 @@
 import { PairDbResponse } from './transformResult';
-import { AssetIdsPair } from 'types';
+import { AssetIdsPair } from '../../types';
 const { prop, and, equals } = require('ramda');
 
 /** matchPairs :: (Object, Object) -> Boolean */

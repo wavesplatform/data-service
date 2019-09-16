@@ -1,7 +1,7 @@
 import { Task, waitAll } from 'folktale/concurrency/task';
 import { Maybe, empty as nothing, of as just } from 'folktale/maybe';
-import { InitError } from 'errorHandling';
-import { AssetIdsPair } from 'types';
+import { InitError } from '../../errorHandling';
+import { AssetIdsPair } from '../../types';
 import { loadMatcherSettings } from './loadMatcherSettings';
 
 import { zipObj, map } from 'ramda';

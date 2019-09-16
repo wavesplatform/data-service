@@ -1,4 +1,4 @@
-import { AssetIdsPair } from 'types';
+import { AssetIdsPair } from '../../types';
 
 export type MgetRequest = {
   pairs: AssetIdsPair[];
