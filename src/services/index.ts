@@ -1,10 +1,6 @@
-import {
-  Task,
-  of as taskOf,
-  rejected as taskRejected,
-} from 'folktale/concurrency/task';
+import { Task, of as taskOf } from 'folktale/concurrency/task';
 
-import { AppError, ValidationError } from '../errorHandling';
+import { AppError } from '../errorHandling';
 import createAliasesService, { AliasService } from './aliases';
 import createAssetsService, { AssetsService } from './assets';
 import createCandlesService, { CandlesService } from './candles';
@@ -58,8 +54,10 @@ import { PairOrderingServiceImpl } from './PairOrderingService';
 
 import { PgDriver } from '../db/driver';
 import { EmitEvent } from './_common/createResolver/types';
-import { ServiceMget, Rate, RateMgetParams, AssetIdsPair } from 'types';
+import { ServiceMget, Rate, RateMgetParams } from '../types';
 import { RateCache } from './rates/repo';
+
+import { validatePairs } from './validation/pairs';
 
 export type CommonServiceDependencies = {
   drivers: {
@@ -153,61 +151,13 @@ export default ({
       cache: ratesCache,
     });
 
-    // pairs service with and without validation
-    const validatePairs = (
-      matcher: string,
-      pairs: AssetIdsPair[]
-    ): Task<ValidationError, void> => {
-      // correct order
-      const isOrderCorrect = pairs
-        .map(p => pairOrderingService.isCorrectOrder(matcher, p))
-        .every(maybeCorrect =>
-          maybeCorrect.matchWith({
-            Just: ({ value }) => value,
-            Nothing: () => true,
-          })
-        );
-
-      if (!isOrderCorrect)
-        return taskRejected(
-          new ValidationError('Wrong assets order in provided pair(s)')
-        );
-
-      // all assets exist
-      const assetIds: Set<string> = new Set();
-      pairs.forEach(p => {
-        assetIds.add(p.amountAsset);
-        assetIds.add(p.priceAsset);
-      });
-
-      return assets
-        .mget(Array.from(assetIds))
-        .mapRejected(err =>
-          err.matchWith({
-            Db: () => new ValidationError('Failed to fetch assets'),
-            Resolver: () => new ValidationError('Failed to fetch assets'),
-            Init: () => new ValidationError('Failed to fetch assets'),
-            Validation: () => err as ValidationError, // @todo better pattern matching?
-          })
-        )
-        .chain(assets => {
-          if (assets.data.every(x => x !== null)) {
-            return taskOf(undefined);
-          } else {
-            return taskRejected(
-              new ValidationError('Asset does not exist in the blockchain')
-            );
-          }
-        });
-    };
-
     const pairsNoAsyncValidation = createPairsService(commonDeps)({
       cache: pairsCache,
-      validatePairs,
+      validatePairs: () => taskOf(undefined),
     });
     const pairsWithAsyncValidation = createPairsService(commonDeps)({
       cache: pairsCache,
-      validatePairs,
+      validatePairs: validatePairs(assets, pairOrderingService),
     });
 
     // specific init services

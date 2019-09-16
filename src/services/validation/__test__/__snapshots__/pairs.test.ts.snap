@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Pairs validation asset order validation known matcher, wrong order, fail 1`] = `
+ValidationError {
+  "error": [Error: Wrong assets order in provided pair(s)],
+  "meta": Object {
+    "pairs": Array [
+      Object {
+        "amountAsset": "BTC",
+        "priceAsset": "WAVES",
+      },
+    ],
+  },
+  "type": "Validation",
+}
+`;
+
+exports[`Pairs validation assets existence validation non-existing assets, right order, fail 1`] = `
+ValidationError {
+  "error": [Error: Assets do not exist in the blockchain],
+  "meta": Object {
+    "assets": Array [
+      "ASSET1",
+    ],
+  },
+  "type": "Validation",
+}
+`;
+
+exports[`Pairs validation assets existence validation non-existing assets, wrong order, fail with ordering error 1`] = `
+ValidationError {
+  "error": [Error: Wrong assets order in provided pair(s)],
+  "meta": Object {
+    "pairs": Array [
+      Object {
+        "amountAsset": "ASSET1",
+        "priceAsset": "ASSET2",
+      },
+    ],
+  },
+  "type": "Validation",
+}
+`;

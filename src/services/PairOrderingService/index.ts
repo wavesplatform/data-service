@@ -4,7 +4,7 @@ import { InitError } from 'errorHandling';
 import { AssetIdsPair } from 'types';
 import { loadMatcherSettings } from './loadMatcherSettings';
 
-import { zip, fromPairs, map } from 'ramda';
+import { zipObj, map } from 'ramda';
 
 import { createOrderPair, TOrderPair } from '@waves/assets-pairs-order';
 
@@ -31,7 +31,7 @@ export class PairOrderingServiceImpl implements PairOrderingService {
     );
 
     return waitAll(matcherSettingsTasks)
-      .map(settings => fromPairs(zip(matcherAddresses, settings)))
+      .map(settings => zipObj(matcherAddresses, settings))
       .map(s => new PairOrderingServiceImpl(s));
   }
 
