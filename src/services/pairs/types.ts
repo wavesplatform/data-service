@@ -1,9 +1,6 @@
-export type Pair = {
-  amountAsset: string;
-  priceAsset: string;
-};
+import { AssetIdsPair } from 'types';
 
 export type MgetRequest = {
-  pairs: Pair[];
+  pairs: AssetIdsPair[];
   matcher: string;
 };

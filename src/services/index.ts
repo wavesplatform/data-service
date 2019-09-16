@@ -1,6 +1,10 @@
-import { Task, of as taskOf } from 'folktale/concurrency/task';
+import {
+  Task,
+  of as taskOf,
+  rejected as taskRejected,
+} from 'folktale/concurrency/task';
 
-import { AppError } from '../errorHandling';
+import { AppError, ValidationError } from '../errorHandling';
 import createAliasesService, { AliasService } from './aliases';
 import createAssetsService, { AssetsService } from './assets';
 import createCandlesService, { CandlesService } from './candles';
@@ -50,14 +54,11 @@ import createTransferTxsService, {
 import { DataServiceConfig } from '../loadConfig';
 import createRateService, { RateCacheImpl } from './rates';
 
-import {
-  PairOrderingService,
-  PairOrderingServiceImpl,
-} from './PairOrderingService';
+import { PairOrderingServiceImpl } from './PairOrderingService';
 
 import { PgDriver } from '../db/driver';
 import { EmitEvent } from './_common/createResolver/types';
-import { ServiceMget, Rate, RateMgetParams } from 'types';
+import { ServiceMget, Rate, RateMgetParams, AssetIdsPair } from 'types';
 import { RateCache } from './rates/repo';
 
 export type CommonServiceDependencies = {
@@ -68,7 +69,6 @@ export type CommonServiceDependencies = {
 };
 
 export type RateSerivceCreatorDependencies = CommonServiceDependencies & {
-  pairOrderingService: PairOrderingService;
   cache: RateCache;
 };
 
@@ -112,7 +112,9 @@ export default ({
   emitEvent: EmitEvent;
 }): Task<AppError, ServiceMesh> =>
   // @todo async init whatever is necessary
-  PairOrderingServiceImpl.dummy().map(pairOrderingService => {
+  PairOrderingServiceImpl.create({
+    [options.matcher.defaultMatcherAddress]: options.matcher.settingsURL,
+  }).map(pairOrderingService => {
     // caches
     const ratesCache = new RateCacheImpl(200000, 60000); // 1 minute
     const pairsCache = createPairsCache(1000, 5000);
@@ -147,14 +149,57 @@ export default ({
     const sponsorshipTxs = createSponsorshipTxsService(commonDeps);
     const transferTxs = createTransferTxsService(commonDeps);
     const rates = createRateService({
-      cache: ratesCache,
-      pairOrderingService,
       ...commonDeps,
+      cache: ratesCache,
     });
 
     // pairs service with and without validation
-    // @todo validation
-    const validatePairs = (x: any) => taskOf<any, any>(x);
+    const validatePairs = (
+      matcher: string,
+      pairs: AssetIdsPair[]
+    ): Task<ValidationError, void> => {
+      // correct order
+      const isOrderCorrect = pairs
+        .map(p => pairOrderingService.isCorrectOrder(matcher, p))
+        .every(maybeCorrect =>
+          maybeCorrect.matchWith({
+            Just: ({ value }) => value,
+            Nothing: () => true,
+          })
+        );
+
+      if (!isOrderCorrect)
+        return taskRejected(
+          new ValidationError('Wrong assets order in provided pair(s)')
+        );
+
+      // all assets exist
+      const assetIds: Set<string> = new Set();
+      pairs.forEach(p => {
+        assetIds.add(p.amountAsset);
+        assetIds.add(p.priceAsset);
+      });
+
+      return assets
+        .mget(Array.from(assetIds))
+        .mapRejected(err =>
+          err.matchWith({
+            Db: () => new ValidationError('Failed to fetch assets'),
+            Resolver: () => new ValidationError('Failed to fetch assets'),
+            Init: () => new ValidationError('Failed to fetch assets'),
+            Validation: () => err as ValidationError, // @todo better pattern matching?
+          })
+        )
+        .chain(assets => {
+          if (assets.data.every(x => x !== null)) {
+            return taskOf(undefined);
+          } else {
+            return taskRejected(
+              new ValidationError('Asset does not exist in the blockchain')
+            );
+          }
+        });
+    };
 
     const pairsNoAsyncValidation = createPairsService(commonDeps)({
       cache: pairsCache,

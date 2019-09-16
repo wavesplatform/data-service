@@ -33,7 +33,7 @@
     "@types/koa-qs": "^2.0.0",
     "@types/koa-router": "^7.0.42",
     "@types/lru-cache": "^5.1.0",
-    "@types/node": "^10.12.14",
+    "@types/node": "^10.14.18",
     "@types/ramda": "^0.25.43",
     "eslint": "^5.15.1",
     "jest": "^24.5.0",

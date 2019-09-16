@@ -1,12 +1,20 @@
 import { identity, zip } from 'ramda';
-import { of as taskOf } from 'folktale/concurrency/task';
+import { of as taskOf, Task } from 'folktale/concurrency/task';
 import { of as just, Maybe } from 'folktale/maybe';
 
 import { forEach, isEmpty } from '../../utils/fp/maybeOps';
 import { tap } from '../../utils/tap';
 
 import { ValidationError } from '../../errorHandling';
-import { pair, PairInfo, Pair, List, Service, CacheSync } from '../../types';
+import {
+  pair,
+  PairInfo,
+  Pair,
+  List,
+  Service,
+  CacheSync,
+  AssetIdsPair,
+} from '../../types';
 import { CommonServiceDependencies } from '..';
 
 // resolver creation and presets
@@ -29,16 +37,14 @@ import {
   transformResultSearch,
 } from './transformResult';
 import * as sql from './sql';
-import { Pair as AssetPair } from './types';
-import { ValidateAsync } from '../_common/createResolver/types';
 import { inputMget } from '../presets/pg/mgetByIds/inputSchema';
 
 export type PairsGetRequest = {
-  pair: AssetPair;
+  pair: AssetIdsPair;
   matcher: string;
 };
 
-export type PairsMgetRequest = { pairs: AssetPair[]; matcher: string };
+export type PairsMgetRequest = { pairs: AssetIdsPair[]; matcher: string };
 
 export type SearchCommonRequest = {
   matcher: string;
@@ -75,7 +81,10 @@ export default ({ drivers, emitEvent }: CommonServiceDependencies) => ({
   validatePairs,
   cache,
 }: {
-  validatePairs: ValidateAsync<ValidationError, AssetPair[]>;
+  validatePairs: (
+    matcher: string,
+    pairs: AssetIdsPair[]
+  ) => Task<ValidationError, void>;
   cache: CacheSync<PairsGetRequest, PairDbResponse>;
 }): PairsService => {
   const get = createGetResolver<
@@ -87,7 +96,7 @@ export default ({ drivers, emitEvent }: CommonServiceDependencies) => ({
     transformInput: identity,
     validateInput: value =>
       validateInput<PairsGetRequest>(inputGet, 'pairs.get')(value).chain(v =>
-        validatePairs([v.pair]).map(() => v)
+        validatePairs(v.matcher, [v.pair]).map(() => v)
       ),
 
     // cache first
@@ -117,7 +126,7 @@ export default ({ drivers, emitEvent }: CommonServiceDependencies) => ({
     transformInput: identity,
     validateInput: value =>
       validateInput<PairsMgetRequest>(inputMget, 'pairs.mget')(value).chain(v =>
-        validatePairs(v.pairs).map(() => v)
+        validatePairs(v.matcher, v.pairs).map(() => v)
       ),
     getData: request => {
       let results: Array<Maybe<PairDbResponse>> = request.pairs.map(p =>

@@ -1,11 +1,10 @@
 import { PairDbResponse } from './transformResult';
-import { Pair as AssetPair } from './types';
-
+import { AssetIdsPair } from 'types';
 const { prop, and, equals } = require('ramda');
 
 /** matchPairs :: (Object, Object) -> Boolean */
 export const matchRequestResult = (
-  request: AssetPair[],
+  request: AssetIdsPair[],
   result: PairDbResponse
 ): boolean =>
   and(
