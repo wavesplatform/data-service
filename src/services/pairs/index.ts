@@ -29,7 +29,12 @@ import { searchPreset } from '../presets/pg/search';
 // service logic
 import { matchRequestResult } from './matchRequestResult';
 import { mgetPairsPg } from './mgetPairsPg';
-import { inputGet, inputSearch, result as resultSchema } from './schema';
+import {
+  inputGet,
+  inputMget,
+  inputSearch,
+  result as resultSchema,
+} from './schema';
 import { transformResults as transformResultMget } from './transformResults';
 import {
   PairDbResponse,
@@ -37,7 +42,6 @@ import {
   transformResultSearch,
 } from './transformResult';
 import * as sql from './sql';
-import { inputMget } from '../presets/pg/mgetByIds/inputSchema';
 
 export type PairsGetRequest = {
   pair: AssetIdsPair;

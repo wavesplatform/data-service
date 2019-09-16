@@ -17,7 +17,7 @@ export interface PairOrderingService {
 export class PairOrderingServiceImpl implements PairOrderingService {
   private orderPair: Record<string, TOrderPair>;
 
-  private constructor(matchersSettings: Record<string, string[]>) {
+  constructor(matchersSettings: Record<string, string[]>) {
     this.orderPair = map(createOrderPair, matchersSettings);
   }
 
