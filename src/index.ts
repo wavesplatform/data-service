@@ -2,7 +2,7 @@ import * as Koa from 'koa';
 import chalk from 'chalk';
 import * as createRequestId from 'koa-requestid';
 import * as bodyParser from 'koa-bodyparser';
-import { koaQs } from './utils/koaQs';
+import { unsafeKoaQs } from './utils/koaQs';
 
 import { createPgDriver } from './db';
 import createEventBus from './eventBus/';
@@ -19,7 +19,7 @@ import * as notFoundHandler from './middleware/notFoundHandler';
 import { loadConfig } from './loadConfig';
 import router from './endpoints';
 
-const app = koaQs(new Koa());
+const app = unsafeKoaQs(new Koa());
 
 const options = loadConfig();
 

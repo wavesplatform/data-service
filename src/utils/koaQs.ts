@@ -3,7 +3,13 @@ import * as Koa from 'koa';
 const merge = require('merge-descriptors');
 const qs = require('qs');
 
-export function koaQs<A, B>(app: Koa<A, B>): Koa<A, B> {
+/**
+ * Replicates logic from koa-qs module but with
+ * modern dependencies versions.
+ * MUTATES the provided Koa app object
+ * @param app Koa app, mutable
+ */
+export function unsafeKoaQs<A, B>(app: Koa<A, B>): Koa<A, B> {
   merge(app.request, {
     /**
      * Get parsed query-string.
