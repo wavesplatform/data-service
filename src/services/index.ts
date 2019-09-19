@@ -79,6 +79,7 @@ export type ServiceMesh = {
   candles: CandlesService;
   matcher: {
     pairs: PairsService;
+    candles: CandlesService;
     rates: ServiceMget<RateMgetParams, Rate>;
   };
   pairs: PairsService;
@@ -215,6 +216,7 @@ export default ({
       },
       matcher: {
         rates,
+        candles,
         pairs: pairsWithAsyncValidation,
       },
     };

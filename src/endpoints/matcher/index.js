@@ -4,7 +4,10 @@ const subrouter = new Router({ prefix: '/matcher/:matcher' });
 
 const pairs = require('./pairs');
 const rates = require('./rates').default;
+const candles = require('./candles').default;
 
-module.exports = (pairsService, ratesService) => subrouter
-  .use(pairs(pairsService).routes())
-  .use(rates(ratesService).routes());
+module.exports = (pairsService, candlesService, ratesService) =>
+  subrouter
+    .use(pairs(pairsService).routes())
+    .use(candles(candlesService).routes())
+    .use(rates(ratesService).routes());

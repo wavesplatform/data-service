@@ -7,8 +7,6 @@ import * as postToGet from '../../utils/postToGet';
 const subrouter: Router = new Router();
 
 export default (rateService: ServiceMget<RateMgetParams, Rate>): Router =>
-  subrouter.get(
-    "/rates", getEstimateRateHandler(rateService)
-  ).post(
-    "/rates", postToGet(getEstimateRateHandler(rateService))
-  )
+  subrouter
+    .get('/rates', getEstimateRateHandler(rateService))
+    .post('/rates', postToGet(getEstimateRateHandler(rateService)));
