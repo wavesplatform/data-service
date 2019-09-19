@@ -1,40 +1,54 @@
-import { Maybe, of as maybeOf } from 'folktale/maybe';
-import { Task, of as taskOf, rejected } from 'folktale/concurrency/task';
-import * as LRU from 'lru-cache';
-import { createOrderPair } from '@waves/assets-pairs-order';
+import { identity, zip } from 'ramda';
+import { of as taskOf, Task } from 'folktale/concurrency/task';
+import { of as just, Maybe } from 'folktale/maybe';
 
-import { DataServiceConfig } from '../../loadConfig';
-import { loadMatcherSettings } from '../../loadMatcherSettings';
-import { AppError, ValidationError } from '../../errorHandling';
+import { forEach, isEmpty } from '../../utils/fp/maybeOps';
+import { tap } from '../../utils/tap';
+
+import { ValidationError } from '../../errorHandling';
 import {
   pair,
   PairInfo,
   Pair,
   List,
   Service,
-  TransactionInfo,
+  CacheSync,
+  AssetIdsPair,
 } from '../../types';
 import { CommonServiceDependencies } from '..';
-import { getByIdPreset } from '../presets/pg/getById';
+
+// resolver creation and presets
+import {
+  get as createGetResolver,
+  mget as createMgetResolver,
+} from '../_common/createResolver';
+import { getData as getByIdPg } from '../presets/pg/getById/pg';
+import { validateInput, validateResult } from '../presets/validation';
 import { searchPreset } from '../presets/pg/search';
 
-import { inputGet, inputSearch, result as resultSchema } from './schema';
+// service logic
+import { matchRequestResult } from './matchRequestResult';
+import { mgetPairsPg } from './mgetPairsPg';
+import {
+  inputGet,
+  inputMget,
+  inputSearch,
+  result as resultSchema,
+} from './schema';
+import { transformResults as transformResultMget } from './transformResults';
 import {
   PairDbResponse,
   transformResult,
   transformResultSearch,
 } from './transformResult';
 import * as sql from './sql';
-import { IssueTxsService } from '../transactions/issue';
-import { Pair as AssetPair } from './types';
-import mget from './mget';
 
 export type PairsGetRequest = {
-  pair: AssetPair;
+  pair: AssetIdsPair;
   matcher: string;
 };
 
-export type PairsMgetRequest = { pairs: AssetPair[]; matcher: string };
+export type PairsMgetRequest = { pairs: AssetIdsPair[]; matcher: string };
 
 export type SearchCommonRequest = {
   matcher: string;
@@ -58,10 +72,6 @@ export type PairsSearchRequest =
   | SearchByAssetRequest
   | SearchByAssetsRequest;
 
-export type PairsServiceCreatorDependencies = CommonServiceDependencies & {
-  options: DataServiceConfig;
-};
-
 export type PairsService = Service<
   PairsGetRequest,
   PairsMgetRequest,
@@ -69,136 +79,113 @@ export type PairsService = Service<
   Pair
 >;
 
+export { create as createCache } from './cache';
+
 export default ({
   drivers,
   emitEvent,
-  options,
-}: PairsServiceCreatorDependencies) => ({
-  issueTxs,
-}: {
-  issueTxs: IssueTxsService;
-}): Task<AppError, PairsService> => {
-  const cache = new LRU(100000);
-  cache.set('WAVES', true);
-
-  const service = (priceAssets: string[] | null): PairsService => {
-    const orderPair = priceAssets ? createOrderPair(priceAssets) : null;
-
-    const getPairByRequest = getByIdPreset<
-      PairsGetRequest,
-      PairDbResponse,
-      any,
-      Pair
-    >({
-      name: 'pairs.get',
-      sql: sql.get,
-      // @todo simplify, when async pair validator will be ready
-      // https://jira.wavesplatform.com/browse/DATA-998
-      inputSchema: inputGet({
-        orderPair,
-        defaultMatcherAddress: options.matcher.defaultMatcherAddress,
-      }),
-      resultSchema,
-      transformResult: transformResult,
-      resultTypeFactory: pair,
-    })({ pg: drivers.pg, emitEvent });
-
-    const mgetPairsByRequest = mget<
-      PairsMgetRequest,
-      PairDbResponse,
-      PairInfo | null,
-      Pair
-    >({
-      name: 'pairs.mget',
-      orderPair: null,  // just for backward compatibility (it's fixed in v1)
-      defaultMatcherAddress: options.matcher.defaultMatcherAddress,
-      sql: sql.mget,
-      transformResult: transformResult,
-      typeFactory: pair,
-    })({ pg: drivers.pg, emitEvent });
-
-    const searchPairsByRequest = searchPreset<
-      PairsSearchRequest,
-      PairDbResponse,
-      PairInfo,
-      List<Pair>
-    >({
-      name: 'pairs.search',
-      sql: sql.search,
-      inputSchema: inputSearch,
-      resultSchema,
-      transformResult: transformResultSearch,
-    })({ pg: drivers.pg, emitEvent });
-
-    return {
-      get: (request: PairsGetRequest) => {
-        const getPair = getPairByRequest(request).chain<AppError, Maybe<Pair>>(
-          maybePair =>
-            maybePair.matchWith({
-              Just: () => taskOf(maybePair),
-              Nothing: () => taskOf(maybeOf(pair())),
-            })
-        );
-
-        // request asset list
-        const assets = [request.pair.amountAsset, request.pair.priceAsset];
-
-        // try to check asset existance through the cache
-        const notCached = assets.filter(assetId => !cache.has(assetId));
-
-        if (notCached.length === 0) {
-          // both of assets are cached
-          return getPair;
-        } else {
-          return issueTxs.mget(notCached).chain(list => {
-            const found = list.data
-              .map(tx => tx.data)
-              .filter(
-                (t: TransactionInfo | null): t is TransactionInfo => t !== null
-              );
-
-            if (found.length < notCached.length) {
-              return rejected(new ValidationError(new Error('Check pair')));
-            } else {
-              found.forEach(tx => cache.set(tx.id, true));
-              return getPair;
-            }
-          });
-        }
-      },
-      mget: (request: PairsMgetRequest) => {
-        const mgetPairs = mgetPairsByRequest(request);
-
-        // request asset list
-        const assets = request.pairs.reduce(
-          (acc: string[], pair) => [...acc, pair.amountAsset, pair.priceAsset],
-          []
-        );
-
-        // try to check asset existance through the cache
-        const notCached = assets.filter(assetId => !cache.has(assetId));
-
-        if (notCached.length === 0) {
-          // all of assets are in cache
-          return mgetPairs;
-        } else {
-          return issueTxs.mget(notCached).chain(list => {
-            const found = list.data
-              .map(tx => tx.data)
-              .filter(
-                (t: TransactionInfo | null): t is TransactionInfo => t !== null
-              );
-
-            found.forEach(tx => cache.set(tx.id, true));
-            return mgetPairs;
-          });
-        }
-      },
-      search: searchPairsByRequest,
-    };
+  validatePairs,
+  cache,
+}: CommonServiceDependencies & {
+  validatePairs: (
+    matcher: string,
+    pairs: AssetIdsPair[]
+  ) => Task<ValidationError, void>;
+  cache: CacheSync<PairsGetRequest, PairDbResponse>;
+}): PairsService => {
+  const SERVICE_NAME = {
+    GET: 'pairs.get',
+    MGET: 'pairs.mget',
+    SEARCH: 'pairs.search',
   };
 
-  return loadMatcherSettings(options)
-    .map(settings => service(settings.priceAssets))
-    .orElse(() => taskOf(service(null)));
+  const get = createGetResolver<
+    PairsGetRequest,
+    PairsGetRequest,
+    PairDbResponse,
+    Pair
+  >({
+    transformInput: identity,
+    validateInput: value =>
+      validateInput<PairsGetRequest>(inputGet, SERVICE_NAME.GET)(value).chain(
+        v => validatePairs(v.matcher, [v.pair]).map(() => v)
+      ),
+
+    // cache first
+    getData: req =>
+      cache.get(req).matchWith({
+        Just: ({ value }) => taskOf(just(value)),
+        Nothing: () =>
+          getByIdPg<PairDbResponse, PairsGetRequest>({
+            name: SERVICE_NAME.GET,
+            sql: sql.get,
+            pg: drivers.pg,
+          })(req).map(
+            tap(maybeResp => forEach(x => cache.set(req, x), maybeResp))
+          ),
+      }),
+    validateResult: validateResult(resultSchema, SERVICE_NAME.GET),
+    transformResult: res => res.map(transformResult).map(pair),
+    emitEvent,
+  });
+
+  const mget = createMgetResolver<
+    PairsMgetRequest,
+    PairsMgetRequest,
+    PairDbResponse,
+    List<Pair>
+  >({
+    transformInput: identity,
+    validateInput: value =>
+      validateInput<PairsMgetRequest>(inputMget, SERVICE_NAME.MGET)(
+        value
+      ).chain(v => validatePairs(v.matcher, v.pairs).map(() => v)),
+    getData: request => {
+      let results: Array<Maybe<PairDbResponse>> = request.pairs.map(p =>
+        cache.get({
+          pair: p,
+          matcher: request.matcher,
+        })
+      );
+
+      const notCachedPairsIndexes = results.filter(isEmpty).map((_, i) => i);
+
+      return mgetPairsPg({
+        name: SERVICE_NAME.MGET,
+        sql: sql.mget,
+        matchRequestResult,
+        pg: drivers.pg,
+      })({
+        pairs: notCachedPairsIndexes.map(i => request.pairs[i]),
+        matcher: request.matcher,
+      }).map(pairsFromDb => {
+        zip(pairsFromDb, notCachedPairsIndexes).forEach(
+          ([pair, i]) => (results[i] = pair)
+        );
+        return results;
+      });
+    },
+    validateResult: validateResult(resultSchema, SERVICE_NAME.MGET),
+    transformResult: transformResultMget,
+    emitEvent,
+  });
+
+  const search = searchPreset<
+    PairsSearchRequest,
+    PairDbResponse,
+    PairInfo,
+    List<Pair>
+  >({
+    name: SERVICE_NAME.SEARCH,
+    sql: sql.search,
+    inputSchema: inputSearch,
+    resultSchema,
+    transformResult: transformResultSearch,
+  })({ pg: drivers.pg, emitEvent });
+
+  return {
+    get,
+    mget,
+    search,
+  };
 };

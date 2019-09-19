@@ -5,21 +5,17 @@ import { matchRequestsResults } from '../../utils/db';
 import { toDbError, DbError } from '../../errorHandling';
 import { MgetRequest } from './types';
 
-export const mgetPairs = <
-  Request extends MgetRequest,
-  ResponseRaw,
-  Id = string
->({
+export const mgetPairsPg = <Request extends MgetRequest, ResponseRaw, Id>({
   matchRequestResult,
   name,
   sql,
+  pg,
 }: {
   name: string;
   sql: (request: Request) => string;
   matchRequestResult: (req: Id[], res: ResponseRaw) => boolean;
-}) => (pg: PgDriver) => (
-  request: Request
-): Task<DbError, Maybe<ResponseRaw>[]> =>
+  pg: PgDriver;
+}) => (request: Request): Task<DbError, Maybe<ResponseRaw>[]> =>
   pg
     .any<ResponseRaw>(sql(request))
     .map(responses =>

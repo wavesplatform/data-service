@@ -2,6 +2,8 @@ const { captureErrors } = require('../../../utils/captureErrors');
 const { handleError } = require('../../../utils/handleError');
 const { select } = require('../../utils/selectors');
 
+const { pair: createPair } = require('../../../types');
+
 /**
  * Endpoint
  * @name /matcher/:matcher/pairs/amountAsset/priceAsset?...params
@@ -37,14 +39,10 @@ const pairsOneEndpoint = service => async ctx => {
 
     pair.matchWith({
       Just: ({ value }) => {
-        if (value.data === null) {
-          ctx.status = 404;
-        } else {
-          ctx.state.returnValue = value;
-        }
+        ctx.state.returnValue = value;
       },
       Nothing: () => {
-        ctx.status = 404;
+        ctx.state.returnValue = createPair();
       },
     });
   } catch (e) {

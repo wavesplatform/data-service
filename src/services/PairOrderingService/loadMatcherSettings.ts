@@ -1,7 +1,6 @@
 import { get } from 'https';
 import * as Task from 'folktale/concurrency/task';
-import { DataServiceConfig } from './loadConfig';
-import { InitError } from './errorHandling';
+import { InitError } from '../../errorHandling';
 
 type MatcherSettings = {
   priceAssets: string[];
@@ -9,11 +8,11 @@ type MatcherSettings = {
 };
 
 export const loadMatcherSettings = (
-  options: DataServiceConfig
+  matcherSettingsURL: string
 ): Task.Task<InitError, MatcherSettings> =>
   Task.task(resolver => {
     try {
-      get(options.matcher.settingsURL, res => {
+      get(matcherSettingsURL, res => {
         let rawData = '';
         res.on('data', (chunk: any) => (rawData += chunk));
         res.on('end', () => {

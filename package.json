@@ -32,14 +32,14 @@
     "@types/koa-bodyparser": "^4.2.1",
     "@types/koa-router": "^7.0.42",
     "@types/lru-cache": "^5.1.0",
-    "@types/node": "^10.12.14",
+    "@types/node": "^10.14.18",
     "@types/ramda": "^0.25.43",
     "eslint": "^5.15.1",
     "jest": "^24.5.0",
     "nodemon": "^1.18.8",
     "ts-jest": "^23.10.5",
     "ts-node": "^7.0.1",
-    "typescript": "^3.2.2"
+    "typescript": "^3.6.3"
   },
   "dependencies": {
     "@koa/cors": "^2.2.3",

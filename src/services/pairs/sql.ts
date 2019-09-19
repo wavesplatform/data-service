@@ -1,7 +1,6 @@
 import * as knex from 'knex';
 import { compose } from 'ramda';
 import { escapeForTsQuery, prepareForLike } from '../../utils/db';
-import { Pair } from './types';
 import {
   PairsGetRequest,
   PairsMgetRequest,
@@ -9,6 +8,7 @@ import {
   SearchByAssetRequest,
   SearchByAssetsRequest,
 } from '.';
+import { AssetIdsPair } from '../../types';
 
 const pg = knex({ client: 'pg' });
 
@@ -60,7 +60,7 @@ const getMatchExactly = (matchExactly: boolean[] | undefined): boolean[] => {
   }
 };
 
-const query = (pairs: Pair[], matcher: string): string =>
+const query = (pairs: AssetIdsPair[], matcher: string): string =>
   pg({ t: 'pairs' })
     .select(COLUMNS)
     .whereIn(

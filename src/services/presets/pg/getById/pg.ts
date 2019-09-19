@@ -6,10 +6,12 @@ import { PgDriver } from '../../../../db/driver';
 export const getData = <ResponseRaw, Id = string>({
   name,
   sql,
+  pg,
 }: {
   name: string;
   sql: (id: Id) => string;
-}) => (pg: PgDriver) => (id: Id) =>
+  pg: PgDriver;
+}) => (id: Id) =>
   pg
     .oneOrNone<ResponseRaw>(sql(id))
     .map(fromNullable)

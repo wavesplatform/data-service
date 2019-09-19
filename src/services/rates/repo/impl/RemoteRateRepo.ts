@@ -12,9 +12,7 @@ const pg = knex({ client: 'pg' });
 
 export default class RemoteRateRepo
   implements AsyncMget<RateMgetParams, RateInfo, DbError> {
-  constructor(
-    private readonly dbDriver: PgDriver
-  ) {}
+  constructor(private readonly dbDriver: PgDriver) {}
 
   mget(request: RateMgetParams): Task<DbError, RateInfo[]> {
     const pairsSqlParams = chain(
@@ -28,10 +26,10 @@ export default class RemoteRateRepo
       ...pairsSqlParams,
     ]);
 
-    // console.log(sql.toString())
-
     const dbTask: Task<DbError, any[]> =
-      request.pairs.length === 0 ? taskOf([]) : this.dbDriver.any(sql.toString());
+      request.pairs.length === 0
+        ? taskOf([])
+        : this.dbDriver.any(sql.toString());
 
     return dbTask.map((result: any[]): RateInfo[] =>
       map((it: any): RateInfo => {

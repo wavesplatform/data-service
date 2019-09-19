@@ -1,16 +1,14 @@
 import { Task } from 'folktale/concurrency/task';
-import { Maybe, of as maybeOf } from 'folktale/maybe';
-import { BigNumber } from '@waves/data-entities';
-import { identity } from 'ramda';
+import { Maybe } from 'folktale/maybe';
 
 import { tap } from '../../utils/tap';
 import { AssetIdsPair, RateInfo, RateMgetParams } from '../../types';
 import { AppError, DbError } from '../../errorHandling';
 
-import { partitionByPreCount, Cache, AsyncMget } from './repo';
+import { partitionByPreCount, AsyncMget, RateCache } from './repo';
 import { RateCacheKey } from './repo/impl/RateCache';
 import RateInfoLookup from './repo/impl/RateInfoLookup';
-import { maybeIsNone } from './util';
+import { isEmpty } from '../../utils/fp/maybeOps';
 
 type ReqAndRes<TReq, TRes> = {
   req: TReq;
@@ -21,7 +19,7 @@ export default class RateEstimator
   implements
     AsyncMget<RateMgetParams, ReqAndRes<AssetIdsPair, RateInfo>, AppError> {
   constructor(
-    private readonly cache: Cache<Maybe<RateCacheKey>, BigNumber>,
+    private readonly cache: RateCache,
     private readonly remoteGet: AsyncMget<RateMgetParams, RateInfo, DbError>
   ) {}
 
@@ -30,28 +28,29 @@ export default class RateEstimator
   ): Task<AppError, ReqAndRes<AssetIdsPair, RateInfo>[]> {
     const { pairs, timestamp, matcher } = request;
 
-    const shouldCache = maybeIsNone(timestamp);
+    const shouldCache = isEmpty(timestamp);
 
-    const getCacheKey = (pair: AssetIdsPair): Maybe<RateCacheKey> =>
-      maybeOf(shouldCache)
-        .filter(identity)
-        .map(() => ({
-          pair,
-          matcher,
-        }));
+    const getCacheKey = (pair: AssetIdsPair): RateCacheKey => ({
+      pair,
+      matcher,
+    });
 
     const cacheAll = (items: RateInfo[]) =>
-      items.forEach(it => this.cache.put(getCacheKey(it), it.current));
+      items.forEach(it => this.cache.set(getCacheKey(it), it.current));
 
     const { preCount, toBeRequested } = partitionByPreCount(
       this.cache,
       pairs,
-      getCacheKey
+      getCacheKey,
+      shouldCache
     );
 
     return this.remoteGet
       .mget({ pairs: toBeRequested, matcher, timestamp })
-      .map(tap(cacheAll))
+      .map(results => {
+        if (shouldCache) cacheAll(results);
+        return results;
+      })
       .map(data => new RateInfoLookup(data.concat(preCount)))
       .map(lookup =>
         pairs.map(idsPair => ({
@@ -63,9 +62,11 @@ export default class RateEstimator
         tap(data =>
           data.forEach(reqAndRes =>
             reqAndRes.res.map(
-              tap(res =>
-                this.cache.put(getCacheKey(reqAndRes.req), res.current)
-              )
+              tap(res => {
+                if (shouldCache) {
+                  this.cache.set(getCacheKey(reqAndRes.req), res.current);
+                }
+              })
             )
           )
         )

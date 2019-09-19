@@ -1,6 +1,6 @@
 // Module transforms pg-promise into pg-task
 import { pgpConnect } from './pgp';
-import { ITask } from 'pg-promise';
+import { ITask, IDatabase } from 'pg-promise';
 import { fromPromised } from 'folktale/concurrency/task';
 
 import { Task } from 'folktale/concurrency/task';
@@ -41,7 +41,7 @@ export const createPgDriver = (
   options: PgDriverOptions,
   connect = pgpConnect
 ): PgDriver => {
-  const driverP = connect({
+  const driverP: IDatabase<{}> = connect({
     host: options.postgresHost,
     port: options.postgresPort,
     database: options.postgresDatabase,
