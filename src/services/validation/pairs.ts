@@ -21,8 +21,6 @@ export const validatePairs = (
       })
   );
 
-  console.log('Incorrect pairs', incorrectPairs);
-
   if (incorrectPairs.length)
     return taskRejected(
       new ValidationError('Wrong assets order in provided pair(s)', {
@@ -53,7 +51,6 @@ export const validatePairs = (
         .filter(x => x[1].data === null)
         .map(x => x[0]);
 
-      console.log('Assets do not exist:', nonExistingIds);
       if (!nonExistingIds.length) {
         return taskOf(undefined);
       } else {

@@ -13,10 +13,7 @@ export const create = (size: number, maxAgeMillis: number): AssetsCache => {
     has: key => {
       return cache.has(key);
     },
-    get: key => {
-      const p = cache.get(key);
-      return fromNullable(p);
-    },
+    get: key => fromNullable(cache.get(key)),
     set: (key, value) => {
       cache.set(key, value);
     },

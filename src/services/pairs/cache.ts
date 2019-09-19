@@ -19,18 +19,12 @@ export const create = (
     req.matcher + req.pair.amountAsset + req.pair.priceAsset;
 
   return {
-    has: key => {
-      const k = toStringKey(key);
-      return cache.has(k);
-    },
+    has: key => cache.has(toStringKey(key)),
     get: key => {
       const k = toStringKey(key);
       const p = cache.get(k);
       return fromNullable(p);
     },
-    set: (key, value) => {
-      const k = toStringKey(key);
-      cache.set(k, value);
-    },
+    set: (key, value) => cache.set(toStringKey(key), value),
   };
 };
