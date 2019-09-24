@@ -2,9 +2,12 @@ const Router = require('koa-router');
 
 const subrouter = new Router({ prefix: '/matcher/:matcher' });
 
-const pairs = require('./pairs');
-const rates = require('./rates').default;
+const createPairs = require('./pairs');
+const createCandles = require('./candles').default;
+const createRates = require('./rates').default;
 
-module.exports = (pairsService, ratesService) => subrouter
-  .use(pairs(pairsService).routes())
-  .use(rates(ratesService).routes());
+module.exports = ({ pairs, candles, rates }) =>
+  subrouter
+    .use(createPairs(pairs).routes())
+    .use(createCandles(candles).routes())
+    .use(createRates(rates).routes());

@@ -1,4 +1,4 @@
-const { has, map, split, zipObj, compose } = require('ramda');
+const { has, map, compose } = require('ramda');
 const Maybe = require('folktale/maybe');
 
 const { captureErrors } = require('../../../utils/captureErrors');
@@ -7,29 +7,14 @@ const { handleError } = require('../../../utils/handleError');
 const { select } = require('../../utils/selectors');
 const { parseArrayQuery } = require('../../utils/parseArrayQuery');
 const { parseBool } = require('../../utils/parseBool');
+
+const { parsePairs } = require('../parsePairs');
+
 const {
   parseFilterValues,
   limit,
   query: queryFilter,
 } = require('../../_common/filters');
-
-/**
- * @typedef {object} PairRequest
- * @property {string} amountAsset
- * @property {string} priceAsset
- */
-
-/**
- * @function
- * @param {string[]} pairs {amoutAsset}/{priceAsset}
- * @returns PairRequest[]
- */
-const parsePairs = map(
-  compose(
-    zipObj(['amountAsset', 'priceAsset']),
-    split('/')
-  )
-);
 
 const mgetFilterName = 'pairs';
 

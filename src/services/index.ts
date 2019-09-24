@@ -57,7 +57,7 @@ import { PairOrderingServiceImpl } from './PairOrderingService';
 
 import { PgDriver } from '../db/driver';
 import { EmitEvent } from './_common/createResolver/types';
-import { ServiceMget, Rate, RateMgetParams } from '../types';
+import { ServiceMget, Rate, RateMgetParams, AssetIdsPair } from '../types';
 import { RateCache } from './rates/repo';
 
 import { validatePairs } from './validation/pairs';
@@ -79,6 +79,7 @@ export type ServiceMesh = {
   candles: CandlesService;
   matcher: {
     pairs: PairsService;
+    candles: CandlesService;
     rates: ServiceMget<RateMgetParams, Rate>;
   };
   pairs: PairsService;
@@ -134,7 +135,6 @@ export default ({
       ...commonDeps,
       cache: assetsCache,
     });
-    const candles = createCandlesService(commonDeps);
 
     const aliasTxs = createAliasTxsService(commonDeps);
     const burnTxs = createBurnTxsService(commonDeps);
@@ -168,6 +168,16 @@ export default ({
       validatePairs: validatePairs(assets, pairOrderingService),
     });
 
+    const candlesNoAsyncValidation = createCandlesService({
+      ...commonDeps,
+      validatePair: () => taskOf(undefined),
+    });
+    const candlesWithAsyncValidation = createCandlesService({
+      ...commonDeps,
+      validatePair: (matcher: string, pair: AssetIdsPair) =>
+        validatePairs(assets, pairOrderingService)(matcher, [pair]),
+    });
+
     // specific init services
     // all txs service
     const allTxs = createAllTxsService(commonDeps)({
@@ -192,7 +202,7 @@ export default ({
     return {
       aliases,
       assets,
-      candles,
+      candles: candlesNoAsyncValidation,
       pairs: pairsNoAsyncValidation,
       transactions: {
         all: allTxs,
@@ -215,6 +225,7 @@ export default ({
       },
       matcher: {
         rates,
+        candles: candlesWithAsyncValidation,
         pairs: pairsWithAsyncValidation,
       },
     };

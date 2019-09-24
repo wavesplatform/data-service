@@ -5,7 +5,7 @@ import { of as just, Maybe } from 'folktale/maybe';
 import { forEach, isEmpty } from '../../utils/fp/maybeOps';
 import { tap } from '../../utils/tap';
 
-import { ValidationError } from '../../errorHandling';
+import { AppError } from '../../errorHandling';
 import {
   pair,
   PairInfo,
@@ -90,7 +90,7 @@ export default ({
   validatePairs: (
     matcher: string,
     pairs: AssetIdsPair[]
-  ) => Task<ValidationError, void>;
+  ) => Task<AppError, void>;
   cache: CacheSync<PairsGetRequest, PairDbResponse>;
 }): PairsService => {
   const SERVICE_NAME = {

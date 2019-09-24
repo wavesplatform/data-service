@@ -1,29 +1,23 @@
 import { Context } from 'koa';
-import { map, compose, split } from 'ramda';
+import { compose } from 'ramda';
 import * as maybe from 'folktale/maybe';
 
 import { ServiceMget, Rate, RateMgetParams } from '../../../types';
 import { select } from '../../utils/selectors';
 import { captureErrors } from '../../../utils/captureErrors';
-import {
-  parseFilterValues,
-} from '../../_common/filters';
+import { parseFilterValues } from '../../_common/filters';
 
 import { handleError } from '../../../utils/handleError';
 import { parseArrayQuery } from '../../utils/parseArrayQuery';
 import { dateOrNull } from '../../../utils/parseDate';
 
-const parsePairs = map(
-  compose(
-    ([amountAsset, priceAsset]) => ({ amountAsset, priceAsset }),
-    split('/')
-  )
-);
+import { parsePairs } from '../parsePairs';
 
 const filterParsers = {
   pairs: compose(
     (val: maybe.Maybe<string[]>) => val.map(parsePairs).getOrElse(null),
-    (val: string[] | undefined): maybe.Maybe<string[]> => maybe.fromNullable(val),
+    (val: string[] | undefined): maybe.Maybe<string[]> =>
+      maybe.fromNullable(val),
     parseArrayQuery
   ),
   timestamp: dateOrNull,
@@ -33,7 +27,9 @@ const filterParsers = {
  * Endpoint
  * @name /rates?pairs[]‌="{asset_id_1}/{asset_id_2}"&pairs[]="{asset_id_1}/{asset_id_2}" ...other params
  */
-const rateEstimateEndpoint = (service: ServiceMget<RateMgetParams, Rate>) => async (ctx: Context) => {
+const rateEstimateEndpoint = (
+  service: ServiceMget<RateMgetParams, Rate>
+) => async (ctx: Context) => {
   const { fromParams, query } = select(ctx);
   const [matcher] = fromParams(['matcher']);
   const fValues = parseFilterValues(filterParsers)(query);
@@ -45,7 +41,11 @@ const rateEstimateEndpoint = (service: ServiceMget<RateMgetParams, Rate>) => asy
   });
 
   const results = await service
-    .mget({ pairs: fValues.pairs, matcher, timestamp: maybe.fromNullable(fValues.timestamp) })
+    .mget({
+      pairs: fValues.pairs,
+      matcher,
+      timestamp: maybe.fromNullable(fValues.timestamp),
+    })
     .run()
     .promise();
 
