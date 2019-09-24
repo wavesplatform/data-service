@@ -6,7 +6,7 @@ const { pair: createPair } = require('../../../types');
 
 /**
  * Endpoint
- * @name /matcher/:matcher/pairs/amountAsset/priceAsset?...params
+ * @name /matchers/:matcher/pairs/amountAsset/priceAsset?...params
  */
 const pairsOneEndpoint = service => async ctx => {
   const { fromParams } = select(ctx);
@@ -18,7 +18,7 @@ const pairsOneEndpoint = service => async ctx => {
 
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
-    resolver: '/matcher/:matcher/pairs/:amountAsset/:priceAsset',
+    resolver: '/matchers/:matcher/pairs/:amountAsset/:priceAsset',
   });
 
   try {

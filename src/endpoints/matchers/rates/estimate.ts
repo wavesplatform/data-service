@@ -25,7 +25,7 @@ const filterParsers = {
 
 /**
  * Endpoint
- * @name /rates?pairs[]‌="{asset_id_1}/{asset_id_2}"&pairs[]="{asset_id_1}/{asset_id_2}" ...other params
+ * @name /matchers/:matcher/rates?pairs[]‌="{asset_id_1}/{asset_id_2}"&pairs[]="{asset_id_1}/{asset_id_2}" ...other params
  */
 const rateEstimateEndpoint = (
   service: ServiceMget<RateMgetParams, Rate>
@@ -36,7 +36,7 @@ const rateEstimateEndpoint = (
 
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
-    resolver: '/pairs',
+    resolver: '/matchers/:matcher/pairs',
     query,
   });
 
