@@ -8,7 +8,11 @@ const { ids } = require('./filters');
 const create = (
   url,
   service,
-  { filterParsers = { ids }, parseFiltersFn, mgetFilterName = 'ids' } = {}
+  {
+    filterParsers = { ids },
+    parseFiltersFn = null,
+    mgetFilterName = 'ids',
+  } = {}
 ) => router => {
   const manyMiddleware = createManyMiddleware(
     {

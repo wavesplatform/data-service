@@ -1,60 +1,65 @@
-const { DEFAULT_NOT_FOUND_MESSAGE } = require('../../errorHandling');
-const createService = require('../../services/pairs');
-const { select } = require('../utils/selectors');
 const { captureErrors } = require('../../utils/captureErrors');
+const { handleError } = require('../../utils/handleError');
 const { parseFilterValues } = require('../_common/filters');
 const { query: parseQuery } = require('../_common/filters/parsers');
-const { handleError } = require('../../utils/handleError');
+const { select } = require('../utils/selectors');
 
 /**
  * Endpoint
- * @name /pairs/id1/id2?...params
+ * @name /pairs/amountAsset/priceAsset?...params
  */
-const pairsOneEndpoint = async ctx => {
+const pairsOneEndpoint = service => async ctx => {
   const { fromParams, query } = select(ctx);
-  const [id1, id2] = fromParams(['id1', 'id2']);
+  const [amountAsset, priceAsset] = fromParams(['amountAsset', 'priceAsset']);
   const { matcher } = parseFilterValues({ matcher: parseQuery })(query);
 
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
-    resolver: '/pairs/:id1/:id2',
+    resolver: '/pairs/:amountAsset/:priceAsset',
   });
 
-  const s = createService({
-    drivers: ctx.state.drivers,
-    emitEvent: ctx.eventBus.emit,
-  });
+  try {
+    const pair = await service
+      .get({
+        pair: {
+          amountAsset,
+          priceAsset,
+        },
+        matcher: matcher || ctx.state.config.defaultMatcher,
+      })
+      .run()
+      .promise();
 
-  if (!s.get) {
-    ctx.status = 404;
-    ctx.body = {
-      message: DEFAULT_NOT_FOUND_MESSAGE,
-    };
-    return;
+    ctx.eventBus.emit('ENDPOINT_RESOLVED', {
+      value: pair,
+    });
+
+    pair.matchWith({
+      Just: ({ value }) => {
+        if (value.data === null) {
+          ctx.status = 404;
+        } else {
+          ctx.state.returnValue = value;
+        }
+      },
+      Nothing: () => {
+        ctx.status = 404;
+      },
+    });
+  } catch (e) {
+    e.matchWith({
+      DB: () => {
+        throw e;
+      },
+      Resolver: () => {
+        throw e;
+      },
+      Validation: () => {
+        ctx.status = 404;
+      },
+    });
   }
-
-  const pair = await s
-    .get({
-      amountAsset: id1,
-      priceAsset: id2,
-      matcher: matcher || ctx.state.config.defaultMatcher,
-    })
-    .run()
-    .promise();
-
-  ctx.eventBus.emit('ENDPOINT_RESOLVED', {
-    value: pair,
-  });
-
-  pair.matchWith({
-    Just: ({ value }) => (ctx.state.returnValue = value),
-    Nothing: () => {
-      ctx.status = 404;
-      ctx.body = {
-        message: DEFAULT_NOT_FOUND_MESSAGE,
-      };
-    },
-  });
 };
 
-module.exports = captureErrors(handleError)(pairsOneEndpoint);
+module.exports = service =>
+  captureErrors(handleError)(pairsOneEndpoint(service));

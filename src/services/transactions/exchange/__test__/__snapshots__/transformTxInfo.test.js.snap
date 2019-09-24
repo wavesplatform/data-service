@@ -7,6 +7,7 @@ Object {
   "fee": "1",
   "height": 809923,
   "id": "8rEwYY4wQ4bkEkk95EiyeQnvnonX6TAnU6eiBAbVSADk",
+  "matcher": "3PJaDyprvekvPXPuAtxrapacuDJopgJRaU3",
   "order1": Object {
     "amount": "1",
     "assetPair": Object {

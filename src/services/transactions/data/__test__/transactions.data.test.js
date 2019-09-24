@@ -2,7 +2,7 @@ const Task = require('folktale/concurrency/task');
 const Maybe = require('folktale/maybe');
 const { always, identity } = require('ramda');
 
-const createService = require('..');
+const createService = require('..').default;
 
 const service = createService({
   drivers: {
@@ -10,8 +10,8 @@ const service = createService({
       oneOrNone: id => Task.of(Maybe.of(id)),
       any: () => Task.of(['1', '2', '3']),
     },
-    emitEvent: always(identity),
   },
+  emitEvent: always(identity),
 });
 
 describe('Data transaction service', () => {

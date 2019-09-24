@@ -71,11 +71,14 @@ const updateCandlesLoop = (logTask, pg, tableName) => {
     pg.tx(t =>
       t
         .batch([
-          t.any(selectLastExchangeTx()),
-          t.any(selectLastCandle(tableName)),
+          t.oneOrNone(selectLastExchangeTx()),
+          t.oneOrNone(selectLastCandle(tableName)),
         ])
         .then(([lastTx, candle]) => {
-          const startHeight = getStartBlock(head(lastTx), head(candle));
+          if (!lastTx) {
+            return new Date();
+          }
+          const startHeight = getStartBlock(lastTx, candle);
           return t
             .one(selectMinTimestampFromHeight(startHeight))
             .then(row => row.time_stamp);

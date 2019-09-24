@@ -2,28 +2,25 @@ const Joi = require('../../utils/validation/joi');
 
 const limitMaximum = 1000;
 
-const inputGet = Joi.object().keys({
+const pair = Joi.object().keys({
   amountAsset: Joi.string()
     .base58()
     .required(),
   priceAsset: Joi.string()
     .base58()
     .required(),
-  matcher: Joi.string(),
 });
 
+const inputGet = Joi.object()
+  .keys({
+    pair,
+    matcher: Joi.string().required(),
+  })
+  .required();
+
 const inputMget = Joi.object().keys({
-  pairs: Joi.array().items(
-    Joi.object().keys({
-      amountAsset: Joi.string()
-        .base58()
-        .required(),
-      priceAsset: Joi.string()
-        .base58()
-        .required(),
-    })
-  ),
-  matcher: Joi.string(),
+  pairs: Joi.array().items(pair),
+  matcher: Joi.string().required(),
 });
 
 const inputSearch = Joi.object()

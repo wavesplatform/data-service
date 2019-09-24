@@ -2,6 +2,7 @@ import * as knex from 'knex';
 import { compose } from 'ramda';
 import { columns } from './common';
 import { searchAssets } from './searchAssets';
+import { AssetsSearchRequest, SearchByTicker } from '../types';
 
 const pg = knex({ client: 'pg' });
 
@@ -10,41 +11,32 @@ const getAssetIndex = (asset_id: string) =>
     .column('rn')
     .where('asset_id', asset_id);
 
-export const mget = (ids: number[]): string =>
+export const mget = (ids: string[]): string =>
   pg('assets')
     .select(columns)
     .whereIn('asset_id', ids)
     .toString();
 
-export const get = (id: number): string => mget([id]);
+export const get = (id: string): string => mget([id]);
 
-export const search = ({
-  ticker,
-  search,
-  after,
-  limit,
-}: {
-  ticker: string;
-  search: string;
-  after: string;
-  limit: number;
-}): string => {
-  const filter = (q: knex.QueryBuilder) => {
-    if (ticker === '*') return q.whereNotNull('ticker');
-    else return q.where('ticker', ticker);
-  };
+export const search = (req: AssetsSearchRequest): string => {
+  const isSearchByTicker = (asr: AssetsSearchRequest): asr is SearchByTicker =>
+    typeof asr.ticker !== 'undefined';
 
-  if (typeof ticker !== 'undefined') {
+  if (isSearchByTicker(req)) {
     return compose(
       (q: knex.QueryBuilder) => q.toString(),
-      filter
+      (q: knex.QueryBuilder) =>
+        req.ticker === '*'
+          ? q.whereNotNull('ticker')
+          : q.where('ticker', req.ticker)
     )(pg('assets').select(columns));
   } else {
     return compose(
       (q: knex.QueryBuilder) => q.toString(),
-      (q: knex.QueryBuilder) => (limit ? q.clone().limit(limit) : q),
+      (q: knex.QueryBuilder) => q.clone().limit(req.limit),
       (q: knex.QueryBuilder) =>
-        after ? q.clone().where('rn', '>', getAssetIndex(after)) : q
-    )(searchAssets(search));
+        req.after ? q.clone().where('rn', '>', getAssetIndex(req.after)) : q
+    )(searchAssets(req.search));
   }
 };

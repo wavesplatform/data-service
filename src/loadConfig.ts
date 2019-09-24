@@ -18,8 +18,11 @@ export type ServerConfig = {
   port: number;
 };
 
-export type DefaultMatcherConfig = {
-  defaultMatcher: string;
+export type MatcherConfig = {
+  matcher: {
+    settingsURL: string;
+    defaultMatcherAddress: string;
+  };
 };
 
 export type DefaultConfig = PostgresConfig & ServerConfig & LoggerConfig;
@@ -27,17 +30,15 @@ export type DefaultConfig = PostgresConfig & ServerConfig & LoggerConfig;
 export type DataServiceConfig = PostgresConfig &
   ServerConfig &
   LoggerConfig &
-  DefaultMatcherConfig;
+  MatcherConfig;
 
-const envVariables = ['PGHOST', 'PGDATABASE', 'PGUSER', 'PGPASSWORD'];
-
-const guard = <T>(name: string, val?: T): T => {
-  if (typeof val === 'undefined') {
-    throw new Error('config value ' + name + ' should be defined');
-  }
-
-  return val;
-};
+const envVariables = [
+  'PGHOST',
+  'PGDATABASE',
+  'PGUSER',
+  'PGPASSWORD',
+  'DEFAULT_MATCHER',
+];
 
 export const loadDefaultConfig = (): DefaultConfig => {
   // assert all necessary env vars are set
@@ -59,7 +60,12 @@ export const loadDefaultConfig = (): DefaultConfig => {
 
 const load = (): DataServiceConfig => ({
   ...loadDefaultConfig(),
-  defaultMatcher: guard('DEFAULT_MATCHER', process.env.DEFAULT_MATCHER),
+  matcher: {
+    settingsURL:
+      process.env.MATCHER_SETTINGS_URL ||
+      'https://matcher.wavesplatform.com/matcher/settings',
+    defaultMatcherAddress: process.env.DEFAULT_MATCHER || '',
+  },
 });
 
 export const loadConfig = memoizeWith(always('config'), load);

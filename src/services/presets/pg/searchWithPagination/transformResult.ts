@@ -1,8 +1,9 @@
 import { compose, last, take } from 'ramda';
 
 import { Serializable, List, list } from '../../../../types';
-import { encode, Cursor } from '../../../_common/pagination/cursor';
-import { RequestWithCursor, WithSortOrder, WithLimit } from '.';
+import { WithSortOrder, WithLimit } from '../../../_common';
+import { Cursor, RequestWithCursor } from '../../../_common/pagination';
+import { encode } from '../../../_common/pagination/cursor';
 
 type ResponseMeta = {
   isLastPage?: boolean;

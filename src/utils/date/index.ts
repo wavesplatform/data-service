@@ -37,7 +37,10 @@ const roundDown = (x: number) => Math.floor(x);
 const defaultRound = (x: number) => Math.round(x);
 
 const roundTo = curry(
-  (roundFn: RoundFunction, interval: Interval, date: Date): Date => {
+  (roundFn: RoundFunction, interval: Interval | null, date: Date): Date => {
+    if (!interval) {
+      throw new Error('Invalid Interval');
+    }
     let newDate = new Date(date);
 
     switch (interval.unit) {

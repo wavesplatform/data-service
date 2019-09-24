@@ -1,6 +1,7 @@
 const Joi = require('../../../../utils/validation/joi');
 
-const commonFilters = require('../../../presets/pg/searchWithPagination/commonFilterSchemas').default;
+const commonFilters = require('../../../presets/pg/searchWithPagination/commonFilterSchemas')
+  .default;
 
 const result = Joi.object().keys({
   tx_type: Joi.number()
@@ -16,8 +17,6 @@ const result = Joi.object().keys({
 const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
-
-    sender: Joi.string(),
   })
   .required();
 

@@ -30,7 +30,7 @@ module.exports = [
     p_dec: 6
   },
   {
-    time_start: '2017-11-03T14:03:00.000Z',
+    time_start: '2017-12-03T14:03:00.000Z',
     open: BigNumber(0.01),
     close: BigNumber(0.0001),
     low: BigNumber(1e-8),

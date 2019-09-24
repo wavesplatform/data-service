@@ -1,100 +1,85 @@
 import { compose, identity } from 'ramda';
 
+import { CommonServiceDependencies } from '../..';
+import {
+  transaction,
+  TransactionInfo,
+  Transaction,
+  List,
+  Service,
+} from '../../../types';
 import { get, mget, search } from '../../_common/createResolver';
-
+import { CommonFilters } from '../_common/types';
 import { inputGet } from '../../presets/pg/getById/inputSchema';
 import { inputMget } from '../../presets/pg/mgetByIds/inputSchema';
-
-// validation
 import { validateInput, validateResult } from '../../presets/validation';
-import {
-  result as resultSchema,
-  inputSearch as inputSearchSchema,
-} from './schema';
-import { List, Serializable } from '../../../types';
-
-import pgData from './pg';
-import { PgDriver } from '../../../db/driver';
-
 import { transformResults as transformResultGet } from '../../presets/pg/getById/transformResult';
 import { transformResults as transformResultMget } from '../../presets/pg/mgetByIds/transformResult';
 import { transformInput as transformInputSearch } from '../../presets/pg/searchWithPagination/transformInput';
 import { transformResults as transformResultSearch } from '../../presets/pg/searchWithPagination/transformResult';
-import transformTxInfo from './transformTxInfo';
-import { EmitEvent } from './../../_common/createResolver/types';
+
+import pgData from './pg';
+import {
+  result as resultSchema,
+  inputSearch as inputSearchSchema,
+} from './schema';
+import * as transformTxInfo from './transformTxInfo';
 import { RawInvokeScriptTx, InvokeScriptTx } from './types';
-import { toSerializable } from '../../../types/serialization';
 
 const createServiceName = (type: string) => `transactions.invokeScript.${type}`;
 
-const transaction = (data?: InvokeScriptTx) =>
-  toSerializable('transaction', data || null);
+type InvokeScriptTxsSearchRequest = CommonFilters &
+  Partial<{
+    dapp: string;
+    function: string;
+  }>;
 
-module.exports = ({
+export type InvokeScriptTxsService = Service<
+  string,
+  string[],
+  InvokeScriptTxsSearchRequest,
+  Transaction
+>;
+
+export default ({
   drivers: { pg },
   emitEvent,
-}: {
-  drivers: { pg: PgDriver };
-  emitEvent: EmitEvent;
-}) => {
+}: CommonServiceDependencies): InvokeScriptTxsService => {
   return {
-    get: get<
-      string,
-      string,
-      RawInvokeScriptTx,
-      Serializable<string, InvokeScriptTx | null>
-    >({
+    get: get<string, string, RawInvokeScriptTx, Transaction>({
       transformInput: identity,
       transformResult: transformResultGet<
         string,
         RawInvokeScriptTx,
         InvokeScriptTx,
-        Serializable<'transaction', InvokeScriptTx | null>
+        Transaction
       >(transaction)(transformTxInfo),
       validateInput: validateInput<string>(inputGet, createServiceName('get')),
       validateResult: validateResult<RawInvokeScriptTx>(
         resultSchema,
         createServiceName('get')
       ),
-      dbQuery: pgData.get,
-    })({ db: pg, emitEvent }),
+      getData: pgData.get(pg),
+      emitEvent,
+    }),
 
-    mget: mget<
-      string[],
-      string[],
-      RawInvokeScriptTx,
-      List<Serializable<string, InvokeScriptTx | null>>
-    >({
+    mget: mget<string[], string[], RawInvokeScriptTx, List<Transaction>>({
       transformInput: identity,
       transformResult: transformResultMget<
         string[],
         RawInvokeScriptTx,
-        InvokeScriptTx,
-        Serializable<'transaction', InvokeScriptTx | null>
+        TransactionInfo,
+        Transaction
       >(transaction)(transformTxInfo),
-      validateInput: validateInput<string[]>(
-        inputMget,
-        createServiceName('mget')
-      ),
-      validateResult: validateResult<RawInvokeScriptTx>(
-        resultSchema,
-        createServiceName('mget')
-      ),
-      dbQuery: pgData.mget,
-    })({ db: pg, emitEvent }),
+      validateInput: validateInput(inputMget, createServiceName('mget')),
+      validateResult: validateResult(resultSchema, createServiceName('mget')),
+      getData: pgData.mget(pg),
+      emitEvent,
+    }),
 
-    search: search<
-      any,
-      any,
-      RawInvokeScriptTx,
-      List<Serializable<string, InvokeScriptTx | null>>
-    >({
+    search: search<any, any, RawInvokeScriptTx, List<Transaction>>({
       transformInput: transformInputSearch,
-      transformResult: transformResultSearch<
-        any,
-        RawInvokeScriptTx,
-        Serializable<'transaction', InvokeScriptTx | null>
-      >(
+      transformResult: transformResultSearch(
         compose(
           transaction,
           transformTxInfo
@@ -108,7 +93,8 @@ module.exports = ({
         resultSchema,
         createServiceName('search')
       ),
-      dbQuery: pgData.search,
-    })({ db: pg, emitEvent }),
+      getData: pgData.search(pg),
+      emitEvent,
+    }),
   };
 };

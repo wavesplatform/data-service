@@ -1,18 +1,15 @@
 openapi: 3.0.0
 info:
-  version: 0.23.0
+  version: 0.24.0
   title: Waves Data Service
-  description: >-
-    This is a a public Waves Data Services API documentation. The goal of the
-    API is to provide a simple and convenient way to get data from Waves
-    blockchain.
+  description: This is a a public Waves Data Services API documentation. The goal of the API is to provide a simple and convenient way to get data from Waves blockchain.
 servers:
   - url: /v0
 tags:
   - name: assets
     description: 'Asset info: ticker, name, decimals, issuer, etc.'
   - name: candles
-    description: 'Candles'
+    description: Candles
   - name: pairs
     description: 'DEX volume, change24, last trade price'
   - name: transactions
@@ -21,6 +18,8 @@ tags:
     description: Get aliases by name or by address
   - name: info
     description: 'Service info: version, etc.'
+  - name: matcher
+    description: 'Candles, pairs and other trading endpoints'
 paths:
   '/assets/{id}':
     get:
@@ -70,7 +69,7 @@ paths:
           name: search
           description: 'Assets prefix-search by the query in asset names, tickers, id.'
           required: false
-          example: 'bitc'
+          example: bitc
           schema:
             type: string
         - in: query
@@ -101,7 +100,7 @@ paths:
     get:
       tags:
         - candles
-      summary: 'Get candles by amount and price assets. Maximum amount of candles in response – 1440.'
+      summary: Get candles by amount and price assets. Maximum amount of candles in response – 1440.
       operationId: getCandles
       parameters:
         - name: amountAsset
@@ -141,7 +140,7 @@ paths:
             type: string
         - in: query
           name: matcher
-          description: 'Matcher address'
+          description: Matcher address
           schema:
             type: string
       responses:
@@ -153,7 +152,6 @@ paths:
                 $ref: '#/components/schemas/ListOfCandle'
         '404':
           description: Candle not found
-          
   '/pairs/{amountAsset}/{priceAsset}':
     get:
       tags:
@@ -175,7 +173,7 @@ paths:
             type: string
         - in: query
           name: matcher
-          description: 'Matcher address'
+          description: Matcher address
           schema:
             type: string
       responses:
@@ -191,9 +189,7 @@ paths:
     get:
       tags:
         - pairs
-      summary: 
-        1) Get list of pairs info by serialized pairs list;
-        2) Get all list of pairs info by limit (sort by volume in WAVES)
+      summary: 1) Get list of pairs info by serialized pairs list; 2) Get all list of pairs info by limit (sort by volume in WAVES)
       operationId: getPairsListAll
       parameters:
         - name: pairs
@@ -208,7 +204,7 @@ paths:
           name: search_by_asset
           description: 'For searching pairs, that have the `search_by_asset` in asset names, tickers, id of one asset of the pair.'
           required: false
-          example: 'bitc'
+          example: bitc
           schema:
             type: string
         - in: query
@@ -217,19 +213,19 @@ paths:
           required: false
           schema:
             type: array
-            items: 
+            items:
               type: string
         - in: query
           name: match_exactly
-          description: 'Whether to search assets of pairs exactly or not. Parameter position is corresponds to asset position.'
+          description: Whether to search assets of pairs exactly or not. Parameter position is corresponds to asset position.
           required: false
           schema:
             type: array
-            items: 
+            items:
               type: boolean
         - in: query
           name: matcher
-          description: 'Matcher address'
+          description: Matcher address
           schema:
             type: string
         - name: limit
@@ -278,21 +274,21 @@ paths:
                   - $ref: '#/components/schemas/TxSetAssetScript'
         '404':
           description: Transaction not found
-  '/transactions/all':
+  /transactions/all:
     get:
       tags:
         - transactions
-      summary: "Get a list of transactions by applying filters"
+      summary: Get a list of transactions by applying filters
       operationId: searchTxsAll
       parameters:
         - in: query
           name: sender
-          description: "Address-sender of the transaction"
+          description: Address-sender of the transaction
           schema:
             type: string
         - in: query
           name: timeStart
-          description: "Time range filter, start. Defaults to first transaction's time_stamp in db."
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db.'
           schema:
             oneOf:
               - type: string
@@ -308,15 +304,17 @@ paths:
               - type: number
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
           schema:
             type: string
         - in: query
           name: sort
-          description: "Sort order. Gonna be rewritten by cursor's sort if present."
+          description: Sort order. Gonna be rewritten by cursor's sort if present.
           schema:
             type: string
-            enum: [asc, desc]
+            enum:
+              - asc
+              - desc
             default: desc
         - in: query
           name: limit
@@ -328,8 +326,7 @@ paths:
             default: 100
       responses:
         '200':
-          description: >-
-            List of transactions satisfying provided filters
+          description: List of transactions satisfying provided filters
           content:
             application/json:
               schema:
@@ -356,16 +353,16 @@ paths:
                 $ref: '#/components/schemas/TxGenesis'
         '404':
           description: Transaction not found
-  '/transactions/genesis':
+  /transactions/genesis:
     get:
       tags:
         - transactions
-      summary: "Get a list of genesis transactions by applying filters"
+      summary: Get a list of genesis transactions by applying filters
       operationId: searchTxsGenesis
       parameters:
         - in: query
           name: timeStart
-          description: "Time range filter, start. Defaults to first transaction's time_stamp in db."
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db.'
           schema:
             oneOf:
               - type: string
@@ -381,20 +378,22 @@ paths:
               - type: number
         - in: query
           name: recipient
-          description: "Search transactions by recipient address"
+          description: Search transactions by recipient address
           schema:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
           schema:
             type: string
         - in: query
           name: sort
-          description: "Sort order. Gonna be rewritten by cursor's sort if present."
+          description: Sort order. Gonna be rewritten by cursor's sort if present.
           schema:
             type: string
-            enum: [asc, desc]
+            enum:
+              - asc
+              - desc
             default: desc
         - in: query
           name: limit
@@ -406,8 +405,7 @@ paths:
             default: 100
       responses:
         '200':
-          description: >-
-            List of genesis transactions satisfying provided filters
+          description: List of genesis transactions satisfying provided filters
           content:
             application/json:
               schema:
@@ -434,21 +432,21 @@ paths:
                 $ref: '#/components/schemas/TxPayment'
         '404':
           description: Transaction not found
-  '/transactions/payment':
+  /transactions/payment:
     get:
       tags:
         - transactions
-      summary: "Get a list of payment transactions by applying filters"
+      summary: Get a list of payment transactions by applying filters
       operationId: searchTxsSend
       parameters:
         - in: query
           name: sender
-          description: "Address-sender of the transaction"
+          description: Address-sender of the transaction
           schema:
             type: string
         - in: query
           name: timeStart
-          description: "Time range filter, start. Defaults to first transaction's time_stamp in db."
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db.'
           schema:
             oneOf:
               - type: string
@@ -464,20 +462,22 @@ paths:
               - type: number
         - in: query
           name: recipient
-          description: "Search transactions by recipient address"
+          description: Search transactions by recipient address
           schema:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
           schema:
             type: string
         - in: query
           name: sort
-          description: "Sort order. Gonna be rewritten by cursor's sort if present."
+          description: Sort order. Gonna be rewritten by cursor's sort if present.
           schema:
             type: string
-            enum: [asc, desc]
+            enum:
+              - asc
+              - desc
             default: desc
         - in: query
           name: limit
@@ -489,8 +489,7 @@ paths:
             default: 100
       responses:
         '200':
-          description: >-
-            List of payment transactions satisfying provided filters
+          description: List of payment transactions satisfying provided filters
           content:
             application/json:
               schema:
@@ -517,21 +516,21 @@ paths:
                 $ref: '#/components/schemas/TxIssue'
         '404':
           description: Transaction not found
-  '/transactions/issue':
+  /transactions/issue:
     get:
       tags:
         - transactions
-      summary: "Get a list of issue transactions by applying filters"
+      summary: Get a list of issue transactions by applying filters
       operationId: searchTxsIssue
       parameters:
         - in: query
           name: sender
-          description: "Address-sender of the transaction"
+          description: Address-sender of the transaction
           schema:
             type: string
         - in: query
           name: timeStart
-          description: "Time range filter, start. Defaults to first transaction's time_stamp in db."
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db.'
           schema:
             oneOf:
               - type: string
@@ -547,15 +546,17 @@ paths:
               - type: number
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
           schema:
             type: string
         - in: query
           name: sort
-          description: "Sort order. Gonna be rewritten by cursor's sort if present."
+          description: Sort order. Gonna be rewritten by cursor's sort if present.
           schema:
             type: string
-            enum: [asc, desc]
+            enum:
+              - asc
+              - desc
             default: desc
         - in: query
           name: limit
@@ -567,18 +568,17 @@ paths:
             default: 100
         - in: query
           name: assetId
-          description: "Filter transactions by assetId"
+          description: Filter transactions by assetId
           schema:
             type: string
         - in: query
           name: script
-          description: "Filter transactions by script. Supports only exact match. Needs to be url-encoded!"
+          description: Filter transactions by script. Supports only exact match. Needs to be url-encoded!
           schema:
             type: string
       responses:
         '200':
-          description: >-
-            List of issue transactions satisfying provided filters
+          description: List of issue transactions satisfying provided filters
           content:
             application/json:
               schema:
@@ -605,21 +605,21 @@ paths:
                 $ref: '#/components/schemas/TxTransfer'
         '404':
           description: Transaction not found
-  '/transactions/transfer':
+  /transactions/transfer:
     get:
       tags:
         - transactions
-      summary: "Get a list of transfer transactions by applying filters"
+      summary: Get a list of transfer transactions by applying filters
       operationId: searchTxsTransfer
       parameters:
         - in: query
           name: sender
-          description: "Address-sender of the transaction"
+          description: Address-sender of the transaction
           schema:
             type: string
         - in: query
           name: timeStart
-          description: "Time range filter, start. Defaults to first transaction's time_stamp in db."
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db.'
           schema:
             oneOf:
               - type: string
@@ -635,25 +635,27 @@ paths:
               - type: number
         - in: query
           name: recipient
-          description: "Search transactions by recipient address"
+          description: Search transactions by recipient address
           schema:
             type: string
         - in: query
           name: assetId
-          description: "Filter transactions by assetId"
+          description: Filter transactions by assetId
           schema:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
           schema:
             type: string
         - in: query
           name: sort
-          description: "Sort order. Gonna be rewritten by cursor's sort if present."
+          description: Sort order. Gonna be rewritten by cursor's sort if present.
           schema:
             type: string
-            enum: [asc, desc]
+            enum:
+              - asc
+              - desc
             default: desc
         - in: query
           name: limit
@@ -665,8 +667,7 @@ paths:
             default: 100
       responses:
         '200':
-          description: >-
-            List of transfer transactions satisfying provided filters
+          description: List of transfer transactions satisfying provided filters
           content:
             application/json:
               schema:
@@ -693,21 +694,21 @@ paths:
                 $ref: '#/components/schemas/TxReissue'
         '404':
           description: Transaction not found
-  '/transactions/reissue':
+  /transactions/reissue:
     get:
       tags:
         - transactions
-      summary: "Get a list of reissue transactions by applying filters"
+      summary: Get a list of reissue transactions by applying filters
       operationId: searchTxsReissue
       parameters:
         - in: query
           name: sender
-          description: "Address-sender of the transaction"
+          description: Address-sender of the transaction
           schema:
             type: string
         - in: query
           name: timeStart
-          description: "Time range filter, start. Defaults to first transaction's time_stamp in db."
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db.'
           schema:
             oneOf:
               - type: string
@@ -723,20 +724,22 @@ paths:
               - type: number
         - in: query
           name: recipient
-          description: "Search transactions by recipient address"
+          description: Search transactions by recipient address
           schema:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
           schema:
             type: string
         - in: query
           name: sort
-          description: "Sort order. Gonna be rewritten by cursor's sort if present."
+          description: Sort order. Gonna be rewritten by cursor's sort if present.
           schema:
             type: string
-            enum: [asc, desc]
+            enum:
+              - asc
+              - desc
             default: desc
         - in: query
           name: limit
@@ -748,13 +751,12 @@ paths:
             default: 100
         - in: query
           name: assetId
-          description: "Filter transactions by assetId"
+          description: Filter transactions by assetId
           schema:
             type: string
       responses:
         '200':
-          description: >-
-            List of reissue transactions satisfying provided filters
+          description: List of reissue transactions satisfying provided filters
           content:
             application/json:
               schema:
@@ -781,21 +783,21 @@ paths:
                 $ref: '#/components/schemas/TxBurn'
         '404':
           description: Transaction not found
-  '/transactions/burn':
+  /transactions/burn:
     get:
       tags:
         - transactions
-      summary: "Get a list of burn transactions by applying filters"
+      summary: Get a list of burn transactions by applying filters
       operationId: searchTxsBurn
       parameters:
         - in: query
           name: sender
-          description: "Address-sender of the transaction"
+          description: Address-sender of the transaction
           schema:
             type: string
         - in: query
           name: timeStart
-          description: "Time range filter, start. Defaults to first transaction's time_stamp in db."
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db.'
           schema:
             oneOf:
               - type: string
@@ -811,20 +813,22 @@ paths:
               - type: number
         - in: query
           name: recipient
-          description: "Search transactions by recipient address"
+          description: Search transactions by recipient address
           schema:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
           schema:
             type: string
         - in: query
           name: sort
-          description: "Sort order. Gonna be rewritten by cursor's sort if present."
+          description: Sort order. Gonna be rewritten by cursor's sort if present.
           schema:
             type: string
-            enum: [asc, desc]
+            enum:
+              - asc
+              - desc
             default: desc
         - in: query
           name: limit
@@ -836,13 +840,12 @@ paths:
             default: 100
         - in: query
           name: assetId
-          description: "Filter transactions by assetId"
+          description: Filter transactions by assetId
           schema:
             type: string
       responses:
         '200':
-          description: >-
-            List of burn transactions satisfying provided filters
+          description: List of burn transactions satisfying provided filters
           content:
             application/json:
               schema:
@@ -869,7 +872,7 @@ paths:
                 $ref: '#/components/schemas/TxExchange'
         '404':
           description: Transaction not found
-  '/transactions/exchange':
+  /transactions/exchange:
     get:
       tags:
         - transactions
@@ -893,7 +896,7 @@ paths:
             type: string
         - in: query
           name: timeStart
-          description: "Time range filter, start. Defaults to first transaction's time_stamp in db."
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db.'
           schema:
             oneOf:
               - type: string
@@ -919,15 +922,17 @@ paths:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
           schema:
             type: string
         - in: query
           name: sort
-          description: "Sort order. Gonna be rewritten by cursor's sort if present."
+          description: Sort order. Gonna be rewritten by cursor's sort if present.
           schema:
             type: string
-            enum: [asc, desc]
+            enum:
+              - asc
+              - desc
             default: desc
         - in: query
           name: limit
@@ -939,9 +944,7 @@ paths:
             default: 100
       responses:
         '200':
-          description: >-
-            List of exchange transactions satisfy provided filters in descending
-            order by timestamp
+          description: List of exchange transactions satisfy provided filters in descending order by timestamp
           content:
             application/json:
               schema:
@@ -968,21 +971,21 @@ paths:
                 $ref: '#/components/schemas/TxLease'
         '404':
           description: Transaction not found
-  '/transactions/lease':
+  /transactions/lease:
     get:
       tags:
         - transactions
-      summary: "Get a list of lease transactions by applying filters"
+      summary: Get a list of lease transactions by applying filters
       operationId: searchTxsLease
       parameters:
         - in: query
           name: sender
-          description: "Address-sender of the transaction"
+          description: Address-sender of the transaction
           schema:
             type: string
         - in: query
           name: timeStart
-          description: "Time range filter, start. Defaults to first transaction's time_stamp in db."
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db.'
           schema:
             oneOf:
               - type: string
@@ -998,20 +1001,22 @@ paths:
               - type: number
         - in: query
           name: recipient
-          description: "Search transactions by recipient address"
+          description: Search transactions by recipient address
           schema:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
           schema:
             type: string
         - in: query
           name: sort
-          description: "Sort order. Gonna be rewritten by cursor's sort if present."
+          description: Sort order. Gonna be rewritten by cursor's sort if present.
           schema:
             type: string
-            enum: [asc, desc]
+            enum:
+              - asc
+              - desc
             default: desc
         - in: query
           name: limit
@@ -1023,8 +1028,7 @@ paths:
             default: 100
       responses:
         '200':
-          description: >-
-            List of lease transactions satisfying provided filters
+          description: List of lease transactions satisfying provided filters
           content:
             application/json:
               schema:
@@ -1051,21 +1055,21 @@ paths:
                 $ref: '#/components/schemas/TxLeaseCancel'
         '404':
           description: Transaction not found
-  '/transactions/lease-cancel':
+  /transactions/lease-cancel:
     get:
       tags:
         - transactions
-      summary: "Get a list of lease cancel transactions by applying filters"
+      summary: Get a list of lease cancel transactions by applying filters
       operationId: searchTxsLeaseCancel
       parameters:
         - in: query
           name: sender
-          description: "Address-sender of the transaction"
+          description: Address-sender of the transaction
           schema:
             type: string
         - in: query
           name: timeStart
-          description: "Time range filter, start. Defaults to first transaction's time_stamp in db."
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db.'
           schema:
             oneOf:
               - type: string
@@ -1081,20 +1085,22 @@ paths:
               - type: number
         - in: query
           name: recipient
-          description: "A recipient of a lease cancelled by this tx"
+          description: A recipient of a lease cancelled by this tx
           schema:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
           schema:
             type: string
         - in: query
           name: sort
-          description: "Sort order. Gonna be rewritten by cursor's sort if present."
+          description: Sort order. Gonna be rewritten by cursor's sort if present.
           schema:
             type: string
-            enum: [asc, desc]
+            enum:
+              - asc
+              - desc
             default: desc
         - in: query
           name: limit
@@ -1106,8 +1112,7 @@ paths:
             default: 100
       responses:
         '200':
-          description: >-
-            List of lease cancel transactions satisfying provided filters
+          description: List of lease cancel transactions satisfying provided filters
           content:
             application/json:
               schema:
@@ -1134,21 +1139,21 @@ paths:
                 $ref: '#/components/schemas/TxAlias'
         '404':
           description: Transaction not found
-  '/transactions/alias':
+  /transactions/alias:
     get:
       tags:
         - transactions
-      summary: "Get a list of alias transactions by applying filters"
+      summary: Get a list of alias transactions by applying filters
       operationId: searchTxsAlias
       parameters:
         - in: query
           name: sender
-          description: "Address-sender of the transaction"
+          description: Address-sender of the transaction
           schema:
             type: string
         - in: query
           name: timeStart
-          description: "Time range filter, start. Defaults to first transaction's time_stamp in db."
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db.'
           schema:
             oneOf:
               - type: string
@@ -1164,15 +1169,17 @@ paths:
               - type: number
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
           schema:
             type: string
         - in: query
           name: sort
-          description: "Sort order. Gonna be rewritten by cursor's sort if present."
+          description: Sort order. Gonna be rewritten by cursor's sort if present.
           schema:
             type: string
-            enum: [asc, desc]
+            enum:
+              - asc
+              - desc
             default: desc
         - in: query
           name: limit
@@ -1184,8 +1191,7 @@ paths:
             default: 100
       responses:
         '200':
-          description: >-
-            List of alias transactions satisfying provided filters
+          description: List of alias transactions satisfying provided filters
           content:
             application/json:
               schema:
@@ -1212,21 +1218,21 @@ paths:
                 $ref: '#/components/schemas/TxMassTransfer'
         '404':
           description: Transaction not found
-  '/transactions/mass-transfer':
+  /transactions/mass-transfer:
     get:
       tags:
         - transactions
-      summary: "Get a list of mass-transfer transactions by applying filters"
+      summary: Get a list of mass-transfer transactions by applying filters
       operationId: searchTxsMassTransfer
       parameters:
         - in: query
           name: sender
-          description: "Address-sender of the transaction"
+          description: Address-sender of the transaction
           schema:
             type: string
         - in: query
           name: timeStart
-          description: "Time range filter, start. Defaults to first transaction's time_stamp in db."
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db.'
           schema:
             oneOf:
               - type: string
@@ -1242,25 +1248,27 @@ paths:
               - type: number
         - in: query
           name: recipient
-          description: "Search transactions by recipient address"
+          description: Search transactions by recipient address
           schema:
             type: string
         - in: query
           name: assetId
-          description: "Filter transactions by assetId"
+          description: Filter transactions by assetId
           schema:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
           schema:
             type: string
         - in: query
           name: sort
-          description: "Sort order. Gonna be rewritten by cursor's sort if present."
+          description: Sort order. Gonna be rewritten by cursor's sort if present.
           schema:
             type: string
-            enum: [asc, desc]
+            enum:
+              - asc
+              - desc
             default: desc
         - in: query
           name: limit
@@ -1272,8 +1280,7 @@ paths:
             default: 100
       responses:
         '200':
-          description: >-
-            List of mass-transfer transactions satisfying provided filters
+          description: List of mass-transfer transactions satisfying provided filters
           content:
             application/json:
               schema:
@@ -1300,21 +1307,21 @@ paths:
                 $ref: '#/components/schemas/TxData'
         '404':
           description: Transaction not found
-  '/transactions/data':
+  /transactions/data:
     get:
       tags:
         - transactions
-      summary: "Get a list of data transactions by applying filters"
+      summary: Get a list of data transactions by applying filters
       operationId: searchTxsData
       parameters:
         - in: query
           name: sender
-          description: "Address-sender of the transaction"
+          description: Address-sender of the transaction
           schema:
             type: string
         - in: query
           name: timeStart
-          description: "Time range filter, start. Defaults to first transaction's time_stamp in db."
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db.'
           schema:
             oneOf:
               - type: string
@@ -1330,12 +1337,12 @@ paths:
               - type: number
         - in: query
           name: key
-          description: "Search transactions by data-enties with given key"
+          description: Search transactions by data-enties with given key
           schema:
             type: string
         - in: query
           name: type
-          description: "Search transactions by data-enties with given data type"
+          description: Search transactions by data-enties with given data type
           schema:
             type: string
             enum:
@@ -1345,7 +1352,7 @@ paths:
               - binary
         - in: query
           name: value
-          description: "Search transactions by data-enties with given value. Can be used only together with `type` parameter"
+          description: Search transactions by data-enties with given value. Can be used only together with `type` parameter
           schema:
             oneOf:
               - type: string
@@ -1353,15 +1360,17 @@ paths:
               - type: number
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
           schema:
             type: string
         - in: query
           name: sort
-          description: "Sort order. Gonna be rewritten by cursor's sort if present."
+          description: Sort order. Gonna be rewritten by cursor's sort if present.
           schema:
             type: string
-            enum: [asc, desc]
+            enum:
+              - asc
+              - desc
             default: desc
         - in: query
           name: limit
@@ -1373,8 +1382,7 @@ paths:
             default: 100
       responses:
         '200':
-          description: >-
-            List of data transactions satisfying provided filters
+          description: List of data transactions satisfying provided filters
           content:
             application/json:
               schema:
@@ -1401,21 +1409,21 @@ paths:
                 $ref: '#/components/schemas/TxSponsorship'
         '404':
           description: Transaction not found
-  '/transactions/sponsorship':
+  /transactions/sponsorship:
     get:
       tags:
         - transactions
-      summary: "Get a list of sponsorship transactions by applying filters"
+      summary: Get a list of sponsorship transactions by applying filters
       operationId: searchTxsSponsorship
       parameters:
         - in: query
           name: sender
-          description: "Address-sender of the transaction"
+          description: Address-sender of the transaction
           schema:
             type: string
         - in: query
           name: timeStart
-          description: "Time range filter, start. Defaults to first transaction's time_stamp in db."
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db.'
           schema:
             oneOf:
               - type: string
@@ -1431,20 +1439,22 @@ paths:
               - type: number
         - in: query
           name: recipient
-          description: "Search transactions by recipient address"
+          description: Search transactions by recipient address
           schema:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
           schema:
             type: string
         - in: query
           name: sort
-          description: "Sort order. Gonna be rewritten by cursor's sort if present."
+          description: Sort order. Gonna be rewritten by cursor's sort if present.
           schema:
             type: string
-            enum: [asc, desc]
+            enum:
+              - asc
+              - desc
             default: desc
         - in: query
           name: limit
@@ -1456,8 +1466,7 @@ paths:
             default: 100
       responses:
         '200':
-          description: >-
-            List of sponsorship transactions satisfying provided filters
+          description: List of sponsorship transactions satisfying provided filters
           content:
             application/json:
               schema:
@@ -1484,21 +1493,21 @@ paths:
                 $ref: '#/components/schemas/TxSetScript'
         '404':
           description: Transaction not found
-  '/transactions/set-script':
+  /transactions/set-script:
     get:
       tags:
         - transactions
-      summary: "Get a list of Set script transactions by applying filters"
+      summary: Get a list of Set script transactions by applying filters
       operationId: searchTxsSetScript
       parameters:
         - in: query
           name: sender
-          description: "Address-sender of the transaction"
+          description: Address-sender of the transaction
           schema:
             type: string
         - in: query
           name: timeStart
-          description: "Time range filter, start. Defaults to first transaction's time_stamp in db."
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db.'
           schema:
             oneOf:
               - type: string
@@ -1514,20 +1523,22 @@ paths:
               - type: number
         - in: query
           name: script
-          description: "Search transactions by the script. Supports only exact match. Needs to be url-encoded!"
+          description: Search transactions by the script. Supports only exact match. Needs to be url-encoded!
           schema:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
           schema:
             type: string
         - in: query
           name: sort
-          description: "Sort order. Gonna be rewritten by cursor's sort if present."
+          description: Sort order. Gonna be rewritten by cursor's sort if present.
           schema:
             type: string
-            enum: [asc, desc]
+            enum:
+              - asc
+              - desc
             default: desc
         - in: query
           name: limit
@@ -1539,8 +1550,7 @@ paths:
             default: 100
       responses:
         '200':
-          description: >-
-            List of SetScript transactions satisfying provided filters
+          description: List of SetScript transactions satisfying provided filters
           content:
             application/json:
               schema:
@@ -1567,21 +1577,21 @@ paths:
                 $ref: '#/components/schemas/TxSetAssetScript'
         '404':
           description: Transaction not found
-  '/transactions/set-asset-script':
+  /transactions/set-asset-script:
     get:
       tags:
         - transactions
-      summary: "Get a list of Set asset script transactions by applying filters"
+      summary: Get a list of Set asset script transactions by applying filters
       operationId: searchTxsSetAssetScript
       parameters:
         - in: query
           name: sender
-          description: "Address-sender of the transaction"
+          description: Address-sender of the transaction
           schema:
             type: string
         - in: query
           name: timeStart
-          description: "Time range filter, start. Defaults to first transaction's time_stamp in db."
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db.'
           schema:
             oneOf:
               - type: string
@@ -1597,25 +1607,27 @@ paths:
               - type: number
         - in: query
           name: assetId
-          description: "Search transactions by the assetId."
+          description: Search transactions by the assetId.
           schema:
             type: string
         - in: query
           name: script
-          description: "Search transactions by the script. Supports only exact match. Needs to be url-encoded!"
+          description: Search transactions by the script. Supports only exact match. Needs to be url-encoded!
           schema:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
           schema:
             type: string
         - in: query
           name: sort
-          description: "Sort order. Gonna be rewritten by cursor's sort if present."
+          description: Sort order. Gonna be rewritten by cursor's sort if present.
           schema:
             type: string
-            enum: [asc, desc]
+            enum:
+              - asc
+              - desc
             default: desc
         - in: query
           name: limit
@@ -1627,8 +1639,7 @@ paths:
             default: 100
       responses:
         '200':
-          description: >-
-            List of SetAssetScript transactions satisfying provided filters
+          description: List of SetAssetScript transactions satisfying provided filters
           content:
             application/json:
               schema:
@@ -1655,21 +1666,21 @@ paths:
                 $ref: '#/components/schemas/TxInvokeScript'
         '404':
           description: Transaction not found
-  '/transactions/invoke-script':
+  /transactions/invoke-script:
     get:
       tags:
         - transactions
-      summary: "Get a list of Invoke script transactions by applying filters"
+      summary: Get a list of Invoke script transactions by applying filters
       operationId: searchTxsInvokeScript
       parameters:
         - in: query
           name: sender
-          description: "Address-sender of the transaction"
+          description: Address-sender of the transaction
           schema:
             type: string
         - in: query
           name: timeStart
-          description: "Time range filter, start. Defaults to first transaction's time_stamp in db."
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db.'
           schema:
             oneOf:
               - type: string
@@ -1685,25 +1696,27 @@ paths:
               - type: number
         - in: query
           name: dapp
-          description: "Search transactions by the dApp address. Supports only exact match."
+          description: Search transactions by the dApp address. Supports only exact match.
           schema:
             type: string
         - in: query
           name: function
-          description: "Search transactions by the called function name. Supports only exact match."
+          description: Search transactions by the called function name. Supports only exact match.
           schema:
             type: string
         - in: query
           name: after
-          description: "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+          description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
           schema:
             type: string
         - in: query
           name: sort
-          description: "Sort order. Gonna be rewritten by cursor's sort if present."
+          description: Sort order. Gonna be rewritten by cursor's sort if present.
           schema:
             type: string
-            enum: [asc, desc]
+            enum:
+              - asc
+              - desc
             default: desc
         - in: query
           name: limit
@@ -1715,8 +1728,7 @@ paths:
             default: 100
       responses:
         '200':
-          description: >-
-            List of InvokeScript transactions satisfying provided filters
+          description: List of InvokeScript transactions satisfying provided filters
           content:
             application/json:
               schema:
@@ -1736,29 +1748,29 @@ paths:
             type: string
       responses:
         '200':
-          description: Alias and address. Alias cam be broken (taken by several people), in which case `address` returns null.
+          description: 'Alias and address. Alias cam be broken (taken by several people), in which case `address` returns null.'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Alias'
         '404':
           description: Alias not found
-  '/aliases':
+  /aliases:
     get:
       tags:
         - aliases
-      summary: "Get a list of aliases for a given address"
+      summary: Get a list of aliases for a given address
       operationId: getAliasesForAddress
       parameters:
         - in: query
           name: address
-          description: "Address"
+          description: Address
           required: true
           schema:
             type: string
         - in: query
           name: showBroken
-          description: "Show broken aliases (taken by several people)"
+          description: Show broken aliases (taken by several people)
           required: false
           schema:
             type: boolean
@@ -1779,6 +1791,136 @@ paths:
       responses:
         '200':
           description: API current version
+  '/matcher/{matcher}/rates':
+    get:
+      tags:
+        - matcher
+      summary: Estimate assets relative assets rate for asset pairs at specific time
+      operationId: estimateRetes
+      parameters:
+        - name: matcher
+          in: path
+          description: Matcher address
+          required: true
+          schema:
+            type: string
+        - name: pairs
+          in: query
+          description: '`{amountAsset}/{priceAsset}` strings list'
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: timestamp
+          description: Time to estimate the rates at. Defaults to now.
+          schema:
+            oneOf:
+              - type: string
+                format: date-time
+              - type: number
+      responses:
+        '200':
+          description: Pair info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfRates'                
+  '/matcher/{matcher}/pairs/{amountAsset}/{priceAsset}':
+    get:
+      tags:
+        - matcher
+      summary: Get pair info by amount and price assets
+      operationId: matcherGetPair
+      parameters:
+        - name: matcher
+          in: path
+          description: Matcher address
+          required: true
+          schema:
+            type: string
+        - name: amountAsset
+          in: path
+          description: Asset ID of the amount asset
+          required: true
+          schema:
+            type: string
+        - name: priceAsset
+          in: path
+          description: Asset ID of the price asset
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Pair info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pair'
+        '400':
+          description: Throws whether assets order in pair is incorrect
+  '/matcher/{matcher}/pairs':
+    get:
+      tags:
+        - matcher
+      summary: 1) Get list of pairs info by serialized pairs list; 2) Get all list of pairs info by limit (sort by volume in WAVES)
+      operationId: matcherGetPairsListAll
+      parameters:
+        - in: path
+          name: matcher
+          description: Matcher address
+          required: true
+          schema:
+            type: string
+        - name: pairs
+          in: query
+          description: '`{amountAsset}/{priceAsset}` strings list'
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: search_by_asset
+          description: 'For searching pairs, that have the `search_by_asset` in asset names, tickers, id of one asset of the pair.'
+          required: false
+          example: bitc
+          schema:
+            type: string
+        - in: query
+          name: search_by_assets
+          description: 'For searching pairs, that have the `search_by_asset` in asset names, tickers, id of one asset of the pair.'
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: match_exactly
+          description: Whether to search assets of pairs exactly or not. Parameter position is corresponds to asset position.
+          required: false
+          schema:
+            type: array
+            items:
+              type: boolean
+        - name: limit
+          in: query
+          description: How many pairs to await in response.
+          required: false
+          schema:
+            type: number
+            minimum: 1
+            maximum: 1000
+            default: 100
+      responses:
+        '200':
+          description: List of Pairs info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfPair'
 components:
   schemas:
     Asset:
@@ -1891,7 +2033,7 @@ components:
       properties:
         id:
           type: string
-        sender:
+        orderSender:
           type: string
         senderPublicKey:
           type: string
@@ -2586,14 +2728,14 @@ components:
                             type: string
                       - type: object
                         properties:
-                          type: 
+                          type:
                             type: string
                             example: integer
                           value:
                             type: number
                       - type: object
                         properties:
-                          type: 
+                          type:
                             type: string
                             example: boolean
                           value:
@@ -2607,6 +2749,37 @@ components:
                     type: number
                   assetId:
                     type: string
+    Rate:
+      type: object
+      required:
+        - __type
+        - data
+      properties:
+        __type:
+          type: string
+          example: rate
+        data:
+          type: object
+          properties:
+            amountAsset:
+              type: string
+            priceAsset:
+              type: string
+            current:
+              type: number
+    ListOfRates:
+      type: object
+      required:
+        - __type
+        - data
+      properties:
+        __type:
+          type: string
+          example: list
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rate'
     ListOfAlias:
       type: object
       required:
@@ -2649,7 +2822,7 @@ components:
         lastCursor:
           type: string
         isLastPage:
-          type: boolean          
+          type: boolean
     ListOfPair:
       type: object
       required:
@@ -2694,7 +2867,7 @@ components:
               - $ref: '#/components/schemas/TxInvokeScript'
         lastCursor:
           type: string
-          example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          example: U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj
         isLastPage:
           type: boolean
     ListOfTxGenesis:
@@ -2712,9 +2885,9 @@ components:
             $ref: '#/components/schemas/TxGenesis'
         lastCursor:
           type: string
-          example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          example: U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj
         isLastPage:
-          type: boolean          
+          type: boolean
     ListOfTxPayment:
       type: object
       required:
@@ -2730,9 +2903,9 @@ components:
             $ref: '#/components/schemas/TxPayment'
         lastCursor:
           type: string
-          example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          example: U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj
         isLastPage:
-          type: boolean          
+          type: boolean
     ListOfTxIssue:
       type: object
       required:
@@ -2748,9 +2921,9 @@ components:
             $ref: '#/components/schemas/TxIssue'
         lastCursor:
           type: string
-          example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          example: U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj
         isLastPage:
-          type: boolean          
+          type: boolean
     ListOfTxTransfer:
       type: object
       required:
@@ -2766,9 +2939,9 @@ components:
             $ref: '#/components/schemas/TxTransfer'
         lastCursor:
           type: string
-          example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          example: U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj
         isLastPage:
-          type: boolean          
+          type: boolean
     ListOfTxReissue:
       type: object
       required:
@@ -2784,9 +2957,9 @@ components:
             $ref: '#/components/schemas/TxReissue'
         lastCursor:
           type: string
-          example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          example: U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj
         isLastPage:
-          type: boolean          
+          type: boolean
     ListOfTxBurn:
       type: object
       required:
@@ -2802,9 +2975,9 @@ components:
             $ref: '#/components/schemas/TxBurn'
         lastCursor:
           type: string
-          example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          example: U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj
         isLastPage:
-          type: boolean          
+          type: boolean
     ListOfTxExchange:
       type: object
       required:
@@ -2820,9 +2993,9 @@ components:
             $ref: '#/components/schemas/TxExchange'
         lastCursor:
           type: string
-          example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          example: U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj
         isLastPage:
-          type: boolean          
+          type: boolean
     ListOfTxLease:
       type: object
       required:
@@ -2838,9 +3011,9 @@ components:
             $ref: '#/components/schemas/TxLease'
         lastCursor:
           type: string
-          example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          example: U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj
         isLastPage:
-          type: boolean          
+          type: boolean
     ListOfTxLeaseCancel:
       type: object
       required:
@@ -2856,9 +3029,9 @@ components:
             $ref: '#/components/schemas/TxLeaseCancel'
         lastCursor:
           type: string
-          example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          example: U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj
         isLastPage:
-          type: boolean          
+          type: boolean
     ListOfTxAlias:
       type: object
       required:
@@ -2874,9 +3047,9 @@ components:
             $ref: '#/components/schemas/TxAlias'
         lastCursor:
           type: string
-          example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          example: U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj
         isLastPage:
-          type: boolean          
+          type: boolean
     ListOfTxMassTransfer:
       type: object
       required:
@@ -2892,9 +3065,9 @@ components:
             $ref: '#/components/schemas/TxMassTransfer'
         lastCursor:
           type: string
-          example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          example: U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj
         isLastPage:
-          type: boolean          
+          type: boolean
     ListOfTxData:
       type: object
       required:
@@ -2910,9 +3083,9 @@ components:
             $ref: '#/components/schemas/TxData'
         lastCursor:
           type: string
-          example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          example: U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj
         isLastPage:
-          type: boolean          
+          type: boolean
     ListOfTxSponsorship:
       type: object
       required:
@@ -2928,9 +3101,9 @@ components:
             $ref: '#/components/schemas/TxSponsorship'
         lastCursor:
           type: string
-          example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          example: U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj
         isLastPage:
-          type: boolean          
+          type: boolean
     ListOfTxSetScript:
       type: object
       required:
@@ -2946,9 +3119,9 @@ components:
             $ref: '#/components/schemas/TxSetScript'
         lastCursor:
           type: string
-          example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          example: U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj
         isLastPage:
-          type: boolean          
+          type: boolean
     ListOfTxSetAssetScript:
       type: object
       required:
@@ -2964,7 +3137,7 @@ components:
             $ref: '#/components/schemas/TxSetAssetScript'
         lastCursor:
           type: string
-          example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          example: U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj
         isLastPage:
           type: boolean
     ListOfTxInvokeScript:
@@ -2982,6 +3155,6 @@ components:
             $ref: '#/components/schemas/TxInvokeScript'
         lastCursor:
           type: string
-          example: "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          example: U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj
         isLastPage:
           type: boolean

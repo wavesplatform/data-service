@@ -23,11 +23,11 @@ const byOrder = curryN(
 module.exports = {
   filters: {
     ...commonFilters,
+    sender: bySender,
     matcher: where('t.sender'),
     amountAsset: where('t.amount_asset'),
     priceAsset: where('t.price_asset'),
     orderId: byOrder,
-    sender: bySender,
     sortOuter: s => q =>
       q
         .clone()
