@@ -36,7 +36,7 @@ const rateEstimateEndpoint = (
 
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
-    resolver: '/matchers/:matcher/pairs',
+    resolver: '/matchers/:matcher/rates',
     query,
   });
 
