@@ -1,4 +1,4 @@
-import { propEq, identity, zip } from 'ramda';
+import { propEq, identity } from 'ramda';
 import { of as taskOf } from 'folktale/concurrency/task';
 import { of as just, Maybe } from 'folktale/maybe';
 import { tap } from '../../utils/tap';
@@ -78,21 +78,29 @@ export default ({
       transformInput: identity,
       validateInput: validateInput(inputMget, SERVICE_NAME.MGET),
       getData: request => {
-        let results: Array<Maybe<AssetDbResponse>> = request.map(p =>
-          cache.get(p)
+        let results: Array<Maybe<AssetDbResponse>> = request.map(x =>
+          cache.get(x)
         );
 
-        const notCachedIndexes = results.filter(isEmpty).map((_, i) => i);
+        const notCachedIndexes = results.reduce<number[]>((acc, x, i) => {
+          if (isEmpty(x)) acc.push(i);
+          return acc;
+        }, []);
+
+        const notCachedAssetIds = notCachedIndexes.map(i => request[i]);
 
         return mgetByIdsPg<AssetDbResponse, string>({
           name: SERVICE_NAME.MGET,
           sql: sql.mget,
           matchRequestResult: propEq('asset_id'),
           pg,
-        })(notCachedIndexes.map(i => request[i])).map(fromDb => {
-          zip(fromDb, notCachedIndexes).forEach(
-            ([res, i]) => (results[i] = res)
-          );
+        })(notCachedAssetIds).map(fromDb => {
+          fromDb.forEach((assetInfo, index) => {
+            forEach(value => {
+              results[notCachedIndexes[index]] = assetInfo;
+              cache.set(notCachedAssetIds[index], value);
+            }, assetInfo);
+          });
           return results;
         });
       },
