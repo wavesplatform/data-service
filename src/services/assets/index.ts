@@ -95,12 +95,12 @@ export default ({
           matchRequestResult: propEq('asset_id'),
           pg,
         })(notCachedAssetIds).map(fromDb => {
-          fromDb.forEach((assetInfo, index) => {
+          fromDb.forEach((assetInfo, index) =>
             forEach(value => {
               results[notCachedIndexes[index]] = assetInfo;
               cache.set(notCachedAssetIds[index], value);
-            }, assetInfo);
-          });
+            }, assetInfo)
+          );
           return results;
         });
       },
