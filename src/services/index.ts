@@ -77,7 +77,7 @@ export type ServiceMesh = {
   aliases: AliasService;
   assets: AssetsService;
   candles: CandlesService;
-  matcher: {
+  matchers: {
     pairs: PairsService;
     candles: CandlesService;
     rates: ServiceMget<RateMgetParams, Rate>;
@@ -223,7 +223,7 @@ export default ({
         setAssetScript: setAssetScriptTxs,
         invokeScript: invokeScriptTxs,
       },
-      matcher: {
+      matchers: {
         rates,
         candles: candlesWithAsyncValidation,
         pairs: pairsWithAsyncValidation,

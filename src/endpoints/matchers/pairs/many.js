@@ -38,7 +38,7 @@ const filterParsers = {
 
 /**
  * Endpoint
- * @name /matcher/:matcher/pairs?pairs[]‌="{asset_id_1}/{asset_id_2}"&pairs[]="{asset_id_1}/{asset_id_2}" ...other params
+ * @name /matchers/:matcher/pairs?pairs[]‌="{asset_id_1}/{asset_id_2}"&pairs[]="{asset_id_1}/{asset_id_2}" ...other params
  */
 const pairsManyEndpoint = service => async ctx => {
   const { fromParams, query } = select(ctx);
@@ -47,7 +47,7 @@ const pairsManyEndpoint = service => async ctx => {
 
   ctx.eventBus.emit('ENDPOINT_HIT', {
     url: ctx.originalUrl,
-    resolver: '/pairs',
+    resolver: '/matchers/:matcher/pairs',
     query,
   });
 

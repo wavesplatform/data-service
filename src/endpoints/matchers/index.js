@@ -1,6 +1,6 @@
 const Router = require('koa-router');
 
-const subrouter = new Router({ prefix: '/matcher/:matcher' });
+const subrouter = new Router({ prefix: '/matchers/:matcher' });
 
 const createPairs = require('./pairs');
 const createCandles = require('./candles').default;

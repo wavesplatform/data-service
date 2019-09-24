@@ -7,7 +7,7 @@ import { parseFilterValues, timeStart, timeEnd } from '../../_common/filters';
 import { CandlesService } from '../../../services/candles';
 import { Context } from 'koa';
 
-const url = '/matcher/{matcher}/candles/:amountAsset/:priceAsset';
+const url = '/matchers/{matcher}/candles/:amountAsset/:priceAsset';
 
 const candlesSearch = (service: CandlesService) => async (ctx: Context) => {
   const { fromParams } = select(ctx);
