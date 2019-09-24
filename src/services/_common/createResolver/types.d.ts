@@ -21,7 +21,7 @@ type CommonResolverDependencies<
   ResRaw,
   ResTransformed
 > = {
-  validateInput: ValidateAsync<ValidationError, ReqRaw>;
+  validateInput: ValidateAsync<AppError, ReqRaw>;
   transformInput: (r: ReqRaw) => ReqTransformed;
   validateResult: ValidateSync<ResolverError, ResRaw>;
   emitEvent: EmitEvent;

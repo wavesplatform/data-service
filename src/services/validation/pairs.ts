@@ -5,13 +5,13 @@ import {
   rejected as taskRejected,
   of as taskOf,
 } from 'folktale/concurrency/task';
-import { ValidationError } from '../../errorHandling/index';
+import { ValidationError, AppError } from '../../errorHandling/index';
 import { zip } from 'ramda';
 
 export const validatePairs = (
   assetsMget: ServiceMget<string[], Asset>,
   pairOrderingService: PairOrderingService
-) => (matcher: string, pairs: AssetIdsPair[]): Task<ValidationError, void> => {
+) => (matcher: string, pairs: AssetIdsPair[]): Task<AppError, void> => {
   // correct order
   const incorrectPairs = pairs.filter(
     p =>
@@ -36,29 +36,19 @@ export const validatePairs = (
   });
   const assetIds = Array.from(assetIdsSet);
 
-  return assetsMget
-    .mget(assetIds)
-    .mapRejected(err =>
-      err.matchWith({
-        Db: () => new ValidationError('Failed to fetch assets'),
-        Resolver: () => new ValidationError('Failed to fetch assets'),
-        Init: () => new ValidationError('Failed to fetch assets'),
-        Validation: () => err as ValidationError, // @todo better pattern matching?
-      })
-    )
-    .chain(assets => {
-      const nonExistingIds = zip(assetIds, assets.data)
-        .filter(x => x[1].data === null)
-        .map(x => x[0]);
+  return assetsMget.mget(assetIds).chain(assets => {
+    const nonExistingIds = zip(assetIds, assets.data)
+      .filter(x => x[1].data === null)
+      .map(x => x[0]);
 
-      if (!nonExistingIds.length) {
-        return taskOf(undefined);
-      } else {
-        return taskRejected(
-          new ValidationError('Assets do not exist in the blockchain', {
-            assets: nonExistingIds,
-          })
-        );
-      }
-    });
+    if (!nonExistingIds.length) {
+      return taskOf(undefined);
+    } else {
+      return taskRejected(
+        new ValidationError('Assets do not exist in the blockchain', {
+          assets: nonExistingIds,
+        })
+      );
+    }
+  });
 };

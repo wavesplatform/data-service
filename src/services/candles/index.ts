@@ -9,7 +9,7 @@ import { sql } from './sql';
 import { inputSearch, output } from './schema';
 import { CandleDbResponse, transformResults } from './transformResults';
 
-import { ValidationError } from '../../errorHandling';
+import { AppError } from '../../errorHandling';
 
 import { validateInput, validateResult } from '../presets/validation';
 import { getData } from '../presets/pg/search/pg';
@@ -32,10 +32,7 @@ export default ({
   emitEvent,
   validatePair,
 }: CommonServiceDependencies & {
-  validatePair: (
-    matcher: string,
-    pair: AssetIdsPair
-  ) => Task<ValidationError, void>;
+  validatePair: (matcher: string, pair: AssetIdsPair) => Task<AppError, void>;
 }): CandlesService => {
   const SERVICE_NAME = 'candles.search';
   return {
