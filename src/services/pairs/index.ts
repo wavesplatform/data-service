@@ -1,4 +1,4 @@
-import { identity, zip } from 'ramda';
+import { identity } from 'ramda';
 import { of as taskOf, Task } from 'folktale/concurrency/task';
 import { of as just, Maybe } from 'folktale/maybe';
 
@@ -148,7 +148,12 @@ export default ({
         })
       );
 
-      const notCachedPairsIndexes = results.filter(isEmpty).map((_, i) => i);
+      const notCachedIndexes = results.reduce<number[]>((acc, x, i) => {
+        if (isEmpty(x)) acc.push(i);
+        return acc;
+      }, []);
+
+      const notCachedPairs = notCachedIndexes.map(i => request.pairs[i]);
 
       return mgetPairsPg({
         name: SERVICE_NAME.MGET,
@@ -156,11 +161,20 @@ export default ({
         matchRequestResult,
         pg: drivers.pg,
       })({
-        pairs: notCachedPairsIndexes.map(i => request.pairs[i]),
+        pairs: notCachedPairs,
         matcher: request.matcher,
       }).map(pairsFromDb => {
-        zip(pairsFromDb, notCachedPairsIndexes).forEach(
-          ([pair, i]) => (results[i] = pair)
+        pairsFromDb.forEach((pair, index) =>
+          forEach(p => {
+            results[notCachedIndexes[index]] = pair;
+            cache.set(
+              {
+                matcher: request.matcher,
+                pair: notCachedPairs[index],
+              },
+              p
+            );
+          }, pair)
         );
         return results;
       });
