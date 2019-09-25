@@ -11,12 +11,16 @@ export const transformResults = (
   request?: MgetRequest
 ): List<Pair> =>
   list(
-    maybeResponses.map(response => response.map(
-      dbResp => pair(transformResult(dbResp), {
-        priceAsset: dbResp.price_asset_id, amountAsset: dbResp.amount_asset_id
-      })).getOrElse(
-        pair(null, null)
-      )),
+    maybeResponses.map(
+      response => response.matchWith(
+        {
+          Just: ({ value }) => pair(transformResult(value), {
+            priceAsset: value.price_asset_id, amountAsset: value.amount_asset_id
+          }),
+          Nothing: () => pair(null, null)
+        }
+      )
+    ),
     request && {
       matcher: request.matcher,
     }
