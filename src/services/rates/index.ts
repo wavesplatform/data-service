@@ -21,9 +21,7 @@ export default function({
         .map(data =>
           data.map(item =>
             rate({
-              rate: item.res
-                .map(it => it.rate)
-                .getOrElse(new BigNumber(0)),
+              rate: item.res.fold(() => new BigNumber(0), it => it.rate)
             }, { amountAsset: item.req.amountAsset, priceAsset: item.req.priceAsset })
           )
         )
