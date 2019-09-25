@@ -54,12 +54,7 @@ export const transformResultSearch = (a: PairDbResponse[]): List<Pair> =>
     (l: Pair[]) => list(l),
     map<PairDbResponse, Pair>((p: PairDbResponse) =>
       compose(
-        pairObject => ({
-          ...pairObject,
-          amountAsset: p.amount_asset_id,
-          priceAsset: p.price_asset_id,
-        }),
-        pair,
+        pairObject => pair(pairObject, { amountAsset: p.amount_asset_id, priceAsset: p.price_asset_id }),
         (p: PairDbResponse): any => transformResult(p)
       )(p)
     )

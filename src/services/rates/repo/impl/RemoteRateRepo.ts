@@ -5,16 +5,17 @@ import { Task, of as taskOf } from 'folktale/concurrency/task';
 import { DbError } from '../../../../errorHandling';
 import { PgDriver } from '../../../../db/driver';
 import { AsyncMget } from '../../repo';
-import { RateInfo, RateMgetParams } from '../../../../types';
+import { RateMgetParams } from '../../../../types';
 import makeSql from './sql';
+import { RateWithPairIds } from '../../../rates';
 
 const pg = knex({ client: 'pg' });
 
 export default class RemoteRateRepo
-  implements AsyncMget<RateMgetParams, RateInfo, DbError> {
+  implements AsyncMget<RateMgetParams, RateWithPairIds, DbError> {
   constructor(private readonly dbDriver: PgDriver) {}
 
-  mget(request: RateMgetParams): Task<DbError, RateInfo[]> {
+  mget(request: RateMgetParams): Task<DbError, Array<RateWithPairIds>> {
     const pairsSqlParams = chain(
       it => [it.amountAsset, it.priceAsset],
       request.pairs
@@ -31,12 +32,12 @@ export default class RemoteRateRepo
         ? taskOf([])
         : this.dbDriver.any(sql.toString());
 
-    return dbTask.map((result: any[]): RateInfo[] =>
-      map((it: any): RateInfo => {
+    return dbTask.map((result: any[]): Array<RateWithPairIds> =>
+      map((it: any): RateWithPairIds => {
         return {
           amountAsset: it.amount_asset_id,
           priceAsset: it.price_asset_id,
-          current: it.weighted_average_price,
+          rate: it.weighted_average_price,
         };
       }, result)
     );
