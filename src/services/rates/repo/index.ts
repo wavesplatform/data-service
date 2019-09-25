@@ -1,5 +1,5 @@
 import { partition, chain, uniqWith } from 'ramda';
-import { AssetIdsPair, RateInfo, CacheSync } from '../../../types';
+import { AssetIdsPair, CacheSync } from '../../../types';
 import { BigNumber } from '@waves/data-entities';
 import {
   pairIsSymmetric,
@@ -8,6 +8,7 @@ import {
 } from '../data';
 import { RateCacheKey } from './impl/RateCache';
 import { Task } from 'folktale/concurrency/task';
+import { RateWithPairIds } from '../../rates';
 
 export type RateCache = CacheSync<RateCacheKey, BigNumber>;
 
@@ -16,7 +17,7 @@ export type AsyncMget<Req, Res, Error> = {
 };
 
 export type PairsForRequest = {
-  preCount: RateInfo[];
+  preCount: Array<RateWithPairIds>;
   toBeRequested: AssetIdsPair[];
 };
 
@@ -28,8 +29,8 @@ export const partitionByPreCount = (
 ): PairsForRequest => {
   const [eq, uneq] = partition(pairIsSymmetric, pairs);
 
-  const eqRates: RateInfo[] = eq.map(pair => ({
-    current: new BigNumber(1),
+  const eqRates: Array<RateWithPairIds> = eq.map(pair => ({
+    rate: new BigNumber(1),
     ...pair,
   }));
 
@@ -44,10 +45,10 @@ export const partitionByPreCount = (
       allPairsToRequest
     );
 
-    const cachedRates: RateInfo[] = cached.map(pair => ({
+    const cachedRates: Array<RateWithPairIds> = cached.map(pair => ({
       amountAsset: pair.amountAsset,
       priceAsset: pair.priceAsset,
-      current: cache.get(getCacheKey(pair)).getOrElse(new BigNumber(0)),
+      rate: cache.get(getCacheKey(pair)).getOrElse(new BigNumber(0)),
     }));
 
     return {

@@ -2,13 +2,14 @@ import { Task } from 'folktale/concurrency/task';
 import { Maybe } from 'folktale/maybe';
 
 import { tap } from '../../utils/tap';
-import { AssetIdsPair, RateInfo, RateMgetParams } from '../../types';
+import { AssetIdsPair, RateMgetParams } from '../../types';
 import { AppError, DbError } from '../../errorHandling';
 
 import { partitionByPreCount, AsyncMget, RateCache } from './repo';
 import { RateCacheKey } from './repo/impl/RateCache';
 import RateInfoLookup from './repo/impl/RateInfoLookup';
 import { isEmpty } from '../../utils/fp/maybeOps';
+import { RateWithPairIds } from '../rates'
 
 type ReqAndRes<TReq, TRes> = {
   req: TReq;
@@ -17,15 +18,15 @@ type ReqAndRes<TReq, TRes> = {
 
 export default class RateEstimator
   implements
-    AsyncMget<RateMgetParams, ReqAndRes<AssetIdsPair, RateInfo>, AppError> {
+    AsyncMget<RateMgetParams, ReqAndRes<AssetIdsPair, RateWithPairIds>, AppError> {
   constructor(
     private readonly cache: RateCache,
-    private readonly remoteGet: AsyncMget<RateMgetParams, RateInfo, DbError>
+    private readonly remoteGet: AsyncMget<RateMgetParams, RateWithPairIds, DbError>
   ) {}
 
   mget(
     request: RateMgetParams
-  ): Task<AppError, ReqAndRes<AssetIdsPair, RateInfo>[]> {
+  ): Task<AppError, ReqAndRes<AssetIdsPair, RateWithPairIds>[]> {
     const { pairs, timestamp, matcher } = request;
 
     const shouldCache = isEmpty(timestamp);
@@ -35,8 +36,8 @@ export default class RateEstimator
       matcher,
     });
 
-    const cacheAll = (items: RateInfo[]) =>
-      items.forEach(it => this.cache.set(getCacheKey(it), it.current));
+    const cacheAll = (items: Array<RateWithPairIds>) =>
+      items.forEach(it => this.cache.set(getCacheKey(it), it.rate));
 
     const { preCount, toBeRequested } = partitionByPreCount(
       this.cache,
@@ -64,7 +65,7 @@ export default class RateEstimator
             reqAndRes.res.map(
               tap(res => {
                 if (shouldCache) {
-                  this.cache.set(getCacheKey(reqAndRes.req), res.current);
+                  this.cache.set(getCacheKey(reqAndRes.req), res.rate);
                 }
               })
             )
