@@ -1,14 +1,12 @@
 import { Maybe } from 'folktale/maybe';
 
 import { list, List, Pair, pair } from '../../types';
-import { MgetRequest } from './types';
 import { PairDbResponse } from './transformResult';
 
 import { transformResult } from './transformResult';
 
 export const transformResults = (
-  maybeResponses: Maybe<PairDbResponse>[],
-  request?: MgetRequest
+  maybeResponses: Maybe<PairDbResponse>[]
 ): List<Pair> =>
   list(
     maybeResponses.map(response =>
