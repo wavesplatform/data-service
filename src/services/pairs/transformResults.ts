@@ -15,7 +15,7 @@ export const transformResults = (
       response => response.matchWith(
         {
           Just: ({ value }) => pair(transformResult(value), {
-            priceAsset: value.price_asset_id, amountAsset: value.amount_asset_id
+            amountAsset: value.amount_asset_id, priceAsset: value.price_asset_id
           }),
           Nothing: () => pair(null, null)
         }

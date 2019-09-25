@@ -42,7 +42,7 @@ const pairsOneEndpoint = service => async ctx => {
         ctx.state.returnValue = value;
       },
       Nothing: () => {
-        ctx.state.returnValue = createPair();
+        ctx.state.returnValue = createPair(null, null);
       },
     });
   } catch (e) {
