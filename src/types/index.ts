@@ -97,7 +97,7 @@ export type PairInfo = {
 };
 
 export type Pair = Serializable<'pair', PairInfo | null> & Partial<AssetIdsPair>;
-export const pair = (data: PairInfo | null = null, pairData: AssetIdsPair | null): Pair =>
+export const pair = (data: PairInfo | null, pairData: AssetIdsPair | null): Pair =>
   ({...toSerializable('pair', data), ...pairData});
 
 // @todo TransactionInfo
@@ -133,5 +133,5 @@ export type RateInfo = {
   rate: BigNumber;
 };
 export type Rate = Serializable<'rate', RateInfo | null> & AssetIdsPair;
-export const rate = (data: RateInfo | null = null, assetMeta: AssetIdsPair): Rate =>
+export const rate = (data: RateInfo | null, assetMeta: AssetIdsPair): Rate =>
   ({...toSerializable('rate', data === null ? null : data), ...assetMeta});
