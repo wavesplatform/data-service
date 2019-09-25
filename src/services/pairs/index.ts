@@ -125,7 +125,9 @@ export default ({
           ),
       }),
     validateResult: validateResult(resultSchema, SERVICE_NAME.GET),
-    transformResult: res => res.map(transformResult).map(pair),
+    transformResult: res => res.map(
+      res => pair(transformResult(res), { amountAsset: res.amount_asset_id, priceAsset: res.price_asset_id })
+    ),
     emitEvent,
   });
 
