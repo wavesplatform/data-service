@@ -1,4 +1,4 @@
-const createService = require('..');
+const createService = require('..').default;
 const { createPgDriver } = require('../../../../db');
 const { parseDate } = require('../../../../utils/parseDate');
 const { encode } = require('../../../_common/pagination/cursor');

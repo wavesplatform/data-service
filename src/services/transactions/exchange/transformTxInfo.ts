@@ -71,7 +71,6 @@ export default (tx: ExchangeTxDbResponse) => {
   return {
     ...commonFields,
     ...exchangeTxFields,
-    matcher: tx.sender,
     order1: createOrder('o1')(tx),
     order2: createOrder('o2')(tx),
   };

@@ -1,7 +1,9 @@
+const { of: taskOf } = require('folktale/concurrency/task');
+
 const { createPgDriver } = require('../../../db');
 const { loadConfig } = require('../../../loadConfig');
 const options = loadConfig();
-const create = require('../index');
+const create = require('..').default;
 
 const amountAsset = 'AnERqFRffNVrCbviXbDEdzrU6ipXCP5Y1PKpFdRnyQAy';
 const priceAsset = 'WAVES';
@@ -10,19 +12,19 @@ describe('Candles', () => {
   const service = create({
     drivers: { pg: createPgDriver(options) },
     emitEvent: () => () => null,
+    validatePair: () => taskOf(undefined),
   });
 
-  describe('search all candles between 2017-04-03 00:00:00 and 2017-04-03 23:59:59', () => {
+  describe('search all candles between 2017-04-12 00:00:00 and 2017-04-12 23:59:59', () => {
     it('should return all Candles correctly for each 1h', done => {
       service
         .search({
           amountAsset,
           priceAsset,
-          params: {
-            timeStart: new Date('2017-04-03T00:00:00.000Z'),
-            timeEnd: new Date('2017-04-03T23:59:59.999Z'),
-            interval: '1h',
-          },
+          timeStart: new Date('2017-04-12T00:00:00.000Z'),
+          timeEnd: new Date('2017-04-12T23:59:59.999Z'),
+          interval: '1h',
+          matcher: options.matcher.defaultMatcherAddress,
         })
         .run()
         .listen({
@@ -39,11 +41,10 @@ describe('Candles', () => {
         .search({
           amountAsset,
           priceAsset,
-          params: {
-            timeStart: new Date('2017-04-03T00:00:00.000Z'),
-            timeEnd: new Date('2017-04-03T23:59:59.999Z'),
-            interval: '1d',
-          },
+          timeStart: new Date('2017-04-12T00:00:00.000Z'),
+          timeEnd: new Date('2017-04-12T23:59:59.999Z'),
+          interval: '1d',
+          matcher: options.matcher.defaultMatcherAddress,
         })
         .run()
         .listen({

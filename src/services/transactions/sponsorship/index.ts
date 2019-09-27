@@ -28,7 +28,10 @@ import * as transformTxInfo from './transformTxInfo';
 type SponsorshipTxsSearchRequest = RequestWithCursor<
   CommonFilters & WithSortOrder & WithLimit,
   string
->;
+> &
+  Partial<{
+    assetId: String;
+  }>;
 
 type SponsorshipTxDbResponse = RawTx & {
   asset_id: string;
