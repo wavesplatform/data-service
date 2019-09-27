@@ -25,12 +25,12 @@ export type MatcherConfig = {
   };
 };
 
+export type DefaultConfig = PostgresConfig & ServerConfig & LoggerConfig;
+
 export type DataServiceConfig = PostgresConfig &
   ServerConfig &
   LoggerConfig &
   MatcherConfig;
-
-export type DefaultConfig = PostgresConfig & ServerConfig & LoggerConfig;
 
 const commonEnvVariables = ['PGHOST', 'PGDATABASE', 'PGUSER', 'PGPASSWORD'];
 
