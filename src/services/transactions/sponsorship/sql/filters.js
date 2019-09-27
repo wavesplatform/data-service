@@ -1,14 +1,12 @@
-const { without, omit } = require('ramda');
-
 const { where } = require('../../../../utils/db/knex');
+
 const commonFilters = require('../../_common/sql/filters');
 const commonFiltersOrder = require('../../_common/sql/filtersOrder');
 
 module.exports = {
-  filters: omit(['sender'], {
+  filters: {
     ...commonFilters,
-    recipient: where('recipient'),
-  }),
-
-  filtersOrder: without('sender', [...commonFiltersOrder, 'recipient']),
+    assetId: where('t.asset_id'),
+  },
+  filtersOrder: [...commonFiltersOrder, 'assetId'],
 };

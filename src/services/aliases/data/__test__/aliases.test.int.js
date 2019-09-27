@@ -1,7 +1,7 @@
 const { createPgDriver } = require('../../../../db');
 const { loadConfig } = require('../../../../loadConfig');
 const options = loadConfig();
-const create = require('../../index');
+const create = require('../..').default;
 
 const ADDRESS = '3PDSJEfqQQ8BNk7QtiwAFPq7SgyAh5kzfBy';
 

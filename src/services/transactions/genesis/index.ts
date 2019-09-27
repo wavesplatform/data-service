@@ -28,7 +28,10 @@ import * as sql from './sql';
 type GenesisTxsSearchRequest = RequestWithCursor<
   Omit<CommonFilters, 'sender'> & WithSortOrder & WithLimit,
   string
->;
+> &
+  Partial<{
+    recipient: string;
+  }>;
 
 type GenesisTxDbResponse = Omit<RawTx, 'sender'> & {
   amount: BigNumber;
