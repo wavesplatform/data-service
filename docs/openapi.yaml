@@ -1984,7 +1984,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ListOfRates'                
+                $ref: '#/components/schemas/ListOfRates'
 components:
   schemas:
     Asset:
@@ -2822,14 +2822,14 @@ components:
         __type:
           type: string
           example: rate
+        amountAsset:
+          type: string
+        priceAsset:
+          type: string
         data:
           type: object
           properties:
-            amountAsset:
-              type: string
-            priceAsset:
-              type: string
-            current:
+            rate:
               type: number
     ListOfRates:
       type: object

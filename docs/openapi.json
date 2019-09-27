@@ -4503,16 +4503,16 @@
             "type": "string",
             "example": "rate"
           },
+          "amountAsset": {
+            "type": "string"
+          },
+          "priceAsset": {
+            "type": "string"
+          },
           "data": {
             "type": "object",
             "properties": {
-              "amountAsset": {
-                "type": "string"
-              },
-              "priceAsset": {
-                "type": "string"
-              },
-              "current": {
+              "rate": {
                 "type": "number"
               }
             }
