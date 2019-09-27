@@ -19,6 +19,7 @@ module.exports = {
   hasMethod,
   where: createPointfree('where'),
   whereIn: createPointfree('whereIn'),
+  whereRaw: createPointfree('whereRaw'),
   limit: createPointfree('limit'),
   orWhere: createPointfree('orWhere'),
   orderBy: createPointfree('orderBy'),
