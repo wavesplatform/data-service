@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "version": "0.24.2",
+    "version": "0.25.0",
     "title": "Waves Data Service",
     "description": "This is a a public Waves Data Services API documentation. The goal of the API is to provide a simple and convenient way to get data from Waves blockchain."
   },
@@ -1190,14 +1190,6 @@
           },
           {
             "in": "query",
-            "name": "recipient",
-            "description": "Search transactions by recipient address",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
             "name": "after",
             "description": "Cursor in base64 encoding. Holds information about timestamp, id, sort.",
             "schema": {
@@ -1332,14 +1324,6 @@
                   "type": "number"
                 }
               ]
-            }
-          },
-          {
-            "in": "query",
-            "name": "recipient",
-            "description": "Search transactions by recipient address",
-            "schema": {
-              "type": "string"
             }
           },
           {
@@ -2366,14 +2350,6 @@
           },
           {
             "in": "query",
-            "name": "recipient",
-            "description": "Search transactions by recipient address",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
             "name": "after",
             "description": "Cursor in base64 encoding. Holds information about timestamp, id, sort.",
             "schema": {
@@ -2402,6 +2378,14 @@
               "minimum": 1,
               "maximum": 100,
               "default": 100
+            }
+          },
+          {
+            "in": "query",
+            "name": "assetId",
+            "description": "Filter transactions by assetId",
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -4027,10 +4011,10 @@
                   "type": "string"
                 }
               },
-              "asset_id": {
+              "assetId": {
                 "type": "string"
               },
-              "asset_name": {
+              "name": {
                 "type": "string"
               },
               "description": {
@@ -4097,11 +4081,14 @@
                   "type": "string"
                 }
               },
-              "recipient": {
+              "assetId": {
                 "type": "string"
               },
-              "amount": {
+              "quantity": {
                 "type": "number"
+              },
+              "reissuable": {
+                "type": "boolean"
               }
             }
           }
@@ -4152,7 +4139,7 @@
                   "type": "string"
                 }
               },
-              "recipient": {
+              "assetId": {
                 "type": "string"
               },
               "amount": {
@@ -4207,10 +4194,10 @@
                   "type": "string"
                 }
               },
-              "recipient": {
+              "assetId": {
                 "type": "string"
               },
-              "amount": {
+              "minSponsoredAssetFee": {
                 "type": "number"
               }
             }
@@ -4503,16 +4490,16 @@
             "type": "string",
             "example": "rate"
           },
+          "amountAsset": {
+            "type": "string"
+          },
+          "priceAsset": {
+            "type": "string"
+          },
           "data": {
             "type": "object",
             "properties": {
-              "amountAsset": {
-                "type": "string"
-              },
-              "priceAsset": {
-                "type": "string"
-              },
-              "current": {
+              "rate": {
                 "type": "number"
               }
             }

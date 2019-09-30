@@ -2034,6 +2034,66 @@ Object {
 }
 `;
 
+exports[`payment transactions service get fetches real tx 1`] = `
+Object {
+  "__type": "transaction",
+  "data": Object {
+    "amount": "5",
+    "fee": "0.001",
+    "height": 251375,
+    "id": "5jpwaJnERa8Gr1ChgrNYnmxm2EtZ4KHC5bW1ZLL7LCY1bUV9gFWFAGjpJaPDCawmFzguqGBgYDyeocpEsKWeYDM1",
+    "recipient": "3PR3xnzz1oD58K73T1dkLuVMJG8UxDZZJzV",
+    "sender": "3P89Gonteikxhpup4ExAf5SaQyHVzeQqvNg",
+    "senderPublicKey": "4uQeVj5tqViQh7yWWGStvkEG1Zmhx6uasJtWCJziofM",
+    "signature": "5jpwaJnERa8Gr1ChgrNYnmxm2EtZ4KHC5bW1ZLL7LCY1bUV9gFWFAGjpJaPDCawmFzguqGBgYDyeocpEsKWeYDM1",
+    "timestamp": 2016-11-28T09:51:07.653Z,
+    "type": 2,
+  },
+}
+`;
+
+exports[`payment transactions service mget fetches real txs with nulls for unreal 1`] = `
+Object {
+  "__type": "list",
+  "data": Array [
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "amount": "5",
+        "fee": "0.001",
+        "height": 251375,
+        "id": "5jpwaJnERa8Gr1ChgrNYnmxm2EtZ4KHC5bW1ZLL7LCY1bUV9gFWFAGjpJaPDCawmFzguqGBgYDyeocpEsKWeYDM1",
+        "recipient": "3PR3xnzz1oD58K73T1dkLuVMJG8UxDZZJzV",
+        "sender": "3P89Gonteikxhpup4ExAf5SaQyHVzeQqvNg",
+        "senderPublicKey": "4uQeVj5tqViQh7yWWGStvkEG1Zmhx6uasJtWCJziofM",
+        "signature": "5jpwaJnERa8Gr1ChgrNYnmxm2EtZ4KHC5bW1ZLL7LCY1bUV9gFWFAGjpJaPDCawmFzguqGBgYDyeocpEsKWeYDM1",
+        "timestamp": 2016-11-28T09:51:07.653Z,
+        "type": 2,
+      },
+    },
+    Object {
+      "__type": "transaction",
+      "data": Object {
+        "amount": "0.00001",
+        "fee": "1e-8",
+        "height": 21874,
+        "id": "119tSRyy2sAFcAS5Htb6m4FtsCtJsacAwarg75WpsAf9HgMJnpvgcLou31ARxxEp1WMuTmGTRNUeghCgrS4PxDT",
+        "recipient": "3PBrHA9R2Rf6xg4keyymMvrvNQmc6oQhxgD",
+        "sender": "3PNqJ6aaGAL15fmPHhWvk3V6yqL6RpptMZp",
+        "senderPublicKey": "HCt7iRNfcWSv4A6yPgcLaBQ6URWAa8ZdPQC9FUkbbJSW",
+        "signature": "119tSRyy2sAFcAS5Htb6m4FtsCtJsacAwarg75WpsAf9HgMJnpvgcLou31ARxxEp1WMuTmGTRNUeghCgrS4PxDT",
+        "timestamp": 2016-06-27T10:07:19.161Z,
+        "type": 2,
+      },
+    },
+    Object {
+      "__type": "transaction",
+      "data": null,
+    },
+  ],
+}
+`;
+
 exports[`reissue transactions service get fetches real tx 1`] = `
 Object {
   "__type": "transaction",
@@ -2090,66 +2150,6 @@ Object {
         "timestamp": 2016-12-07T08:21:00.941Z,
         "type": 5,
         "version": 1,
-      },
-    },
-    Object {
-      "__type": "transaction",
-      "data": null,
-    },
-  ],
-}
-`;
-
-exports[`send transactions service get fetches real tx 1`] = `
-Object {
-  "__type": "transaction",
-  "data": Object {
-    "amount": "5",
-    "fee": "0.001",
-    "height": 251375,
-    "id": "5jpwaJnERa8Gr1ChgrNYnmxm2EtZ4KHC5bW1ZLL7LCY1bUV9gFWFAGjpJaPDCawmFzguqGBgYDyeocpEsKWeYDM1",
-    "recipient": "3PR3xnzz1oD58K73T1dkLuVMJG8UxDZZJzV",
-    "sender": "3P89Gonteikxhpup4ExAf5SaQyHVzeQqvNg",
-    "senderPublicKey": "4uQeVj5tqViQh7yWWGStvkEG1Zmhx6uasJtWCJziofM",
-    "signature": "5jpwaJnERa8Gr1ChgrNYnmxm2EtZ4KHC5bW1ZLL7LCY1bUV9gFWFAGjpJaPDCawmFzguqGBgYDyeocpEsKWeYDM1",
-    "timestamp": 2016-11-28T09:51:07.653Z,
-    "type": 2,
-  },
-}
-`;
-
-exports[`send transactions service mget fetches real txs with nulls for unreal 1`] = `
-Object {
-  "__type": "list",
-  "data": Array [
-    Object {
-      "__type": "transaction",
-      "data": Object {
-        "amount": "5",
-        "fee": "0.001",
-        "height": 251375,
-        "id": "5jpwaJnERa8Gr1ChgrNYnmxm2EtZ4KHC5bW1ZLL7LCY1bUV9gFWFAGjpJaPDCawmFzguqGBgYDyeocpEsKWeYDM1",
-        "recipient": "3PR3xnzz1oD58K73T1dkLuVMJG8UxDZZJzV",
-        "sender": "3P89Gonteikxhpup4ExAf5SaQyHVzeQqvNg",
-        "senderPublicKey": "4uQeVj5tqViQh7yWWGStvkEG1Zmhx6uasJtWCJziofM",
-        "signature": "5jpwaJnERa8Gr1ChgrNYnmxm2EtZ4KHC5bW1ZLL7LCY1bUV9gFWFAGjpJaPDCawmFzguqGBgYDyeocpEsKWeYDM1",
-        "timestamp": 2016-11-28T09:51:07.653Z,
-        "type": 2,
-      },
-    },
-    Object {
-      "__type": "transaction",
-      "data": Object {
-        "amount": "0.00001",
-        "fee": "1e-8",
-        "height": 21874,
-        "id": "119tSRyy2sAFcAS5Htb6m4FtsCtJsacAwarg75WpsAf9HgMJnpvgcLou31ARxxEp1WMuTmGTRNUeghCgrS4PxDT",
-        "recipient": "3PBrHA9R2Rf6xg4keyymMvrvNQmc6oQhxgD",
-        "sender": "3PNqJ6aaGAL15fmPHhWvk3V6yqL6RpptMZp",
-        "senderPublicKey": "HCt7iRNfcWSv4A6yPgcLaBQ6URWAa8ZdPQC9FUkbbJSW",
-        "signature": "119tSRyy2sAFcAS5Htb6m4FtsCtJsacAwarg75WpsAf9HgMJnpvgcLou31ARxxEp1WMuTmGTRNUeghCgrS4PxDT",
-        "timestamp": 2016-06-27T10:07:19.161Z,
-        "type": 2,
       },
     },
     Object {

@@ -27,11 +27,14 @@ import * as sql from './sql';
 type PaymentTxsSearchRequest = RequestWithCursor<
   CommonFilters & WithSortOrder & WithLimit,
   string
->;
+> &
+  Partial<{
+    recipient: string;
+  }>;
 
 type PaymentTxDbResponse = RawTx & {
-  asset_id: string;
   amount: string;
+  recipient: string;
 };
 
 export type PaymentTxsService = Service<
