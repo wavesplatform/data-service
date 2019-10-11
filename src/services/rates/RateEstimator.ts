@@ -1,3 +1,4 @@
+import { BigNumber } from '@waves/data-entities';
 import { Task } from 'folktale/concurrency/task';
 import { Maybe } from 'folktale/maybe';
 
@@ -36,8 +37,16 @@ export default class RateEstimator
       matcher,
     });
 
+    const cacheUnlessCached = (item: AssetIdsPair, rate: BigNumber) => {
+      const key = getCacheKey(item)
+
+      if (!this.cache.has(key)) {
+        this.cache.set(key, rate)
+      }
+    }
+
     const cacheAll = (items: Array<RateWithPairIds>) =>
-      items.forEach(it => this.cache.set(getCacheKey(it), it.rate));
+      items.forEach(it => cacheUnlessCached(it, it.rate));
 
     const { preCount, toBeRequested } = partitionByPreCount(
       this.cache,
@@ -65,7 +74,7 @@ export default class RateEstimator
             reqAndRes.res.map(
               tap(res => {
                 if (shouldCache) {
-                  this.cache.set(getCacheKey(reqAndRes.req), res.rate);
+                  cacheUnlessCached(reqAndRes.req, res.rate);
                 }
               })
             )

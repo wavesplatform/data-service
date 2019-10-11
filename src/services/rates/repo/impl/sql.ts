@@ -5,10 +5,10 @@ select
 	p.amount_asset_id,
 	p.price_asset_id,
 	p.matcher,
-	(select avg(wap.weighted_average_price) from 
+	(select sum(wap.weighted_average_price * wap.volume) / sum(wap.volume) from 
 	(
 	select
-		weighted_average_price
+	        weighted_average_price, volume
 	from
 		candles
 	where
@@ -16,6 +16,7 @@ select
 		and price_asset_id = p.price_asset_id
 		and matcher = p.matcher
 	        and interval_in_secs = 60
+                and volume > 0
                 and time_start < ?
 	order by
 		time_start desc
