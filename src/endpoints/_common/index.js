@@ -18,7 +18,7 @@ const create = (
     {
       parseFiltersFn,
       filterParsers,
-      mgetFilterName,
+      mgetFilterName,      
     },
     url,
     service
