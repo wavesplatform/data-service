@@ -7,22 +7,30 @@ import {
   ServiceGet,
   ServiceSearch,
   List,
+  ServiceMget,
 } from '../../types';
 
 import { CommonServiceDependencies } from '..';
 import { transformResults as transformSearch } from '../presets/pg/search/transformResult';
-
 import * as sql from './data/sql';
 import { AliasDbResponse, transformDbResponse } from './data/transformResult';
 import { inputGet, inputSearch, output } from './schema';
+import { mgetByIdsPreset } from '../../services/presets/pg/mgetByIds';
+import * as Joi from '../../utils/validation/joi';
+import { propEq } from 'ramda';
 
 type AliasesSearchRequest = {
   address: string;
   showBroken: boolean;
 };
 
+type AliasMGetParams = string[]
+
+const aliasesInputSchema = Joi.array().items(Joi.string()).required();
+
 export type AliasService = ServiceGet<string, Alias> &
-  ServiceSearch<AliasesSearchRequest, Alias>;
+  ServiceSearch<AliasesSearchRequest, Alias> &
+  ServiceMget<AliasMGetParams, Alias>
 
 export default ({
   drivers,
@@ -36,6 +44,16 @@ export default ({
       resultSchema: output,
       transformResult: transformDbResponse,
       resultTypeFactory: alias,
+    })({ pg: drivers.pg, emitEvent: emitEvent }),
+
+    mget: mgetByIdsPreset<string, AliasDbResponse, AliasInfo, Alias>({
+      name: 'aliases.mget',
+      sql: sql.mget,
+      inputSchema: aliasesInputSchema,
+      resultSchema: output,
+      transformResult: transformDbResponse,
+      resultTypeFactory: alias,
+      matchRequestResult: propEq('alias')
     })({ pg: drivers.pg, emitEvent: emitEvent }),
 
     search: searchPreset<
