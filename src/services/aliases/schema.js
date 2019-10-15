@@ -2,6 +2,8 @@ const Joi = require('../../utils/validation/joi');
 
 const inputGet = Joi.string().required();
 
+const inputMGet = Joi.array().items(Joi.string()).required();
+
 const inputSearch = Joi.object()
   .keys({
     address: Joi.string().required(),
@@ -17,4 +19,4 @@ const output = Joi.object().keys({
   duplicates: Joi.object().bignumber(),
 });
 
-module.exports = { inputGet, inputSearch, output };
+module.exports = { inputGet, inputMGet, inputSearch, output };
