@@ -240,6 +240,7 @@ module.exports = rawJoi
     name: 'object',
     language: {
       bignumber: {
+        nan: 'is Not a Number',
         int64: 'The number {{value}} is outside int64 range',
       },
     },
@@ -251,6 +252,20 @@ module.exports = rawJoi
             return this.createError(
               'object.type',
               { type: BigNumber },
+              state,
+              options
+            );
+          }
+          return value;
+        },
+      },
+      {
+        name: 'notNan',
+        validate(_, value, state, options) {
+          if (!(value instanceof BigNumber) || value.isNaN()) {
+            return this.createError(
+              'object.bignumber.nan',
+              { value: NaN },
               state,
               options
             );
