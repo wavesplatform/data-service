@@ -14,9 +14,8 @@ import { CommonServiceDependencies } from '..';
 import { transformResults as transformSearch } from '../presets/pg/search/transformResult';
 import * as sql from './data/sql';
 import { AliasDbResponse, transformDbResponse } from './data/transformResult';
-import { inputGet, inputSearch, output } from './schema';
+import { inputGet, inputMGet, inputSearch, output } from './schema';
 import { mgetByIdsPreset } from '../../services/presets/pg/mgetByIds';
-import * as Joi from '../../utils/validation/joi';
 import { propEq } from 'ramda';
 
 type AliasesSearchRequest = {
@@ -25,8 +24,6 @@ type AliasesSearchRequest = {
 };
 
 type AliasMGetParams = string[]
-
-const aliasesInputSchema = Joi.array().items(Joi.string()).required();
 
 export type AliasService = ServiceGet<string, Alias> &
   ServiceSearch<AliasesSearchRequest, Alias> &
@@ -49,7 +46,7 @@ export default ({
     mget: mgetByIdsPreset<string, AliasDbResponse, AliasInfo, Alias>({
       name: 'aliases.mget',
       sql: sql.mget,
-      inputSchema: aliasesInputSchema,
+      inputSchema: inputMGet,
       resultSchema: output,
       transformResult: transformDbResponse,
       resultTypeFactory: alias,
