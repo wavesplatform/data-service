@@ -8,14 +8,15 @@ const result = Joi.object().keys({
 
   script: Joi.string()
     .required()
+    .base64()
     .allow(null),
 });
 
 const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
-    sender: Joi.string(),
-    script: Joi.string(),
+    sender: Joi.string().base58(),
+    script: Joi.string().base64(),
   })
   .required();
 

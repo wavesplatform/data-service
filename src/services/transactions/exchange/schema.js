@@ -5,12 +5,12 @@ const commonFilters = require('../../presets/pg/searchWithPagination/commonFilte
   .default;
 
 const orderTypes = prefix => ({
-  [`${prefix}_id`]: Joi.string().required(),
+  [`${prefix}_id`]: Joi.string().base58().required(),
   [`${prefix}_version`]: Joi.string().required().allow(null),
   [`${prefix}_type`]: Joi.string().required(),
-  [`${prefix}_sender`]: Joi.string().required(),
-  [`${prefix}_sender_public_key`]: Joi.string().required(),
-  [`${prefix}_signature`]: Joi.string().required(),
+  [`${prefix}_sender`]: Joi.string().base58().required(),
+  [`${prefix}_sender_public_key`]: Joi.string().base58().required(),
+  [`${prefix}_signature`]: Joi.string().base58().required(),
   [`${prefix}_matcher_fee`]: Joi.object()
     .bignumber()
     .required(),
@@ -26,14 +26,14 @@ const orderTypes = prefix => ({
   [`${prefix}_expiration`]: Joi.object()
     .type(Date)
     .required(),
-  [`${prefix}_matcher_fee_asset_id`]: Joi.string().allow(null),
+  [`${prefix}_matcher_fee_asset_id`]: Joi.string().assetId().allow(null),
 });
 
 const result = Joi.object().keys({
   ...commonFields,
 
-  price_asset: Joi.string().required(),
-  amount_asset: Joi.string().required(),
+  price_asset: Joi.string().assetId().required(),
+  amount_asset: Joi.string().assetId().required(),
   price: Joi.object()
     .bignumber()
     .required(),
@@ -55,10 +55,10 @@ const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
 
-    matcher: Joi.string(),
-    orderId: Joi.string(),
-    amountAsset: Joi.string().base58(),
-    priceAsset: Joi.string().base58(),
+    matcher: Joi.string().base58(),
+    orderId: Joi.string().base58(),
+    amountAsset: Joi.string().assetId(),
+    priceAsset: Joi.string().assetId(),
   })
   .required();
 

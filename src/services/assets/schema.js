@@ -13,10 +13,11 @@ const inputSearch = Joi.object()
   .required();
 
 const result = Joi.object().keys({
-  asset_id: Joi.string().required(),
+  asset_id: Joi.string().assetId().required(),
   asset_name: Joi.string().required(),
   description: Joi.string().allow(''),
   sender: Joi.string()
+    .base58()
     .allow('')
     .required(),
   issue_height: Joi.number().required(),

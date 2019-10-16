@@ -6,7 +6,7 @@ const inputMGet = Joi.array().items(Joi.string()).required();
 
 const inputSearch = Joi.object()
   .keys({
-    address: Joi.string().required(),
+    address: Joi.string().base58().required(),
     showBroken: Joi.boolean(),
   })
   .required();

@@ -21,7 +21,7 @@ export const result = Joi.object().keys({
       .bignumber()
       .required(),
     assetId: Joi.string()
-      .base58()
+      .assetId()
       .required()
       .allow(null),
   }),

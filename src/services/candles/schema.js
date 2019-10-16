@@ -146,15 +146,15 @@ const inputSearch = customJoi
   .object()
   .keys({
     amountAsset: Joi.string()
-      .base58()
+      .assetId()
       .required(),
     priceAsset: Joi.string()
-      .base58()
+      .assetId()
       .required(),
     timeStart: Joi.date().required(),
     timeEnd: Joi.date().required(),
     interval: Joi.string().required(),
-    matcher: Joi.string(),
+    matcher: Joi.string().base58(),
   })
   .period({
     limit: 1440,
@@ -165,10 +165,10 @@ const inputSearch = customJoi
 const output = Joi.object().keys({
   time_start: Joi.date().required(),
   amount_asset_id: Joi.string()
-    .base58()
+    .assetId()
     .required(),
   price_asset_id: Joi.string()
-    .base58()
+    .assetId()
     .required(),
   matcher: Joi.string().base58(),
   max_height: Joi.number()

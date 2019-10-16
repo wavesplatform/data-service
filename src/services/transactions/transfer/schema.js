@@ -10,10 +10,10 @@ const result = Joi.object().keys({
     .bignumber()
     .required(),
   asset_id: Joi.string()
-    .base58()
+    .assetId()
     .required(),
   fee_asset: Joi.string()
-    .base58()
+    .assetId()
     .required(),
   attachment: Joi.string()
     .required()
@@ -24,8 +24,8 @@ const result = Joi.object().keys({
 const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
-    sender: Joi.string(),
-    assetId: Joi.string().base58(),
+    sender: Joi.string().base58(),
+    assetId: Joi.string().assetId(),
     recipient: Joi.string(),
   })
   .required();

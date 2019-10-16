@@ -7,13 +7,13 @@ const result = Joi.object().keys({
   ...commonFields,
 
   asset_id: Joi.string()
-    .base58()
+    .assetId()
     .required(),
   attachment: Joi.string()
     .required()
     .allow(''),
-  sender: Joi.string().required(),
-  sender_public_key: Joi.string().required(),
+  sender: Joi.string().base58().required(),
+  sender_public_key: Joi.string().base58().required(),
   recipients: Joi.array().items(Joi.string()),
   amounts: Joi.array().items(
     Joi.object()
@@ -26,8 +26,8 @@ const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
 
-    sender: Joi.string(),
-    assetId: Joi.string().base58(),
+    sender: Joi.string().base58(),
+    assetId: Joi.string().assetId(),
     recipient: Joi.string(),
   })
   .required();

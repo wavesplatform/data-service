@@ -2,7 +2,7 @@ const rawJoi = require('joi');
 
 const { BigNumber } = require('@waves/data-entities');
 const { decode } = require('../../services/_common/pagination/cursor');
-const { base58: base58Regex, interval: intervalRegex } = require('../regex');
+const { base58: base58Regex, interval: intervalRegex, assetId: assetIdRegex } = require('../regex');
 const { interval } = require('../../types');
 const { div } = require('../interval');
 
@@ -12,6 +12,7 @@ module.exports = rawJoi
     name: 'string',
     language: {
       base58: 'must be a valid base58 string',
+      assetId: 'must be a valid base58 string or "WAVES"',
       cursor: 'must be a valid cursor string',
       pair: 'must be a valid pair string',
       period: {
@@ -35,6 +36,21 @@ module.exports = rawJoi
           ) {
             return this.createError('string.base58', { value }, state, options);
           }
+          return value;
+        },
+      },
+      {
+        name: 'assetId',
+        validate(_, value, state, options) {
+          if (
+            joi
+              .string()
+              .regex(assetIdRegex)
+              .validate(value).error
+          ) {
+            return this.createError('string.assetId', { value }, state, options);
+          }
+
           return value;
         },
       },
