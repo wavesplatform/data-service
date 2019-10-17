@@ -18,7 +18,7 @@ const result = Joi.object().keys({
   attachment: Joi.string()
     .required()
     .allow(''),
-  recipient: Joi.string().required(),
+  recipient: Joi.string().noControlChars().required(),
 });
 
 const inputSearch = Joi.object()
@@ -26,7 +26,7 @@ const inputSearch = Joi.object()
     ...commonFilters,
     sender: Joi.string().base58(),
     assetId: Joi.string().assetId(),
-    recipient: Joi.string(),
+    recipient: Joi.string().noControlChars(),
   })
   .required();
 

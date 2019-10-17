@@ -14,7 +14,7 @@ const result = Joi.object().keys({
     .allow(''),
   sender: Joi.string().base58().required(),
   sender_public_key: Joi.string().base58().required(),
-  recipients: Joi.array().items(Joi.string()),
+  recipients: Joi.array().items(Joi.string().noControlChars()),
   amounts: Joi.array().items(
     Joi.object()
       .bignumber()
@@ -28,7 +28,7 @@ const inputSearch = Joi.object()
 
     sender: Joi.string().base58(),
     assetId: Joi.string().assetId(),
-    recipient: Joi.string(),
+    recipient: Joi.string().noControlChars(),
   })
   .required();
 

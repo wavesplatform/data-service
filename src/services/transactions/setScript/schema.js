@@ -8,7 +8,7 @@ const result = Joi.object().keys({
 
   script: Joi.string()
     .required()
-    .base64()
+    .base64({ paddingRequired: false })
     .allow(null),
 });
 
@@ -16,7 +16,7 @@ const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
     sender: Joi.string().base58(),
-    script: Joi.string().base64(),
+    script: Joi.string().base64({ paddingRequired: false }),
   })
   .required();
 

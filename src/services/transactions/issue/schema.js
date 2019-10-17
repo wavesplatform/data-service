@@ -9,7 +9,7 @@ const result = Joi.object().keys({
   asset_id: Joi.string()
     .assetId()
     .required(),
-  asset_name: Joi.string().required(),
+  asset_name: Joi.string().noControlChars().required(),
   description: Joi.string()
     .required()
     .allow(''),
@@ -18,14 +18,14 @@ const result = Joi.object().keys({
     .required(),
   decimals: Joi.number().required(),
   reissuable: Joi.boolean().required(),
-  script: Joi.string().base64().allow(null),
+  script: Joi.string().base64({ paddingRequired: false }).allow(null),
 });
 
 const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
 
-    script: Joi.string().base64(),
+    script: Joi.string().base64({ paddingRequired: false }),
     assetId: Joi.string().assetId(),
   })
   .required();

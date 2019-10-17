@@ -22,9 +22,9 @@ const customJoi = Joi.extend(joi => ({
       name: 'period',
       params: {
         options: joi.object().keys({
-          divisibleByLeftBound: joi.array().items(joi.string()),
+          divisibleByLeftBound: joi.array().items(joi.string().noControlChars()),
           limit: joi.number().integer(),
-          allow: joi.array().items(joi.string()),
+          allow: joi.array().items(joi.string().noControlChars()),
         }),
       },
       validate(params, value, state, options) {
@@ -153,7 +153,7 @@ const inputSearch = customJoi
       .required(),
     timeStart: Joi.date().required(),
     timeEnd: Joi.date().required(),
-    interval: Joi.string().required(),
+    interval: Joi.string().noControlChars().required(),
     matcher: Joi.string().base58(),
   })
   .period({

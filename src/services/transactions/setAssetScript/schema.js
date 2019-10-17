@@ -11,7 +11,7 @@ const result = Joi.object().keys({
     .assetId()
     .required(),
   script: Joi.string()
-    .base64()
+    .base64({ paddingRequired: false })
     .required()
     .allow(null),
 });
@@ -20,7 +20,7 @@ const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
     assetId: Joi.string().assetId(),
-    script: Joi.string().base64(),
+    script: Joi.string().base64({ paddingRequired: false }),
   })
   .required();
 

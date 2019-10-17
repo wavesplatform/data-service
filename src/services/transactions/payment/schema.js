@@ -10,12 +10,12 @@ const result = Joi.object().keys({
   amount: Joi.object()
     .bignumber()
     .required(),
-  recipient: Joi.string().required(),
+  recipient: Joi.string().noControlChars().required(),
 });
 
 const inputSearch = Joi.object().keys({
   ...commonFilters,
-  recipient: Joi.string(),
+  recipient: Joi.string().noControlChars(),
 });
 
 module.exports = {

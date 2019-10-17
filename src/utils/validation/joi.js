@@ -2,7 +2,8 @@ const rawJoi = require('joi');
 
 const { BigNumber } = require('@waves/data-entities');
 const { decode } = require('../../services/_common/pagination/cursor');
-const { base58: base58Regex, interval: intervalRegex, assetId: assetIdRegex } = require('../regex');
+const { base58: base58Regex, interval: intervalRegex,
+        assetId: assetIdRegex, noControlChars: noControlCharsRegex } = require('../regex');
 const { interval } = require('../../types');
 const { div } = require('../interval');
 
@@ -13,6 +14,7 @@ module.exports = rawJoi
     language: {
       base58: 'must be a valid base58 string',
       assetId: 'must be a valid base58 string or "WAVES"',
+      noControlChars: 'must not contain unicode control characters',
       cursor: 'must be a valid cursor string',
       pair: 'must be a valid pair string',
       period: {
@@ -49,6 +51,21 @@ module.exports = rawJoi
               .validate(value).error
           ) {
             return this.createError('string.assetId', { value }, state, options);
+          }
+
+          return value;
+        },
+      },
+      {
+        name: 'noControlChars',
+        validate(_, value, state, options) {
+          if (
+            joi
+              .string()
+              .regex(noControlCharsRegex)
+              .validate(value).error
+          ) {
+            return this.createError('string.noControlChars', { value }, state, options);
           }
 
           return value;

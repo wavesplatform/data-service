@@ -17,6 +17,7 @@ module.exports = {
     .required(),
   time_stamp: Joi.date().required(),
   signature: Joi.string()
+    .base58()
     .required()
     .allow(null),
   proofs: Joi.array().required(),
