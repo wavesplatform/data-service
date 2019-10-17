@@ -7,6 +7,22 @@ const { base58: base58Regex, interval: intervalRegex,
 const { interval } = require('../../types');
 const { div } = require('../interval');
 
+const regexRule = (joi, regex, { name, errorCode }) => ({
+  name,
+  validate(_, value, state, options) {
+    // assert base64
+    if (
+      joi
+        .string()
+        .regex(regex)
+        .validate(value).error
+    ) {
+      return this.createError(errorCode, { value }, state, options);
+    }
+    return value;
+  },
+});
+
 module.exports = rawJoi
   .extend(joi => ({
     base: joi.string(),
@@ -26,51 +42,12 @@ module.exports = rawJoi
       },
     },
     rules: [
-      {
-        name: 'base58',
-        validate(_, value, state, options) {
-          // assert base64
-          if (
-            joi
-              .string()
-              .regex(base58Regex)
-              .validate(value).error
-          ) {
-            return this.createError('string.base58', { value }, state, options);
-          }
-          return value;
-        },
-      },
-      {
-        name: 'assetId',
-        validate(_, value, state, options) {
-          if (
-            joi
-              .string()
-              .regex(assetIdRegex)
-              .validate(value).error
-          ) {
-            return this.createError('string.assetId', { value }, state, options);
-          }
-
-          return value;
-        },
-      },
-      {
-        name: 'noControlChars',
-        validate(_, value, state, options) {
-          if (
-            joi
-              .string()
-              .regex(noControlCharsRegex)
-              .validate(value).error
-          ) {
-            return this.createError('string.noControlChars', { value }, state, options);
-          }
-
-          return value;
-        },
-      },
+      regexRule(joi, base58Regex, { name: 'base58', errorCode: 'string.base58' }),
+      regexRule(joi, assetIdRegex,{ name: 'assetId', errorCode: 'string.assetId' }),
+      regexRule(joi, noControlCharsRegex, {
+        name: 'noControlChars', errorCode:  'string.noControlChars'
+      }),
+      regexRule(joi, intervalRegex, { name: 'period', errorCode:  'string.period.value'}),      
       {
         name: 'cursor',
         validate(_, value, state, options) {
@@ -89,26 +66,6 @@ module.exports = rawJoi
             Error: () =>
               this.createError('string.cursor', { value }, state, options),
           });
-        },
-      },
-      {
-        name: 'period',
-        validate(_, value, state, options) {
-          if (
-            joi
-              .string()
-              .regex(intervalRegex)
-              .validate(value).error
-          ) {
-            return this.createError(
-              'string.period.value',
-              { value },
-              state,
-              options
-            );
-          }
-
-          return value;
         },
       },
       {
