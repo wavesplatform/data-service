@@ -4,6 +4,6 @@ export const parseArrayQuery = (strOrArr: string | string[]): string[] | undefin
   if (isNil(strOrArr)) return;
   else if (typeof strOrArr === 'string') {
     if (!strOrArr.length) return [];
-    else return strOrArr.split(/\s*,\s*/);
+    else return strOrArr.split(',');
   } else return strOrArr;
 };
