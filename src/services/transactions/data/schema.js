@@ -41,6 +41,7 @@ const inputSearch = Joi.object()
       is: 'integer',
       then: Joi.object()
         .bignumber()
+        .notNan()
         .int64(),
     })
       .when('type', {
