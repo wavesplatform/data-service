@@ -6,12 +6,12 @@ import commonFilters from '../../presets/pg/searchWithPagination/commonFilterSch
 export const result = Joi.object().keys({
   ...commonFields,
 
-  dapp: Joi.string().noControlChars().required(),
+  dapp: Joi.string().required(),
   call: Joi.object()
     .keys({
-      function: Joi.string().noControlChars(),
+      function: Joi.string().noNullChars(),
       args: Joi.array().items({
-        type: Joi.string().noControlChars(),
+        type: Joi.string(),
         value: Joi.any(),
       }),
     })

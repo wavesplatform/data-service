@@ -1,8 +1,8 @@
 const Joi = require('../../utils/validation/joi');
 
-const inputGet = Joi.string().noControlChars().required();
+const inputGet = Joi.string().noNullChars().required();
 
-const inputMGet = Joi.array().items(Joi.string().noControlChars()).required();
+const inputMGet = Joi.array().items(Joi.string().noNullChars()).required();
 
 const inputSearch = Joi.object()
   .keys({
@@ -13,10 +13,10 @@ const inputSearch = Joi.object()
 
 const output = Joi.object().keys({
   address: Joi.string()
-    .noControlChars()
+    .base58()
     .required()
     .allow(null),
-  alias: Joi.string().noControlChars().required(),
+  alias: Joi.string().required(),
   duplicates: Joi.object().bignumber(),
 });
 

@@ -17,7 +17,6 @@ const result = Joi.object().keys({
     .items(
       Joi.object().keys({
         key: Joi.string()
-          .noControlChars()
           .allow('')
           .required(),
         type: CORRECT_TYPE.required(),
@@ -25,7 +24,7 @@ const result = Joi.object().keys({
           Joi.object()
             .bignumber()
             .int64(),
-          Joi.string().noControlChars().allow(''),
+          Joi.string().allow(''),
           Joi.boolean(),
         ],
       })
@@ -36,7 +35,7 @@ const result = Joi.object().keys({
 const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
-    key: Joi.string().noControlChars(),
+    key: Joi.string().noNullChars(),
     type: CORRECT_TYPE,
     value: Joi.when('type', {
       is: 'integer',
@@ -51,7 +50,7 @@ const inputSearch = Joi.object()
       })
       .when('type', {
         is: ['string', 'binary'],
-        then: Joi.string().noControlChars().allow(''),
+        then: Joi.string().noNullChars().allow(''),
       }),
   })
   .with('value', 'type')

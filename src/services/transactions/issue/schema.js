@@ -9,7 +9,7 @@ const result = Joi.object().keys({
   asset_id: Joi.string()
     .assetId()
     .required(),
-  asset_name: Joi.string().noControlChars().required(),
+  asset_name: Joi.string().required(),
   description: Joi.string()
     .required()
     .allow(''),

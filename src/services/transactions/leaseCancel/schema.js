@@ -12,7 +12,7 @@ const result = Joi.object().keys({
 const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
-    recipient: Joi.string().noControlChars(),
+    recipient: Joi.string().noNullChars(),
   })
   .required();
 

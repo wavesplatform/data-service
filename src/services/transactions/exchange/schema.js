@@ -6,8 +6,8 @@ const commonFilters = require('../../presets/pg/searchWithPagination/commonFilte
 
 const orderTypes = prefix => ({
   [`${prefix}_id`]: Joi.string().base58().required(),
-  [`${prefix}_version`]: Joi.string().noControlChars().required().allow(null),
-  [`${prefix}_type`]: Joi.string().required(),
+  [`${prefix}_version`]: Joi.string().noNullChars().required().allow(null),
+  [`${prefix}_type`]: Joi.string().noNullChars().required(),
   [`${prefix}_sender`]: Joi.string().base58().required(),
   [`${prefix}_sender_public_key`]: Joi.string().base58().required(),
   [`${prefix}_signature`]: Joi.string().base58().required(),

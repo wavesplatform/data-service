@@ -2,8 +2,8 @@ const Joi = require('../../utils/validation/joi');
 
 const inputSearch = Joi.object()
   .keys({
-    ticker: Joi.string().noControlChars(),
-    search: Joi.string().noControlChars(),
+    ticker: Joi.string().noNullChars(),
+    search: Joi.string().noNullChars(),
     after: Joi.string().base58(),
     limit: Joi.number()
       .min(0)
@@ -14,8 +14,8 @@ const inputSearch = Joi.object()
 
 const result = Joi.object().keys({
   asset_id: Joi.string().assetId().required(),
-  asset_name: Joi.string().noControlChars().required(),
-  description: Joi.string().noControlChars().allow(''),
+  asset_name: Joi.string().required(),
+  description: Joi.string().allow(''),
   sender: Joi.string()
     .base58()
     .allow('')
@@ -25,7 +25,6 @@ const result = Joi.object().keys({
   decimals: Joi.number().required(),
   reissuable: Joi.boolean().required(),
   ticker: Joi.string()
-    .noControlChars()
     .required()
     .allow(null),
   issue_timestamp: Joi.object()

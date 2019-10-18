@@ -3,7 +3,8 @@ const rawJoi = require('joi');
 const { BigNumber } = require('@waves/data-entities');
 const { decode } = require('../../services/_common/pagination/cursor');
 const { base58: base58Regex, interval: intervalRegex,
-        assetId: assetIdRegex, noControlChars: noControlCharsRegex } = require('../regex');
+        assetId: assetIdRegex, noNullChars: noNullCharsRegex,
+        saneForDbLike: saneForDbLikeRegex } = require('../regex');
 const { interval } = require('../../types');
 const { div } = require('../interval');
 
@@ -30,7 +31,8 @@ module.exports = rawJoi
     language: {
       base58: 'must be a valid base58 string',
       assetId: 'must be a valid base58 string or "WAVES"',
-      noControlChars: 'must not contain unicode control characters',
+      noNullChars: 'must not contain unicode null characters',
+      saneForDbLike: 'must not end with unescaped slash symbol',
       cursor: 'must be a valid cursor string',
       pair: 'must be a valid pair string',
       period: {
@@ -44,10 +46,11 @@ module.exports = rawJoi
     rules: [
       regexRule(joi, base58Regex, { name: 'base58', errorCode: 'string.base58' }),
       regexRule(joi, assetIdRegex,{ name: 'assetId', errorCode: 'string.assetId' }),
-      regexRule(joi, noControlCharsRegex, {
-        name: 'noControlChars', errorCode:  'string.noControlChars'
+      regexRule(joi, noNullCharsRegex, {
+        name: 'noNullChars', errorCode:  'string.noNullChars'
       }),
-      regexRule(joi, intervalRegex, { name: 'period', errorCode:  'string.period.value'}),      
+      regexRule(joi, intervalRegex, { name: 'period', errorCode:  'string.period.value'}),
+      regexRule(joi, saneForDbLikeRegex, { name: 'saneForDbLike', errorCode: 'string.saneForDbLike'}),
       {
         name: 'cursor',
         validate(_, value, state, options) {

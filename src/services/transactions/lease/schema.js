@@ -10,13 +10,13 @@ const result = Joi.object().keys({
   amount: Joi.object()
     .bignumber()
     .required(),
-  recipient: Joi.string().noControlChars().required(),
+  recipient: Joi.string().required(),
 });
 
 const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
-    recipient: Joi.string().noControlChars(),
+    recipient: Joi.string().noNullChars(),
   })
   .required();
 
