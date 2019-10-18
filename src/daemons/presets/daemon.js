@@ -1,6 +1,7 @@
 const Task = require('folktale/concurrency/task');
 const Maybe = require('folktale/maybe');
 
+const { AppError } = require('../../errorHandling');
 const { tap } = require('../../utils/tap');
 const logTaskProgress = require('../utils/logTaskProgress');
 
@@ -8,6 +9,16 @@ const logTaskProgress = require('../utils/logTaskProgress');
 const getSleepTime = (start, interval) => {
   let diff = interval - (new Date() - start);
   return diff < 0 ? 0 : diff;
+};
+
+const errorToString = e => {
+  if (e instanceof AppError) {
+    return e.error.message;
+  } else if (e instanceof Error) {
+    return e.message;
+  } else {
+    return String(e);
+  }
 };
 
 /** loop :: (Object -> Task) -> Object -> Number -> Number -> Promise */
@@ -115,7 +126,7 @@ const main = (daemon, config, interval, timeout, logger) =>
       },
       onRejected: error =>
         logger.error({
-          message: `[DAEMON] error: ${error}`,
+          message: `[DAEMON] error: ${errorToString(error)}`,
           error,
         }),
       onCancelled: () =>
