@@ -8,7 +8,6 @@ const result = Joi.object().keys({
 
   script: Joi.string()
     .required()
-    .base64({ paddingRequired: false })
     .allow(null),
 });
 

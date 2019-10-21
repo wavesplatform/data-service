@@ -18,7 +18,7 @@ const result = Joi.object().keys({
     .required(),
   decimals: Joi.number().required(),
   reissuable: Joi.boolean().required(),
-  script: Joi.string().base64({ paddingRequired: false }).allow(null),
+  script: Joi.string().allow(null),
 });
 
 const inputSearch = Joi.object()

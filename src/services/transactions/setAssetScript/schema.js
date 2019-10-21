@@ -11,7 +11,6 @@ const result = Joi.object().keys({
     .assetId()
     .required(),
   script: Joi.string()
-    .base64({ paddingRequired: false })
     .required()
     .allow(null),
 });
