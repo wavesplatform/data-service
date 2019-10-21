@@ -4,35 +4,35 @@ const limitMaximum = 1000;
 
 const pair = Joi.object().keys({
   amountAsset: Joi.string()
-    .base58()
+    .assetId()
     .required(),
   priceAsset: Joi.string()
-    .base58()
+    .assetId()
     .required(),
 });
 
 const inputGet = Joi.object()
   .keys({
     pair,
-    matcher: Joi.string().required(),
+    matcher: Joi.string().base58().required(),
   })
   .required();
 
 const inputMget = Joi.object().keys({
   pairs: Joi.array().items(pair),
-  matcher: Joi.string().required(),
+  matcher: Joi.string().base58().required(),
 });
 
 const inputSearch = Joi.object()
   .keys({
-    search_by_asset: Joi.string(),
+    search_by_asset: Joi.string().assetId(),
     search_by_assets: Joi.array()
-      .items(Joi.string(), Joi.string())
+      .items(Joi.string().assetId(), Joi.string().assetId())
       .length(2),
     match_exactly: Joi.array()
       .items(Joi.boolean(), Joi.boolean())
       .max(2),
-    matcher: Joi.string(),
+    matcher: Joi.string().base58(),
     limit: Joi.number()
       .min(1)
       .max(limitMaximum),
@@ -41,10 +41,10 @@ const inputSearch = Joi.object()
 
 const result = Joi.object().keys({
   amount_asset_id: Joi.string()
-    .base58()
+    .assetId()
     .required(),
   price_asset_id: Joi.string()
-    .base58()
+    .assetId()
     .required(),
   first_price: Joi.object()
     .bignumber()

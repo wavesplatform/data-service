@@ -8,7 +8,7 @@ const result = Joi.object().keys({
   ...commonFields,
 
   asset_id: Joi.string()
-    .base58()
+    .assetId()
     .required(),
   script: Joi.string()
     .required()
@@ -18,8 +18,8 @@ const result = Joi.object().keys({
 const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
-    assetId: Joi.string().base58(),
-    script: Joi.string(),
+    assetId: Joi.string().assetId(),
+    script: Joi.string().base64Prefixed(),
   })
   .required();
 
