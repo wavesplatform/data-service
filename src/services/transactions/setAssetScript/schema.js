@@ -19,7 +19,7 @@ const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
     assetId: Joi.string().assetId(),
-    script: Joi.string().base64({ paddingRequired: false }),
+    script: Joi.string().base64Prefixed(),
   })
   .required();
 

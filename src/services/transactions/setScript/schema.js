@@ -15,7 +15,7 @@ const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
     sender: Joi.string().base58(),
-    script: Joi.string().base64({ paddingRequired: false }),
+    script: Joi.string().base64Prefixed(),
   })
   .required();
 

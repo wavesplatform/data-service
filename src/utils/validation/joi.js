@@ -7,6 +7,7 @@ const { base58: base58Regex, interval: intervalRegex,
         saneForDbLike: saneForDbLikeRegex } = require('../regex');
 const { interval } = require('../../types');
 const { div } = require('../interval');
+const Maybe = require('folktale/maybe');
 
 const regexRule = (joi, name, regexes) => ({
   name,
@@ -32,6 +33,7 @@ module.exports = rawJoi
     language: {
       base58: 'must be a valid base58 string',
       assetId: 'must be a valid base58 string or "WAVES"',
+      base64Prefixed: 'must be a string of "base64:${base64EncodedString}"',
       noNullChars: 'must not contain unicode null characters',
       saneForDbLike: 'must not end with unescaped slash symbol',
       cursor: 'must be a valid cursor string',
@@ -53,6 +55,26 @@ module.exports = rawJoi
         { regex: saneForDbLikeRegex, errorCode: 'string.saneForDbLike' },
         { regex: noNullCharsRegex, errorCode: 'string.noNullChars' }        
       ]),
+      {
+        name: 'base64Prefixed',
+        validate(_, value, state, options) {
+          // the value should be "base64:${base4dEncodedString}"
+          return Maybe.of(value)
+            .filter(it => typeof it === 'string')
+            .map(it => it.split(':'))
+            .filter(it => it.length === 2)
+            .filter(
+              ([prefix, val]) => prefix === 'base64'
+                && !joi.string().base64({ paddingRequired: false }).validate(val).error
+            ).matchWith(
+              {
+                Just: () => value,
+                Nothing: () =>
+                  this.createError('string.base64Prefixed', { value }, state, options)
+              }
+            );
+        }
+      },
       {
         name: 'cursor',
         validate(_, value, state, options) {
