@@ -8,7 +8,7 @@ const { base58: base58Regex, interval: intervalRegex,
 const { interval } = require('../../types');
 const { div } = require('../interval');
 
-const regexRule = (joi, regexes, name) => ({
+const regexRule = (joi, name, regexes) => ({
   name,
   validate(_, value, state, options) {
     for (const { regex, errorCode } of regexes) {
@@ -45,14 +45,14 @@ module.exports = rawJoi
       },
     },
     rules: [
-      regexRule(joi, [{ regex: base58Regex, errorCode: 'string.base58' }], 'base58'),
-      regexRule(joi, [{ regex: assetIdRegex, errorCode: 'string.assetId' }],'assetId'),
-      regexRule(joi, [{ regex: noNullCharsRegex, errorCode: 'string.noNullChars' }], 'noNullChars'),
-      regexRule(joi, [{ regex: intervalRegex, errorCode: 'string.period.value' }], 'period'),
-      regexRule(joi, [
+      regexRule(joi, 'base58', [{ regex: base58Regex, errorCode: 'string.base58' }]),
+      regexRule(joi, 'assetId', [{ regex: assetIdRegex, errorCode: 'string.assetId' }]),
+      regexRule(joi, 'noNullChars', [{ regex: noNullCharsRegex, errorCode: 'string.noNullChars' }]),
+      regexRule(joi, 'period', [{ regex: intervalRegex, errorCode: 'string.period.value' }]),
+      regexRule(joi, 'saneForDbLike', [
         { regex: saneForDbLikeRegex, errorCode: 'string.saneForDbLike' },
         { regex: noNullCharsRegex, errorCode: 'string.noNullChars' }        
-      ], 'saneForDbLike'),
+      ]),
       {
         name: 'cursor',
         validate(_, value, state, options) {
