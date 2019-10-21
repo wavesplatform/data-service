@@ -5,5 +5,5 @@ export const base58: RegExp = new RegExp(`^${base58Chars}$`);
 export const assetId: RegExp = new RegExp(`^(?:WAVES|${base58Chars})$`);
 export const noNullChars: RegExp = /^[^\x00]*$/;
 
-// string doesn't have null character and dangding unescaped slash at the end
+// string doesn't have dangding unescaped slash at the end
 export const saneForDbLike: RegExp = /^(?:.*[^\\])?(?:\\\\)*$/;
