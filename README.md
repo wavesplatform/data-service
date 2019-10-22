@@ -63,9 +63,13 @@ When using the container in production, we recommend establishing a Docker loggi
    ```bash
    npm install    # or `yarn install`, if you prefer
    ```
-2. Start the server
+2. Build the server
    ```bash
-   export $(cat variables.env | xargs) && NODE_ENV=production node src/index.js
+   npm run build
+   ```
+3. Start the server
+   ```bash
+   export $(cat variables.env | xargs) && NODE_ENV=production node dist/index.js
    ```
 
 Server will start at `localhost:PORT` (defaults to 3000). Logs will be directed to stdout.
