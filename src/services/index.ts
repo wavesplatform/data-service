@@ -120,7 +120,7 @@ export default ({
     // caches
     const ratesCache = new RateCacheImpl(200000, 60000); // 1 minute
     const pairsCache = createPairsCache(1000, 5000);
-    const assetsCache = createAssetsCache(10000, 10 * 60 * 1000); // 10 minutes
+    const assetsCache = createAssetsCache(10000, 60000); // 1 minute
 
     const commonDeps = {
       drivers: {
