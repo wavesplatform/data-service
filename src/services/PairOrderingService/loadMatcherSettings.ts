@@ -7,20 +7,22 @@ type MatcherSettings = {
   orderVersions: number[];
 };
 
+const err = (matcherSettingsURL: string, originalError?: Error) =>
+  new InitError(
+    `Unable to get matcher settings for ${matcherSettingsURL}. Please check the MATCHER_SETTINGS_URL env variable.`,
+    { error: originalError }
+  );
+
 export const loadMatcherSettings = (
   matcherSettingsURL: string
 ): Task.Task<InitError, MatcherSettings> =>
-  Task.task(resolver => {
-    try {
-      get(matcherSettingsURL, res => {
-        let rawData = '';
-        res.on('data', (chunk: any) => (rawData += chunk));
-        res.on('end', () => {
-          const settings: MatcherSettings = JSON.parse(rawData);
-          resolver.resolve(settings);
-        });
+  Task.task(({ resolve, reject }) =>
+    get(matcherSettingsURL, res => {
+      let rawData = '';
+      res.on('data', (chunk: any) => (rawData += chunk));
+      res.on('end', () => {
+        const settings: MatcherSettings = JSON.parse(rawData);
+        resolve(settings);
       });
-    } catch (e) {
-      resolver.reject(new InitError(e));
-    }
-  });
+    }).on('error', error => reject(err(matcherSettingsURL, error)))
+  );
