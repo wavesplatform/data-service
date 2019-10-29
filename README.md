@@ -36,7 +36,7 @@ The service uses following environment variables:
 |`PGPOOLSIZE`|`20`|NO|Postgres pool size|
 |`LOG_LEVEL`|`info`|NO|Log level `['info','warn','error']`|
 |`DEFAULT_MATCHER`||YES|Default matcher public address|
-|`MATCHER_SETTINGS_URL`|https://matcher.wavesplatform.com/matcher/settings|NO|Default matcher URL for getting settings|
+|`MATCHER_SETTINGS_URL`||NO|Default matcher URL for getting settings|
 
 `PGPOOLSIZE` is used by the `pg-pool` library to determine Postgres connection pool size per NodeJS process instance. A good value depends on your server and db configuration and can be found empirically. You can leave it at the default value to start with.
 
