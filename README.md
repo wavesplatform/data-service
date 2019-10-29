@@ -45,11 +45,14 @@ Set those variables to a `variables.env` file in the root of the project for con
 If you would like to use some other way of setting environment variables, just replace relevant commands below with custom alternatives.
 
 ##### Docker
-1. Build a Docker image from the project root
+If you wish to build data-service image locally, run this command from the project root
    ```bash
    docker build -t wavesplatform/data-service .
    ```
-2. Run the container
+
+Otherwise you can use our public image from https://hub.docker.com/r/wavesplatform/data-service
+
+Run the container using this command:
    ```bash
    docker run -p=<port>:3000 --env-file=variables.env wavesplatform/data-service
    ```
