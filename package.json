@@ -53,7 +53,7 @@
     "folktale": "^2.1.0",
     "joi": "^13.2.0",
     "json-colorizer": "^1.1.1",
-    "knex": "^0.14.6",
+    "knex": "^0.19.5",
     "koa": "^2.5.0",
     "koa-bodyparser": "^4.2.1",
     "koa-compose": "^4.1.0",
