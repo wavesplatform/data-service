@@ -16,7 +16,7 @@ const result = Joi.object().keys({
 const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
-    recipient: Joi.string(),
+    recipient: Joi.string().noNullChars(),
   })
   .required();
 

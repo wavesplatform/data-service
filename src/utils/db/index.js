@@ -41,10 +41,9 @@ const pickBindFilters = curryN(3, (F, fsToApply, fValues) =>
  */
 const escapeForTsQuery = query => {
   return query
-    .trim()
     .replace(/[^\w\s]|_/g, '')
-    .split(' ')
-    .join(' & ');
+    .trim()
+    .replace(/\s+/g, ' & ')
 };
 
 /**

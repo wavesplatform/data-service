@@ -36,7 +36,7 @@ The service uses following environment variables:
 |`PGPOOLSIZE`|`20`|NO|Postgres pool size|
 |`LOG_LEVEL`|`info`|NO|Log level `['info','warn','error']`|
 |`DEFAULT_MATCHER`||YES|Default matcher public address|
-|`MATCHER_SETTINGS_URL`|https://matcher.wavesplatform.com/matcher/settings|NO|Default matcher URL for getting settings|
+|`MATCHER_SETTINGS_URL`||NO|Default matcher URL for getting settings|
 
 `PGPOOLSIZE` is used by the `pg-pool` library to determine Postgres connection pool size per NodeJS process instance. A good value depends on your server and db configuration and can be found empirically. You can leave it at the default value to start with.
 
@@ -45,11 +45,14 @@ Set those variables to a `variables.env` file in the root of the project for con
 If you would like to use some other way of setting environment variables, just replace relevant commands below with custom alternatives.
 
 ##### Docker
-1. Build a Docker image from the project root
+If you wish to build data-service image locally, run this command from the project root
    ```bash
    docker build -t wavesplatform/data-service .
    ```
-2. Run the container
+
+Otherwise you can use our public image from https://hub.docker.com/r/wavesplatform/data-service
+
+Run the container using this command:
    ```bash
    docker run -p=<port>:3000 --env-file=variables.env wavesplatform/data-service
    ```
@@ -63,9 +66,13 @@ When using the container in production, we recommend establishing a Docker loggi
    ```bash
    npm install    # or `yarn install`, if you prefer
    ```
-2. Start the server
+2. Build the server
    ```bash
-   export $(cat variables.env | xargs) && NODE_ENV=production node src/index.js
+   npm run build
+   ```
+3. Start the server
+   ```bash
+   export $(cat variables.env | xargs) && NODE_ENV=production node dist/index.js
    ```
 
 Server will start at `localhost:PORT` (defaults to 3000). Logs will be directed to stdout.

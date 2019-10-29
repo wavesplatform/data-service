@@ -35,7 +35,7 @@ const result = Joi.object().keys({
 const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
-    key: Joi.string(),
+    key: Joi.string().noNullChars(),
     type: CORRECT_TYPE,
     value: Joi.when('type', {
       is: 'integer',
@@ -50,7 +50,7 @@ const inputSearch = Joi.object()
       })
       .when('type', {
         is: ['string', 'binary'],
-        then: Joi.string().allow(''),
+        then: Joi.string().noNullChars().allow(''),
       }),
   })
   .with('value', 'type')

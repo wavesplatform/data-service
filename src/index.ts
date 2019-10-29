@@ -62,4 +62,7 @@ createServices({
         );
       }
     },
+    onRejected: e => {
+      console.error(e);
+    },
   });

@@ -1,9 +1,11 @@
 import * as rawJoi from 'joi';
+
+import { Joi } from '../../../../utils/validation';
 import { decode } from '../../../_common/pagination/cursor';
 
 const DATE0 = new Date(0);
 
-const Joi = rawJoi.extend(
+const CustomJoi = Joi.extend(
   (joi: rawJoi.Root): rawJoi.Extension => ({
     base: joi.string().base64({ paddingRequired: false }),
     name: 'cursor',
@@ -26,17 +28,17 @@ const Joi = rawJoi.extend(
 );
 
 export default {
-  timeStart: Joi.date().min(DATE0),
-  timeEnd: Joi.when('timeStart', {
-    is: Joi.exist(),
-    then: Joi.date().min(Joi.ref('timeStart')),
-    otherwise: Joi.date().min(DATE0),
+  timeStart: CustomJoi.date().min(DATE0),
+  timeEnd: CustomJoi.when('timeStart', {
+    is: CustomJoi.exist(),
+    then: CustomJoi.date().min(CustomJoi.ref('timeStart')),
+    otherwise: CustomJoi.date().min(DATE0),
   }),
-  limit: Joi.number()
+  limit: CustomJoi.number()
     .min(1)
     .max(100)
     .required(),
-  sort: Joi.string().valid('asc', 'desc'),
-  after: Joi.cursor().valid(),
-  sender: Joi.string(),
+  sort: CustomJoi.string().valid('asc', 'desc'),
+  after: CustomJoi.cursor().valid(),
+  sender: CustomJoi.string().base58(),
 };

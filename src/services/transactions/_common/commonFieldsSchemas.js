@@ -17,10 +17,11 @@ module.exports = {
     .required(),
   time_stamp: Joi.date().required(),
   signature: Joi.string()
+    .base58()
     .required()
     .allow(null),
   proofs: Joi.array().required(),
 
-  sender: Joi.string().required(),
-  sender_public_key: Joi.string().required(),
+  sender: Joi.string().base58().required(),
+  sender_public_key: Joi.string().base58().required(),
 };

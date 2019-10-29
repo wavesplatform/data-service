@@ -6,13 +6,13 @@ const commonFilters = require('../../presets/pg/searchWithPagination/commonFilte
 
 const result = Joi.object().keys({
   ...commonFields,
-  lease_id: Joi.string().required(),
+  lease_id: Joi.string().base58().required(),
 });
 
 const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
-    recipient: Joi.string(),
+    recipient: Joi.string().noNullChars(),
   })
   .required();
 
