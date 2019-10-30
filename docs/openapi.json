@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "version": "0.25.0",
+    "version": "0.26.3",
     "title": "Waves Data Service",
     "description": "This is a a public Waves Data Services API documentation. The goal of the API is to provide a simple and convenient way to get data from Waves blockchain."
   },
@@ -2873,14 +2873,14 @@
         "tags": [
           "aliases"
         ],
-        "summary": "Get a list of aliases for a given address",
+        "summary": "Get a list of aliases",
         "operationId": "getAliasesForAddress",
         "parameters": [
           {
             "in": "query",
             "name": "address",
             "description": "Address",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string"
             }
@@ -2894,11 +2894,22 @@
               "type": "boolean",
               "default": false
             }
+          },
+          {
+            "in": "query",
+            "name": "aliases",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "List of aliases for given address",
+            "description": "List of aliases",
             "content": {
               "application/json": {
                 "schema": {

@@ -9,7 +9,7 @@ export const result = Joi.object().keys({
   dapp: Joi.string().required(),
   call: Joi.object()
     .keys({
-      function: Joi.string(),
+      function: Joi.string().noNullChars(),
       args: Joi.array().items({
         type: Joi.string(),
         value: Joi.any(),
@@ -21,7 +21,7 @@ export const result = Joi.object().keys({
       .bignumber()
       .required(),
     assetId: Joi.string()
-      .base58()
+      .assetId()
       .required()
       .allow(null),
   }),

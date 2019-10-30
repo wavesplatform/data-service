@@ -17,7 +17,7 @@ export type AsyncMget<Req, Res, Error> = {
 };
 
 export type PairsForRequest = {
-  preCount: Array<RateWithPairIds>;
+  preCount: RateWithPairIds[];
   toBeRequested: AssetIdsPair[];
 };
 

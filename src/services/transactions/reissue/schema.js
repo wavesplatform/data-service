@@ -7,7 +7,7 @@ const result = Joi.object().keys({
   ...commonFields,
 
   asset_id: Joi.string()
-    .base58()
+    .assetId()
     .required(),
   quantity: Joi.object()
     .bignumber()
@@ -19,7 +19,7 @@ const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
 
-    assetId: Joi.string().base58(),
+    assetId: Joi.string().assetId(),
   })
   .required();
 

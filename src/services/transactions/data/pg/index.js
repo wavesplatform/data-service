@@ -15,26 +15,31 @@ const pg = {
       .map(transformResult)
       .map(head)
       .map(Maybe.fromNullable)
-      .mapRejected(toDbError({ request: 'transactions.data.get', params: id })),
+      .mapRejected(e =>
+        toDbError({ request: 'transactions.data.get', params: id }, e.error)
+      ),
 
   mget: pg => ids =>
     pg
       .any(sql.mget(ids))
       .map(transformResult)
       .map(matchRequestsResults(propEq('id'), ids))
-      .mapRejected(
-        toDbError({ request: 'transactions.data.mget', params: ids })
+      .mapRejected(e =>
+        toDbError({ request: 'transactions.data.mget', params: ids }, e.error)
       ),
 
   search: pg => filters =>
     pg
       .any(sql.search(filters))
       .map(transformResult)
-      .mapRejected(
-        toDbError({
-          request: 'transactions.data.search',
-          params: filters,
-        })
+      .mapRejected(e =>
+        toDbError(
+          {
+            request: 'transactions.data.search',
+            params: filters,
+          },
+          e.error
+        )
       ),
 };
 

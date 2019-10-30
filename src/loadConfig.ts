@@ -21,7 +21,7 @@ export type ServerConfig = {
 
 export type MatcherConfig = {
   matcher: {
-    settingsURL: string;
+    settingsURL?: string;
     defaultMatcherAddress: string;
   };
 };
@@ -62,14 +62,22 @@ const load = (): DataServiceConfig => {
   // assert all necessary env vars are set
   checkEnv(envVariables);
 
+  const matcher: MatcherConfig = {
+    matcher: {
+      defaultMatcherAddress: process.env.DEFAULT_MATCHER as string,
+    },
+  };
+
+  if (
+    typeof process.env.MATCHER_SETTINGS_URL !== 'undefined' &&
+    process.env.MATCHER_SETTINGS_URL !== ''
+  ) {
+    matcher.matcher.settingsURL = process.env.MATCHER_SETTINGS_URL;
+  }
+
   return {
     ...loadDefaultConfig(),
-    matcher: {
-      settingsURL:
-        process.env.MATCHER_SETTINGS_URL ||
-        'https://matcher.wavesplatform.com/matcher/settings',
-      defaultMatcherAddress: process.env.DEFAULT_MATCHER || '',
-    },
+    ...matcher,
   };
 };
 
