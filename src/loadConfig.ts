@@ -8,6 +8,7 @@ export type PostgresConfig = {
   postgresUser: string;
   postgresPassword: string;
   postgresPoolSize: number;
+  postgresStatementTimeout: number;
 };
 
 export type LoggerConfig = {
@@ -48,6 +49,9 @@ export const loadDefaultConfig = (): DefaultConfig => {
     postgresPoolSize: process.env.PGPOOLSIZE
       ? parseInt(process.env.PGPOOLSIZE)
       : 20,
+    postgresStatementTimeout: process.env.PGSTATEMENTTIMEOUT
+      ? parseInt(process.env.PGSTATEMENTTIMEOUT)
+      : 30000,
     logLevel: process.env.LOG_LEVEL || 'info',
   };
 };

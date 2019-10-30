@@ -1,7 +1,9 @@
 const Task = require('folktale/concurrency/task');
 const Maybe = require('folktale/maybe');
 
+const getErrorMessage = require('../../errorHandling/getErrorMessage');
 const { tap } = require('../../utils/tap');
+
 const logTaskProgress = require('../utils/logTaskProgress');
 
 /** getSleepTime :: Date -> Number ms -> Number ms */
@@ -18,7 +20,7 @@ const loop = (func, cfg, interval, timeout) => {
     func(cfg),
     Task.task(resolver => {
       const timerId = setTimeout(
-        () => resolver.reject(new Error('[DAEMON] timeout expired')),
+        () => resolver.reject(new Error('Daemon timeout expired')),
         timeout
       );
       resolver.cleanup(() => clearTimeout(timerId));
@@ -90,7 +92,7 @@ const main = (daemon, config, interval, timeout, logger) =>
           error: (e, timeTaken) => ({
             message: '[DAEMON] loop error',
             time: timeTaken,
-            error: e,
+            error: getErrorMessage(e),
           }),
           success: (_, timeTaken) => ({
             message: '[DAEMON] loop successfully stopped',
@@ -115,8 +117,8 @@ const main = (daemon, config, interval, timeout, logger) =>
       },
       onRejected: error =>
         logger.error({
-          message: `[DAEMON] error: ${error}`,
-          error,
+          message: `[DAEMON] loop is stopped with error`,
+          error: getErrorMessage(error),
         }),
       onCancelled: () =>
         logger.error({

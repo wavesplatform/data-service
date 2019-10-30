@@ -1,9 +1,8 @@
 // Module transforms pg-promise into pg-task
 import { pgpConnect } from './pgp';
 import { ITask, IDatabase } from 'pg-promise';
-import { fromPromised } from 'folktale/concurrency/task';
-
-import { Task } from 'folktale/concurrency/task';
+import { fromPromised, Task } from 'folktale/concurrency/task';
+import { defaultTo } from 'ramda';
 import { DbError, toDbError } from '../../errorHandling';
 
 export type PgDriverOptions = {
@@ -13,6 +12,7 @@ export type PgDriverOptions = {
   postgresUser: string;
   postgresPassword: string;
   postgresPoolSize: number;
+  postgresStatementTimeout: number;
 };
 
 export type SqlQuery = string;
@@ -48,6 +48,7 @@ export const createPgDriver = (
     user: options.postgresUser,
     password: options.postgresPassword,
     max: options.postgresPoolSize, // max connection pool size
+    statement_timeout: defaultTo(false, options.postgresStatementTimeout),
   });
 
   const toTasked = <T>(promised: () => Promise<T>) =>

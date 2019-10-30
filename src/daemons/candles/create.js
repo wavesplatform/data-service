@@ -1,6 +1,8 @@
-const { compose, head, map, nth } = require('ramda');
+const { compose, map, nth } = require('ramda');
 const Task = require('folktale/concurrency/task');
 const { fromNullable } = require('folktale/maybe');
+
+const getErrorMessage = require('../../errorHandling/getErrorMessage');
 
 const logTaskProgress = require('../utils/logTaskProgress');
 
@@ -52,7 +54,7 @@ const updateCandlesLoop = (logTask, pg, tableName) => {
       return {
         message: '[CANDLES] update error',
         time: timeTaken,
-        error: e,
+        error: getErrorMessage(e),
       };
     },
     success: (_, timeTaken) => ({
