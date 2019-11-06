@@ -63,6 +63,7 @@ export type DataTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
+  timeouts,
 }: CommonServiceDependencies): DataTxsService => {
   return {
     get: get<string, string, DataTxDbResponse, Transaction>({
@@ -75,7 +76,7 @@ export default ({
       >(transaction)(transformTxInfo),
       validateInput: validateInput(inputGet, createServiceName('get')),
       validateResult: validateResult(resultSchema, createServiceName('get')),
-      getData: pgData.get(pg),
+      getData: pgData.get(pg)(timeouts.get),
       emitEvent,
     }),
 
@@ -89,7 +90,7 @@ export default ({
       >(transaction)(transformTxInfo),
       validateInput: validateInput(inputMget, createServiceName('mget')),
       validateResult: validateResult(resultSchema, createServiceName('mget')),
-      getData: pgData.mget(pg),
+      getData: pgData.mget(pg)(timeouts.mget),
       emitEvent,
     }),
 
@@ -111,7 +112,7 @@ export default ({
         createServiceName('search')
       ),
       validateResult: validateResult(resultSchema, createServiceName('search')),
-      getData: pgData.search(pg),
+      getData: pgData.search(pg)(timeouts.search),
       emitEvent,
     }),
   };

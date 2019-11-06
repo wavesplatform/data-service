@@ -21,6 +21,7 @@ export const searchWithPaginationPreset = <
   inputSchema,
   resultSchema,
   transformResult,
+  statementTimeout,
 }: {
   name: string;
   sql: (r: RequestWithCursor<Request, Cursor>) => string;
@@ -30,6 +31,7 @@ export const searchWithPaginationPreset = <
     response: ResponseRaw,
     request?: RequestWithCursor<Request, Cursor>
   ) => Result;
+  statementTimeout: number;
 }) => ({ pg, emitEvent }: ServicePresetInitOptions) =>
   search<
     RequestWithCursor<Request, string>,
@@ -45,6 +47,7 @@ export const searchWithPaginationPreset = <
       name,
       sql,
       pg,
+      statementTimeout,
     }),
     emitEvent,
   });

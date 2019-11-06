@@ -15,7 +15,7 @@ const { inputGet } = require('../../../presets/pg/getById/inputSchema');
 const { inputMget } = require('../../../presets/pg/mgetByIds/inputSchema');
 const { result, inputSearch } = require('./schema');
 
-module.exports = ({ drivers: { pg }, emitEvent }) => {
+module.exports = ({ drivers: { pg }, emitEvent, timeouts }) => {
   return {
     get: getByIdPreset({
       name: 'transactions.all.commonData.get',
@@ -24,6 +24,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       resultSchema: result,
       resultTypeFactory: transaction,
       transformResult: transformTxInfo,
+      statementTimeout: timeouts.get,
     })({ pg, emitEvent }),
 
     mget: mgetByIdsPreset({
@@ -34,6 +35,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       inputSchema: inputMget,
       resultSchema: result,
       transformResult: transformTxInfo,
+      statementTimeout: timeouts.mget,
     })({ pg, emitEvent }),
 
     search: searchWithPaginationPreset({
@@ -45,6 +47,7 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
         transaction,
         transformTxInfo
       ),
+      statementTimeout: timeouts.search,
     })({ pg, emitEvent }),
   };
 };

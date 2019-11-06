@@ -30,6 +30,7 @@ export type CandlesService = ServiceSearch<CandlesSearchRequest, Candle>;
 export default ({
   drivers: { pg },
   emitEvent,
+  timeouts,
   validatePair,
 }: CommonServiceDependencies & {
   validatePair: (matcher: string, pair: AssetIdsPair) => Task<AppError, void>;
@@ -54,7 +55,12 @@ export default ({
           }).map(() => req)
         ),
       validateResult: validateResult(output, SERVICE_NAME),
-      getData: getData({ name: SERVICE_NAME, sql, pg }),
+      getData: getData({
+        name: SERVICE_NAME,
+        sql,
+        pg,
+        statementTimeout: timeouts.search,
+      }),
       emitEvent,
     }),
   };

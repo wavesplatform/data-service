@@ -25,6 +25,8 @@ const mockTxs: TestTransaction[] = [
   { id: 'w', timestamp: new Date() },
 ];
 
+const DEFAULT_TIMEOUT_IN_MS = 30000;
+
 const service = searchPreset<
   TestQueryOptions,
   TestTransaction,
@@ -37,6 +39,7 @@ const service = searchPreset<
   resultSchema: Joi.any(),
   transformResult: (res: TestTransaction[]) =>
     list(res.map(tx => toSerializable<'tx', TestTransaction>('tx', tx))),
+  statementTimeout: DEFAULT_TIMEOUT_IN_MS,
 })({
   pg: { any: filters => task(mockTxs) } as PgDriver,
   emitEvent: always(T),

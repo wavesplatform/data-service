@@ -11,6 +11,8 @@ import {
 import { PgDriver } from '../../../../../db/driver';
 const { inputMget: input } = require('../inputSchema');
 
+const DEFAULT_TIMEOUT_IN_MS = 30000;
+
 const createService = (resultSchema: SchemaLike) =>
   mgetByIdsPreset<string, string, string, Serializable<'test', string | null>>({
     name: 'some_name',
@@ -21,6 +23,7 @@ const createService = (resultSchema: SchemaLike) =>
     transformResult: identity,
     resultTypeFactory: (a?: string | null) =>
       toSerializable<'test', string | null>('test', a ? a : null),
+    statementTimeout: DEFAULT_TIMEOUT_IN_MS,
   })({
     pg: {
       any: ids => taskOf(ids.split(';')),

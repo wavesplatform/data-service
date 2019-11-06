@@ -46,7 +46,10 @@ export default ({
   drivers: { pg },
   emitEvent,
   cache,
-}: CommonServiceDependencies & { cache: AssetsCache }): AssetsService => {
+  timeouts,
+}: CommonServiceDependencies & {
+  cache: AssetsCache;
+}): AssetsService => {
   const SERVICE_NAME = {
     GET: 'assets.get',
     MGET: 'assets.mget',
@@ -65,6 +68,7 @@ export default ({
               name: SERVICE_NAME.GET,
               sql: sql.get,
               pg,
+              statementTimeout: timeouts.get,
             })(req).map(
               tap(maybeResp => forEach(x => cache.set(req, x), maybeResp))
             ),
@@ -94,6 +98,7 @@ export default ({
           sql: sql.mget,
           matchRequestResult: propEq('asset_id'),
           pg,
+          statementTimeout: timeouts.mget,
         })(notCachedAssetIds).map(fromDb => {
           fromDb.forEach((assetInfo, index) =>
             forEach(value => {
@@ -129,6 +134,7 @@ export default ({
         AssetDbResponse,
         Asset
       >(asset)(transformDbResponse),
+      statementTimeout: timeouts.search,
     })({ pg, emitEvent }),
   };
 };

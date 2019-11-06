@@ -37,6 +37,7 @@ The service uses following environment variables:
 |`LOG_LEVEL`|`info`|NO|Log level `['info','warn','error']`|
 |`DEFAULT_MATCHER`||YES|Default matcher public address|
 |`MATCHER_SETTINGS_URL`||NO|Default matcher URL for getting settings|
+|`DEFAULT_TIMEOUT`|30000|NO|Default timeout in ms; at this moment used only as `PG STATEMENT_TIMEOUT`|
 
 `PGPOOLSIZE` is used by the `pg-pool` library to determine Postgres connection pool size per NodeJS process instance. A good value depends on your server and db configuration and can be found empirically. You can leave it at the default value to start with.
 

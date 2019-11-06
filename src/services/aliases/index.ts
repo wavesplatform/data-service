@@ -23,15 +23,16 @@ type AliasesSearchRequest = {
   showBroken: boolean;
 };
 
-type AliasMGetParams = string[]
+type AliasMGetParams = string[];
 
 export type AliasService = ServiceGet<string, Alias> &
   ServiceSearch<AliasesSearchRequest, Alias> &
-  ServiceMget<AliasMGetParams, Alias>
+  ServiceMget<AliasMGetParams, Alias>;
 
 export default ({
   drivers,
   emitEvent,
+  timeouts,
 }: CommonServiceDependencies): AliasService => {
   return {
     get: getByIdPreset<string, AliasDbResponse, AliasInfo, Alias>({
@@ -41,6 +42,7 @@ export default ({
       resultSchema: output,
       transformResult: transformDbResponse,
       resultTypeFactory: alias,
+      statementTimeout: timeouts.get,
     })({ pg: drivers.pg, emitEvent: emitEvent }),
 
     mget: mgetByIdsPreset<string, AliasDbResponse, AliasInfo, Alias>({
@@ -50,7 +52,8 @@ export default ({
       resultSchema: output,
       transformResult: transformDbResponse,
       resultTypeFactory: alias,
-      matchRequestResult: propEq('alias')
+      matchRequestResult: propEq('alias'),
+      statementTimeout: timeouts.mget,
     })({ pg: drivers.pg, emitEvent: emitEvent }),
 
     search: searchPreset<
@@ -68,6 +71,7 @@ export default ({
         AliasDbResponse,
         Alias
       >(alias)(transformDbResponse),
+      statementTimeout: timeouts.search,
     })({ pg: drivers.pg, emitEvent: emitEvent }),
   };
 };

@@ -78,6 +78,7 @@ export type ExchangeTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
+  timeouts,
 }: CommonServiceDependencies): ExchangeTxsService => {
   return {
     get: getByIdPreset<
@@ -92,6 +93,7 @@ export default ({
       resultSchema: result,
       resultTypeFactory: transaction,
       transformResult: transformTxInfo,
+      statementTimeout: timeouts.get,
     })({ pg, emitEvent }),
 
     mget: mgetByIdsPreset<
@@ -107,6 +109,7 @@ export default ({
       resultTypeFactory: transaction,
       resultSchema: result,
       transformResult: transformTxInfo,
+      statementTimeout: timeouts.mget,
     })({ pg, emitEvent }),
 
     search: searchWithPaginationPreset<
@@ -123,6 +126,7 @@ export default ({
         transaction,
         transformTxInfo
       ),
+      statementTimeout: timeouts.search,
     })({ pg, emitEvent }),
   };
 };

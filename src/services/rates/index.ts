@@ -1,5 +1,13 @@
 import { BigNumber } from '@waves/data-entities';
-import { ServiceMget, Rate, RateMgetParams, list, rate, RateInfo, AssetIdsPair } from '../../types';
+import {
+  ServiceMget,
+  Rate,
+  RateMgetParams,
+  list,
+  rate,
+  RateInfo,
+  AssetIdsPair,
+} from '../../types';
 import { RateSerivceCreatorDependencies } from '../../services';
 import RateEstimator from './RateEstimator';
 import RemoteRateRepo from './repo/impl/RemoteRateRepo';
@@ -11,8 +19,12 @@ export type RateWithPairIds = RateInfo & AssetIdsPair;
 export default function({
   drivers,
   cache,
+  timeouts,
 }: RateSerivceCreatorDependencies): ServiceMget<RateMgetParams, Rate> {
-  const estimator = new RateEstimator(cache, new RemoteRateRepo(drivers.pg));
+  const estimator = new RateEstimator(
+    cache,
+    new RemoteRateRepo(drivers.pg, timeouts.mget)
+  );
 
   return {
     mget(request: RateMgetParams) {
@@ -20,9 +32,15 @@ export default function({
         .mget(request)
         .map(data =>
           data.map(item =>
-            rate({
-              rate: item.res.fold(() => new BigNumber(0), it => it.rate)
-            }, { amountAsset: item.req.amountAsset, priceAsset: item.req.priceAsset })
+            rate(
+              {
+                rate: item.res.fold(() => new BigNumber(0), it => it.rate),
+              },
+              {
+                amountAsset: item.req.amountAsset,
+                priceAsset: item.req.priceAsset,
+              }
+            )
           )
         )
         .map(list);

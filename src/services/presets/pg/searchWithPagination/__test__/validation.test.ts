@@ -29,6 +29,8 @@ type ResponseRaw = {
   timestamp: Date;
 };
 
+const DEFAULT_TIMEOUT_IN_MS = 30000;
+
 const service = searchWithPaginationPreset<
   Request,
   ResponseRaw,
@@ -41,6 +43,7 @@ const service = searchWithPaginationPreset<
   resultSchema: Joi.any(),
   transformResult: (response: ResponseRaw) =>
     toSerializable<'tx', ResponseRaw>('tx', response),
+  statementTimeout: DEFAULT_TIMEOUT_IN_MS,
 })({
   pg: { any: filters => task(mockTxs) } as PgDriver,
   emitEvent: always(T),

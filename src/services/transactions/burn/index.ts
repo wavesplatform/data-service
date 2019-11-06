@@ -47,6 +47,7 @@ export type BurnTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
+  timeouts,
 }: CommonServiceDependencies): BurnTxsService => {
   return {
     get: getByIdPreset<string, BurnTxDbResponse, TransactionInfo, Transaction>({
@@ -56,6 +57,7 @@ export default ({
       resultSchema,
       resultTypeFactory: transaction,
       transformResult: transformTxInfo,
+      statementTimeout: timeouts.get,
     })({ pg, emitEvent }),
 
     mget: mgetByIdsPreset<
@@ -71,6 +73,7 @@ export default ({
       resultTypeFactory: transaction,
       resultSchema,
       transformResult: transformTxInfo,
+      statementTimeout: timeouts.mget,
     })({ pg, emitEvent }),
 
     search: searchWithPaginationPreset<
@@ -87,6 +90,7 @@ export default ({
         transaction,
         transformTxInfo
       ),
+      statementTimeout: timeouts.search,
     })({ pg, emitEvent }),
   };
 };

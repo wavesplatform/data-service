@@ -44,6 +44,7 @@ export type InvokeScriptTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
+  timeouts,
 }: CommonServiceDependencies): InvokeScriptTxsService => {
   return {
     get: get<string, string, RawInvokeScriptTx, Transaction>({
@@ -59,7 +60,7 @@ export default ({
         resultSchema,
         createServiceName('get')
       ),
-      getData: pgData.get(pg),
+      getData: pgData.get(pg)(timeouts.get),
       emitEvent,
     }),
 
@@ -73,7 +74,7 @@ export default ({
       >(transaction)(transformTxInfo),
       validateInput: validateInput(inputMget, createServiceName('mget')),
       validateResult: validateResult(resultSchema, createServiceName('mget')),
-      getData: pgData.mget(pg),
+      getData: pgData.mget(pg)(timeouts.mget),
       emitEvent,
     }),
 
@@ -93,7 +94,7 @@ export default ({
         resultSchema,
         createServiceName('search')
       ),
-      getData: pgData.search(pg),
+      getData: pgData.search(pg)(timeouts.search),
       emitEvent,
     }),
   };

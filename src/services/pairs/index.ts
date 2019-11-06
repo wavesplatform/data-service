@@ -84,6 +84,7 @@ export { create as createCache } from './cache';
 export default ({
   drivers,
   emitEvent,
+  timeouts,
   validatePairs,
   cache,
 }: CommonServiceDependencies & {
@@ -120,14 +121,19 @@ export default ({
             name: SERVICE_NAME.GET,
             sql: sql.get,
             pg: drivers.pg,
+            statementTimeout: timeouts.get,
           })(req).map(
             tap(maybeResp => forEach(x => cache.set(req, x), maybeResp))
           ),
       }),
     validateResult: validateResult(resultSchema, SERVICE_NAME.GET),
-    transformResult: res => res.map(
-      res => pair(transformResult(res), { amountAsset: res.amount_asset_id, priceAsset: res.price_asset_id })
-    ),
+    transformResult: res =>
+      res.map(res =>
+        pair(transformResult(res), {
+          amountAsset: res.amount_asset_id,
+          priceAsset: res.price_asset_id,
+        })
+      ),
     emitEvent,
   });
 
@@ -162,6 +168,7 @@ export default ({
         sql: sql.mget,
         matchRequestResult,
         pg: drivers.pg,
+        statementTimeout: timeouts.mget,
       })({
         pairs: notCachedPairs,
         matcher: request.matcher,
@@ -197,6 +204,7 @@ export default ({
     inputSchema: inputSearch,
     resultSchema,
     transformResult: transformResultSearch,
+    statementTimeout: timeouts.search,
   })({ pg: drivers.pg, emitEvent });
 
   return {

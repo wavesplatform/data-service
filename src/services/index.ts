@@ -67,6 +67,11 @@ export type CommonServiceDependencies = {
     pg: PgDriver;
   };
   emitEvent: EmitEvent;
+  timeouts: {
+    get: number;
+    mget: number;
+    search: number;
+  };
 };
 
 export type RateSerivceCreatorDependencies = CommonServiceDependencies & {
@@ -133,6 +138,11 @@ export default ({
           pg: pgDriver,
         },
         emitEvent,
+        timeouts: {
+          get: options.defaultTimeout,
+          mget: options.defaultTimeout,
+          search: options.defaultTimeout,
+        },
       };
 
       // common init services

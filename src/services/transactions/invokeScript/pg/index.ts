@@ -4,6 +4,7 @@ import { head, propEq } from 'ramda';
 import { PgDriver } from '../../../../db/driver';
 import { matchRequestsResults } from '../../../../utils/db';
 import { toDbError } from '../../../../errorHandling';
+import { withStatementTimeout } from '../../../_common/utils';
 
 import sql from './sql';
 import { transformResult } from './transformResult';
@@ -13,9 +14,11 @@ import {
 } from '../types';
 
 export default {
-  get: (pg: PgDriver) => (id: string) =>
+  get: (pg: PgDriver) => (statementTimeout: number) => (id: string) =>
     pg
-      .any<DbRawInvokeScriptTx>(sql.get(id))
+      .any<DbRawInvokeScriptTx>(
+        withStatementTimeout(statementTimeout, sql.get(id))
+      )
       .map(transformResult)
       .map<RawInvokeScriptTx>(head)
       .map(fromNullable)
@@ -26,9 +29,11 @@ export default {
         )
       ),
 
-  mget: (pg: PgDriver) => (ids: string[]) =>
+  mget: (pg: PgDriver) => (statementTimeout: number) => (ids: string[]) =>
     pg
-      .any<DbRawInvokeScriptTx>(sql.mget(ids))
+      .any<DbRawInvokeScriptTx>(
+        withStatementTimeout(statementTimeout, sql.mget(ids))
+      )
       .map(transformResult)
       .map<Maybe<RawInvokeScriptTx>[]>(matchRequestsResults(propEq('id'), ids))
       .mapRejected(e =>
@@ -38,9 +43,13 @@ export default {
         )
       ),
 
-  search: (pg: PgDriver) => (filters: Record<string, any>) =>
+  search: (pg: PgDriver) => (statementTimeout: number) => (
+    filters: Record<string, any>
+  ) =>
     pg
-      .any<DbRawInvokeScriptTx>(sql.search(filters))
+      .any<DbRawInvokeScriptTx>(
+        withStatementTimeout(statementTimeout, sql.search(filters))
+      )
       .map(transformResult)
       .mapRejected(e =>
         toDbError(

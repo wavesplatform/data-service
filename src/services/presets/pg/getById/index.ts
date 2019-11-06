@@ -20,6 +20,7 @@ export const getByIdPreset = <
   resultSchema,
   resultTypeFactory,
   transformResult,
+  statementTimeout,
 }: {
   name: string;
   inputSchema: SchemaLike;
@@ -27,6 +28,7 @@ export const getByIdPreset = <
   resultTypeFactory: (t: ResponseTransformed) => Result;
   transformResult: (response: ResponseRaw, request?: Id) => ResponseTransformed;
   sql: (r: Id) => string;
+  statementTimeout: number;
 }) => ({ pg, emitEvent }: ServicePresetInitOptions) =>
   get<Id, Id, ResponseRaw, Result>({
     transformInput: identity,
@@ -38,6 +40,6 @@ export const getByIdPreset = <
     >(resultTypeFactory)(transformResult),
     validateInput: validateInput(inputSchema, name),
     validateResult: validateResult(resultSchema, name),
-    getData: getData({ name, sql, pg }),
+    getData: getData({ name, sql, pg, statementTimeout }),
     emitEvent,
   });
