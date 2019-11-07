@@ -1,5 +1,6 @@
 import { propEq, compose } from 'ramda';
 
+import { withStatementTimeout } from '../../../db/driver';
 import { CommonServiceDependencies } from '../..';
 import {
   transaction,
@@ -59,8 +60,10 @@ export default ({
       resultSchema: result,
       resultTypeFactory: transaction,
       transformResult: transformTxInfo,
-      statementTimeout: timeouts.get,
-    })({ pg, emitEvent }),
+    })({
+      pg: withStatementTimeout(pg, timeouts.get, timeouts.default),
+      emitEvent,
+    }),
 
     mget: mgetByIdsPreset<
       string,
@@ -75,8 +78,10 @@ export default ({
       resultTypeFactory: transaction,
       resultSchema: result,
       transformResult: transformTxInfo,
-      statementTimeout: timeouts.mget,
-    })({ pg, emitEvent }),
+    })({
+      pg: withStatementTimeout(pg, timeouts.mget, timeouts.default),
+      emitEvent,
+    }),
 
     search: searchWithPaginationPreset<
       SetScriptTxsSearchRequest,
@@ -92,7 +97,9 @@ export default ({
         transaction,
         transformTxInfo
       ),
-      statementTimeout: timeouts.search,
-    })({ pg, emitEvent }),
+    })({
+      pg: withStatementTimeout(pg, timeouts.search, timeouts.default),
+      emitEvent,
+    }),
   };
 };

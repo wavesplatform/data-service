@@ -1,5 +1,6 @@
 import { compose, identity } from 'ramda';
 
+import { withStatementTimeout } from '../../../db/driver';
 import { CommonServiceDependencies } from '../..';
 import {
   transaction,
@@ -60,7 +61,9 @@ export default ({
         resultSchema,
         createServiceName('get')
       ),
-      getData: pgData.get(pg)(timeouts.get),
+      getData: pgData.get(
+        withStatementTimeout(pg, timeouts.get, timeouts.default)
+      ),
       emitEvent,
     }),
 
@@ -74,7 +77,9 @@ export default ({
       >(transaction)(transformTxInfo),
       validateInput: validateInput(inputMget, createServiceName('mget')),
       validateResult: validateResult(resultSchema, createServiceName('mget')),
-      getData: pgData.mget(pg)(timeouts.mget),
+      getData: pgData.mget(
+        withStatementTimeout(pg, timeouts.mget, timeouts.default)
+      ),
       emitEvent,
     }),
 
@@ -94,7 +99,9 @@ export default ({
         resultSchema,
         createServiceName('search')
       ),
-      getData: pgData.search(pg)(timeouts.search),
+      getData: pgData.search(
+        withStatementTimeout(pg, timeouts.search, timeouts.default)
+      ),
       emitEvent,
     }),
   };

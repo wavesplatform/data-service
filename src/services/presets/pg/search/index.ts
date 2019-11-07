@@ -20,14 +20,12 @@ export const searchPreset = <
   inputSchema,
   resultSchema,
   transformResult,
-  statementTimeout,
 }: {
   name: string;
   sql: (r: Request) => string;
   inputSchema: SchemaLike;
   resultSchema: SchemaLike;
   transformResult: (response: ResponseRaw[], request: Request) => Result;
-  statementTimeout: number;
 }) => ({
   pg,
   emitEvent,
@@ -37,6 +35,6 @@ export const searchPreset = <
     transformResult,
     validateInput: validateInput(inputSchema, name),
     validateResult: validateResult(resultSchema, name),
-    getData: getData({ name, sql, pg, statementTimeout }),
+    getData: getData({ name, sql, pg }),
     emitEvent,
   });

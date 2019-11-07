@@ -5,15 +5,13 @@ const { toDbError } = require('../../../../errorHandling');
 
 const { matchRequestsResults } = require('../../../../utils/db/index');
 
-const { withStatementTimeout } = require('../../../_common/utils');
-
 const transformResult = require('./transformResult');
 const sql = require('./sql');
 
 const pg = {
-  get: pg => statementTimeout => id =>
+  get: pg => id =>
     pg
-      .any(withStatementTimeout(statementTimeout, sql.get(id)))
+      .any(sql.get(id))
       .map(transformResult)
       .map(head)
       .map(Maybe.fromNullable)
@@ -21,18 +19,18 @@ const pg = {
         toDbError({ request: 'transactions.data.get', params: id }, e.error)
       ),
 
-  mget: pg => statementTimeout => ids =>
+  mget: pg => ids =>
     pg
-      .any(withStatementTimeout(statementTimeout, sql.mget(ids)))
+      .any(sql.mget(ids))
       .map(transformResult)
       .map(matchRequestsResults(propEq('id'), ids))
       .mapRejected(e =>
         toDbError({ request: 'transactions.data.mget', params: ids }, e.error)
       ),
 
-  search: pg => statementTimeout => filters =>
+  search: pg => filters =>
     pg
-      .any(withStatementTimeout(statementTimeout, sql.search(filters)))
+      .any(sql.search(filters))
       .map(transformResult)
       .mapRejected(e =>
         toDbError(

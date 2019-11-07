@@ -2,8 +2,8 @@
 import { pgpConnect } from './pgp';
 import { ITask, IDatabase } from 'pg-promise';
 import { fromPromised } from 'folktale/concurrency/task';
-
 import { Task } from 'folktale/concurrency/task';
+
 import { DbError, toDbError } from '../../errorHandling';
 
 export type PgDriverOptions = {

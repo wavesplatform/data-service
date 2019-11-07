@@ -71,6 +71,7 @@ export type CommonServiceDependencies = {
     get: number;
     mget: number;
     search: number;
+    default: number;
   };
 };
 
@@ -142,6 +143,7 @@ export default ({
           get: options.defaultTimeout,
           mget: options.defaultTimeout,
           search: options.defaultTimeout,
+          default: options.defaultTimeout,
         },
       };
 

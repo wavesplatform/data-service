@@ -21,7 +21,6 @@ export const mgetByIdsPreset = <
   resultTypeFactory,
   matchRequestResult,
   transformResult,
-  statementTimeout,
 }: {
   name: string;
   inputSchema: SchemaLike;
@@ -33,7 +32,6 @@ export const mgetByIdsPreset = <
   ) => ResponseTransformed;
   sql: (r: Id[]) => string;
   matchRequestResult: (req: Id[], res: ResponseRaw) => boolean;
-  statementTimeout: number;
 }) => ({ pg, emitEvent }: ServicePresetInitOptions) =>
   mget<Id[], Id[], ResponseRaw, List<Result>>({
     transformInput: identity,
@@ -50,7 +48,6 @@ export const mgetByIdsPreset = <
       sql,
       matchRequestResult,
       pg,
-      statementTimeout,
     }),
     emitEvent,
   });

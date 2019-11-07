@@ -1,5 +1,6 @@
 const { propEq, compose } = require('ramda');
 
+const { withStatementTimeout } = require('../../../../db/driver');
 const { getByIdPreset } = require('../../../presets/pg/getById');
 const { mgetByIdsPreset } = require('../../../presets/pg/mgetByIds');
 const {
@@ -24,8 +25,10 @@ module.exports = ({ drivers: { pg }, emitEvent, timeouts }) => {
       resultSchema: result,
       resultTypeFactory: transaction,
       transformResult: transformTxInfo,
-      statementTimeout: timeouts.get,
-    })({ pg, emitEvent }),
+    })({
+      pg: withStatementTimeout(pg, timeouts.get, timeouts.default),
+      emitEvent,
+    }),
 
     mget: mgetByIdsPreset({
       name: 'transactions.all.commonData.mget',
@@ -35,8 +38,10 @@ module.exports = ({ drivers: { pg }, emitEvent, timeouts }) => {
       inputSchema: inputMget,
       resultSchema: result,
       transformResult: transformTxInfo,
-      statementTimeout: timeouts.mget,
-    })({ pg, emitEvent }),
+    })({
+      pg: withStatementTimeout(pg, timeouts.mget, timeouts.default),
+      emitEvent,
+    }),
 
     search: searchWithPaginationPreset({
       name: 'transactions.all.commonData.search',
@@ -47,7 +52,9 @@ module.exports = ({ drivers: { pg }, emitEvent, timeouts }) => {
         transaction,
         transformTxInfo
       ),
-      statementTimeout: timeouts.search,
-    })({ pg, emitEvent }),
+    })({
+      pg: withStatementTimeout(pg, timeouts.search, timeouts.default),
+      emitEvent,
+    }),
   };
 };

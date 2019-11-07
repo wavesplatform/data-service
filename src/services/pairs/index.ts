@@ -5,6 +5,7 @@ import { of as just, Maybe } from 'folktale/maybe';
 import { forEach, isEmpty } from '../../utils/fp/maybeOps';
 import { tap } from '../../utils/tap';
 
+import { withStatementTimeout } from '../../db/driver';
 import { AppError } from '../../errorHandling';
 import {
   pair,
@@ -120,8 +121,11 @@ export default ({
           getByIdPg<PairDbResponse, PairsGetRequest>({
             name: SERVICE_NAME.GET,
             sql: sql.get,
-            pg: drivers.pg,
-            statementTimeout: timeouts.get,
+            pg: withStatementTimeout(
+              drivers.pg,
+              timeouts.get,
+              timeouts.default
+            ),
           })(req).map(
             tap(maybeResp => forEach(x => cache.set(req, x), maybeResp))
           ),
@@ -167,8 +171,7 @@ export default ({
         name: SERVICE_NAME.MGET,
         sql: sql.mget,
         matchRequestResult,
-        pg: drivers.pg,
-        statementTimeout: timeouts.mget,
+        pg: withStatementTimeout(drivers.pg, timeouts.mget, timeouts.default),
       })({
         pairs: notCachedPairs,
         matcher: request.matcher,
@@ -204,8 +207,10 @@ export default ({
     inputSchema: inputSearch,
     resultSchema,
     transformResult: transformResultSearch,
-    statementTimeout: timeouts.search,
-  })({ pg: drivers.pg, emitEvent });
+  })({
+    pg: withStatementTimeout(drivers.pg, timeouts.search, timeouts.default),
+    emitEvent,
+  });
 
   return {
     get,

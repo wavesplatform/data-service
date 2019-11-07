@@ -3,7 +3,7 @@ import { of as taskOf } from 'folktale/concurrency/task';
 import { of as just, Maybe } from 'folktale/maybe';
 import { tap } from '../../utils/tap';
 import { forEach, isEmpty } from '../../utils/fp/maybeOps';
-
+import { withStatementTimeout } from '../../db/driver/utils';
 import { asset, Asset, AssetInfo, List } from '../../types';
 
 import { CommonServiceDependencies } from '..';
@@ -67,8 +67,7 @@ export default ({
             getByIdPg<AssetDbResponse, string>({
               name: SERVICE_NAME.GET,
               sql: sql.get,
-              pg,
-              statementTimeout: timeouts.get,
+              pg: withStatementTimeout(pg, timeouts.get, timeouts.default),
             })(req).map(
               tap(maybeResp => forEach(x => cache.set(req, x), maybeResp))
             ),
@@ -97,8 +96,7 @@ export default ({
           name: SERVICE_NAME.MGET,
           sql: sql.mget,
           matchRequestResult: propEq('asset_id'),
-          pg,
-          statementTimeout: timeouts.mget,
+          pg: withStatementTimeout(pg, timeouts.mget, timeouts.default),
         })(notCachedAssetIds).map(fromDb => {
           fromDb.forEach((assetInfo, index) =>
             forEach(value => {
@@ -135,6 +133,9 @@ export default ({
         Asset
       >(asset)(transformDbResponse),
       statementTimeout: timeouts.search,
-    })({ pg, emitEvent }),
+    })({
+      pg: withStatementTimeout(pg, timeouts.search, timeouts.default),
+      emitEvent,
+    }),
   };
 };

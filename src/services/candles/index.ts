@@ -1,8 +1,8 @@
 import { Task } from 'folktale/concurrency/task';
 import { identity } from 'ramda';
 
+import { withStatementTimeout } from '../../db/driver';
 import { Candle, List, ServiceSearch, AssetIdsPair } from '../../types';
-
 import { CommonServiceDependencies } from '..';
 
 import { sql } from './sql';
@@ -58,8 +58,7 @@ export default ({
       getData: getData({
         name: SERVICE_NAME,
         sql,
-        pg,
-        statementTimeout: timeouts.search,
+        pg: withStatementTimeout(pg, timeouts.search, timeouts.default),
       }),
       emitEvent,
     }),

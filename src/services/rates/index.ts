@@ -1,4 +1,5 @@
 import { BigNumber } from '@waves/data-entities';
+import { withStatementTimeout } from '../../db/driver';
 import {
   ServiceMget,
   Rate,
@@ -23,7 +24,9 @@ export default function({
 }: RateSerivceCreatorDependencies): ServiceMget<RateMgetParams, Rate> {
   const estimator = new RateEstimator(
     cache,
-    new RemoteRateRepo(drivers.pg, timeouts.mget)
+    new RemoteRateRepo(
+      withStatementTimeout(drivers.pg, timeouts.mget, timeouts.default)
+    )
   );
 
   return {

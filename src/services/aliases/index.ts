@@ -18,6 +18,8 @@ import { inputGet, inputMGet, inputSearch, output } from './schema';
 import { mgetByIdsPreset } from '../../services/presets/pg/mgetByIds';
 import { propEq } from 'ramda';
 
+import { withStatementTimeout } from '../../db/driver';
+
 type AliasesSearchRequest = {
   address: string;
   showBroken: boolean;
@@ -42,8 +44,10 @@ export default ({
       resultSchema: output,
       transformResult: transformDbResponse,
       resultTypeFactory: alias,
-      statementTimeout: timeouts.get,
-    })({ pg: drivers.pg, emitEvent: emitEvent }),
+    })({
+      pg: withStatementTimeout(drivers.pg, timeouts.get, timeouts.default),
+      emitEvent: emitEvent,
+    }),
 
     mget: mgetByIdsPreset<string, AliasDbResponse, AliasInfo, Alias>({
       name: 'aliases.mget',
@@ -53,8 +57,10 @@ export default ({
       transformResult: transformDbResponse,
       resultTypeFactory: alias,
       matchRequestResult: propEq('alias'),
-      statementTimeout: timeouts.mget,
-    })({ pg: drivers.pg, emitEvent: emitEvent }),
+    })({
+      pg: withStatementTimeout(drivers.pg, timeouts.mget, timeouts.default),
+      emitEvent: emitEvent,
+    }),
 
     search: searchPreset<
       AliasesSearchRequest,
@@ -71,7 +77,9 @@ export default ({
         AliasDbResponse,
         Alias
       >(alias)(transformDbResponse),
-      statementTimeout: timeouts.search,
-    })({ pg: drivers.pg, emitEvent: emitEvent }),
+    })({
+      pg: withStatementTimeout(drivers.pg, timeouts.search, timeouts.default),
+      emitEvent: emitEvent,
+    }),
   };
 };
