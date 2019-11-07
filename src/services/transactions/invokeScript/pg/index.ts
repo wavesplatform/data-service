@@ -4,7 +4,7 @@ import { head, propEq } from 'ramda';
 import { PgDriver } from '../../../../db/driver';
 import { matchRequestsResults } from '../../../../utils/db';
 
-import { pgErrorMatching } from '../../../_common/utils';
+import { addMeta } from '../../../../errorHandling';
 
 import sql from './sql';
 import { transformResult } from './transformResult';
@@ -21,7 +21,7 @@ export default {
       .map<RawInvokeScriptTx>(head)
       .map(fromNullable)
       .mapRejected(
-        pgErrorMatching({
+        addMeta({
           request: 'transactions.invokeScript.get',
           params: id,
         })
@@ -33,7 +33,7 @@ export default {
       .map(transformResult)
       .map<Maybe<RawInvokeScriptTx>[]>(matchRequestsResults(propEq('id'), ids))
       .mapRejected(
-        pgErrorMatching({
+        addMeta({
           request: 'transactions.invokeScript.mget',
           params: ids,
         })
@@ -43,11 +43,10 @@ export default {
     pg
       .any<DbRawInvokeScriptTx>(sql.search(filters))
       .map(transformResult)
-      .mapRejected(e =>
-        pgErrorMatching({
+      .mapRejected(
+        addMeta({
           request: 'transactions.invokeScript.search',
           params: filters,
-          message: e.error.message,
-        })(e)
+        })
       ),
 };

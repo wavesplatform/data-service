@@ -1,5 +1,5 @@
 import { PgDriver } from '../../../../db/driver';
-import { pgErrorMatching } from '../../../_common/utils';
+import { addMeta } from '../../../../errorHandling';
 
 export const getData = <Request, ResponseRaw>({
   name,
@@ -12,4 +12,4 @@ export const getData = <Request, ResponseRaw>({
 }) => (request: Request) =>
   pg
     .any<ResponseRaw>(sql(request))
-    .mapRejected(pgErrorMatching({ request: name, params: request }));
+    .mapRejected(addMeta({ request: name, params: request }));

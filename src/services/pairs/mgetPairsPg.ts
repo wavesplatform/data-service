@@ -2,8 +2,7 @@ import { Task } from 'folktale/concurrency/task';
 import { Maybe } from 'folktale/maybe';
 import { PgDriver } from '../../db/driver';
 import { matchRequestsResults } from '../../utils/db';
-import { DbError, Timeout } from '../../errorHandling';
-import { pgErrorMatching } from '../_common/utils';
+import { DbError, Timeout, addMeta } from '../../errorHandling';
 import { MgetRequest } from './types';
 
 export const mgetPairsPg = <Request extends MgetRequest, ResponseRaw, Id>({
@@ -22,4 +21,4 @@ export const mgetPairsPg = <Request extends MgetRequest, ResponseRaw, Id>({
     .map(responses =>
       matchRequestsResults(matchRequestResult, request.pairs, responses)
     )
-    .mapRejected(pgErrorMatching({ request: name, params: request }));
+    .mapRejected(addMeta({ request: name, params: request }));
