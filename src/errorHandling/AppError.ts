@@ -23,6 +23,7 @@ export type AppErrorPattern<C> = {
   Init: (e: ErrorInfo) => C;
   Resolver: (e: ErrorInfo) => C;
   Validation: (e: ValidationErrorInfo) => C;
+  Timeout: (e: ErrorInfo) => C;
 };
 
 const isJoiError = (err: any): err is joi.ValidationError => {
@@ -80,6 +81,9 @@ export abstract class AppError implements Matchable {
   }
   public static Validation(error: Error | string, meta?: ErrorMetaInfo) {
     return new ValidationError(error, meta);
+  }
+  public static Timeout(error: Error | string, meta?: ErrorMetaInfo) {
+    return new Timeout(error, meta);
   }
 }
 
@@ -154,6 +158,26 @@ export class ValidationError extends AppError {
   public matchWith<C>(pattern: AppErrorPattern<C>): C {
     return pattern.Validation(
       createErrorInfo(this.type, this.error, this.meta)
+    );
+  }
+}
+
+export class Timeout extends AppError implements ErrorInfo {
+  public readonly type = 'Timeout';
+  public readonly error: ErrorInfo['error'];
+  public readonly meta?: ErrorInfo['meta'];
+
+  constructor(error: Error | string, meta?: ErrorMetaInfo) {
+    super();
+    this.error = ensureError(error);
+    this.meta = meta;
+  }
+
+  public matchWith<C>(pattern: AppErrorPattern<C>): C {
+    return pattern.Timeout(
+      this.meta === undefined
+        ? createErrorInfo(this.type, this.error)
+        : createErrorInfo(this.type, this.error, this.meta)
     );
   }
 }

@@ -132,7 +132,6 @@ export default ({
         AssetDbResponse,
         Asset
       >(asset)(transformDbResponse),
-      statementTimeout: timeouts.search,
     })({
       pg: withStatementTimeout(pg, timeouts.search, timeouts.default),
       emitEvent,

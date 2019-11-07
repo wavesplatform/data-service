@@ -1,5 +1,5 @@
 import { PgDriver } from '../../../../db/driver';
-import { toDbError } from '../../../../errorHandling';
+import { pgErrorMatching } from '../../../_common/utils';
 
 export const getData = <Request, ResponseRaw>({
   name,
@@ -12,4 +12,4 @@ export const getData = <Request, ResponseRaw>({
 }) => (filters: Request) =>
   pg
     .any<ResponseRaw>(sql(filters))
-    .mapRejected(e => toDbError({ request: name, params: filters }, e.error));
+    .mapRejected(pgErrorMatching({ request: name, params: filters }));

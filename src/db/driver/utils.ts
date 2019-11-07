@@ -71,3 +71,6 @@ export const withStatementTimeout = (
       ),
   };
 };
+
+export const isStatementTimeoutErrorMessage = (message: string) =>
+  message === 'canceling statement due to statement timeout';

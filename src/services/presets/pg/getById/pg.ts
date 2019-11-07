@@ -1,6 +1,6 @@
 import { fromNullable } from 'folktale/maybe';
-import { toDbError } from '../../../../errorHandling';
 import { PgDriver } from '../../../../db/driver';
+import { pgErrorMatching } from '../../../_common/utils';
 
 export const getData = <ResponseRaw, Id = string>({
   name,
@@ -14,4 +14,4 @@ export const getData = <ResponseRaw, Id = string>({
   pg
     .oneOrNone<ResponseRaw>(sql(id))
     .map(fromNullable)
-    .mapRejected(e => toDbError({ request: name, params: { id } }, e.error));
+    .mapRejected(pgErrorMatching({ request: name, params: { id } }));

@@ -4,9 +4,6 @@ import {
   DEFAULT_TIMEOUT_OCCURRED_MESSAGE,
 } from '../errorHandling';
 
-const isStatementTimeoutErrorMessage = (message: string) =>
-  message === 'canceling statement due to statement timeout';
-
 export const handleError = ({ ctx, error }: { ctx: any; error: AppError }) => {
   ctx.eventBus.emit('ERROR', error);
   error.matchWith({
@@ -16,18 +13,11 @@ export const handleError = ({ ctx, error }: { ctx: any; error: AppError }) => {
         message: DEFAULT_INTERNAL_SERVER_ERROR_MESSAGE,
       };
     },
-    Db: e => {
-      if (isStatementTimeoutErrorMessage(e.error.message)) {
-        ctx.status = 524;
-        ctx.state.returnValue = {
-          message: DEFAULT_TIMEOUT_OCCURRED_MESSAGE,
-        };
-      } else {
-        ctx.status = 500;
-        ctx.state.returnValue = {
-          message: DEFAULT_INTERNAL_SERVER_ERROR_MESSAGE,
-        };
-      }
+    Db: () => {
+      ctx.status = 500;
+      ctx.state.returnValue = {
+        message: DEFAULT_INTERNAL_SERVER_ERROR_MESSAGE,
+      };
     },
     Resolver: () => {
       ctx.status = 500;
@@ -47,6 +37,12 @@ export const handleError = ({ ctx, error }: { ctx: any; error: AppError }) => {
                 }))
               : errorInfo.meta
             : undefined,
+      };
+    },
+    Timeout: () => {
+      ctx.status = 524;
+      ctx.state.returnValue = {
+        message: DEFAULT_TIMEOUT_OCCURRED_MESSAGE,
       };
     },
   });

@@ -9,8 +9,6 @@ import { Serializable } from '../../../../../types';
 import { getByIdPreset } from '..';
 import { inputGet as input } from '../inputSchema';
 
-const DEFAULT_TIMEOUT_IN_MS = 30000;
-
 const createService = (resultSchema: SchemaLike) =>
   getByIdPreset<string, string, string, Serializable<'test', string | null>>({
     name: 'some_name',
@@ -24,7 +22,6 @@ const createService = (resultSchema: SchemaLike) =>
       data: s ? s : null,
       __type: 'test',
     }),
-    statementTimeout: DEFAULT_TIMEOUT_IN_MS,
   })({
     pg: { oneOrNone: (id: string) => taskOf(id) } as PgDriver,
     emitEvent: always(T),

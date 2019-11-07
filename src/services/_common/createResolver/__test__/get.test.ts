@@ -10,6 +10,7 @@ import {
   ValidationError,
   ResolverError,
   DbError,
+  Timeout,
 } from '../../../../errorHandling/';
 
 import { get } from '../';
@@ -30,7 +31,7 @@ afterEach(() => jest.clearAllMocks());
 
 describe('Resolver', () => {
   const mockPgDriver: PgDriver = {
-    one: (s: string) => taskOf<DbError, string>(s),
+    one: (s: string) => taskOf<DbError | Timeout, string>(s),
   } as PgDriver;
 
   const commonConfig = {
