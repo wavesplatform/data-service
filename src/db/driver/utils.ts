@@ -5,9 +5,9 @@ const pg = knex({ client: 'pg' });
 import { SqlQuery, PgDriver } from './';
 
 const queryWithStatementTimeout = (
+  query: string,
   statementTimeout: number,
-  defaultStatementTimeout: number,
-  query: string
+  defaultStatementTimeout: number
 ): string =>
   [
     pg.raw('begin;set statement_timeout = ?;commit;', [statementTimeout]),
@@ -27,45 +27,45 @@ export const withStatementTimeout = (
     none: (query: SqlQuery, values?: any) =>
       pg.none(
         queryWithStatementTimeout(
+          query,
           statementTimeout,
-          defaultStatementTimeout,
-          query
+          defaultStatementTimeout
         ),
         values
       ),
     one: (query: SqlQuery, values?: any) =>
       pg.one(
         queryWithStatementTimeout(
+          query,
           statementTimeout,
-          defaultStatementTimeout,
-          query
+          defaultStatementTimeout
         ),
         values
       ),
     oneOrNone: (query: SqlQuery, values?: any) =>
       pg.oneOrNone(
         queryWithStatementTimeout(
+          query,
           statementTimeout,
-          defaultStatementTimeout,
-          query
+          defaultStatementTimeout
         ),
         values
       ),
     many: (query: SqlQuery, values?: any) =>
       pg.many(
         queryWithStatementTimeout(
+          query,
           statementTimeout,
-          defaultStatementTimeout,
-          query
+          defaultStatementTimeout
         ),
         values
       ),
     any: (query: SqlQuery, values?: any) =>
       pg.any(
         queryWithStatementTimeout(
+          query,
           statementTimeout,
-          defaultStatementTimeout,
-          query
+          defaultStatementTimeout
         ),
         values
       ),

@@ -1,7 +1,7 @@
 import {
   AppError,
   DEFAULT_INTERNAL_SERVER_ERROR_MESSAGE,
-  DEFAULT_A_TIMEOUT_OCCURRED_MESSAGE,
+  DEFAULT_TIMEOUT_OCCURRED_MESSAGE,
 } from '../errorHandling';
 
 const isStatementTimeoutErrorMessage = (message: string) =>
@@ -20,7 +20,7 @@ export const handleError = ({ ctx, error }: { ctx: any; error: AppError }) => {
       if (isStatementTimeoutErrorMessage(e.error.message)) {
         ctx.status = 524;
         ctx.state.returnValue = {
-          message: DEFAULT_A_TIMEOUT_OCCURRED_MESSAGE,
+          message: DEFAULT_TIMEOUT_OCCURRED_MESSAGE,
         };
       } else {
         ctx.status = 500;
