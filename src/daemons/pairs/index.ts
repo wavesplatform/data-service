@@ -13,7 +13,7 @@ import { createPgDriver } from '../../db';
 import { withStatementTimeout } from '../../db/driver';
 const pgDriver = withStatementTimeout(
   createPgDriver(configuration),
-  configuration.pairsUpdateInterval,
+  configuration.pairsUpdateTimeout,
   0 // 0 - unset statement timeout;
 );
 
