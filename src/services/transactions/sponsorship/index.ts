@@ -1,6 +1,7 @@
 import { propEq, compose } from 'ramda';
 import { BigNumber } from '@waves/data-entities';
 
+import { withStatementTimeout } from '../../../db/driver';
 import { CommonServiceDependencies } from '../..';
 import {
   transaction,
@@ -48,6 +49,7 @@ export type SponsorshipTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
+  timeouts,
 }: CommonServiceDependencies): SponsorshipTxsService => {
   return {
     get: getByIdPreset<
@@ -62,7 +64,10 @@ export default ({
       resultSchema,
       resultTypeFactory: transaction,
       transformResult: transformTxInfo,
-    })({ pg, emitEvent }),
+    })({
+      pg: withStatementTimeout(pg, timeouts.get, timeouts.default),
+      emitEvent,
+    }),
 
     mget: mgetByIdsPreset<
       string,
@@ -77,7 +82,10 @@ export default ({
       resultTypeFactory: transaction,
       resultSchema,
       transformResult: transformTxInfo,
-    })({ pg, emitEvent }),
+    })({
+      pg: withStatementTimeout(pg, timeouts.mget, timeouts.default),
+      emitEvent,
+    }),
 
     search: searchWithPaginationPreset<
       SponsorshipTxsSearchRequest,
@@ -93,6 +101,9 @@ export default ({
         transaction,
         transformTxInfo
       ),
-    })({ pg, emitEvent }),
+    })({
+      pg: withStatementTimeout(pg, timeouts.search, timeouts.default),
+      emitEvent,
+    }),
   };
 };

@@ -1,5 +1,6 @@
 import { identity, compose } from 'ramda';
 
+import { withStatementTimeout } from '../../../db/driver';
 import { CommonServiceDependencies } from '../..';
 import { DataTxEntryType } from '../../../types';
 import {
@@ -63,6 +64,7 @@ export type DataTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
+  timeouts,
 }: CommonServiceDependencies): DataTxsService => {
   return {
     get: get<string, string, DataTxDbResponse, Transaction>({
@@ -75,7 +77,9 @@ export default ({
       >(transaction)(transformTxInfo),
       validateInput: validateInput(inputGet, createServiceName('get')),
       validateResult: validateResult(resultSchema, createServiceName('get')),
-      getData: pgData.get(pg),
+      getData: pgData.get(
+        withStatementTimeout(pg, timeouts.get, timeouts.default)
+      ),
       emitEvent,
     }),
 
@@ -89,7 +93,9 @@ export default ({
       >(transaction)(transformTxInfo),
       validateInput: validateInput(inputMget, createServiceName('mget')),
       validateResult: validateResult(resultSchema, createServiceName('mget')),
-      getData: pgData.mget(pg),
+      getData: pgData.mget(
+        withStatementTimeout(pg, timeouts.mget, timeouts.default)
+      ),
       emitEvent,
     }),
 
@@ -111,7 +117,9 @@ export default ({
         createServiceName('search')
       ),
       validateResult: validateResult(resultSchema, createServiceName('search')),
-      getData: pgData.search(pg),
+      getData: pgData.search(
+        withStatementTimeout(pg, timeouts.search, timeouts.default)
+      ),
       emitEvent,
     }),
   };

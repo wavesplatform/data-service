@@ -10,6 +10,7 @@ import {
   ValidationError,
   ResolverError,
   DbError,
+  Timeout,
 } from '../../../../errorHandling/';
 
 import { mget } from '..';
@@ -31,7 +32,8 @@ const resultError = (s: string) =>
   error<ResolverError, string>(AppError.Resolver(errorMessage));
 
 const mockPgDriver: PgDriver = {
-  many: (query: string) => taskOf<DbError, string[]>(query.split('::')),
+  many: (query: string) =>
+    taskOf<DbError | Timeout, string[]>(query.split('::')),
 } as PgDriver;
 
 const commonConfig = {

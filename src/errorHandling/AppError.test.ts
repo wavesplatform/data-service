@@ -5,6 +5,7 @@ const errorTypes: (keyof AppErrorPattern<any>)[] = [
   'Resolver',
   'Db',
   'Validation',
+  'Timeout',
 ];
 
 const throwFn = () => {
@@ -15,6 +16,7 @@ const throwPattern: AppErrorPattern<never> = {
   Resolver: throwFn,
   Validation: throwFn,
   Db: throwFn,
+  Timeout: throwFn,
 };
 
 describe('AppError', () => {

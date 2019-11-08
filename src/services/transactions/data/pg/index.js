@@ -1,8 +1,7 @@
 const Maybe = require('folktale/maybe');
 const { head, propEq } = require('ramda');
 
-const { toDbError } = require('../../../../errorHandling');
-
+const { addMeta } = require('../../../../errorHandling');
 const { matchRequestsResults } = require('../../../../utils/db/index');
 
 const transformResult = require('./transformResult');
@@ -15,31 +14,24 @@ const pg = {
       .map(transformResult)
       .map(head)
       .map(Maybe.fromNullable)
-      .mapRejected(e =>
-        toDbError({ request: 'transactions.data.get', params: id }, e.error)
-      ),
+      .mapRejected(addMeta({ request: 'transactions.data.get', params: id })),
 
   mget: pg => ids =>
     pg
       .any(sql.mget(ids))
       .map(transformResult)
       .map(matchRequestsResults(propEq('id'), ids))
-      .mapRejected(e =>
-        toDbError({ request: 'transactions.data.mget', params: ids }, e.error)
-      ),
+      .mapRejected(addMeta({ request: 'transactions.data.mget', params: ids })),
 
   search: pg => filters =>
     pg
       .any(sql.search(filters))
       .map(transformResult)
-      .mapRejected(e =>
-        toDbError(
-          {
-            request: 'transactions.data.search',
-            params: filters,
-          },
-          e.error
-        )
+      .mapRejected(
+        addMeta({
+          request: 'transactions.data.search',
+          params: filters,
+        })
       ),
 };
 
