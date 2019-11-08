@@ -1,5 +1,6 @@
 import { propEq, compose } from 'ramda';
 
+import { withStatementTimeout } from '../../../db/driver';
 import { CommonServiceDependencies } from '../..';
 import {
   transaction,
@@ -48,6 +49,7 @@ export type IssueTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
+  timeouts,
 }: CommonServiceDependencies): IssueTxsService => {
   return {
     get: getByIdPreset<string, IssueTxDbResponse, TransactionInfo, Transaction>(
@@ -59,7 +61,10 @@ export default ({
         resultTypeFactory: transaction,
         transformResult: transformTxInfo,
       }
-    )({ pg, emitEvent }),
+    )({
+      pg: withStatementTimeout(pg, timeouts.get, timeouts.default),
+      emitEvent,
+    }),
 
     mget: mgetByIdsPreset<
       string,
@@ -74,7 +79,10 @@ export default ({
       resultTypeFactory: transaction,
       resultSchema,
       transformResult: transformTxInfo,
-    })({ pg, emitEvent }),
+    })({
+      pg: withStatementTimeout(pg, timeouts.mget, timeouts.default),
+      emitEvent,
+    }),
 
     search: searchWithPaginationPreset<
       IssueTxsSearchRequest,
@@ -90,6 +98,9 @@ export default ({
         transaction,
         transformTxInfo
       ),
-    })({ pg, emitEvent }),
+    })({
+      pg: withStatementTimeout(pg, timeouts.search, timeouts.default),
+      emitEvent,
+    }),
   };
 };

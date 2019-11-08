@@ -11,7 +11,12 @@ import { resultToTask } from '../../../utils/fp/';
 import { applyValidation } from './applyToResult';
 export { applyTransformation } from './applyToResult';
 
-import { ResolverError, DbError, AppError } from '../../../errorHandling/';
+import {
+  ResolverError,
+  DbError,
+  AppError,
+  Timeout,
+} from '../../../errorHandling/';
 
 import {
   EmitEvent,
@@ -30,7 +35,7 @@ const createResolver = <
 >(
   validateInput: ValidateAsync<AppError, RequestRaw>,
   transformInput: (r: RequestRaw) => RequestTransformed,
-  getData: (r: RequestTransformed) => Task<DbError, ResponseRaw>,
+  getData: (r: RequestTransformed) => Task<DbError | Timeout, ResponseRaw>,
   validateAllResults: ValidateSync<ResolverError, ResponseRaw>,
   transformAllResults: (
     response: ResponseRaw,
