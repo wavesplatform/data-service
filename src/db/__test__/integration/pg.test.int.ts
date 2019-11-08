@@ -9,7 +9,7 @@ describe('Db', () => {
       .none('select pg_sleep(1);')
       .run()
       .listen({
-        onResolved: () => done.fail('Error was not throwed'),
+        onResolved: () => done.fail('Error was not thrown'),
         onRejected: e =>
           isStatementTimeoutErrorMessage(e.error.message)
             ? done()
