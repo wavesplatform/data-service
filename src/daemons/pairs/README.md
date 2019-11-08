@@ -28,6 +28,7 @@ docker run -e PGHOST=*** -e PGDATABASE=*** -e PGUSER=*** -e PGPASSWORD=*** -it w
 |`PGUSER`||YES|Postgres user name|
 |`PGPASSWORD`||YES|Postgres password|
 |`PGPOOLSIZE`|`20`|NO|Postgres pool size|
+|`PGSTATEMENTTIMEOUT`|`false`|NO|Postgres statement timeout|
 |`LOG_LEVEL`|`info`|NO|Log level `['info','warn','error']`|
 |`PAIRS_UPDATE_INTERVAL`|`2500`|NO|Minimum daemon update time. If time is exceeded, the next iteration starts immediately|
 |`PAIRS_UPDATE_TIMEOUT`|`20000`|NO|If the update time is exceeded, the daemon terminates|
