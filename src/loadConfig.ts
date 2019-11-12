@@ -1,5 +1,5 @@
 import * as checkEnv from 'check-env';
-import { memoizeWith, always } from 'ramda';
+import { always, isNil, memoizeWith } from 'ramda';
 
 export type PostgresConfig = {
   postgresHost: string;
@@ -8,7 +8,7 @@ export type PostgresConfig = {
   postgresUser: string;
   postgresPassword: string;
   postgresPoolSize: number;
-  postgresStatementTimeout?: number | false;
+  postgresStatementTimeout: number | false;
 };
 
 export type LoggerConfig = {
@@ -51,9 +51,11 @@ export const loadDefaultConfig = (): DefaultConfig => {
     postgresPoolSize: process.env.PGPOOLSIZE
       ? parseInt(process.env.PGPOOLSIZE)
       : 20,
-    postgresStatementTimeout: process.env.PGSTATEMENTTIMEOUT
-      ? parseInt(process.env.PGSTATEMENTTIMEOUT)
-      : undefined,
+    postgresStatementTimeout:
+      isNil(process.env.PGSTATEMENTTIMEOUT) ||
+      isNaN(parseInt(process.env.PGSTATEMENTTIMEOUT))
+        ? false
+        : parseInt(process.env.PGSTATEMENTTIMEOUT),
     logLevel: process.env.LOG_LEVEL || 'info',
   };
 };

@@ -143,7 +143,10 @@ export default ({
           get: options.defaultTimeout,
           mget: options.defaultTimeout,
           search: options.defaultTimeout,
-          default: options.defaultTimeout,
+          default:
+            options.postgresStatementTimeout === false
+              ? options.defaultTimeout
+              : options.postgresStatementTimeout,
         },
       };
 

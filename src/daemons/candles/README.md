@@ -28,7 +28,7 @@ docker run -e PGHOST=*** -e PGDATABASE=*** -e PGUSER=*** -e PGPASSWORD=*** -it w
 |`PGUSER`||YES|Postgres user name|
 |`PGPASSWORD`||YES|Postgres password|
 |`PGPOOLSIZE`|`20`|NO|Postgres pool size|
-|`PGSTATEMENTTIMEOUT`|`false`|NO|Postgres statement timeout|
+|`PGSTATEMENTTIMEOUT`|`false`|NO|Postgres statement timeout; number in ms (false = disabled)|
 |`LOG_LEVEL`|`info`|NO|Log level `['info','warn','error']`|
 |`CANDLES_UPDATE_INTERVAL_`|`2500`|NO|Minimum daemon update time in ms. If time is exceeded, the next iteration starts immediately|
 |`CANDLES_UPDATE_TIMEOUT`|`20000`|NO|If the update time in ms is exceeded, the daemon terminates|
