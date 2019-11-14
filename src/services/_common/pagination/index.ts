@@ -1,9 +1,7 @@
 import { WithSortOrder } from '../';
-export { Cursor } from './cursor';
 
-export type RequestWithCursor<
-  Request extends WithSortOrder,
-  CursorType
-> = Request & {
+export type RequestWithCursor<Request, CursorType> = Request & {
   after?: CursorType;
 };
+
+export type Cursorable = WithSortOrder;

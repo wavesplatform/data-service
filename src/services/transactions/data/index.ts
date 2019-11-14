@@ -26,6 +26,7 @@ import { transformResults as transformResultMget } from '../../presets/pg/mgetBy
 import { transformInput as transformInputSearch } from '../../presets/pg/searchWithPagination/transformInput';
 import { transformResults as transformResultSearch } from '../../presets/pg/searchWithPagination/transformResult';
 
+import { decode, encode } from '../_common/cursor';
 import {
   result as resultSchema,
   inputSearch as inputSearchSchema,
@@ -105,12 +106,13 @@ export default ({
       DataTxDbResponse,
       List<Transaction>
     >({
-      transformInput: transformInputSearch,
+      transformInput: transformInputSearch(decode),
       transformResult: transformResultSearch(
-        compose(
+        compose<DataTxDbResponse, TransactionInfo | null, Transaction>(
           transaction,
           transformTxInfo
-        )
+        ),
+        encode
       ),
       validateInput: validateInput(
         inputSearchSchema,

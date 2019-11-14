@@ -19,6 +19,8 @@ import { transformResults as transformResultMget } from '../../presets/pg/mgetBy
 import { transformInput as transformInputSearch } from '../../presets/pg/searchWithPagination/transformInput';
 import { transformResults as transformResultSearch } from '../../presets/pg/searchWithPagination/transformResult';
 
+import { encode } from '../_common/cursor';
+
 import pgData from './pg';
 import {
   result as resultSchema,
@@ -86,10 +88,8 @@ export default ({
     search: search<any, any, RawInvokeScriptTx, List<Transaction>>({
       transformInput: transformInputSearch,
       transformResult: transformResultSearch(
-        compose(
-          transaction,
-          transformTxInfo
-        )
+        compose(transaction, transformTxInfo),
+        encode
       ),
       validateInput: validateInput<any>(
         inputSearchSchema,

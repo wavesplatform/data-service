@@ -1,7 +1,12 @@
 const Joi = require('../../../utils/validation/joi');
 
 const commonFields = require('../_common/commonFieldsSchemas');
-const commonFilterSchemas = require('../../presets/pg/searchWithPagination/commonFilterSchemas').default;
+const commonFilterSchemas = require('../_common/commonFilterSchemas').default;
+
+const inputSearch = decode =>
+  Joi.object().keys({
+    ...commonFilterSchemas(decode),
+  });
 
 const result = Joi.object().keys({
   ...commonFields,
@@ -10,5 +15,5 @@ const result = Joi.object().keys({
 
 module.exports = {
   result,
-  inputSearch: commonFilterSchemas,
+  inputSearch,
 };

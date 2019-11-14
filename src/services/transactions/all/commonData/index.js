@@ -16,6 +16,8 @@ const { inputGet } = require('../../../presets/pg/getById/inputSchema');
 const { inputMget } = require('../../../presets/pg/mgetByIds/inputSchema');
 const { result, inputSearch } = require('./schema');
 
+const { decode, encode } = require('../../_common/cursor');
+
 module.exports = ({ drivers: { pg }, emitEvent, timeouts }) => {
   return {
     get: getByIdPreset({
@@ -48,10 +50,11 @@ module.exports = ({ drivers: { pg }, emitEvent, timeouts }) => {
       sql: sql.search,
       inputSchema: inputSearch,
       resultSchema: result,
-      transformResult: compose(
-        transaction,
-        transformTxInfo
-      ),
+      transformResult: compose(transaction, transformTxInfo),
+      cursor: {
+        decode,
+        encode,
+      },
     })({
       pg: withStatementTimeout(pg, timeouts.search, timeouts.default),
       emitEvent,

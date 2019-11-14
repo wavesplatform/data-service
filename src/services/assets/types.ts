@@ -4,15 +4,17 @@ export type AssetsCache = CacheSync<string, AssetDbResponse>;
 
 export type SearchByTicker = {
   ticker: string;
+  limit: number;
 };
 
 export type SearchFullText = {
   search: string;
   limit: number;
-  after?: string;
 };
 
-export type AssetsSearchRequest = XOR<SearchByTicker, SearchFullText>;
+export type AssetsSearchRequest = XOR<SearchByTicker, SearchFullText> & {
+  after?: string;
+};
 
 export type AssetsService = Service<
   string,

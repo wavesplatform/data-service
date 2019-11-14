@@ -1,33 +1,25 @@
 import { compose, last, take } from 'ramda';
 
 import { Serializable, List, list } from '../../../../types';
-import { WithSortOrder, WithLimit } from '../../../_common';
-import { Cursor, RequestWithCursor } from '../../../_common/pagination';
-import { encode } from '../../../_common/pagination/cursor';
+import { WithLimit } from '../../../_common';
+import { RequestWithCursor } from '../../../_common/pagination';
 
 type ResponseMeta = {
   isLastPage?: boolean;
   lastCursor?: string;
 };
 
-const makeCursorFromResponse = <
-  Request extends WithSortOrder,
-  ResponseTransformed extends Record<string, any>
->(
-  request: RequestWithCursor<Request, Cursor>,
-  response: ResponseTransformed
-): string =>
-  encode({
-    timestamp: response.data.timestamp,
-    id: response.data.id,
-    sort: request.sort,
-  });
-
 const createMeta = <
-  Request extends WithSortOrder & WithLimit,
+  Cursor extends Record<string, any>,
+  Request extends WithLimit,
   ResponseRaw,
   ResponseTransformed
 >(
+  encode: (
+    request: Request,
+    response: ResponseTransformed
+  ) => string | undefined
+) => (
   request: RequestWithCursor<Request, Cursor>,
   responsesRaw: ResponseRaw[],
   lastTransformedResponse: ResponseTransformed | undefined
@@ -35,23 +27,25 @@ const createMeta = <
   const metaBuilder: ResponseMeta = {};
   if (typeof lastTransformedResponse !== 'undefined') {
     metaBuilder.isLastPage = responsesRaw.length < request.limit;
-    metaBuilder.lastCursor = makeCursorFromResponse(
-      request,
-      lastTransformedResponse
-    );
+    metaBuilder.lastCursor = encode(request, lastTransformedResponse);
   }
   return metaBuilder;
 };
 
 export const transformResults = <
-  Request extends WithSortOrder & WithLimit,
+  Cursor extends Record<string, any>,
+  Request extends WithLimit,
   ResponseRaw,
   ResponseTransformed extends Serializable<string, any>
 >(
   transformDbResponse: (
     results: ResponseRaw,
     request?: RequestWithCursor<Request, Cursor>
-  ) => ResponseTransformed
+  ) => ResponseTransformed,
+  encode: (
+    request: Request,
+    response: ResponseTransformed
+  ) => string | undefined
 ) => (
   responses: ResponseRaw[],
   request: RequestWithCursor<Request, Cursor>
@@ -63,6 +57,6 @@ export const transformResults = <
 
   return list(
     transformedData,
-    createMeta(request, responses, last(transformedData))
+    createMeta(encode)(request, responses, last(transformedData))
   );
 };
