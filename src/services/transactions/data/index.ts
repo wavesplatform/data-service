@@ -79,7 +79,7 @@ export default ({
       validateInput: validateInput(inputGet, createServiceName('get')),
       validateResult: validateResult(resultSchema, createServiceName('get')),
       getData: pgData.get(
-        withStatementTimeout(pg, timeouts.get, timeouts.default)
+        withStatementTimeout(pg, timeouts.get)
       ),
       emitEvent,
     }),
@@ -95,7 +95,7 @@ export default ({
       validateInput: validateInput(inputMget, createServiceName('mget')),
       validateResult: validateResult(resultSchema, createServiceName('mget')),
       getData: pgData.mget(
-        withStatementTimeout(pg, timeouts.mget, timeouts.default)
+        withStatementTimeout(pg, timeouts.mget)
       ),
       emitEvent,
     }),
@@ -120,7 +120,7 @@ export default ({
       ),
       validateResult: validateResult(resultSchema, createServiceName('search')),
       getData: pgData.search(
-        withStatementTimeout(pg, timeouts.search, timeouts.default)
+        withStatementTimeout(pg, timeouts.search)
       ),
       emitEvent,
     }),

@@ -13,8 +13,7 @@ import { createPgDriver } from '../../db';
 import { withStatementTimeout } from '../../db/driver';
 const pgDriver = withStatementTimeout(
   createPgDriver(configuration),
-  configuration.pairsUpdateTimeout,
-  0 // 0 - unset statement timeout;
+  configuration.pairsUpdateTimeout
 );
 
 const { daemon: runDaemon } = require('../presets/daemon');

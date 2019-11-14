@@ -28,7 +28,7 @@ module.exports = ({ drivers: { pg }, emitEvent, timeouts }) => {
       resultTypeFactory: transaction,
       transformResult: transformTxInfo,
     })({
-      pg: withStatementTimeout(pg, timeouts.get, timeouts.default),
+      pg: withStatementTimeout(pg, timeouts.get),
       emitEvent,
     }),
 
@@ -41,7 +41,7 @@ module.exports = ({ drivers: { pg }, emitEvent, timeouts }) => {
       resultSchema: result,
       transformResult: transformTxInfo,
     })({
-      pg: withStatementTimeout(pg, timeouts.mget, timeouts.default),
+      pg: withStatementTimeout(pg, timeouts.mget),
       emitEvent,
     }),
 
@@ -56,7 +56,7 @@ module.exports = ({ drivers: { pg }, emitEvent, timeouts }) => {
         encode,
       },
     })({
-      pg: withStatementTimeout(pg, timeouts.search, timeouts.default),
+      pg: withStatementTimeout(pg, timeouts.search),
       emitEvent,
     }),
   };

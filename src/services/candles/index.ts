@@ -58,7 +58,7 @@ export default ({
       getData: getData({
         name: SERVICE_NAME,
         sql,
-        pg: withStatementTimeout(pg, timeouts.search, timeouts.default),
+        pg: withStatementTimeout(pg, timeouts.search),
       }),
       emitEvent,
     }),
