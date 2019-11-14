@@ -109,9 +109,10 @@ export default ({
   >({
     transformInput: identity,
     validateInput: value =>
-      validateInput<PairsGetRequest>(inputGet, SERVICE_NAME.GET)(value).chain(
-        v => validatePairs(v.matcher, [v.pair]).map(() => v)
-      ),
+      validateInput<PairsGetRequest>(
+        inputGet,
+        SERVICE_NAME.GET
+      )(value).chain(v => validatePairs(v.matcher, [v.pair]).map(() => v)),
 
     // cache first
     getData: req =>
@@ -121,11 +122,7 @@ export default ({
           getByIdPg<PairDbResponse, PairsGetRequest>({
             name: SERVICE_NAME.GET,
             sql: sql.get,
-            pg: withStatementTimeout(
-              drivers.pg,
-              timeouts.get,
-              timeouts.default
-            ),
+            pg: withStatementTimeout(drivers.pg, timeouts.get),
           })(req).map(
             tap(maybeResp => forEach(x => cache.set(req, x), maybeResp))
           ),
@@ -149,9 +146,10 @@ export default ({
   >({
     transformInput: identity,
     validateInput: value =>
-      validateInput<PairsMgetRequest>(inputMget, SERVICE_NAME.MGET)(
-        value
-      ).chain(v => validatePairs(v.matcher, v.pairs).map(() => v)),
+      validateInput<PairsMgetRequest>(
+        inputMget,
+        SERVICE_NAME.MGET
+      )(value).chain(v => validatePairs(v.matcher, v.pairs).map(() => v)),
     getData: request => {
       let results: Array<Maybe<PairDbResponse>> = request.pairs.map(p =>
         cache.get({
@@ -171,7 +169,7 @@ export default ({
         name: SERVICE_NAME.MGET,
         sql: sql.mget,
         matchRequestResult,
-        pg: withStatementTimeout(drivers.pg, timeouts.mget, timeouts.default),
+        pg: withStatementTimeout(drivers.pg, timeouts.mget),
       })({
         pairs: notCachedPairs,
         matcher: request.matcher,
@@ -208,7 +206,7 @@ export default ({
     resultSchema,
     transformResult: transformResultSearch,
   })({
-    pg: withStatementTimeout(drivers.pg, timeouts.search, timeouts.default),
+    pg: withStatementTimeout(drivers.pg, timeouts.search),
     emitEvent,
   });
 

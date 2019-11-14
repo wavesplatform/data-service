@@ -45,7 +45,7 @@ export default ({
       transformResult: transformDbResponse,
       resultTypeFactory: alias,
     })({
-      pg: withStatementTimeout(drivers.pg, timeouts.get, timeouts.default),
+      pg: withStatementTimeout(drivers.pg, timeouts.get),
       emitEvent: emitEvent,
     }),
 
@@ -58,7 +58,7 @@ export default ({
       resultTypeFactory: alias,
       matchRequestResult: propEq('alias'),
     })({
-      pg: withStatementTimeout(drivers.pg, timeouts.mget, timeouts.default),
+      pg: withStatementTimeout(drivers.pg, timeouts.mget),
       emitEvent: emitEvent,
     }),
 
@@ -78,7 +78,7 @@ export default ({
         Alias
       >(alias)(transformDbResponse),
     })({
-      pg: withStatementTimeout(drivers.pg, timeouts.search, timeouts.default),
+      pg: withStatementTimeout(drivers.pg, timeouts.search),
       emitEvent: emitEvent,
     }),
   };

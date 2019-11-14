@@ -5,7 +5,7 @@ import createDb from './createDb';
 describe('Db', () => {
   const db = createDb();
   it('should throw and recognize timeout error', done => {
-    withStatementTimeout(db, 1, 30000)
+    withStatementTimeout(db, 1)
       .none('select pg_sleep(1);')
       .run()
       .listen({

@@ -1,8 +1,7 @@
 // Module transforms pg-promise into pg-task
 import { pgpConnect } from './pgp';
 import { ITask, IDatabase } from 'pg-promise';
-import { fromPromised } from 'folktale/concurrency/task';
-import { Task } from 'folktale/concurrency/task';
+import { fromPromised, Task } from 'folktale/concurrency/task';
 
 import { DbError, toDbError, Timeout, toTimeout } from '../../errorHandling';
 import { isStatementTimeoutErrorMessage } from './utils';

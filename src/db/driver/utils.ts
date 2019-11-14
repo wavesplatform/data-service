@@ -6,69 +6,31 @@ import { SqlQuery, PgDriver } from './';
 
 const queryWithStatementTimeout = (
   query: string,
-  statementTimeout: number,
-  defaultStatementTimeout: number
+  statementTimeout: number
 ): string =>
   [
-    pg.raw('begin;set statement_timeout = ?;commit;', [statementTimeout]),
+    pg.raw('begin'),
+    pg.raw('set statement_timeout = ?', [statementTimeout]),
+    pg.raw('commit'),
     query,
-    pg.raw('begin;set statement_timeout = ?;commit;', [
-      defaultStatementTimeout,
-    ]),
   ].join(';');
 
 export const withStatementTimeout = (
   pg: PgDriver,
-  statementTimeout: number,
-  defaultStatementTimeout: number
+  statementTimeout: number
 ): PgDriver => {
   return {
     ...pg,
     none: (query: SqlQuery, values?: any) =>
-      pg.none(
-        queryWithStatementTimeout(
-          query,
-          statementTimeout,
-          defaultStatementTimeout
-        ),
-        values
-      ),
+      pg.none(queryWithStatementTimeout(query, statementTimeout), values),
     one: (query: SqlQuery, values?: any) =>
-      pg.one(
-        queryWithStatementTimeout(
-          query,
-          statementTimeout,
-          defaultStatementTimeout
-        ),
-        values
-      ),
+      pg.one(queryWithStatementTimeout(query, statementTimeout), values),
     oneOrNone: (query: SqlQuery, values?: any) =>
-      pg.oneOrNone(
-        queryWithStatementTimeout(
-          query,
-          statementTimeout,
-          defaultStatementTimeout
-        ),
-        values
-      ),
+      pg.oneOrNone(queryWithStatementTimeout(query, statementTimeout), values),
     many: (query: SqlQuery, values?: any) =>
-      pg.many(
-        queryWithStatementTimeout(
-          query,
-          statementTimeout,
-          defaultStatementTimeout
-        ),
-        values
-      ),
+      pg.many(queryWithStatementTimeout(query, statementTimeout), values),
     any: (query: SqlQuery, values?: any) =>
-      pg.any(
-        queryWithStatementTimeout(
-          query,
-          statementTimeout,
-          defaultStatementTimeout
-        ),
-        values
-      ),
+      pg.any(queryWithStatementTimeout(query, statementTimeout), values),
   };
 };
 
