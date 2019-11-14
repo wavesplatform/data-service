@@ -37,7 +37,7 @@ export const search = (req: AssetsSearchRequest): string => {
       (q: knex.QueryBuilder) => q.toString(),
       (q: knex.QueryBuilder) => q.clone().limit(req.limit),
       (q: knex.QueryBuilder) =>
-        req.after ? q.clone().where('rn', '>', getAssetIndex(req.after)) : q
+        req.assetId ? q.clone().where('rn', '>', getAssetIndex(req.assetId)) : q
     )(searchAssets(req.search));
   }
 };

@@ -11,11 +11,8 @@ export const encode = <ResponseTransformed extends Asset>(
   request: AssetsSearchRequest,
   response: ResponseTransformed
 ): string | undefined =>
-  request.after === undefined || response.data === null
-    ? undefined
-    : Buffer.from(request.after).toString('base64');
+  response.data === null ? undefined : response.data.id;
 
 export const decode = (cursor: string): Result<ValidationError, Cursor> => {
-  const assetId = Buffer.from(cursor, 'base64').toString('utf8');
-  return ok<ValidationError, Cursor>({ assetId });
+  return ok<ValidationError, Cursor>({ assetId: cursor });
 };

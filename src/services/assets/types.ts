@@ -13,7 +13,7 @@ export type SearchFullText = {
 };
 
 export type AssetsSearchRequest = XOR<SearchByTicker, SearchFullText> & {
-  after?: string;
+  assetId?: string;
 };
 
 export type AssetsService = Service<
