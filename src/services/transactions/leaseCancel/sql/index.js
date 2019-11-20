@@ -4,14 +4,14 @@ const createSql = require('../../_common/sql/index');
 const { select, fSelect } = require('./query');
 const { filters, filtersOrder } = require('./filters');
 
+const outerSort = s => q => q.clone().orderBy('txs.uid', s);
+const outerLimit = l => q => q.clone().limit(l);
+
 const queryAfterFilters = {
   get: fSelect,
   mget: fSelect,
   search: (q, fValues) =>
-    compose(
-      filters.sort(fValues.sort),
-      fSelect
-    )(q),
+    compose(outerLimit(fValues.limit), outerSort(fValues.sort), fSelect)(q),
 };
 
 module.exports = createSql({

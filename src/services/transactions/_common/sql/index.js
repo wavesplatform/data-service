@@ -55,7 +55,7 @@ const createSql = ({
       )(filtersOrder);
 
       return compose(
-        tap(console.log),
+        tap(q => console.log('q = ', q)),
         String,
         q => queryAfterFiltersWithDefaults.search(q, fValuesPicked),
         ...appliedFs,

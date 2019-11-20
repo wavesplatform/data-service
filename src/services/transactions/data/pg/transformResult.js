@@ -28,7 +28,7 @@ const getDataObject = txRow => ({
 });
 
 const removeDataEntryFromRow = omit([
-  'tx_id',
+  'tx_uid',
   'data_key',
   'data_type',
   'data_value_integer',

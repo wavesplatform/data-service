@@ -3,27 +3,31 @@ const pg = require('knex')({ client: 'pg' });
 const { compose, omit, keys } = require('ramda');
 
 const columns = {
-  tuid: 't.tuid',
+  tx_uid: 't.tx_uid',
   id: 'txs.id',
-  time_stamp: 't.time_stamp',
+  time_stamp: 'txs.time_stamp',
   height: 't.height',
-  signature: 't.signature',
-  proofs: 't.proofs',
+  signature: 'txs.signature',
+  proofs: 'txs.proofs',
 
-  tx_type: 't.tx_type',
-  tx_version: 't.tx_version',
+  tx_type: 'txs.tx_type',
+  tx_version: 'txs.tx_version',
 
-  sender: 'addrm.address',
-  sender_public_key: 'addrm.public_key',
+  sender: 'addr.address',
+  sender_public_key: 'addr.public_key',
 
-  amount_asset: pg.raw("o1.order->'assetPair'->>'amountAsset'"),
-  price_asset: pg.raw("o1.order->'assetPair'->>'priceAsset'"),
+  amount_asset: pg.raw(
+    "coalesce(o1.order->'assetPair'->>'amountAsset', 'WAVES')"
+  ),
+  price_asset: pg.raw(
+    "coalesce(o1.order->'assetPair'->>'priceAsset', 'WAVES')"
+  ),
 
   // satoshi
   price: pg.raw('t.price'),
   amount: pg.raw('t.amount'),
 
-  fee: pg.raw('t.fee * 10^(-8)'),
+  fee: pg.raw('txs.fee * 10^(-8)'),
   sell_matcher_fee: pg.raw('t.sell_matcher_fee * 10^(-8)'),
   buy_matcher_fee: pg.raw('t.buy_matcher_fee * 10^(-8)'),
 
@@ -59,21 +63,23 @@ const columns = {
 };
 
 // filters would be applied on this
-const select = pg({ t: 'txs_7' }).select('*');
+const select = pg({ t: 'txs_7_orders' }).select('tx_uid');
 
 const withDecimals = q =>
   pg({
-    t: pg({ t: q })
+    t: pg({ t: 'txs_7' })
       .columns(columns)
-      .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tuid')
-      .leftJoin({ addrm: 'addresses_map' }, 'addrm.uid', 't.sender_uid')
+      .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tx_uid')
+      .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid')
       .leftJoin({ o1: 'orders' }, 'o1.uid', 't.order1_uid')
-      .leftJoin({ o2: 'orders' }, 'o2.uid', 't.order2_uid'),
+      .leftJoin({ o2: 'orders' }, 'o2.uid', 't.order2_uid')
+      .whereIn('tx_uid', q),
   })
     .columns(
       compose(
         keys,
         omit([
+          'tx_uid',
           'price',
           'amount',
           'o1_price',
@@ -97,8 +103,8 @@ const withDecimals = q =>
       ),
       o2_amount: pg.raw('t.o2_amount * 10^(-coalesce(a_dec.decimals, 8))'),
     })
-    .leftJoin({ a_dec: 'asset_decimals' }, 'amount_asset', 'a_dec.asset_id')
-    .leftJoin({ p_dec: 'asset_decimals' }, 'price_asset', 'p_dec.asset_id');
+    .leftJoin({ a_dec: 'assets' }, 't.amount_asset', 'a_dec.asset_id')
+    .leftJoin({ p_dec: 'assets' }, 't.price_asset', 'p_dec.asset_id');
 
 module.exports = {
   select,

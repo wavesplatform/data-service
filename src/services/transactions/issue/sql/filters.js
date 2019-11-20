@@ -8,7 +8,7 @@ const byScript = where('script');
 const byAssetId = assetId =>
   where('asset_uid', function() {
     this.select('uid')
-      .from('assets_map')
+      .from('assets')
       .where('asset_id', assetId);
   });
 

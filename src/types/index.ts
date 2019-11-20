@@ -100,7 +100,6 @@ export type DataTxEntryType = 'binary' | 'boolean' | 'integer' | 'string';
 export type TransactionInfo = {
   id: string;
   type: number;
-  timestamp: Date;
 };
 export type NotNullTransaction = Serializable<'transaction', TransactionInfo>;
 export type Transaction = Serializable<'transaction', TransactionInfo | null>;
@@ -108,22 +107,27 @@ export const transaction = (data: TransactionInfo | null = null): Transaction =>
   toSerializable('transaction', data);
 
 export type AssetIdsPair = {
-  amountAsset: string,
-  priceAsset: string
-}
+  amountAsset: string;
+  priceAsset: string;
+};
 
 export type RateMgetParams = {
-  pairs: AssetIdsPair[],
-  matcher: string,
-  timestamp: Maybe<Date>,
-}
+  pairs: AssetIdsPair[];
+  matcher: string;
+  timestamp: Maybe<Date>;
+};
 
 export type RateGetParams = {
-  pair: AssetIdsPair,
-  matcher: string,
-  timestamp: Maybe<Date>
-}
+  pair: AssetIdsPair;
+  matcher: string;
+  timestamp: Maybe<Date>;
+};
 
-export type RateInfo = { current: BigNumber, amountAsset: string, priceAsset: string };
+export type RateInfo = {
+  current: BigNumber;
+  amountAsset: string;
+  priceAsset: string;
+};
 export type Rate = Serializable<'rate', RateInfo | null>;
-export const rate = (data: RateInfo | null = null): Rate => toSerializable('rate', data === null ? null : data)
+export const rate = (data: RateInfo | null = null): Rate =>
+  toSerializable('rate', data === null ? null : data);

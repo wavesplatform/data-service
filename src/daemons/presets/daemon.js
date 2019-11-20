@@ -115,7 +115,7 @@ const main = (daemon, config, interval, timeout, logger) =>
       },
       onRejected: error =>
         logger.error({
-          message: `[DAEMON] error: ${error}`,
+          message: `[DAEMON] error: ${typeof error.error !== 'undefined' ? error.error.message : error.message}`,
           error,
         }),
       onCancelled: () =>

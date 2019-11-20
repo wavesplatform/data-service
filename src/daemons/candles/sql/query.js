@@ -7,8 +7,8 @@ const { serializeCandle, candlePresets } = require('./utils');
 const makeCandleCalculateColumns = longerInterval => {
   return {
     candle_time: candlePresets.aggregate.candle_time(longerInterval),
-    amount_asset_id: 'amount_asset_id',
-    price_asset_id: 'price_asset_id',
+    amount_asset_uid: 'amount_asset_uid',
+    price_asset_uid: 'price_asset_uid',
     low: candlePresets.aggregate.low,
     high: candlePresets.aggregate.high,
     volume: candlePresets.aggregate.volume,
@@ -19,55 +19,41 @@ const makeCandleCalculateColumns = longerInterval => {
     open: candlePresets.aggregate.open,
     close: candlePresets.aggregate.close,
     interval_in_secs: longerInterval,
-    matcher: 'matcher',
+    matcher_uid: 'matcher_uid',
   };
 };
 
 const candleSelectColumns = [
-  {
-    time_start: pg.raw('e.candle_time'),
-  },
-  'amount_asset as amount_asset_id',
-  'price_asset as price_asset_id',
-  {
-    low: pg.raw('min(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'),
-  },
-  {
-    high: pg.raw('max(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'),
-  },
-  {
-    volume: pg.raw('sum(e.amount * 10 ^(-a_dec.decimals))'),
-  },
+  { time_start: 'e.candle_time' },
+  'amount_asset_uid',
+  'price_asset_uid',
+  { low: pg.raw('min(e.price * 10 ^(-8 - p.decimals + a.decimals))') },
+  { high: pg.raw('max(e.price * 10 ^(-8 - p.decimals + a.decimals))') },
+  { volume: pg.raw('sum(e.amount * 10 ^(-a.decimals))') },
   {
     quote_volume: pg.raw(
-      'sum(e.amount * 10 ^(-a_dec.decimals) * e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'
+      'sum(e.amount * 10 ^(-a.decimals) * e.price * 10 ^(-8 - p.decimals + a.decimals))'
     ),
   },
-  {
-    max_height: pg.max('height'),
-  },
-  {
-    txs_count: pg.raw('count(e.price)'),
-  },
+  { max_height: pg.max('height') },
+  { txs_count: pg.raw('count(e.price)') },
   {
     weighted_average_price: pg.raw(
-      'sum((e.amount * 10 ^(-a_dec.decimals))::numeric * (e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))::numeric)/sum((e.amount * 10 ^(-a_dec.decimals))::numeric)'
+      'sum((e.amount * 10 ^(-a.decimals))::numeric * (e.price * 10 ^(-8 - p.decimals + a.decimals))::numeric)/sum((e.amount * 10 ^(-a.decimals))::numeric)'
     ),
   },
   {
     open: pg.raw(
-      '(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals) ORDER BY e.candle_time)::numeric[])[1]'
+      '(array_agg(e.price * 10 ^(-8 - p.decimals + a.decimals) ORDER BY e.candle_time)::numeric[])[1]'
     ),
   },
   {
     close: pg.raw(
-      '(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals) ORDER BY e.candle_time DESC)::numeric[])[1]'
+      '(array_agg(e.price * 10 ^(-8 - p.decimals + a.decimals) ORDER BY e.candle_time DESC)::numeric[])[1]'
     ),
   },
-  {
-    interval_in_secs: 60,
-  },
-  'sender as matcher',
+  { interval_in_secs: 60 },
+  { matcher_uid: 'sender_uid' },
 ];
 
 /** insertIntoCandlesFromSelect :: (String, Function) -> QueryBuilder */
@@ -75,26 +61,35 @@ const insertIntoCandlesFromSelect = (tableName, selectFunction) =>
   pg.into(tableName).insert(selectFunction);
 
 /** selectExchanges :: QueryBuilder */
-const selectExchanges = pg({ t: 'txs_7' }).column(
-  'amount_asset',
-  'price_asset',
-  'sender',
-  'height',
-  { candle_time: pg.raw(`date_trunc('minute', t.time_stamp)`) },
-  `amount`,
-  `price`,
-);
+const selectExchanges = pg({ t: 'txs_7' })
+  .column(
+    'o.amount_asset_uid',
+    'o.price_asset_uid',
+    't.sender_uid',
+    't.height',
+    { candle_time: pg.raw(`date_trunc('minute', txs.time_stamp)`) },
+    `t.amount`,
+    `t.price`
+  )
+  .join({ txs: 'txs' }, 'txs.uid', 't.tx_uid')
+  .join({ o: 'txs_7_orders' }, 'o.order_uid', 't.order1_uid');
 
 /** selectExchangesAfterTimestamp :: Date -> QueryBuilder */
 const selectExchangesAfterTimestamp = fromTimestamp =>
-  selectExchanges
-    .clone()
-    .whereRaw(
-      `t.time_stamp >= date_trunc('minute', '${fromTimestamp.toISOString()}'::timestamp)`
-    );
+  selectExchanges.clone().where(
+    't.tx_uid',
+    '>=',
+    pg('txs')
+      .select('uid')
+      .from('txs')
+      .whereRaw(
+        `txs.time_stamp >= date_trunc('minute', '${fromTimestamp.toISOString()}'::timestamp)`
+      )
+      .limit(1)
+  );
 
 /** selectLastCandle :: String -> String query */
-const selectLastCandle = tableName =>
+const selectLastCandleHeight = tableName =>
   pg({ t: tableName })
     .select('max_height')
     .limit(1)
@@ -102,7 +97,7 @@ const selectLastCandle = tableName =>
     .toString();
 
 /** selectLastExchangeTx :: String query */
-const selectLastExchangeTx = () =>
+const selectLastExchangeTxHeight = () =>
   pg({ t: 'txs_7' })
     .select('height')
     .limit(1)
@@ -111,10 +106,16 @@ const selectLastExchangeTx = () =>
 
 /** selectLastExchangeTx :: String query */
 const selectMinTimestampFromHeight = height =>
-  pg.raw(`select min(time_stamp) as time_stamp 
-          from (
-            select time_stamp from txs_7 where height >= ${height} order by time_stamp
-          ) as t`).toString();
+  pg({
+    t: pg('txs')
+      .column('time_stamp')
+      .where('tx_type', 7)
+      .andWhere('height', '>=', height)
+      .orderBy('uid')
+      .limit(1),
+  })
+    .column({ time_stamp: pg.min('t.time_stamp') })
+    .toString();
 
 /** for make complex query with "on conflict (...) update ... without set concrete values" See insertOrUpdateCandles or insertOrUpdateCandlesFromShortInterval */
 const updatedFieldsExcluded = [
@@ -138,7 +139,7 @@ const insertOrUpdateCandles = (tableName, candles) => {
       .raw(
         `${pg({ t: tableName }).insert(
           candles.map(serializeCandle)
-        )} on conflict (time_start, amount_asset_id, price_asset_id, matcher, interval_in_secs) do update set ${updatedFieldsExcluded}`
+        )} on conflict (time_start, amount_asset_uid, price_asset_uid, matcher_uid, interval_in_secs) do update set ${updatedFieldsExcluded}`
       )
       .toString();
   }
@@ -162,8 +163,13 @@ const insertOrUpdateCandlesFromShortInterval = (
           .whereRaw(
             `time_start >= to_timestamp(floor(extract('epoch' from '${fromTimestamp.toISOString()}'::timestamp) / ${longerInterval}) * ${longerInterval})`
           )
-          .groupBy('candle_time', 'amount_asset_id', 'price_asset_id', 'matcher');
-      })} on conflict (time_start, amount_asset_id, price_asset_id, matcher, interval_in_secs) do update set ${updatedFieldsExcluded}`
+          .groupBy(
+            'candle_time',
+            'amount_asset_uid',
+            'price_asset_uid',
+            'matcher_uid'
+          );
+      })} on conflict (time_start, amount_asset_uid, price_asset_uid, matcher_uid, interval_in_secs) do update set ${updatedFieldsExcluded}`
     )
     .toString();
 
@@ -178,13 +184,11 @@ const insertAllMinuteCandles = tableName =>
   insertIntoCandlesFromSelect(tableName, function() {
     this.select(candleSelectColumns)
       .from(selectExchanges.clone().as('e'))
-      .innerJoin(
-        { a_dec: 'asset_decimals' },
-        'e.amount_asset',
-        'a_dec.asset_id'
-      )
-      .innerJoin({ p_dec: 'asset_decimals' }, 'e.price_asset', 'p_dec.asset_id')
-      .groupByRaw('e.candle_time, e.amount_asset, e.price_asset, e.sender');
+      .innerJoin({ a: 'assets' }, 'e.amount_asset_uid', 'a.uid')
+      .innerJoin({ p: 'assets' }, 'e.price_asset_uid', 'p.uid')
+      .groupByRaw(
+        'e.candle_time, e.amount_asset_uid, e.price_asset_uid, e.sender_uid'
+      );
   }).toString();
 
 /** insertAllCandles :: (String, Number, Number, Number) -> String query */
@@ -193,7 +197,12 @@ const insertAllCandles = (tableName, shortInterval, longerInterval) =>
     this.from({ t: tableName })
       .column(makeCandleCalculateColumns(longerInterval))
       .where('t.interval_in_secs', shortInterval)
-      .groupBy(['candle_time', 'amount_asset_id', 'price_asset_id', 'matcher']);
+      .groupBy([
+        'candle_time',
+        'amount_asset_uid',
+        'price_asset_uid',
+        'matcher_uid',
+      ]);
   }).toString();
 
 /** selectCandlesByMinute :: Date -> String query */
@@ -205,9 +214,14 @@ const selectCandlesByMinute = fromTimetamp =>
         .clone()
         .as('e')
     )
-    .innerJoin({ a_dec: 'asset_decimals' }, 'e.amount_asset', 'a_dec.asset_id')
-    .innerJoin({ p_dec: 'asset_decimals' }, 'e.price_asset', 'p_dec.asset_id')
-    .groupBy(['e.candle_time', 'e.amount_asset', 'e.price_asset', 'e.sender'])
+    .innerJoin({ a: 'assets' }, 'e.amount_asset_uid', 'a.uid')
+    .innerJoin({ p: 'assets' }, 'e.price_asset_uid', 'p.uid')
+    .groupBy([
+      'e.candle_time',
+      'e.amount_asset_uid',
+      'e.price_asset_uid',
+      'e.sender_uid',
+    ])
     .toString();
 
 module.exports = {
@@ -216,8 +230,8 @@ module.exports = {
   insertAllCandles,
   selectCandlesByMinute,
   insertOrUpdateCandles,
-  selectLastCandle,
-  selectLastExchangeTx,
+  selectLastCandleHeight,
+  selectLastExchangeTxHeight,
   insertOrUpdateCandlesFromShortInterval,
   selectMinTimestampFromHeight,
 };

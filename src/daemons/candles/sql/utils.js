@@ -4,9 +4,9 @@ const pg = knex({ client: 'pg' });
 // serializeCandle:: Object => Object
 const serializeCandle = candle => ({
   time_start: candle.time_start,
-  amount_asset_id: candle.amount_asset_id,
-  price_asset_id: candle.price_asset_id,
-  matcher: candle.matcher,
+  amount_asset_uid: candle.amount_asset_uid,
+  price_asset_uid: candle.price_asset_uid,
+  matcher_uid: candle.matcher_uid,
   low: candle.low.toString(),
   high: candle.high.toString(),
   volume: candle.volume.toString(),

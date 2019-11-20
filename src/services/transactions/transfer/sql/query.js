@@ -3,38 +3,74 @@ const pg = require('knex')({ client: 'pg' });
 const select = pg({ t: 'txs_4' }).select('*');
 
 const withDecimals = q =>
-  pg({ t: q.clone() })
+  pg
+    .with(
+      'ts',
+      pg({ t: q })
+        .select({
+          tx_uid: 't.tx_uid',
+          height: 't.height',
+          sender: 'addr.address',
+          sender_public_key: 'addr.public_key',
+          asset_id: pg.raw(`coalesce(a.asset_id,'WAVES')`),
+          attachment: 't.attachment',
+          amount: pg.raw(
+            't.amount * 10^(-coalesce(a.decimals, 8))::double precision'
+          ),
+          recipient_uid: 't.recipient_uid',
+          recipient_alias_uid: 't.recipient_alias_uid',
+          fee_asset_uid: 't.fee_asset_uid',
+        })
+        .leftJoin(
+          { a: pg('assets').select('uid', 'asset_id', 'decimals') },
+          'a.uid',
+          't.asset_uid'
+        )
+        .leftJoin(
+          { addr: pg('addresses').select('uid', 'address', 'public_key') },
+          'addr.uid',
+          't.sender_uid'
+        )
+    )
     .select({
       // common
       height: 't.height',
-      tx_type: 't.tx_type',
+      tx_type: 'txs.tx_type',
       id: 'txs.id',
-      time_stamp: 't.time_stamp',
-      signature: 't.signature',
-      proofs: 't.proofs',
-      tx_version: 't.tx_version',
-      fee: pg.raw('t.fee * 10^(-fd.decimals)'),
-      sender: 'addrm.address',
-      sender_public_key: 'addrm.public_key',
+      time_stamp: 'txs.time_stamp',
+      signature: 'txs.signature',
+      proofs: 'txs.proofs',
+      tx_version: 'txs.tx_version',
+      fee: pg.raw('txs.fee * 10^(-coalesce(fa.decimals, 8))::double precision'),
+      sender: 't.sender',
+      sender_public_key: 't.sender_public_key',
 
       // type-specific
-      asset_id: 'am.asset_id',
-      amount: pg.raw('t.amount * 10^(-ad.decimals)'),
-      recipient: 'recipient_addrm.address',
-      fee_asset: 'fam.asset_id',
+      asset_id: 't.asset_id',
+      amount: 't.amount',
+      recipient: pg.raw(
+        'coalesce(recipient_alias.alias, recipient_addr.address)'
+      ),
+      fee_asset: pg.raw("coalesce(fa.asset_id, 'WAVES')"),
       attachment: 't.attachment',
     })
-    .leftJoin('txs', 'txs.uid', 't.tuid')
-    .leftJoin({ addrm: 'addresses_map' }, 'addrm.uid', 't.sender_uid')
+    .from({ t: 'ts' })
+    .leftJoin('txs', 'txs.uid', 't.tx_uid')
     .leftJoin(
-      { recipient_addrm: 'addresses_map' },
-      'recipient_addrm.uid',
+      { fa: pg('assets').select('uid', 'asset_id', 'decimals') },
+      'fa.uid',
+      't.fee_asset_uid'
+    )
+    .leftJoin(
+      { recipient_addr: pg('addresses').select('uid', 'address') },
+      'recipient_addr.uid',
       't.recipient_uid'
     )
-    .leftJoin({ am: 'assets_map' }, 'am.uid', 't.asset_uid')
-    .leftJoin({ fam: 'assets_map' }, 'fam.uid', 't.fee_asset_uid')
-    .join({ ad: 'txs_3' }, 't.asset_uid', '=', 'ad.asset_uid')
-    .join({ fd: 'txs_3' }, 't.fee_asset_uid', '=', 'fd.asset_uid');
+    .leftJoin(
+      { recipient_alias: pg('txs_10').select('tx_uid', 'alias') },
+      'recipient_alias.tx_uid',
+      't.recipient_alias_uid'
+    );
 
 module.exports = {
   select,

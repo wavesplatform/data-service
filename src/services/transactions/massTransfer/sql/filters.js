@@ -1,19 +1,19 @@
-const { whereIn } = require('../../../../utils/db/knex');
+const { where } = require('../../../../utils/db/knex');
 const { selectIdsWhereRecipient } = require('./query');
 
 const commonFilters = require('../../_common/sql/filters');
 const commonFiltersOrder = require('../../_common/sql/filtersOrder');
 
 const byAssetId = assetId => {
-  return whereIn('asset_uid', function() {
+  return where('asset_uid', function() {
     this.select('uid')
-      .from('assets_map')
+      .from('assets')
       .where('asset_id', assetId);
   });
 };
 
 const byRecipient = rec => q =>
-  q.clone().whereIn('tuid', selectIdsWhereRecipient(rec));
+  q.clone().where('tx_uid', selectIdsWhereRecipient(rec));
 
 module.exports = {
   filters: {

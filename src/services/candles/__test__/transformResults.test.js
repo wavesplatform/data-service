@@ -12,7 +12,7 @@ const monthCandles = require('./mocks/monthCandles');
 const yearCandles = require('./mocks/yearCandles');
 
 const date1 = new Date('2018-11-01T00:00:00.000Z'),
-  date2 = new Date('2018-12-01T00:00:00.000Z');
+  date2 = new Date(new Date('2018-12-01T00:00:00.000Z').valueOf() - 1);
 
 const day = interval('1d').unsafeGet(),
   minute = interval('1m').unsafeGet(),

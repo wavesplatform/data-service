@@ -1,27 +1,29 @@
-const { whereIn, limit } = require('../../../../utils/db/knex/index');
+const { where, whereIn, limit } = require('../../../../utils/db/knex/index');
 
 const id = id =>
-  whereIn('t.tuid', function() {
+  where('t.tx_uid', function() {
     this.select('uid')
       .from('txs')
-      .where('id', id);
+      .where('id', id)
+      .limit(1);
   });
+
 const ids = ids =>
-  whereIn('t.tuid', function() {
+  whereIn('t.tx_uid', function() {
     this.select('uid')
       .from('txs')
       .whereIn('id', ids);
   });
 
 const sender = addr =>
-  whereIn('t.sender_uid', function() {
+  where('t.sender_uid', function() {
     this.select('uid')
-      .from('addresses_map')
+      .from('addresses')
       .where('address', addr);
   });
 
 const byTimeStamp = comparator => ts =>
-  whereIn('t.tuid', comparator, function() {
+  where('t.tx_uid', comparator, function() {
     this.select('uid')
       .from('txs')
       .where('time_stamp', comparator, ts)
@@ -29,11 +31,11 @@ const byTimeStamp = comparator => ts =>
       .limit(1);
   });
 
-const sort = s => q => q.clone().orderBy('t.tuid', s);
+const sort = s => q => q.clone().orderBy('t.tx_uid', s);
 
 const after = ({ id, sort }) => q => {
   const comparator = sort === 'desc' ? '<' : '>';
-  return q.clone().whereIn('t.tuid', function() {
+  return q.clone().whereIn('t.tx_uid', function() {
     this.select('uid')
       .from('txs')
       .where('uid', comparator, function() {

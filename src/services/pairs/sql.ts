@@ -13,8 +13,6 @@ import {
 const pg = knex({ client: 'pg' });
 
 const COLUMNS = [
-  'amount_asset_id',
-  'price_asset_id',
   'first_price',
   'last_price',
   'volume',
@@ -63,11 +61,27 @@ const getMatchExactly = (matchExactly: boolean[] | undefined): boolean[] => {
 const query = (pairs: Pair[], matcher: string): string =>
   pg({ t: 'pairs' })
     .select(COLUMNS)
+    .select({
+      amount_asset_id: 'aa.asset_id',
+      price_asset_id: 'pa.asset_id',
+    })
+    .leftJoin({ aa: 'assets' }, 'aa.uid', 't.amount_asset_uid')
+    .leftJoin({ pa: 'assets' }, 'pa.uid', 't.price_asset_uid')
+    .leftJoin(
+      { matcher_addr: 'addresses' },
+      'matcher_addr.uid',
+      't.matcher_uid'
+    )
     .whereIn(
-      ['t.amount_asset_id', 't.price_asset_id'],
+      ['aa.asset_id', 'pa.asset_id'],
       pairs.map(pair => [pair.amountAsset, pair.priceAsset])
     )
-    .where('matcher', matcher)
+    .whereIn('matcher_uid', function() {
+      this.select('uid')
+        .from('addresses')
+        .where('address', matcher)
+        .limit(1);
+    })
     .toString();
 
 const searchAssets = (

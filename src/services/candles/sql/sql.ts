@@ -1,5 +1,5 @@
 import * as knex from 'knex';
-import { repeat } from 'ramda';
+import { omit, repeat } from 'ramda';
 import { Interval, Unit, interval } from '../../../types';
 import { add, trunc } from '../../../utils/date';
 import {
@@ -12,28 +12,31 @@ import { CandlesSearchRequest } from '..';
 
 const pg = knex({ client: 'pg' });
 
-const FIELDS = [
-  'time_start',
-  'amount_asset_id',
-  'price_asset_id',
-  'low',
-  'high',
-  'volume',
-  'quote_volume',
-  'max_height',
-  'txs_count',
-  'weighted_average_price',
-  'open',
-  'close',
-  'interval_in_secs',
-  'matcher',
-];
+const FIELDS = {
+  time_start: 'c.time_start',
+  amount_asset_uid: 'c.amount_asset_uid',
+  price_asset_uid: 'c.price_asset_uid',
+  low: 'c.low',
+  high: 'c.high',
+  volume: 'c.volume',
+  quote_volume: 'c.quote_volume',
+  max_height: 'c.max_height',
+  txs_count: 'c.txs_count',
+  weighted_average_price: 'c.weighted_average_price',
+  open: 'c.open',
+  close: 'c.close',
+  interval_in_secs: 'c.interval_in_secs',
+  matcher_uid: 'c.matcher_uid',
+};
 
-const FIELDS_WITH_DECIMALS: knex.ColumnName[] = [
-  ...FIELDS,
-  { a_dec: 'a_dec.decimals' },
-  { p_dec: 'p_dec.decimals' },
-];
+const FULL_FIELDS: Record<string, string> = {
+  ...omit(['amount_asset_uid', 'price_asset_uid', 'matcher_uid'], FIELDS),
+  amount_asset_id: 'a.asset_id',
+  price_asset_id: 'p.asset_id',
+  matcher: 'addr.address',
+  a_dec: 'a.decimals',
+  p_dec: 'p.decimals',
+};
 
 const DIVIDERS = ['1m', '5m', '15m', '30m', '1h', '3h', '6h', '12h', '1d'];
 
@@ -54,13 +57,27 @@ export const selectCandles = ({
   matcher,
   interval: inter,
 }: CandleSelectionParams): knex.QueryBuilder =>
-  pg('candles')
+  pg({ c: 'candles' })
     .select(FIELDS)
-    .where('amount_asset_id', amountAsset)
-    .where('price_asset_id', priceAsset)
+    .whereIn('amount_asset_uid', function() {
+      this.select('uid')
+        .from('assets')
+        .where('asset_id', amountAsset)
+        .limit(1);
+    })
+    .whereIn('price_asset_uid', function() {
+      this.select('uid')
+        .from('assets')
+        .where('asset_id', priceAsset)
+        .limit(1);
+    })
     .where('time_start', '>=', timeStart)
     .where('time_start', '<=', timeEnd)
-    .where('matcher', matcher)
+    .whereIn('matcher_uid', function() {
+      this.select('uid')
+        .from('addresses')
+        .where('address', matcher);
+    })
     .where(
       'interval_in_secs',
       // should always be valid after validation
@@ -69,7 +86,7 @@ export const selectCandles = ({
         unsafeIntervalsFromStrings(DIVIDERS)
       ).matchWith({
         Ok: ({ value: i }) => i.length / 1000,
-        Error: ({ value: error }) => interval('1m').unsafeGet().length / 1000,
+        Error: () => interval('1m').unsafeGet().length / 1000,
       })
     );
 
@@ -141,8 +158,8 @@ export const sql = ({
     []
   );
 
-  return pg('candles')
-    .select(FIELDS_WITH_DECIMALS)
+  return pg({ c: 'candles' })
+    .select(FULL_FIELDS)
     .from(
       selectCandles({
         amountAsset,
@@ -164,33 +181,14 @@ export const sql = ({
         )
         .as('c')
     )
-    .innerJoin(
-      { a_dec: 'asset_decimals' },
-      'c.amount_asset_id',
-      'a_dec.asset_id'
-    )
-    .innerJoin(
-      { p_dec: 'asset_decimals' },
-      'c.price_asset_id',
-      'p_dec.asset_id'
-    )
+    .innerJoin({ a: 'assets' }, 'a.uid', 'c.amount_asset_uid')
+    .innerJoin({ p: 'assets' }, 'p.uid', 'c.price_asset_uid')
+    .innerJoin({ addr: 'addresses' }, 'addr.uid', 'c.matcher_uid')
     .orderBy('c.time_start', 'asc')
     .toString();
 };
 
-export const assetDecimals = (asset: string): string =>
-  pg('asset_decimals')
-    .select('decimals')
-    .whereIn('asset_uid', function() {
-      this.select('uid')
-        .from('assets_map')
-        .where('asset_id', asset)
-        .limit(1);
-    })
-    .toString();
-
 module.exports = {
-  assetDecimals,
   periodsToQueries,
   sql,
 };

@@ -1,4 +1,4 @@
-const { compose, merge, pick, pipe, assoc } = require('ramda');
+const { assoc, compose, merge, pick, pipe } = require('ramda');
 
 const { select, fSelect, composeQuery } = require('./query');
 const { pickBindFilters } = require('../../../../../utils/db');

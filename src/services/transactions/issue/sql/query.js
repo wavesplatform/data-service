@@ -6,16 +6,16 @@ const fSelect = q =>
   pg({ t: q })
     .select({
       height: 't.height',
-      tx_type: 't.tx_type',
+      tx_type: 'txs.tx_type',
       id: 'txs.id',
-      time_stamp: 't.time_stamp',
-      signature: 't.signature',
-      proofs: 't.proofs',
-      tx_version: 't.tx_version',
-      fee: pg.raw('t.fee * 10^(-8)'),
-      sender: 'addrm.address',
-      sender_public_key: 'addrm.public_key',
-      asset_id: 'am.asset_id',
+      time_stamp: 'txs.time_stamp',
+      signature: 'txs.signature',
+      proofs: 'txs.proofs',
+      tx_version: 'txs.tx_version',
+      fee: pg.raw('txs.fee * 10^(-8)'),
+      sender: 'addr.address',
+      sender_public_key: 'addr.public_key',
+      asset_id: 'a.asset_id',
       asset_name: 't.asset_name',
       description: 't.description',
       decimals: 't.decimals',
@@ -23,8 +23,8 @@ const fSelect = q =>
       reissuable: 't.reissuable',
       script: 't.script',
     })
-    .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tuid')
-    .leftJoin({ addrm: 'addresses_map' }, 'addrm.uid', 't.sender_uid')
-    .leftJoin({ am: 'assets_map' }, 'am.uid', 't.asset_uid');
+    .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tx_uid')
+    .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid')
+    .leftJoin({ a: 'assets' }, 'a.uid', 't.asset_uid');
 
 module.exports = { select, fSelect };

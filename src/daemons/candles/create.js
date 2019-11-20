@@ -1,4 +1,4 @@
-const { compose, head, map, nth } = require('ramda');
+const { compose, map, nth } = require('ramda');
 const Task = require('folktale/concurrency/task');
 const { fromNullable } = require('folktale/maybe');
 
@@ -10,8 +10,8 @@ const {
   insertAllCandles,
   selectCandlesByMinute,
   insertOrUpdateCandles,
-  selectLastCandle,
-  selectLastExchangeTx,
+  selectLastCandleHeight,
+  selectLastExchangeTxHeight,
   insertOrUpdateCandlesFromShortInterval,
   selectMinTimestampFromHeight,
 } = require('./sql/query');
@@ -71,8 +71,8 @@ const updateCandlesLoop = (logTask, pg, tableName) => {
     pg.tx(t =>
       t
         .batch([
-          t.oneOrNone(selectLastExchangeTx()),
-          t.oneOrNone(selectLastCandle(tableName)),
+          t.oneOrNone(selectLastExchangeTxHeight()),
+          t.oneOrNone(selectLastCandleHeight(tableName)),
         ])
         .then(([lastTx, candle]) => {
           if (!lastTx) {

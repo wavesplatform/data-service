@@ -4,12 +4,14 @@ const createSql = require('../../_common/sql/index');
 const { select, fSelect } = require('./query');
 const { filters, filtersOrder } = require('./filters');
 
+const outerSort = s => q => q.clone().orderBy('txs.uid', s);
+
 const queryAfterFilters = {
   get: fSelect,
   mget: fSelect,
   search: (q, fValues) =>
     compose(
-      filters.sort(fValues.sort),
+      outerSort(fValues.sort),
       fSelect
     )(q),
 };

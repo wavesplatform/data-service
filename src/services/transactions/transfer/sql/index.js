@@ -5,12 +5,14 @@ const createSql = require('../../_common/sql/index');
 const { select, withDecimals } = require('./query');
 const { filters, filtersOrder } = require('./filters');
 
+const outerSort = s => q => q.clone().orderBy('txs.uid', s);
+
 const queryAfterFilters = {
   get: withDecimals,
   mget: withDecimals,
   search: (q, fValues) =>
     compose(
-      filters.sort(fValues.sort),
+      outerSort(fValues.sort),
       withDecimals
     )(q),
 };

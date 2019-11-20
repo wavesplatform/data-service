@@ -3,11 +3,12 @@ const { pipe } = require('ramda');
 
 const selectIdsWhereRecipient = recipient =>
   pg('txs_11_transfers')
-    .select('tuid')
+    .select('tx_uid')
     .where('recipient_uid', function() {
       this.select('uid')
-        .from('addresses_map')
-        .where('address', recipient);
+        .from('addresses')
+        .where('address', recipient)
+        .limit(1);
     });
 
 const select = pg({ t: 'txs_11' });
@@ -15,10 +16,10 @@ const select = pg({ t: 'txs_11' });
 const withTransfers = q =>
   q
     .clone()
-    .join({ tfs: 'txs_11_transfers' }, 'tfs.tuid', '=', 't.tuid')
+    .leftJoin({ tfs: 'txs_11_transfers' }, 'tfs.tx_uid', '=', 't.tx_uid')
     .leftJoin(
-      { recipient_addrm: 'addresses_map' },
-      'recipient_addrm.uid',
+      { recipient_addr: 'addresses' },
+      'recipient_addr.uid',
       'tfs.recipient_uid'
     );
 
@@ -26,52 +27,63 @@ const withGrouping = q =>
   q
     .clone()
     .groupBy(
-      't.tuid',
       'txs.id',
-      't.fee',
+      'txs.fee',
       't.height',
-      't.tx_type',
-      't.time_stamp',
-      't.signature',
-      't.proofs',
-      't.tx_version',
-      'addrm.address',
-      'addrm.public_key',
-      'am.asset_id',
+      'txs.tx_type',
+      'txs.time_stamp',
+      'txs.signature',
+      'txs.proofs',
+      'txs.tx_version',
+      'addr.address',
+      'addr.public_key',
+      't.asset_id',
       't.attachment'
     );
 
 const withTransfersDecimalsAndGrouping = pipe(
-  q => pg({ t: q }),
-  withTransfers,
-  withGrouping,
   q =>
-    q
+    pg
+      .with(
+        't_cte',
+        withTransfers(pg({ t: q }))
+          .select({
+            tx_uid: 't.tx_uid',
+            height: 't.height',
+            sender_uid: 't.sender_uid',
+            asset_id: pg.raw(`coalesce(a.asset_id,'WAVES')`),
+            attachment: 't.attachment',
+            amount: pg.raw(
+              'tfs.amount * 10^(-coalesce(a.decimals, 8))::double precision'
+            ),
+            position_in_tx: 'tfs.position_in_tx',
+            recipient_alias_uid: 'tfs.recipient_alias_uid',
+            address: 'recipient_addr.address',
+          })
+          .leftJoin({ a: 'assets' }, 'a.uid', 't.asset_uid')
+      )
       .select({
         id: 'txs.id',
-        fee: pg.raw('(t.fee * 10^(-8)) :: DOUBLE PRECISION'),
-        recipients: pg.raw(
-          'array_agg(recipient_addrm.address order by tfs.position_in_tx)'
-        ),
-        amounts: pg.raw(
-          'array_agg (tfs.amount * 10^(-coalesce(ad.decimals, 8)) :: double precision order by tfs.position_in_tx)'
-        ),
+        fee: pg.raw('(txs.fee * 10^(-8)) :: DOUBLE PRECISION'),
+        recipients: pg.raw('array_agg(t.address order by t.position_in_tx)'),
+        amounts: pg.raw('array_agg(t.amount  order by t.position_in_tx)'),
         height: 't.height',
-        tx_type: 't.tx_type',
-        time_stamp: 't.time_stamp',
-        signature: 't.signature',
-        proofs: 't.proofs',
-        tx_version: 't.tx_version',
-        sender: 'addrm.address',
-        sender_public_key: 'addrm.public_key',
-        asset_id: 'am.asset_id',
+        tx_type: 'txs.tx_type',
+        time_stamp: 'txs.time_stamp',
+        signature: 'txs.signature',
+        proofs: 'txs.proofs',
+        tx_version: 'txs.tx_version',
+        sender: 'addr.address',
+        sender_public_key: 'addr.public_key',
+        asset_id: 't.asset_id',
         attachment: 't.attachment',
       })
-      .leftJoin('txs', 'txs.uid', 't.tuid')
-      .leftJoin({ addrm: 'addresses_map' }, 'addrm.uid', 't.sender_uid')
-      .leftJoin({ am: 'assets_map' }, 'am.uid', 't.asset_uid')
-      .leftJoin({ ad: 'txs_3' }, 'ad.asset_uid', '=', 't.asset_uid')
+      .from({ t: 't_cte' })
+      .leftJoin('txs', 'txs.uid', 't.tx_uid')
+      .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid'),
+  withGrouping
 );
+
 module.exports = {
   select,
   withTransfersDecimalsAndGrouping,

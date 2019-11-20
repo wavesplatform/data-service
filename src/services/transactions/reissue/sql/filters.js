@@ -6,7 +6,7 @@ const commonFiltersOrder = require('../../_common/sql/filtersOrder');
 const assetId = assetId =>
   where('t.asset_uid', function() {
     this.select('uid')
-      .from('assets_map')
+      .from('assets')
       .where('asset_id', assetId);
   });
 

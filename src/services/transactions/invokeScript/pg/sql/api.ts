@@ -1,24 +1,17 @@
-const { compose, merge, pick, pipe } = require('ramda');
+const { compose, defaultTo, merge, pick, pipe, tap } = require('ramda');
 
-const { select, fSelect, composeQuery } = require('./query');
+const { select, fSelect } = require('./query');
 const { pickBindFilters } = require('../../../../../utils/db');
 
 // get — get by id
 // mget/search — apply filters
 export const createApi = ({ filters: F }: { filters: any }) => ({
-  get: (id: string): string =>
-    pipe(
-      F.id(id),
-      String
-    )(select),
+  get: (id: string): string => pipe(F.id(id), select, String)(fSelect('desc')),
 
   mget: (ids: string[]): string =>
-    pipe(
-      F.ids(ids),
-      String
-    )(select),
+    pipe(F.ids(ids), select, String)(fSelect('desc')),
 
-  search: (fValues = {}): string => {
+  search: (fValues: Record<string, any> = {}): string => {
     const defaultValues = { limit: 100, sort: 'desc' };
 
     // no `limit` here, will apply it separately
@@ -31,24 +24,18 @@ export const createApi = ({ filters: F }: { filters: any }) => ({
       // specific attributes
       'dapp',
       'function',
-      // sort
-      'sort',
+      // limit
       'limit',
     ];
 
     // { [fName]: fValue }
-    const withDefaults = compose(
-      pick(fNames),
-      merge(defaultValues)
-    )(fValues);
-
+    const withDefaults = compose(pick(fNames), merge(defaultValues))(fValues);
+    console.log('fValues ', fValues);
     const fs = pickBindFilters(F, fNames, withDefaults);
-    const fQuery = pipe(...fs)(fSelect);
+    const fQuery = pipe(...fs)(
+      fSelect(defaultTo(defaultValues.sort, fValues['sort']))
+    );
 
-    return pipe(
-      composeQuery,
-      F.sort(withDefaults.sort),
-      String
-    )(fQuery);
+    return pipe(select, String, tap(console.log))(fQuery);
   },
 });

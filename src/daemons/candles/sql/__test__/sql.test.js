@@ -45,12 +45,12 @@ describe('candles daemon sql test', () => {
     ).toMatchSnapshot();
   });
 
-  it('get last candle', () => {
-    expect(sql.selectLastCandle('candles').toString()).toMatchSnapshot();
+  it('get last candle height', () => {
+    expect(sql.selectLastCandleHeight('candles').toString()).toMatchSnapshot();
   });
 
-  it('get last exchange tx', () => {
-    expect(sql.selectLastExchangeTx().toString()).toMatchSnapshot();
+  it('get last exchange tx height', () => {
+    expect(sql.selectLastExchangeTxHeight().toString()).toMatchSnapshot();
   });
 
   it('insert or update candles from height', () => {

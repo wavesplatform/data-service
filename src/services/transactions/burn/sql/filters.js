@@ -1,12 +1,12 @@
-const { whereIn } = require('../../../../utils/db/knex');
+const { where } = require('../../../../utils/db/knex');
 
 const commonFilters = require('../../_common/sql/filters');
 const commonFiltersOrder = require('../../_common/sql/filtersOrder');
 
 const assetId = assetId =>
-  whereIn('asset_uid', function() {
+  where('asset_uid', function() {
     this.select('uid')
-      .from('assets_map')
+      .from('assets')
       .where('asset_id', assetId)
       .limit(1);
   });

@@ -1,44 +1,44 @@
 const pg = require('knex')({ client: 'pg' });
 
 const select = pg
-  .columns([
-    'tx_type',
-    'tx_version',
-    'height',
-    'id',
-    'signature',
-    'time_stamp',
-    'proofs',
-    'sender',
-    'sender_public_key',
+  .columns({
+    tx_type: 'txs.tx_type',
+    tx_version: 'txs.tx_version',
+    height: 't.height',
+    id: 'txs.id',
+    signature: 'txs.signature',
+    time_stamp: 'txs.time_stamp',
+    proofs: 'txs.proofs',
+    sender: 'addr.address',
+    sender_public_key: 'addr.public_key',
 
     // data values
-    'tx_id',
-    'data_key',
-    'data_type',
-    'data_value_integer',
-    'data_value_boolean',
-    'data_value_string',
-    'data_value_binary',
-    'position_in_tx',
-  ])
+    data_key: 'td.data_key',
+    data_type: 'td.data_type',
+    data_value_integer: 'td.data_value_integer',
+    data_value_boolean: 'td.data_value_boolean',
+    data_value_string: 'td.data_value_string',
+    data_value_binary: 'td.data_value_binary',
+    position_in_tx: 'td.position_in_tx',
+  })
   .columns({
     fee: pg.raw('fee * 10^(-8)'),
   })
-  .select()
-  .from('txs_12')
-  .leftJoin('txs_12_data', 'txs_12.id', 'txs_12_data.tx_id');
+  .from({ t: 'txs_12' })
+  .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tx_uid')
+  .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid')
+  .leftJoin({ td: 'txs_12_data' }, 'td.tx_uid', 't.tx_uid');
 
 const fSelect = pg
-  .select('id')
-  .min({ time_stamp: 'time_stamp' })
-  .from('txs_12')
-  .leftJoin('txs_12_data', 'txs_12.id', 'txs_12_data.tx_id')
-  .groupBy('id');
+  .select('t.tx_uid')
+  // .min({ time_stamp: 'time_stamp' })
+  .from({ t: 'txs_12' })
+  .leftJoin({ td: 'txs_12_data' }, 't.tx_uid', 'td.tx_uid')
+  .groupBy('t.tx_uid');
 
 // filtering query should include sort
 const composeQuery = filteringQ =>
-  select.clone().whereIn('id', pg.select('id').from({ filtered: filteringQ }));
+  select.clone().whereIn('t.tx_uid', filteringQ);
 
 module.exports = {
   select,

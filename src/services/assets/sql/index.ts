@@ -1,9 +1,14 @@
 import * as knex from 'knex';
-import { compose } from 'ramda';
+import { complement, compose, ifElse, isNil, map, tap } from 'ramda';
 import { columns } from './common';
 import { searchAssets } from './searchAssets';
 
 const pg = knex({ client: 'pg' });
+
+/* 
+ * coalesce(a.first_appeared_on_height, 0) is used because of first_appeared_on_height for WAVES is null
+ * coalesce(addr.address, '') is used for the same reason
+ */
 
 const getAssetIndex = (asset_id: string) =>
   pg('assets_cte')
@@ -11,9 +16,15 @@ const getAssetIndex = (asset_id: string) =>
     .where('asset_id', asset_id);
 
 export const mget = (ids: string[]): string =>
-  pg('assets')
-    .select(columns)
+  pg({ a: 'assets' })
+    .select(map(col => `a.${col}`, columns))
+    .select({
+      issue_height: pg.raw('coalesce(a.first_appeared_on_height, 0)'),
+      sender: pg.raw(`coalesce(addr.address, '')`),
+    })
     .whereIn('asset_id', ids)
+    .leftJoin({ t: 'txs_3' }, 't.asset_uid', 'a.uid')
+    .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid')
     .toString();
 
 export const get = (id: string): string => mget([id]);
@@ -29,22 +40,31 @@ export const search = ({
   after: string;
   limit: number;
 }): string => {
-  const filter = (q: knex.QueryBuilder) => {
+  const filter = (ticker: string) => (q: knex.QueryBuilder) => {
     if (ticker === '*') return q.whereNotNull('ticker');
     else return q.where('ticker', ticker);
   };
 
-  if (typeof ticker !== 'undefined') {
-    return compose(
-      (q: knex.QueryBuilder) => q.toString(),
-      filter
-    )(pg('assets').select(columns));
-  } else {
-    return compose(
-      (q: knex.QueryBuilder) => q.toString(),
-      (q: knex.QueryBuilder) => (limit ? q.clone().limit(limit) : q),
-      (q: knex.QueryBuilder) =>
-        after ? q.clone().where('rn', '>', getAssetIndex(after)) : q
-    )(searchAssets(search));
-  }
+  return compose(
+    tap(console.log),
+    (q: knex.QueryBuilder) => q.toString(),
+    (q: knex.QueryBuilder) =>
+      q
+        .select({
+          issue_height: pg.raw('coalesce(a.first_appeared_on_height, 0)'),
+          sender: pg.raw(`coalesce(addr.address, '')`),
+        })
+        .leftJoin({ t: 'txs_3' }, 't.asset_uid', 'a.uid')
+        .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid'),
+    ifElse(
+      complement(isNil),
+      ticker => compose(filter(ticker))(pg({ a: 'assets' }).select(columns)),
+      () =>
+        compose(
+          (q: knex.QueryBuilder) => (limit ? q.clone().limit(limit) : q),
+          (q: knex.QueryBuilder) =>
+            after ? q.clone().where('rn', '>', getAssetIndex(after)) : q
+        )(searchAssets(search))
+    )
+  )(ticker);
 };
