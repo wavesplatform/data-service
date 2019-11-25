@@ -2,6 +2,7 @@
 import { pgpConnect } from './pgp';
 import { ITask, IDatabase } from 'pg-promise';
 import { fromPromised, Task } from 'folktale/concurrency/task';
+import { defaultTo } from 'ramda';
 
 import { DbError, toDbError, Timeout, toTimeout } from '../../errorHandling';
 import { isStatementTimeoutErrorMessage } from './utils';
@@ -13,6 +14,7 @@ export type PgDriverOptions = {
   postgresUser: string;
   postgresPassword: string;
   postgresPoolSize: number;
+  postgresStatementTimeout?: number | false;
 };
 
 export type SqlQuery = string;
@@ -48,6 +50,7 @@ export const createPgDriver = (
     user: options.postgresUser,
     password: options.postgresPassword,
     max: options.postgresPoolSize, // max connection pool size
+    statement_timeout: defaultTo(false, options.postgresStatementTimeout),
   });
 
   const toTasked = <T>(promised: () => Promise<T>) =>
