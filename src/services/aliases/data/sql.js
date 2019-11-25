@@ -20,7 +20,10 @@ module.exports = {
     selectFromSet([alias])
       .clone()
       .toString(),
-
+  mget: aliases =>
+    selectFromSet(aliases)
+      .clone()
+      .toString(),
   search: ({ address, showBroken }) => {
     const q = selectFromSet(
       pg('txs_10')

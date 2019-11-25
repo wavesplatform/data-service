@@ -1,5 +1,5 @@
 import * as checkEnv from 'check-env';
-import { memoizeWith, always } from 'ramda';
+import { always, isNil, memoizeWith } from 'ramda';
 
 export type PostgresConfig = {
   postgresHost: string;
@@ -8,6 +8,7 @@ export type PostgresConfig = {
   postgresUser: string;
   postgresPassword: string;
   postgresPoolSize: number;
+  postgresStatementTimeout: number | false;
 };
 
 export type LoggerConfig = {
@@ -20,7 +21,7 @@ export type ServerConfig = {
 
 export type MatcherConfig = {
   matcher: {
-    settingsURL: string;
+    settingsURL?: string;
     defaultMatcherAddress: string;
   };
 };
@@ -30,19 +31,15 @@ export type DefaultConfig = PostgresConfig & ServerConfig & LoggerConfig;
 export type DataServiceConfig = PostgresConfig &
   ServerConfig &
   LoggerConfig &
-  MatcherConfig;
+  MatcherConfig & {
+    defaultTimeout: number;
+  };
 
-const envVariables = [
-  'PGHOST',
-  'PGDATABASE',
-  'PGUSER',
-  'PGPASSWORD',
-  'DEFAULT_MATCHER',
-];
+const commonEnvVariables = ['PGHOST', 'PGDATABASE', 'PGUSER', 'PGPASSWORD'];
 
 export const loadDefaultConfig = (): DefaultConfig => {
-  // assert all necessary env vars are set
-  checkEnv(envVariables);
+  // assert common env vars are set
+  checkEnv(commonEnvVariables);
 
   return {
     port: process.env.PORT ? parseInt(process.env.PORT) : 3000,
@@ -54,18 +51,42 @@ export const loadDefaultConfig = (): DefaultConfig => {
     postgresPoolSize: process.env.PGPOOLSIZE
       ? parseInt(process.env.PGPOOLSIZE)
       : 20,
+    postgresStatementTimeout:
+      isNil(process.env.PGSTATEMENTTIMEOUT) ||
+      isNaN(parseInt(process.env.PGSTATEMENTTIMEOUT))
+        ? false
+        : parseInt(process.env.PGSTATEMENTTIMEOUT),
     logLevel: process.env.LOG_LEVEL || 'info',
   };
 };
 
-const load = (): DataServiceConfig => ({
-  ...loadDefaultConfig(),
-  matcher: {
-    settingsURL:
-      process.env.MATCHER_SETTINGS_URL ||
-      'https://matcher.wavesplatform.com/matcher/settings',
-    defaultMatcherAddress: process.env.DEFAULT_MATCHER || '',
-  },
-});
+const envVariables = ['DEFAULT_MATCHER'];
+
+const load = (): DataServiceConfig => {
+  // assert all necessary env vars are set
+  checkEnv(envVariables);
+
+  const matcher: MatcherConfig = {
+    matcher: {
+      defaultMatcherAddress: process.env.DEFAULT_MATCHER as string,
+    },
+  };
+
+  if (
+    typeof process.env.MATCHER_SETTINGS_URL !== 'undefined' &&
+    process.env.MATCHER_SETTINGS_URL !== ''
+  ) {
+    matcher.matcher.settingsURL = process.env.MATCHER_SETTINGS_URL;
+  }
+
+  return {
+    ...loadDefaultConfig(),
+    ...matcher,
+
+    defaultTimeout: process.env.DEFAULT_TIMEOUT
+      ? parseInt(process.env.DEFAULT_TIMEOUT)
+      : 30000,
+  };
+};
 
 export const loadConfig = memoizeWith(always('config'), load);

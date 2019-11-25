@@ -1,11 +1,11 @@
 import * as knex from 'knex';
-import { complement, compose, ifElse, isNil, map, tap } from 'ramda';
+import { complement, compose, ifElse, isNil, map } from 'ramda';
 import { columns } from './common';
 import { searchAssets } from './searchAssets';
 
 const pg = knex({ client: 'pg' });
 
-/* 
+/*
  * coalesce(a.first_appeared_on_height, 0) is used because of first_appeared_on_height for WAVES is null
  * coalesce(addr.address, '') is used for the same reason
  */
@@ -46,7 +46,6 @@ export const search = ({
   };
 
   return compose(
-    tap(console.log),
     (q: knex.QueryBuilder) => q.toString(),
     (q: knex.QueryBuilder) =>
       q

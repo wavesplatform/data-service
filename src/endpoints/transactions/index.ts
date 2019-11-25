@@ -45,11 +45,18 @@ const transactionsEndpointsConfig = (
   },
   '/transactions/genesis': {
     service: services.genesis,
-    options: { filterParsers: omit(['sender'], commonTxFilters) },
+    options: {
+      filterParsers: omit(['sender'], {
+        ...commonTxFilters,
+        recipient: identity,
+      }),
+    },
   },
   '/transactions/payment': {
     service: services.payment,
-    options: createOptions(),
+    options: createOptions({
+      recipient: identity,
+    }),
   },
   '/transactions/issue': {
     service: services.issue,
@@ -117,7 +124,9 @@ const transactionsEndpointsConfig = (
   },
   '/transactions/sponsorship': {
     service: services.sponsorship,
-    options: createOptions(),
+    options: createOptions({
+      assetId: identity,
+    }),
   },
   '/transactions/set-asset-script': {
     service: services.setAssetScript,

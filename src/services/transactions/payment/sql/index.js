@@ -9,11 +9,7 @@ const outerSort = s => q => q.clone().orderBy('txs.uid', s);
 const queryAfterFilters = {
   get: withFirstOnly,
   mget: withFirstOnly,
-  search: (q, fValues) =>
-    compose(
-      outerSort(fValues.sort),
-      withFirstOnly
-    )(q),
+  search: (q, fValues) => compose(outerSort(fValues.sort), withFirstOnly)(q),
 };
 
 module.exports = createSql({

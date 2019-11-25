@@ -1,6 +1,6 @@
 {
   "name": "data-service",
-  "version": "0.23.0",
+  "version": "0.26.3",
   "description": "Waves data service",
   "main": "src/index.js",
   "repository": "git@github.com:wavesplatform/data-service.git",
@@ -22,6 +22,8 @@
     "test:t": "npm run test:u && npm run test:it",
     "test:u": "jest --runInBand --detectOpenHandles --config=config/jest.config.unit.json",
     "test:i": "export $(cat variables.env | xargs) && jest --runInBand --detectOpenHandles --config=config/jest.config.integration.json",
+    "test:is": "export $(cat variables.stage.env | xargs) && jest --runInBand --detectOpenHandles --config=config/jest.config.integration.json",
+    "test:isn": "export $(cat variables.stagenet.env | xargs) && jest --runInBand --detectOpenHandles --config=config/jest.config.integration.json",
     "test:it": "export $(cat variables.testnet.env | xargs) && jest --runInBand --detectOpenHandles --config=config/jest.config.integration.testnet.json"
   },
   "devDependencies": {
@@ -30,10 +32,9 @@
     "@types/knex": "^0.15.1",
     "@types/koa": "^2.0.47",
     "@types/koa-bodyparser": "^4.2.1",
-    "@types/koa-qs": "^2.0.0",
     "@types/koa-router": "^7.0.42",
     "@types/lru-cache": "^5.1.0",
-    "@types/node": "^10.12.14",
+    "@types/node": "^10.14.18",
     "@types/ramda": "^0.25.43",
     "eslint": "^5.15.1",
     "jest": "^24.5.0",
@@ -41,7 +42,7 @@
     "pg-monitor": "^1.3.1",
     "ts-jest": "^23.10.5",
     "ts-node": "^7.0.1",
-    "typescript": "^3.2.2"
+    "typescript": "^3.6.3"
   },
   "dependencies": {
     "@koa/cors": "^2.2.3",
@@ -57,10 +58,10 @@
     "koa": "^2.5.0",
     "koa-bodyparser": "^4.2.1",
     "koa-compose": "^4.1.0",
-    "koa-qs": "^2.0.0",
     "koa-requestid": "^2.0.1",
     "koa-router": "^7.4.0",
     "lru-cache": "^5.1.1",
+    "merge-descriptors": "^1.0.1",
     "pg-promise": "^8.2.3",
     "qs": "^6.5.2",
     "ramda": "^0.25.0",

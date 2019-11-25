@@ -1,31 +1,22 @@
 import { Maybe } from 'folktale/maybe';
 
-import { list, List, Serializable } from '../../types';
-import { MgetRequest } from './types';
+import { list, List, Pair, pair } from '../../types';
+import { PairDbResponse } from './transformResult';
 
-export const transformResults = <
-  Request extends MgetRequest,
-  ResponseRaw,
-  ResponseTransformed,
-  Result extends Serializable<string, any>
->(
-  typeFactory: (d?: ResponseTransformed) => Result
-) => (
-  transformDbResponse: (
-    results: ResponseRaw,
-    request?: Request
-  ) => ResponseTransformed
-) => (maybeResponses: Maybe<ResponseRaw>[], request?: Request): List<Result> =>
+import { transformResult } from './transformResult';
+
+export const transformResults = (
+  maybeResponses: Maybe<PairDbResponse>[]
+): List<Pair> =>
   list(
     maybeResponses.map(response =>
-      response
-        .map(res => transformDbResponse(res, request))
-        .matchWith({
-          Just: ({ value }) => typeFactory(value),
-          Nothing: () => typeFactory(),
-        })
-    ),
-    request && {
-      matcher: request.matcher,
-    }
+      response.matchWith({
+        Just: ({ value }) =>
+          pair(transformResult(value), {
+            amountAsset: value.amount_asset_id,
+            priceAsset: value.price_asset_id,
+          }),
+        Nothing: () => pair(null, null),
+      })
+    )
   );

@@ -1,5 +1,6 @@
 import { propEq, compose } from 'ramda';
 
+import { withStatementTimeout } from '../../../db/driver';
 import {
   transaction,
   TransactionInfo,
@@ -27,11 +28,14 @@ import * as sql from './sql';
 type PaymentTxsSearchRequest = RequestWithCursor<
   CommonFilters & WithSortOrder & WithLimit,
   string
->;
+> &
+  Partial<{
+    recipient: string;
+  }>;
 
 type PaymentTxDbResponse = RawTx & {
-  asset_id: string;
   amount: string;
+  recipient: string;
 };
 
 export type PaymentTxsService = Service<
@@ -44,6 +48,7 @@ export type PaymentTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
+  timeouts,
 }: CommonServiceDependencies): PaymentTxsService => {
   return {
     get: getByIdPreset<
@@ -58,7 +63,10 @@ export default ({
       resultSchema,
       resultTypeFactory: transaction,
       transformResult: transformTxInfo,
-    })({ pg, emitEvent }),
+    })({
+      pg: withStatementTimeout(pg, timeouts.get),
+      emitEvent,
+    }),
 
     mget: mgetByIdsPreset<
       string,
@@ -73,7 +81,10 @@ export default ({
       resultTypeFactory: transaction,
       resultSchema,
       transformResult: transformTxInfo,
-    })({ pg, emitEvent }),
+    })({
+      pg: withStatementTimeout(pg, timeouts.mget),
+      emitEvent,
+    }),
 
     search: searchWithPaginationPreset<
       PaymentTxsSearchRequest,
@@ -89,6 +100,9 @@ export default ({
         transaction,
         transformTxInfo
       ),
-    })({ pg, emitEvent }),
+    })({
+      pg: withStatementTimeout(pg, timeouts.search),
+      emitEvent,
+    }),
   };
 };

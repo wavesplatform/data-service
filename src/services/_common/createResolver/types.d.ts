@@ -6,13 +6,15 @@ import {
   ResolverError,
   DbError,
   AppError,
+  Timeout,
 } from '../../../errorHandling/';
 
 import { PgDriver } from '../../../db/driver';
 
 export type EmitEvent = (name: string) => <A>(object: A) => void;
 
-export type Validate<Error, Value> = (value: Value) => Result<Error, Value>;
+export type ValidateSync<Error, Value> = (value: Value) => Result<Error, Value>;
+export type ValidateAsync<Error, Value> = (value: Value) => Task<Error, Value>;
 
 type CommonResolverDependencies<
   ReqRaw,
@@ -20,9 +22,10 @@ type CommonResolverDependencies<
   ResRaw,
   ResTransformed
 > = {
-  validateInput: Validate<ValidationError, ReqRaw>;
+  validateInput: ValidateAsync<AppError, ReqRaw>;
   transformInput: (r: ReqRaw) => ReqTransformed;
-  validateResult: Validate<ResolverError, ResRaw>;
+  validateResult: ValidateSync<ResolverError, ResRaw>;
+  emitEvent: EmitEvent;
 };
 
 export type GetResolverDependencies<
@@ -36,9 +39,7 @@ export type GetResolverDependencies<
   ResRaw,
   ResTransformed
 > & {
-  dbQuery: (
-    db: PgDriver
-  ) => (r: ReqTransformed) => Task<DbError, Maybe<ResRaw>>;
+  getData: (r: ReqTransformed) => Task<DbError | Timeout, Maybe<ResRaw>>;
   transformResult: (
     result: Maybe<ResRaw>,
     request: ReqRaw
@@ -56,9 +57,7 @@ export type MgetResolverDependencies<
   ResRaw,
   ResTransformed
 > & {
-  dbQuery: (
-    db: PgDriver
-  ) => (r: ReqTransformed) => Task<DbError, Maybe<ResRaw>[]>;
+  getData: (r: ReqTransformed) => Task<DbError | Timeout, Maybe<ResRaw>[]>;
   transformResult: (result: Maybe<ResRaw>[], request: ReqRaw) => ResTransformed;
 };
 
@@ -73,14 +72,9 @@ export type SearchResolverDependencies<
   ResRaw,
   ResTransformed
 > & {
-  dbQuery: (db: PgDriver) => (r: ReqTransformed) => Task<DbError, ResRaw[]>;
+  getData: (r: ReqTransformed) => Task<DbError | Timeout, ResRaw[]>;
   transformResult: (
     results: ResRaw[],
     request: ReqTransformed
   ) => ResTransformed;
-};
-
-export type ResolverDependencies = {
-  db: PgDriver;
-  emitEvent?: EmitEvent;
 };

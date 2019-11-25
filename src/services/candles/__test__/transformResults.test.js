@@ -24,7 +24,7 @@ const addMissing1mCandles = addMissingCandles(minute),
 
 describe('add missing candles', () => {
   describe('with 1 minute interval', () => {
-    it('should add empty candles for period with 1 candle at half of month', () => {
+    it('should add empty candles to list of one candle for 1M period including the 1st day of next M', () => {
       expect(
         pipe(
           groupBy(candle =>
@@ -33,9 +33,9 @@ describe('add missing candles', () => {
           addMissing1mCandles(date1, date2),
           toPairs
         )(oneDayCandles).length
-      ).toBe(43200);
+      ).toBe(43201);
     });
-    it('should add empty candles for period with 1 candle at each day', () => {
+    it('should add empty candles to list of thirty candles for 1M period including the 1st day of next M', () => {
       expect(
         pipe(
           groupBy(candle =>
@@ -44,12 +44,12 @@ describe('add missing candles', () => {
           addMissing1mCandles(date1, date2),
           toPairs
         )(monthCandles).length
-      ).toBe(43200);
+      ).toBe(43201);
     });
   });
 
   describe('with 1 day interval', () => {
-    it('should add empty candles in period with 1 candle at half', () => {
+    it('should add empty candles to list of one candle for 1M period including the 1st day of next M', () => {
       expect(
         pipe(
           groupBy(candle =>
@@ -58,10 +58,10 @@ describe('add missing candles', () => {
           addMissing1dCandles(date1, date2),
           toPairs
         )(oneDayCandles).length
-      ).toBe(30);
+      ).toBe(31);
     });
 
-    it('should not add candles in period with 1 candle at each interval', () => {
+    it('should not add any candles to list of thirty candles for 1M period including the 1st day of next M', () => {
       expect(
         pipe(
           groupBy(candle =>
@@ -70,10 +70,10 @@ describe('add missing candles', () => {
           addMissing1dCandles(date1, date2),
           toPairs
         )(monthCandles).length
-      ).toBe(30);
+      ).toBe(31);
     });
 
-    it('should not add candles in period with 1 candle at each interval', () => {
+    it('should not add candles to list of twenty candles for 1Y period including the last day of month', () => {
       expect(
         pipe(
           groupBy(candle =>

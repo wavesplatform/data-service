@@ -1,6 +1,7 @@
 import { propEq, compose, Omit } from 'ramda';
 import { BigNumber } from '@waves/data-entities';
 
+import { withStatementTimeout } from '../../../db/driver';
 import { CommonServiceDependencies } from '../..';
 import {
   transaction,
@@ -28,7 +29,10 @@ import * as sql from './sql';
 type GenesisTxsSearchRequest = RequestWithCursor<
   Omit<CommonFilters, 'sender'> & WithSortOrder & WithLimit,
   string
->;
+> &
+  Partial<{
+    recipient: string;
+  }>;
 
 type GenesisTxDbResponse = Omit<RawTx, 'sender'> & {
   amount: BigNumber;
@@ -45,6 +49,7 @@ export type GenesisTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
+  timeouts,
 }: CommonServiceDependencies): GenesisTxsService => {
   return {
     get: getByIdPreset<
@@ -59,7 +64,10 @@ export default ({
       resultSchema,
       resultTypeFactory: transaction,
       transformResult: transformTxInfo,
-    })({ pg, emitEvent }),
+    })({
+      pg: withStatementTimeout(pg, timeouts.get),
+      emitEvent,
+    }),
 
     mget: mgetByIdsPreset<
       string,
@@ -74,7 +82,10 @@ export default ({
       resultTypeFactory: transaction,
       resultSchema,
       transformResult: transformTxInfo,
-    })({ pg, emitEvent }),
+    })({
+      pg: withStatementTimeout(pg, timeouts.mget),
+      emitEvent,
+    }),
 
     search: searchWithPaginationPreset<
       GenesisTxsSearchRequest,
@@ -90,6 +101,9 @@ export default ({
         transaction,
         transformTxInfo
       ),
-    })({ pg, emitEvent }),
+    })({
+      pg: withStatementTimeout(pg, timeouts.search),
+      emitEvent,
+    }),
   };
 };

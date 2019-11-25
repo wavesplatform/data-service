@@ -1,17 +1,30 @@
 const http = require('http');
-const createService = require('../index');
 const json = require('@waves/json-bigint');
 
+import createService, { createCache } from '../index';
+
 // dependencies
-const { createPgDriver } = require('../../../db');
-const { loadConfig } = require('../../../loadConfig');
+import { createPgDriver } from '../../../db';
+import { loadConfig } from '../../../loadConfig';
+import { EventEmitter } from 'events';
+
 const options = loadConfig();
 const drivers = {
   pg: createPgDriver(options),
 };
+const cache = createCache(10, 10000);
+
+const DEFAULT_TIMEOUT_IN_MS = 30000;
+
 const service = createService({
   drivers,
   emitEvent: () => () => null,
+  cache,
+  timeouts: {
+    get: DEFAULT_TIMEOUT_IN_MS,
+    mget: DEFAULT_TIMEOUT_IN_MS,
+    search: DEFAULT_TIMEOUT_IN_MS,
+  },
 });
 
 const assetId = 'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH';
@@ -70,36 +83,35 @@ describe('Assets service', () => {
     it('fetches non-WAVES asset by ticker (BTC)', async done => {
       http.get(
         'http://nodes.wavesnodes.com/assets/details/8LQW8f7P5d5PZM7GtZEBgaqRPGSzS3DfPuiXrURJ4AJS',
-        res => {
-          let data = '';
-          res.on('data', chunk => (data += chunk));
+        (res: EventEmitter) => {
+          let data: string = '';
+          res.on('data', (chunk: string) => (data += chunk));
           res.on('end', () => {
-            data = json.parse(data);
+            const assetInfoFromNode: any = json.parse(data);
             service
               .search({ ticker: 'BTC' })
               .run()
               .promise()
               .then(xs => {
                 expect(xs.data[0].data).toMatchObject({
-                  description: data.description,
-                  height: data.issueHeight,
-                  id: data.assetId,
-                  name: data.name,
-                  precision: data.decimals,
-                  quantity: data.quantity,
-                  reissuable: data.reissuable,
-                  sender: data.issuer,
+                  description: assetInfoFromNode.description,
+                  height: assetInfoFromNode.issueHeight,
+                  id: assetInfoFromNode.assetId,
+                  name: assetInfoFromNode.name,
+                  precision: assetInfoFromNode.decimals,
+                  quantity: assetInfoFromNode.quantity,
+                  reissuable: assetInfoFromNode.reissuable,
+                  sender: assetInfoFromNode.issuer,
                   ticker: 'BTC',
                 });
                 done();
-              })
-              .catch(e => done(JSON.stringify(e)));
+              });
           });
         }
       );
     });
 
-    it('fetches all assets with tickers by ticker=*', async done => {
+    it('fetches all assets with tickers by ticker=*', () =>
       service
         .search({ ticker: '*' })
         .run()
@@ -108,11 +120,8 @@ describe('Assets service', () => {
           expect(as.data.length).toBeGreaterThan(100);
           // make sure WAVES is included
           expect(
-            as.data.find(a => a.data.ticker === 'WAVES')
+            as.data.find(a => a.data && a.data.ticker === 'WAVES')
           ).not.toBeUndefined();
-          done();
-        })
-        .catch(e => done(JSON.stringify(e)));
-    });
+        }));
   });
 });

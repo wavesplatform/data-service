@@ -12,10 +12,10 @@ import { applyValidation } from './applyToResult';
 export { applyTransformation } from './applyToResult';
 
 import {
-  ValidationError,
   ResolverError,
   DbError,
   AppError,
+  Timeout,
 } from '../../../errorHandling/';
 
 import {
@@ -23,8 +23,8 @@ import {
   GetResolverDependencies,
   MgetResolverDependencies,
   SearchResolverDependencies,
-  ResolverDependencies,
-  Validate,
+  ValidateSync,
+  ValidateAsync,
 } from './types';
 
 const createResolver = <
@@ -33,10 +33,10 @@ const createResolver = <
   ResponseRaw,
   ResponseTransformed
 >(
-  validateInput: Validate<ValidationError, RequestRaw>,
+  validateInput: ValidateAsync<AppError, RequestRaw>,
   transformInput: (r: RequestRaw) => RequestTransformed,
-  getData: (r: RequestTransformed) => Task<DbError, ResponseRaw>,
-  validateAllResults: Validate<ResolverError, ResponseRaw>,
+  getData: (r: RequestTransformed) => Task<DbError | Timeout, ResponseRaw>,
+  validateAllResults: ValidateSync<ResolverError, ResponseRaw>,
   transformAllResults: (
     response: ResponseRaw,
     request: RequestRaw
@@ -45,8 +45,7 @@ const createResolver = <
   request: RequestRaw
 ): Task<AppError, ResponseTransformed> =>
   taskOf<never, RequestRaw>(request)
-    .map(validateInput)
-    .chain(resultToTask)
+    .chain(validateInput)
     .map(tap(emitEvent('INPUT_VALIDATION_OK')))
     .map(transformInput)
     .map(tap(emitEvent('TRANSFORM_INPUT_OK')))
@@ -70,9 +69,7 @@ const getResolver = <
     ResponseRaw,
     ResponseTransformed
   >
-) => ({ db, emitEvent = () => () => undefined }: ResolverDependencies) => (
-  request: RequestRaw
-) =>
+) => (request: RequestRaw) =>
   createResolver<
     RequestRaw,
     RequestTransformed,
@@ -81,10 +78,10 @@ const getResolver = <
   >(
     dependencies.validateInput,
     dependencies.transformInput,
-    dependencies.dbQuery(db),
+    dependencies.getData,
     applyValidation.get(dependencies.validateResult),
     result => dependencies.transformResult(result, request),
-    emitEvent,
+    dependencies.emitEvent,
     request
   );
 
@@ -100,9 +97,7 @@ const mgetResolver = <
     ResponseRaw,
     ResponseTransformed
   >
-) => ({ db, emitEvent = () => () => undefined }: ResolverDependencies) => (
-  request: RequestRaw
-) =>
+) => (request: RequestRaw) =>
   createResolver<
     RequestRaw,
     RequestTransformed,
@@ -111,10 +106,10 @@ const mgetResolver = <
   >(
     dependencies.validateInput,
     dependencies.transformInput,
-    dependencies.dbQuery(db),
+    dependencies.getData,
     applyValidation.mget(dependencies.validateResult),
     result => dependencies.transformResult(result, request),
-    emitEvent,
+    dependencies.emitEvent,
     request
   );
 
@@ -130,9 +125,7 @@ const searchResolver = <
     ResponseRaw,
     ResponseTransformed
   >
-) => ({ db, emitEvent = () => () => undefined }: ResolverDependencies) => (
-  request: RequestRaw
-) =>
+) => (request: RequestRaw) =>
   createResolver<
     RequestRaw,
     RequestTransformed,
@@ -141,14 +134,14 @@ const searchResolver = <
   >(
     dependencies.validateInput,
     dependencies.transformInput,
-    dependencies.dbQuery(db),
+    dependencies.getData,
     applyValidation.search(dependencies.validateResult),
     result =>
       dependencies.transformResult(
         result,
         dependencies.transformInput(request)
       ),
-    emitEvent,
+    dependencies.emitEvent,
     request
   );
 

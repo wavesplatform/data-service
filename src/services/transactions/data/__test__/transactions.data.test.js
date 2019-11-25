@@ -4,6 +4,8 @@ const { always, identity } = require('ramda');
 
 const createService = require('..').default;
 
+const DEFAULT_TIMEOUT = 30000;
+
 const service = createService({
   drivers: {
     pg: {
@@ -12,6 +14,12 @@ const service = createService({
     },
   },
   emitEvent: always(identity),
+  timeouts: {
+    get: DEFAULT_TIMEOUT,
+    mget: DEFAULT_TIMEOUT,
+    search: DEFAULT_TIMEOUT,
+    default: DEFAULT_TIMEOUT,
+  },
 });
 
 describe('Data transaction service', () => {

@@ -1,21 +1,7 @@
 import { renameKeys } from 'ramda-adjunct';
 import { compose } from 'ramda';
 import { Asset } from '@waves/data-entities';
-
-export type AssetDbResponse = {
-  asset_id: string;
-  asset_name: string;
-  description: string;
-  sender: string;
-  issue_height: number;
-  total_quantity: string;
-  decimals: number;
-  reissuable: boolean;
-  ticker: string;
-  issue_timestamp: Date;
-  has_script: boolean;
-  min_sponsored_asset_fee: number;
-};
+import { AssetDbResponse } from './types';
 
 export const transformDbResponse = (raw: AssetDbResponse): Asset =>
   compose(

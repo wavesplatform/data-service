@@ -2,7 +2,11 @@ import * as Koa from 'koa';
 import chalk from 'chalk';
 import * as createRequestId from 'koa-requestid';
 import * as bodyParser from 'koa-bodyparser';
-import * as qs from 'koa-qs';
+import { unsafeKoaQs } from './utils/koaQs';
+
+const statuses = require('statuses');
+import { DEFAULT_TIMEOUT_OCCURRED_MESSAGE } from './errorHandling';
+statuses['524'] = DEFAULT_TIMEOUT_OCCURRED_MESSAGE;
 
 import { createPgDriver } from './db';
 import createEventBus from './eventBus/';
@@ -19,8 +23,7 @@ import * as notFoundHandler from './middleware/notFoundHandler';
 import { loadConfig } from './loadConfig';
 import router from './endpoints';
 
-const app = new Koa();
-qs(app);
+const app = unsafeKoaQs(new Koa());
 
 const options = loadConfig();
 
@@ -62,5 +65,8 @@ createServices({
           chalk.yellow(`App has started on http://localhost:${options.port}/`)
         );
       }
+    },
+    onRejected: e => {
+      console.error(e);
     },
   });

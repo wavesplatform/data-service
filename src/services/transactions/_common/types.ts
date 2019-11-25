@@ -22,7 +22,7 @@ export type Tx = CommonTxFields & {
 };
 
 export type CommonFilters = {
-  timeStart: Date;
-  timeEnd: Date;
-  sender: string;
+  timeStart?: Date;
+  timeEnd?: Date;
+  sender?: string;
 };

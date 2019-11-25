@@ -1,5 +1,6 @@
 import { compose, identity } from 'ramda';
 
+import { withStatementTimeout } from '../../../db/driver';
 import { CommonServiceDependencies } from '../..';
 import {
   transaction,
@@ -44,6 +45,7 @@ export type InvokeScriptTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
+  timeouts,
 }: CommonServiceDependencies): InvokeScriptTxsService => {
   return {
     get: get<string, string, RawInvokeScriptTx, Transaction>({
@@ -59,8 +61,11 @@ export default ({
         resultSchema,
         createServiceName('get')
       ),
-      dbQuery: pgData.get,
-    })({ db: pg, emitEvent }),
+      getData: pgData.get(
+        withStatementTimeout(pg, timeouts.get)
+      ),
+      emitEvent,
+    }),
 
     mget: mget<string[], string[], RawInvokeScriptTx, List<Transaction>>({
       transformInput: identity,
@@ -72,8 +77,11 @@ export default ({
       >(transaction)(transformTxInfo),
       validateInput: validateInput(inputMget, createServiceName('mget')),
       validateResult: validateResult(resultSchema, createServiceName('mget')),
-      dbQuery: pgData.mget,
-    })({ db: pg, emitEvent }),
+      getData: pgData.mget(
+        withStatementTimeout(pg, timeouts.mget)
+      ),
+      emitEvent,
+    }),
 
     search: search<any, any, RawInvokeScriptTx, List<Transaction>>({
       transformInput: transformInputSearch,
@@ -91,7 +99,10 @@ export default ({
         resultSchema,
         createServiceName('search')
       ),
-      dbQuery: pgData.search,
-    })({ db: pg, emitEvent }),
+      getData: pgData.search(
+        withStatementTimeout(pg, timeouts.search)
+      ),
+      emitEvent,
+    }),
   };
 };

@@ -9,7 +9,7 @@ import * as root from './root';
 import * as aliases from './aliases';
 import * as assets from './assets';
 import * as candles from './candles';
-import * as matcher from './matcher';
+import * as matchers from './matchers';
 import * as pairs from './pairs';
 import transactions from './transactions';
 
@@ -18,7 +18,7 @@ export default (serviceMesh: ServiceMesh) =>
     .use(aliases(serviceMesh.aliases).routes())
     .use(assets(serviceMesh.assets).routes())
     .use(candles(serviceMesh.candles).routes())
-    .use(matcher(serviceMesh.pairs, serviceMesh.rates).routes())
+    .use(matchers(serviceMesh.matchers).routes())
     .use(pairs(serviceMesh.pairs).routes())
     .use(transactions(serviceMesh.transactions).routes())
     .get('/version', version)

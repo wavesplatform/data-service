@@ -6,10 +6,14 @@ import { toSerializable, Serializable } from './serialization';
 import { Interval, interval, Unit } from './interval';
 import { List, list } from './list';
 
+export { CacheSync } from './cache';
+
 export { List, list };
 export { Interval, interval, Unit };
 
 export { Serializable, FromSerializable } from './serialization';
+
+export { Without, XOR } from './generic';
 
 export const fromMaybe = <A, B>(factory: (a?: A) => B) => (mb: Maybe<A>): B =>
   mb.matchWith({
@@ -91,9 +95,10 @@ export type PairInfo = {
   volumeWaves: BigNumber;
   txsCount: number;
 };
-export type Pair = Serializable<'pair', PairInfo | null>;
-export const pair = (data: PairInfo | null = null): Pair =>
-  toSerializable('pair', data);
+
+export type Pair = Serializable<'pair', PairInfo | null> & Partial<AssetIdsPair>;
+export const pair = (data: PairInfo | null, pairData: AssetIdsPair | null): Pair =>
+  ({...toSerializable('pair', data), ...pairData});
 
 // @todo TransactionInfo
 export type DataTxEntryType = 'binary' | 'boolean' | 'integer' | 'string';
@@ -124,10 +129,8 @@ export type RateGetParams = {
 };
 
 export type RateInfo = {
-  current: BigNumber;
-  amountAsset: string;
-  priceAsset: string;
+  rate: BigNumber;
 };
-export type Rate = Serializable<'rate', RateInfo | null>;
-export const rate = (data: RateInfo | null = null): Rate =>
-  toSerializable('rate', data === null ? null : data);
+export type Rate = Serializable<'rate', RateInfo | null> & AssetIdsPair;
+export const rate = (data: RateInfo | null, assetMeta: AssetIdsPair): Rate =>
+  ({...toSerializable('rate', data === null ? null : data), ...assetMeta});

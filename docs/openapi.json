@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "version": "0.23.1",
+    "version": "0.26.3",
     "title": "Waves Data Service",
     "description": "This is a a public Waves Data Services API documentation. The goal of the API is to provide a simple and convenient way to get data from Waves blockchain."
   },
@@ -36,7 +36,7 @@
       "description": "Service info: version, etc."
     },
     {
-      "name": "matcher",
+      "name": "matchers",
       "description": "Candles, pairs and other trading endpoints"
     }
   ],
@@ -1190,14 +1190,6 @@
           },
           {
             "in": "query",
-            "name": "recipient",
-            "description": "Search transactions by recipient address",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
             "name": "after",
             "description": "Cursor in base64 encoding. Holds information about timestamp, id, sort.",
             "schema": {
@@ -1332,14 +1324,6 @@
                   "type": "number"
                 }
               ]
-            }
-          },
-          {
-            "in": "query",
-            "name": "recipient",
-            "description": "Search transactions by recipient address",
-            "schema": {
-              "type": "string"
             }
           },
           {
@@ -2366,14 +2350,6 @@
           },
           {
             "in": "query",
-            "name": "recipient",
-            "description": "Search transactions by recipient address",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
             "name": "after",
             "description": "Cursor in base64 encoding. Holds information about timestamp, id, sort.",
             "schema": {
@@ -2402,6 +2378,14 @@
               "minimum": 1,
               "maximum": 100,
               "default": 100
+            }
+          },
+          {
+            "in": "query",
+            "name": "assetId",
+            "description": "Filter transactions by assetId",
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -2889,14 +2873,14 @@
         "tags": [
           "aliases"
         ],
-        "summary": "Get a list of aliases for a given address",
+        "summary": "Get a list of aliases",
         "operationId": "getAliasesForAddress",
         "parameters": [
           {
             "in": "query",
             "name": "address",
             "description": "Address",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string"
             }
@@ -2910,11 +2894,22 @@
               "type": "boolean",
               "default": false
             }
+          },
+          {
+            "in": "query",
+            "name": "aliases",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "List of aliases for given address",
+            "description": "List of aliases",
             "content": {
               "application/json": {
                 "schema": {
@@ -2940,70 +2935,10 @@
         }
       }
     },
-    "/matcher/{matcher}/rates": {
+    "/matchers/{matcher}/pairs/{amountAsset}/{priceAsset}": {
       "get": {
         "tags": [
-          "matcher"
-        ],
-        "summary": "Estimate assets relative assets rate for asset pairs at specific time",
-        "operationId": "estimateRetes",
-        "parameters": [
-          {
-            "name": "matcher",
-            "in": "path",
-            "description": "Matcher address",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "pairs",
-            "in": "query",
-            "description": "`{amountAsset}/{priceAsset}` strings list",
-            "required": false,
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          {
-            "in": "query",
-            "name": "timestamp",
-            "description": "Time to estimate the rates at. Defaults to now.",
-            "schema": {
-              "oneOf": [
-                {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                {
-                  "type": "number"
-                }
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Pair info",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ListOfRates"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/matcher/{matcher}/pairs/{amountAsset}/{priceAsset}": {
-      "get": {
-        "tags": [
-          "matcher"
+          "matchers"
         ],
         "summary": "Get pair info by amount and price assets",
         "operationId": "matcherGetPair",
@@ -3048,15 +2983,15 @@
             }
           },
           "400": {
-            "description": "Throws whether assets order in pair is incorrect"
+            "description": "If assets order in pair is incorrect or asset(s) does not exist"
           }
         }
       }
     },
-    "/matcher/{matcher}/pairs": {
+    "/matchers/{matcher}/pairs": {
       "get": {
         "tags": [
-          "matcher"
+          "matchers"
         ],
         "summary": "1) Get list of pairs info by serialized pairs list; 2) Get all list of pairs info by limit (sort by volume in WAVES)",
         "operationId": "matcherGetPairsListAll",
@@ -3136,6 +3071,172 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ListOfPair"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "If assets order in one of the pairs is incorrect or at least on of the assets does not exist"
+          }
+        }
+      }
+    },
+    "/matchers/{matcher}/candles/{amountAsset}/{priceAsset}": {
+      "get": {
+        "tags": [
+          "matchers"
+        ],
+        "summary": "Get candles by amount and price assets. Maximum amount of candles in response – 1440.",
+        "operationId": "matcherGetCandles",
+        "parameters": [
+          {
+            "name": "matcher",
+            "in": "path",
+            "description": "Matcher address",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "amountAsset",
+            "in": "path",
+            "description": "Asset ID of the amount asset",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "priceAsset",
+            "in": "path",
+            "description": "Asset ID of the price asset",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "timeStart",
+            "description": "Time range filter, start.",
+            "required": true,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "timeEnd",
+            "description": "Time range filter, end. Defaults to now.",
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "interval",
+            "description": "Candle interval. One of 1d, 12h, 6h, 3h, 1h, 30m, 15m, 5m, 1m.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "matcher",
+            "description": "Matcher address",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of Candles",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListOfCandle"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Candle not found"
+          }
+        }
+      }
+    },
+    "/matchers/{matcher}/rates": {
+      "get": {
+        "tags": [
+          "matchers"
+        ],
+        "summary": "Estimate assets relative assets rate for asset pairs at specific time",
+        "operationId": "estimateRates",
+        "parameters": [
+          {
+            "name": "matcher",
+            "in": "path",
+            "description": "Matcher address",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pairs",
+            "in": "query",
+            "description": "`{amountAsset}/{priceAsset}` strings list",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "in": "query",
+            "name": "timestamp",
+            "description": "Time to estimate the rates at. Defaults to now.",
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pair info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListOfRates"
                 }
               }
             }
@@ -3921,10 +4022,10 @@
                   "type": "string"
                 }
               },
-              "asset_id": {
+              "assetId": {
                 "type": "string"
               },
-              "asset_name": {
+              "name": {
                 "type": "string"
               },
               "description": {
@@ -3991,11 +4092,14 @@
                   "type": "string"
                 }
               },
-              "recipient": {
+              "assetId": {
                 "type": "string"
               },
-              "amount": {
+              "quantity": {
                 "type": "number"
+              },
+              "reissuable": {
+                "type": "boolean"
               }
             }
           }
@@ -4046,7 +4150,7 @@
                   "type": "string"
                 }
               },
-              "recipient": {
+              "assetId": {
                 "type": "string"
               },
               "amount": {
@@ -4101,10 +4205,10 @@
                   "type": "string"
                 }
               },
-              "recipient": {
+              "assetId": {
                 "type": "string"
               },
-              "amount": {
+              "minSponsoredAssetFee": {
                 "type": "number"
               }
             }
@@ -4397,16 +4501,16 @@
             "type": "string",
             "example": "rate"
           },
+          "amountAsset": {
+            "type": "string"
+          },
+          "priceAsset": {
+            "type": "string"
+          },
           "data": {
             "type": "object",
             "properties": {
-              "amountAsset": {
-                "type": "string"
-              },
-              "priceAsset": {
-                "type": "string"
-              },
-              "current": {
+              "rate": {
                 "type": "number"
               }
             }

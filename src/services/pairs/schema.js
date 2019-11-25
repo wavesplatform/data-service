@@ -2,93 +2,37 @@ const Joi = require('../../utils/validation/joi');
 
 const limitMaximum = 1000;
 
-const JoiWithOrderPair = orderPair =>
-  Joi.extend(joi => ({
-    base: joi.object(),
-    name: 'object',
-    language: {
-      pair: 'in pair {{amountAsset}}/{{priceAsset}} is incorrect.',
-    },
-    rules: [
-      {
-        name: 'valid',
-        validate(_, value, state, options) {
-          const validAmountAsset = orderPair(
-            value.amountAsset,
-            value.priceAsset
-          )[0];
-          if (value.amountAsset !== validAmountAsset) {
-            return this.createError(
-              'object.pair',
-              { amountAsset: value.amountAsset, priceAsset: value.priceAsset },
-              state,
-              options,
-              { label: 'Asset order' }
-            );
-          }
-          return value;
-        },
-      },
-    ],
-  }));
+const pair = Joi.object().keys({
+  amountAsset: Joi.string()
+    .assetId()
+    .required(),
+  priceAsset: Joi.string()
+    .assetId()
+    .required(),
+});
 
-const pair = orderPair => {
-  if (orderPair) {
-    return JoiWithOrderPair(orderPair)
-      .object()
-      .keys({
-        amountAsset: Joi.string()
-          .base58()
-          .required(),
-        priceAsset: Joi.string()
-          .base58()
-          .required(),
-      })
-      .valid();
-  } else {
-    return Joi.object().keys({
-      amountAsset: Joi.string()
-        .base58()
-        .required(),
-      priceAsset: Joi.string()
-        .base58()
-        .required(),
-    });
-  }
-};
+const inputGet = Joi.object()
+  .keys({
+    pair,
+    matcher: Joi.string().base58().required(),
+  })
+  .required();
 
-const inputGet = ({ orderPair, defaultMatcherAddress }) =>
-  Joi.object()
-    .keys({
-      pair: Joi.when('matcher', {
-        is: defaultMatcherAddress,
-        then: pair(orderPair),
-        otherWise: pair(null),
-      }).required(),
-      matcher: Joi.string().required(),
-    })
-    .required();
-
-const inputMget = ({ orderPair, defaultMatcherAddress }) =>
-  Joi.object().keys({
-    pairs: Joi.when('matcher', {
-      is: defaultMatcherAddress,
-      then: Joi.array().items(pair(orderPair)),
-      otherWise: Joi.array().items(pair(null)),
-    }),
-    matcher: Joi.string().required(),
-  });
+const inputMget = Joi.object().keys({
+  pairs: Joi.array().items(pair),
+  matcher: Joi.string().base58().required(),
+});
 
 const inputSearch = Joi.object()
   .keys({
-    search_by_asset: Joi.string(),
+    search_by_asset: Joi.string().assetId(),
     search_by_assets: Joi.array()
-      .items(Joi.string(), Joi.string())
+      .items(Joi.string().assetId(), Joi.string().assetId())
       .length(2),
     match_exactly: Joi.array()
       .items(Joi.boolean(), Joi.boolean())
       .max(2),
-    matcher: Joi.string(),
+    matcher: Joi.string().base58(),
     limit: Joi.number()
       .min(1)
       .max(limitMaximum),
@@ -97,10 +41,10 @@ const inputSearch = Joi.object()
 
 const result = Joi.object().keys({
   amount_asset_id: Joi.string()
-    .base58()
+    .assetId()
     .required(),
   price_asset_id: Joi.string()
-    .base58()
+    .assetId()
     .required(),
   first_price: Joi.object()
     .bignumber()

@@ -1,4 +1,7 @@
-import { of as taskOf } from 'folktale/concurrency/task';
+import {
+  of as taskOf,
+  rejected as taskRejected,
+} from 'folktale/concurrency/task';
 import { Ok, Error as error } from 'folktale/result';
 import { identity } from 'ramda';
 import {
@@ -6,10 +9,11 @@ import {
   ValidationError,
   ResolverError,
   DbError,
+  Timeout,
 } from '../../../../errorHandling/';
 
 import { search } from '..';
-import { Validate } from '../types';
+import { ValidateSync, ValidateAsync } from '../types';
 import { PgDriver } from '../../../../db/driver';
 
 const ids = [
@@ -19,33 +23,34 @@ const ids = [
 const errorMessage = 'Bad value';
 
 // mock validation
-const inputOk = (s: string[]) => Ok<ValidationError, string[]>(s);
-const inputError = (s: string[]) =>
-  error<ValidationError, string[]>(AppError.Validation(errorMessage));
+const inputOk = (s: string[]) => taskOf<ValidationError, string[]>(s);
+const inputError = () =>
+  taskRejected<ValidationError, string[]>(AppError.Validation(errorMessage));
 const resultOk = (s: string) => Ok<ResolverError, string>(s);
 const resultError = (s: string) =>
   error<ResolverError, string>(AppError.Resolver(errorMessage));
 
 const mockPgDriver: PgDriver = {
-  many: (query: string) => taskOf<DbError, string[]>(query.split('::')),
+  many: (query: string) =>
+    taskOf<DbError | Timeout, string[]>(query.split('::')),
 } as PgDriver;
 
 const commonConfig = {
   transformInput: identity,
   transformResult: identity,
-  dbQuery: (driver: PgDriver) => (ids: string[]) =>
-    driver.many<string>(ids.join('::')),
+  getData: (ids: string[]) => mockPgDriver.many<string>(ids.join('::')),
+  emitEvent: () => () => undefined,
 };
 
 const createMockResolver = (
-  validateInput: Validate<ValidationError, string[]>,
-  validateResult: Validate<ResolverError, string>
+  validateInput: ValidateAsync<ValidationError, string[]>,
+  validateResult: ValidateSync<ResolverError, string>
 ) =>
   search<string[], string[], string, string[]>({
     ...commonConfig,
     validateInput,
     validateResult,
-  })({ db: mockPgDriver });
+  });
 
 afterEach(() => jest.clearAllMocks());
 
@@ -69,7 +74,7 @@ describe('Resolver', () => {
       ...commonConfig,
       validateInput: inputOk,
       validateResult: resultOk,
-    })({ db: mockPgDriver });
+    });
 
     goodResolver(ids)
       .run()
@@ -100,7 +105,7 @@ describe('Resolver', () => {
       ...commonConfig,
       validateInput: inputError,
       validateResult: resultOk,
-    })({ db: mockPgDriver });
+    });
 
     badInputResolver(ids)
       .run()
