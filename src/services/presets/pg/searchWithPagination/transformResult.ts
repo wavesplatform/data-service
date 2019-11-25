@@ -2,7 +2,7 @@ import { compose, last, take } from 'ramda';
 
 import { Serializable, List, list } from '../../../../types';
 import { WithLimit } from '../../../_common';
-import { RequestWithCursor } from '../../../_common/pagination';
+import { RequestWithCursor, CursorEncode } from '../../../_common/pagination';
 
 type ResponseMeta = {
   isLastPage?: boolean;
@@ -15,10 +15,7 @@ const createMeta = <
   ResponseRaw,
   ResponseTransformed
 >(
-  encode: (
-    request: Request,
-    response: ResponseTransformed
-  ) => string | undefined
+  encode: CursorEncode<Request, ResponseTransformed>
 ) => (
   request: RequestWithCursor<Request, Cursor>,
   responsesRaw: ResponseRaw[],
@@ -42,10 +39,7 @@ export const transformResults = <
     results: ResponseRaw,
     request?: RequestWithCursor<Request, Cursor>
   ) => ResponseTransformed,
-  encode: (
-    request: Request,
-    response: ResponseTransformed
-  ) => string | undefined
+  encode: CursorEncode<Request, ResponseTransformed>
 ) => (
   responses: ResponseRaw[],
   request: RequestWithCursor<Request, Cursor>

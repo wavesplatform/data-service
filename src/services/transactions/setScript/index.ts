@@ -96,7 +96,7 @@ export default ({
       inputSchema: inputSearch,
       resultSchema: result,
       transformResult: compose(transaction, transformTxInfo),
-      cursor: {
+      cursorSerialization: {
         decode,
         encode,
       },

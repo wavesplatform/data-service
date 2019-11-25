@@ -1,4 +1,5 @@
 const Joi = require('./joi');
+const { decode } = require('../../services/transactions/_common/cursor');
 
 const { BigNumber } = require('@waves/data-entities');
 
@@ -15,7 +16,7 @@ describe('Joi extended with custom types', () => {
   });
 
   it('should validate cursor correctly', () => {
-    const validateCursor = validate(Joi.cursor());
+    const validateCursor = validate(Joi.cursor().valid(decode));
     assertPass(
       validateCursor(
         'MjAxOC0wOS0xOFQxMzo0NDozNC4wMDBaOjo2b3NpNGI2Q3FrS3oyMVVtWDlxeXdydDJ1aXQ4U1VCOE1udndONjJhNnFLbzo6ZGVzYw=='

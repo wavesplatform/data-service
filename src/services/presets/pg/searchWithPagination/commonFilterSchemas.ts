@@ -1,14 +1,10 @@
-import { Result } from 'folktale/result';
-
 import { Joi } from '../../../../utils/validation';
-import { ValidationError } from '../../../../errorHandling';
+import { CursorDecode } from '../../../_common/pagination';
 
-export default <Cursor>(
-  decode: (cursor: string) => Result<ValidationError, Cursor>
-) => ({
+export default <Cursor>(decode: CursorDecode<Cursor>) => ({
   limit: Joi.number()
     .min(1)
     .max(100)
     .required(),
-  after: Joi.cursor(decode).valid(),
+  after: Joi.cursor().valid(decode),
 });

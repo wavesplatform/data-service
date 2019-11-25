@@ -3,9 +3,7 @@ import { Asset } from '../../types';
 import { ValidationError } from '../../errorHandling';
 import { AssetsSearchRequest } from './types';
 
-export type Cursor = {
-  assetId: String;
-};
+export type Cursor = string;
 
 export const encode = <ResponseTransformed extends Asset>(
   request: AssetsSearchRequest,
@@ -14,5 +12,5 @@ export const encode = <ResponseTransformed extends Asset>(
   response.data === null ? undefined : response.data.id;
 
 export const decode = (cursor: string): Result<ValidationError, Cursor> => {
-  return ok<ValidationError, Cursor>({ assetId: cursor });
+  return ok<ValidationError, Cursor>(cursor);
 };

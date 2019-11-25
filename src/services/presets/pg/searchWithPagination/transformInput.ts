@@ -1,20 +1,18 @@
 import { omit, compose, evolve, inc } from 'ramda';
-import { Result } from 'folktale/result';
 
 import { WithLimit } from '../../../_common';
-import { RequestWithCursor } from '../../../_common/pagination';
-import { ValidationError } from 'errorHandling';
+import { RequestWithCursor, CursorDecode } from '../../../_common/pagination';
 
-const decodeAfter = <Cursor>(
-  decode: (cursor: string) => Result<ValidationError, Cursor>
-) => (cursorString: string) =>
+const decodeAfter = <Cursor>(decode: CursorDecode<Cursor>) => (
+  cursorString: string
+) =>
   decode(cursorString).matchWith({
     Ok: ({ value }) => value,
     Error: () => ({}),
   });
 
 export const transformInput = <Cursor, Request extends WithLimit>(
-  decode: (cursor: string) => Result<ValidationError, Cursor>
+  decode: CursorDecode<Cursor>
 ) => (
   request: RequestWithCursor<Request, string>
 ): RequestWithCursor<Request, Cursor> => {
@@ -32,7 +30,7 @@ export const transformInput = <Cursor, Request extends WithLimit>(
   } else {
     return {
       ...requestWithoutAfter,
-      ...decodeAfter(decode)(request.after),
+      after: decodeAfter(decode)(request.after),
     };
   }
 };

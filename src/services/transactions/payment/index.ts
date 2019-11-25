@@ -99,7 +99,7 @@ export default ({
       inputSchema: inputSearchSchema,
       resultSchema,
       transformResult: compose(transaction, transformTxInfo),
-      cursor: {
+      cursorSerialization: {
         decode,
         encode,
       },

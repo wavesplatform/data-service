@@ -51,7 +51,7 @@ module.exports = ({ drivers: { pg }, emitEvent, timeouts }) => {
       inputSchema: inputSearch,
       resultSchema: result,
       transformResult: compose(transaction, transformTxInfo),
-      cursor: {
+      cursorSerialization: {
         decode,
         encode,
       },

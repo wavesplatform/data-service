@@ -89,10 +89,10 @@ export default ({
     >({
       name: 'transactions.alias.search',
       sql: sql.search,
-      inputSchema: inputSearchSchema(decode),
+      inputSchema: inputSearchSchema,
       resultSchema,
       transformResult: compose(transaction, transformTxInfo),
-      cursor: {
+      cursorSerialization: {
         encode,
         decode,
       },

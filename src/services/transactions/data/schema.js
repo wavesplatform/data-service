@@ -1,8 +1,7 @@
 const Joi = require('../../../utils/validation/joi');
 
 const commonFields = require('../_common/commonFieldsSchemas');
-const commonFilters = require('../../presets/pg/searchWithPagination/commonFilterSchemas')
-  .default;
+const commonFilters = require('../_common/commonFilterSchemas').default;
 
 const CORRECT_TYPE = Joi.string().valid([
   'integer',
@@ -50,7 +49,9 @@ const inputSearch = Joi.object()
       })
       .when('type', {
         is: ['string', 'binary'],
-        then: Joi.string().noNullChars().allow(''),
+        then: Joi.string()
+          .noNullChars()
+          .allow(''),
       }),
   })
   .with('value', 'type')

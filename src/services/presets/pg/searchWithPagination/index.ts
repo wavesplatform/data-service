@@ -1,16 +1,17 @@
 import { SchemaLike } from 'joi';
-import { Result } from 'folktale/result';
 
 import { search } from '../../../_common/createResolver';
 import { validateInput, validateResult } from '../../validation';
 import { Serializable, List } from '../../../../types';
 import { ServicePresetInitOptions } from '../../../presets/types';
 import { WithLimit } from '../../../_common';
-import { RequestWithCursor } from '../../../_common/pagination';
+import {
+  RequestWithCursor,
+  CursorSerialization,
+} from '../../../_common/pagination';
 import { transformInput } from './transformInput';
 import { transformResults } from './transformResult';
 import { getData } from './pg';
-import { ValidationError } from '../../../../errorHandling';
 
 export const searchWithPaginationPreset = <
   Cursor,
@@ -24,7 +25,7 @@ export const searchWithPaginationPreset = <
   inputSchema,
   resultSchema,
   transformResult,
-  cursor,
+  cursorSerialization,
 }: {
   name: string;
   sql: (r: RequestWithCursor<Request, Cursor>) => string;
@@ -34,10 +35,7 @@ export const searchWithPaginationPreset = <
     response: ResponseRaw,
     request?: RequestWithCursor<Request, Cursor>
   ) => Res;
-  cursor: {
-    encode: (request: Request, response: Res) => string | undefined;
-    decode: (cursor: string) => Result<ValidationError, Cursor>;
-  };
+  cursorSerialization: CursorSerialization<Cursor, Request, Res>;
 }) => ({ pg, emitEvent }: ServicePresetInitOptions) =>
   search<
     RequestWithCursor<Request, string>,
@@ -45,13 +43,13 @@ export const searchWithPaginationPreset = <
     ResponseRaw,
     List<Res>
   >({
-    transformInput: transformInput(cursor.decode),
+    transformInput: transformInput(cursorSerialization.decode),
     transformResult: transformResults<
       Cursor,
       RequestWithCursor<Request, Cursor>,
       ResponseRaw,
       Res
-    >(transformResult, cursor.encode),
+    >(transformResult, cursorSerialization.encode),
     validateInput: validateInput(inputSchema, name),
     validateResult: validateResult(resultSchema, name),
     getData: getData<RequestWithCursor<Request, Cursor>, ResponseRaw>({

@@ -323,7 +323,7 @@ module.exports = rawJoi
       {
         name: 'valid',
         params: {
-          decode: rawJoi.func().arity(1),
+          decode: joi.func().arity(1).required(),
         },
         validate(params, value, state, options) {
           return params.decode(value).matchWith({

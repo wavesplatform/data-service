@@ -83,7 +83,7 @@ const service = searchWithPaginationPreset<
   resultSchema: Joi.any(),
   transformResult: (response: ResponseRaw) =>
     toSerializable<'tx', ResponseRaw>('tx', response),
-  cursor: {
+  cursorSerialization: {
     encode,
     decode,
   },

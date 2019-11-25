@@ -98,7 +98,7 @@ export default ({
       inputSchema: inputSearchSchema,
       resultSchema,
       transformResult: compose(transaction, transformTxInfo),
-      cursor: { decode, encode },
+      cursorSerialization: { decode, encode },
     })({
       pg: withStatementTimeout(pg, timeouts.search),
       emitEvent,

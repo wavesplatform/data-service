@@ -126,7 +126,7 @@ export default ({
       inputSchema: inputSearchSchema,
       resultSchema,
       transformResult: compose(asset, transformDbResponse),
-      cursor: {
+      cursorSerialization: {
         encode,
         decode,
       },
