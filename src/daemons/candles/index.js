@@ -9,12 +9,7 @@ const logger = createLogger({
 
 // pg
 const { createPgDriver } = require('../../db');
-const { withStatementTimeout } = require('../../db/driver');
-const pgDriver = withStatementTimeout(
-  createPgDriver(options),
-  options.candlesUpdateTimeout,
-  0 // 0 - unset statement timeout
-);
+const pgDriver = createPgDriver(options);
 
 const { daemon: runDaemon } = require('../presets/daemon');
 const createDaemon = require('./create');
