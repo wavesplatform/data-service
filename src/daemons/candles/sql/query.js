@@ -19,7 +19,7 @@ const makeCandleCalculateColumns = longerInterval => {
     open: candlePresets.aggregate.open,
     close: candlePresets.aggregate.close,
     interval_in_secs: longerInterval,
-    matcher_uid: 'matcher_uid',
+    matcher_address_uid: 'matcher_address_uid',
   };
 };
 
@@ -53,7 +53,7 @@ const candleSelectColumns = [
     ),
   },
   { interval_in_secs: 60 },
-  { matcher_uid: 'sender_uid' },
+  { matcher_address_uid: 'sender_uid' },
 ];
 
 /** insertIntoCandlesFromSelect :: (String, Function) -> QueryBuilder */
@@ -139,7 +139,7 @@ const insertOrUpdateCandles = (tableName, candles) => {
       .raw(
         `${pg({ t: tableName }).insert(
           candles.map(serializeCandle)
-        )} on conflict (time_start, amount_asset_uid, price_asset_uid, matcher_uid, interval_in_secs) do update set ${updatedFieldsExcluded}`
+        )} on conflict (time_start, amount_asset_uid, price_asset_uid, matcher_address_uid, interval_in_secs) do update set ${updatedFieldsExcluded}`
       )
       .toString();
   }
@@ -167,9 +167,9 @@ const insertOrUpdateCandlesFromShortInterval = (
             'candle_time',
             'amount_asset_uid',
             'price_asset_uid',
-            'matcher_uid'
+            'matcher_address_uid'
           );
-      })} on conflict (time_start, amount_asset_uid, price_asset_uid, matcher_uid, interval_in_secs) do update set ${updatedFieldsExcluded}`
+      })} on conflict (time_start, amount_asset_uid, price_asset_uid, matcher_address_uid, interval_in_secs) do update set ${updatedFieldsExcluded}`
     )
     .toString();
 
@@ -201,7 +201,7 @@ const insertAllCandles = (tableName, shortInterval, longerInterval) =>
         'candle_time',
         'amount_asset_uid',
         'price_asset_uid',
-        'matcher_uid',
+        'matcher_address_uid',
       ]);
   }).toString();
 

@@ -32,6 +32,7 @@ const byTimeStamp = comparator => ts =>
   });
 
 const sort = s => q => q.clone().orderBy('t.tx_uid', s);
+const outerSort = s => q => q.clone().orderBy('txs.uid', s);
 
 const after = ({ id, sort }) => q => {
   const comparator = sort === 'desc' ? '<' : '>';
@@ -55,4 +56,5 @@ module.exports = {
   sort,
   after,
   limit,
+  outerSort,
 };

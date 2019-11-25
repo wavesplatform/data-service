@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+const { md5 } = require('../../../../utils/hash');
 const { where, whereRaw } = require('../../../../utils/db/knex');
 
 const commonFilters = require('../../_common/sql/filters');
@@ -16,14 +16,7 @@ module.exports = {
   filters: {
     ...commonFilters,
     assetId: byAssetId,
-    script: s =>
-      whereRaw(
-        'md5(script) = ?',
-        crypto
-          .createHash('md5')
-          .update(s)
-          .digest('hex')
-      ),
+    script: s => whereRaw('md5(script) = ?', md5(s)),
   },
   filtersOrder: [...commonFiltersOrder, 'assetId', 'script'],
 };

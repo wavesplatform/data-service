@@ -65,7 +65,7 @@ const columns = {
 // filters would be applied on this
 const select = pg({ t: 'txs_7_orders' }).select('tx_uid');
 
-const withDecimals = q =>
+const selectOnFiltered = filtered =>
   pg({
     t: pg({ t: 'txs_7' })
       .columns(columns)
@@ -73,7 +73,7 @@ const withDecimals = q =>
       .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid')
       .leftJoin({ o1: 'orders' }, 'o1.uid', 't.order1_uid')
       .leftJoin({ o2: 'orders' }, 'o2.uid', 't.order2_uid')
-      .whereIn('tx_uid', q),
+      .whereIn('tx_uid', filtered),
   })
     .columns(
       compose(
@@ -108,5 +108,5 @@ const withDecimals = q =>
 
 module.exports = {
   select,
-  withDecimals,
+  selectOnFiltered,
 };

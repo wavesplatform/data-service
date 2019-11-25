@@ -2,11 +2,11 @@ const pg = require('knex')({ client: 'pg' });
 
 const select = pg({ t: 'txs_4' }).select('*');
 
-const withDecimals = q =>
+const selectOnFiltered = filtered =>
   pg
     .with(
       'ts',
-      pg({ t: q })
+      pg({ t: filtered })
         .select({
           tx_uid: 't.tx_uid',
           height: 't.height',
@@ -74,5 +74,5 @@ const withDecimals = q =>
 
 module.exports = {
   select,
-  withDecimals,
+  selectOnFiltered,
 };

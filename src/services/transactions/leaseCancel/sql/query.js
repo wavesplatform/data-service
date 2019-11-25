@@ -2,11 +2,11 @@ const pg = require('knex')({ client: 'pg' });
 
 const select = pg({ t: 'txs_9' });
 
-const fSelect = q =>
+const selectOnFiltered = filtered =>
   pg
     .with(
       't_cte',
-      q
+      filtered
         .select({
           tx_uid: 't.tx_uid',
           height: 't.height',
@@ -32,4 +32,4 @@ const fSelect = q =>
     .leftJoin('txs', 'txs.uid', 't.tx_uid')
     .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid');
 
-module.exports = { select, fSelect };
+module.exports = { select, selectOnFiltered };

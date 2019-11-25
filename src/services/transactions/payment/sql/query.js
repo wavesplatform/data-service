@@ -2,7 +2,7 @@ const pg = require('knex')({ client: 'pg' });
 
 const select = pg({ t: 'txs_2' }).select('*');
 
-const withFirstOnly = q =>
+const selectOnFiltered = filtered =>
   pg
     .select({
       // common
@@ -31,7 +31,7 @@ const withFirstOnly = q =>
             'row_number() over (partition by tx_uid order by tx_uid asc)'
           ),
         })
-        .from({ t: q.clone() }),
+        .from({ t: filtered }),
     })
     .where('rn', '=', 1)
     .leftJoin('txs', 'txs.uid', 't.tx_uid')
@@ -47,4 +47,4 @@ const withFirstOnly = q =>
       't.recipient_alias_uid'
     );
 
-module.exports = { select, withFirstOnly };
+module.exports = { select, selectOnFiltered };

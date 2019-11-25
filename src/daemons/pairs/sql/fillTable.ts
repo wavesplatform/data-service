@@ -85,11 +85,8 @@ const selectPairsCTE = pg
       .andOn('p2.matcher_uid', 'p.matcher_uid');
   });
 
-export const fillTable = (tableName: string): string => {
-  const sql = pg
+export const fillTable = (tableName: string): string =>
+  pg
     .into(tableName)
     .insert(selectPairsCTE)
     .toString();
-  console.log(sql);
-  return sql;
-};

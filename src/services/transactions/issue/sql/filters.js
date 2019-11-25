@@ -1,17 +1,10 @@
-const crypto = require('crypto');
+const { md5 } = require('../../../../utils/hash');
 const { where, whereRaw } = require('../../../../utils/db/knex');
 
 const commonFilters = require('../../_common/sql/filters');
 const commonFiltersOrder = require('../../_common/sql/filtersOrder');
 
-const byScript = s =>
-  whereRaw(
-    'md5(script) = ?',
-    crypto
-      .createHash('md5')
-      .update(s)
-      .digest('hex')
-  );
+const byScript = s => whereRaw('md5(script) = ?', md5(s));
 
 const byAssetId = assetId =>
   where('asset_uid', function() {

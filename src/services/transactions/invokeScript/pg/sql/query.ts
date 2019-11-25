@@ -49,13 +49,13 @@ export const txs = (filteringQ: knex.QueryBuilder) =>
     .whereIn('t.tx_uid', filteringQ)
     .orderBy('t.tx_uid', 'desc');
 
-export const fSelect = (s: string) =>
+export const select = (s: string) =>
   pg
     .select('t.tx_uid')
     .from({ t: 'txs_16' })
     .orderBy('t.tx_uid', s);
 
-export const select = (filteringQ: knex.QueryBuilder) =>
+export const selectOnFiltered = (filtered: knex.QueryBuilder) =>
   pg
     .select(columnsWithoutFeeAndPaymentAssetId)
     .select({
@@ -66,7 +66,7 @@ export const select = (filteringQ: knex.QueryBuilder) =>
     .select({
       fee: pg.raw('fee * 10^(-8)'),
     })
-    .from({ t: txs(filteringQ) })
+    .from({ t: txs(filtered) })
     .leftJoin({ a: 'assets' }, 'a.uid', 't.asset_uid')
     .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid')
     .leftJoin({ daddr: 'addresses' }, 'daddr.uid', 't.dapp_uid')

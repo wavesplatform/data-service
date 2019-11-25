@@ -117,13 +117,8 @@ const main = (daemon, config, interval, timeout, logger) =>
       },
       onRejected: error =>
         logger.error({
-<<<<<<< HEAD
-          message: `[DAEMON] error: ${typeof error.error !== 'undefined' ? error.error.message : error.message}`,
-          error,
-=======
           message: `[DAEMON] loop is stopped with error`,
           error: getErrorMessage(error),
->>>>>>> develop
         }),
       onCancelled: () =>
         logger.error({

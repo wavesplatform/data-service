@@ -6,7 +6,7 @@ const serializeCandle = candle => ({
   time_start: candle.time_start,
   amount_asset_uid: candle.amount_asset_uid,
   price_asset_uid: candle.price_asset_uid,
-  matcher_uid: candle.matcher_uid,
+  matcher_address_uid: candle.matcher_address_uid,
   low: candle.low.toString(),
   high: candle.high.toString(),
   volume: candle.volume.toString(),

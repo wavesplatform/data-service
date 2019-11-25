@@ -31,7 +31,6 @@ const select = pg
 
 const fSelect = pg
   .select('t.tx_uid')
-  // .min({ time_stamp: 'time_stamp' })
   .from({ t: 'txs_12' })
   .leftJoin({ td: 'txs_12_data' }, 't.tx_uid', 'td.tx_uid')
   .groupBy('t.tx_uid');

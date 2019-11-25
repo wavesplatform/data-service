@@ -8,7 +8,6 @@ const {
   identity,
   reverse,
   merge,
-  tap,
 } = require('ramda');
 
 const commonFiltersOrder = require('./filtersOrder');
@@ -32,7 +31,6 @@ const createSql = ({
   return {
     get: id =>
       compose(
-        tap(console.log),
         String,
         q => queryAfterFiltersWithDefaults.get(q, id),
         filters.id(id)
@@ -40,7 +38,6 @@ const createSql = ({
 
     mget: ids =>
       compose(
-        tap(console.log),
         String,
         q => queryAfterFiltersWithDefaults.mget(q, ids),
         filters.ids(ids)
@@ -55,7 +52,6 @@ const createSql = ({
       )(filtersOrder);
 
       return compose(
-        tap(q => console.log('q = ', q)),
         String,
         q => queryAfterFiltersWithDefaults.search(q, fValuesPicked),
         ...appliedFs,

@@ -41,12 +41,12 @@ const withGrouping = q =>
       't.attachment'
     );
 
-const withTransfersDecimalsAndGrouping = pipe(
-  q =>
+const selectOnFiltered = pipe(
+  filtered =>
     pg
       .with(
         't_cte',
-        withTransfers(pg({ t: q }))
+        withTransfers(pg({ t: filtered }))
           .select({
             tx_uid: 't.tx_uid',
             height: 't.height',
@@ -86,6 +86,6 @@ const withTransfersDecimalsAndGrouping = pipe(
 
 module.exports = {
   select,
-  withTransfersDecimalsAndGrouping,
+  selectOnFiltered,
   selectIdsWhereRecipient,
 };
