@@ -25,7 +25,7 @@ export default function({
   const estimator = new RateEstimator(
     cache,
     new RemoteRateRepo(
-      withStatementTimeout(drivers.pg, timeouts.mget, timeouts.default)
+      withStatementTimeout(drivers.pg, timeouts.mget)
     )
   );
 

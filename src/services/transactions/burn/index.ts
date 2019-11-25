@@ -59,7 +59,7 @@ export default ({
       resultTypeFactory: transaction,
       transformResult: transformTxInfo,
     })({
-      pg: withStatementTimeout(pg, timeouts.get, timeouts.default),
+      pg: withStatementTimeout(pg, timeouts.get),
       emitEvent,
     }),
 
@@ -77,7 +77,7 @@ export default ({
       resultSchema,
       transformResult: transformTxInfo,
     })({
-      pg: withStatementTimeout(pg, timeouts.mget, timeouts.default),
+      pg: withStatementTimeout(pg, timeouts.mget),
       emitEvent,
     }),
 
@@ -96,7 +96,7 @@ export default ({
         transformTxInfo
       ),
     })({
-      pg: withStatementTimeout(pg, timeouts.search, timeouts.default),
+      pg: withStatementTimeout(pg, timeouts.search),
       emitEvent,
     }),
   };

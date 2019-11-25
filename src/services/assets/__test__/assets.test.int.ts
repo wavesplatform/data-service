@@ -24,7 +24,6 @@ const service = createService({
     get: DEFAULT_TIMEOUT_IN_MS,
     mget: DEFAULT_TIMEOUT_IN_MS,
     search: DEFAULT_TIMEOUT_IN_MS,
-    default: DEFAULT_TIMEOUT_IN_MS,
   },
 });
 

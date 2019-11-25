@@ -67,7 +67,7 @@ export default ({
             getByIdPg<AssetDbResponse, string>({
               name: SERVICE_NAME.GET,
               sql: sql.get,
-              pg: withStatementTimeout(pg, timeouts.get, timeouts.default),
+              pg: withStatementTimeout(pg, timeouts.get),
             })(req).map(
               tap(maybeResp => forEach(x => cache.set(req, x), maybeResp))
             ),
@@ -96,7 +96,7 @@ export default ({
           name: SERVICE_NAME.MGET,
           sql: sql.mget,
           matchRequestResult: propEq('asset_id'),
-          pg: withStatementTimeout(pg, timeouts.mget, timeouts.default),
+          pg: withStatementTimeout(pg, timeouts.mget),
         })(notCachedAssetIds).map(fromDb => {
           fromDb.forEach((assetInfo, index) =>
             forEach(value => {
@@ -133,7 +133,7 @@ export default ({
         Asset
       >(asset)(transformDbResponse),
     })({
-      pg: withStatementTimeout(pg, timeouts.search, timeouts.default),
+      pg: withStatementTimeout(pg, timeouts.search),
       emitEvent,
     }),
   };
