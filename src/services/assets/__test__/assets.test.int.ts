@@ -94,8 +94,6 @@ describe('Assets service', () => {
               .run()
               .promise()
               .then(xs => {
-                console.log(xs.data[0].data);
-                console.log(assetInfoFromNode);
                 const assetInfo = xs.data[0].data;
                 if (assetInfo !== null) {
                   expect(assetInfo.description).toMatch(
