@@ -20,7 +20,7 @@ import { transformResults as transformResultMget } from '../../presets/pg/mgetBy
 import { transformInput as transformInputSearch } from '../../presets/pg/searchWithPagination/transformInput';
 import { transformResults as transformResultSearch } from '../../presets/pg/searchWithPagination/transformResult';
 
-import { decode, encode, Cursor } from '../_common/cursor';
+import { serialize, deserialize, Cursor } from '../_common/cursor';
 
 import pgData from './pg';
 import {
@@ -94,10 +94,10 @@ export default ({
       RawInvokeScriptTx,
       List<Transaction>
     >({
-      transformInput: transformInputSearch(decode),
+      transformInput: transformInputSearch(deserialize),
       transformResult: transformResultSearch(
         compose(transaction, transformTxInfo),
-        encode
+        serialize
       ),
       validateInput: validateInput<InvokeScriptTxsSearchRequest>(
         inputSearchSchema,

@@ -16,7 +16,7 @@ const { inputGet } = require('../../../presets/pg/getById/inputSchema');
 const { inputMget } = require('../../../presets/pg/mgetByIds/inputSchema');
 const { result, inputSearch } = require('./schema');
 
-const { decode, encode } = require('../../_common/cursor');
+const { serialize, deserialize } = require('../../_common/cursor');
 
 module.exports = ({ drivers: { pg }, emitEvent, timeouts }) => {
   return {
@@ -52,8 +52,8 @@ module.exports = ({ drivers: { pg }, emitEvent, timeouts }) => {
       resultSchema: result,
       transformResult: compose(transaction, transformTxInfo),
       cursorSerialization: {
-        decode,
-        encode,
+        serialize,
+        deserialize,
       },
     })({
       pg: withStatementTimeout(pg, timeouts.search),

@@ -7,7 +7,7 @@ import { Joi } from '../../../../../utils/validation';
 import {
   Serializable,
   toSerializable,
-} from '../../../../../types/serialization';
+} from '../../../../../types/serializable';
 import { PgDriver } from '../../../../../db/driver';
 import { SortOrder, WithLimit } from '../../../../_common';
 import { searchWithPaginationPreset } from '..';
@@ -35,7 +35,7 @@ type Cursor = {
   id: string;
 };
 
-const encode = <ResponseRaw extends Serializable<string, any>>(
+const serialize = <ResponseRaw extends Serializable<string, any>>(
   request: Request,
   response: ResponseRaw
 ): string | undefined =>
@@ -45,13 +45,13 @@ const encode = <ResponseRaw extends Serializable<string, any>>(
         `${response.data.timestamp.toISOString()}::${response.data.id}`
       ).toString('base64');
 
-const decode = (cursor: string): Result<ValidationError, Cursor> => {
+const deserialize = (cursor: string): Result<ValidationError, Cursor> => {
   const data = Buffer.from(cursor, 'base64')
     .toString('utf8')
     .split('::');
 
   const err = (message?: string) =>
-    new ValidationError('Cursor decode is failed', { cursor, message });
+    new ValidationError('Cursor deserialization is failed', { cursor, message });
 
   return (
     ok<ValidationError, string[]>(data)
@@ -79,13 +79,13 @@ const service = searchWithPaginationPreset<
 >({
   name: 'some_name',
   sql: () => '',
-  inputSchema: Joi.object().keys(commonFilterSchemas(decode)),
+  inputSchema: Joi.object().keys(commonFilterSchemas(deserialize)),
   resultSchema: Joi.any(),
   transformResult: (response: ResponseRaw) =>
     toSerializable<'tx', ResponseRaw>('tx', response),
   cursorSerialization: {
-    encode,
-    decode,
+    serialize,
+    deserialize,
   },
 })({
   pg: { any: filters => task(mockTxs) } as PgDriver,

@@ -35,7 +35,7 @@ import {
   AssetsService,
   AssetsSearchRequest,
 } from './types';
-import { Cursor, encode, decode } from './cursor';
+import { Cursor, serialize, deserialize } from './cursor';
 export { create as createCache } from './cache';
 export { AssetsService } from './types';
 
@@ -127,8 +127,8 @@ export default ({
       resultSchema,
       transformResult: compose(asset, transformDbResponse),
       cursorSerialization: {
-        encode,
-        decode,
+        serialize,
+        deserialize,
       },
     })({
       pg: withStatementTimeout(pg, timeouts.search),

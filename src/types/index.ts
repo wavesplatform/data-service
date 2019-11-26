@@ -2,7 +2,7 @@ import { Task } from 'folktale/concurrency/task';
 import { Maybe } from 'folktale/maybe';
 import { Asset as AssetInfo, BigNumber } from '@waves/data-entities';
 import { AppError } from '../errorHandling';
-import { toSerializable, Serializable } from './serialization';
+import { toSerializable, Serializable } from './serializable';
 import { Interval, interval, Unit } from './interval';
 import { List, list } from './list';
 
@@ -11,7 +11,7 @@ export { CacheSync } from './cache';
 export { List, list };
 export { Interval, interval, Unit };
 
-export { Serializable, FromSerializable } from './serialization';
+export { Serializable, FromSerializable } from './serializable';
 
 export { Without, XOR } from './generic';
 

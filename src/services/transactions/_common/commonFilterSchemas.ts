@@ -1,12 +1,12 @@
 import { Joi } from '../../../utils/validation';
 import commonFilterSchemas from '../../presets/pg/searchWithPagination/commonFilterSchemas';
 
-import { decode } from './cursor';
+import { deserialize } from './cursor';
 
 const DATE0 = new Date(0);
 
 export default {
-  ...commonFilterSchemas(decode),
+  ...commonFilterSchemas(deserialize),
   timeStart: Joi.date().min(DATE0),
   timeEnd: Joi.when('timeStart', {
     is: Joi.exist(),

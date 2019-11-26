@@ -13,7 +13,7 @@ export type Cursor = {
   sort: SortOrder;
 };
 
-export const encode = <
+export const serialize = <
   Request extends WithSortOrder,
   ResponseTransformed extends Transaction
 >(
@@ -28,13 +28,15 @@ export const encode = <
         }`
       ).toString('base64');
 
-export const decode = (cursor: string): Result<ValidationError, Cursor> => {
+export const deserialize = (
+  cursor: string
+): Result<ValidationError, Cursor> => {
   const data = Buffer.from(cursor, 'base64')
     .toString('utf8')
     .split('::');
 
   const err = (message?: string) =>
-    new ValidationError('Cursor decode is failed', { cursor, message });
+    new ValidationError('Cursor deserialization is failed', { cursor, message });
 
   return (
     ok<ValidationError, string[]>(data)

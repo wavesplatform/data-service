@@ -2,7 +2,10 @@ import { compose, last, take } from 'ramda';
 
 import { Serializable, List, list } from '../../../../types';
 import { WithLimit } from '../../../_common';
-import { RequestWithCursor, CursorEncode } from '../../../_common/pagination';
+import {
+  RequestWithCursor,
+  CursorSerialization,
+} from '../../../_common/pagination';
 
 type ResponseMeta = {
   isLastPage?: boolean;
@@ -10,12 +13,16 @@ type ResponseMeta = {
 };
 
 const createMeta = <
-  Cursor extends Record<string, any>,
+  Cursor extends Partial<Request> & Partial<ResponseTransformed>,
   Request extends WithLimit,
   ResponseRaw,
   ResponseTransformed
 >(
-  encode: CursorEncode<Request, ResponseTransformed>
+  serialize: CursorSerialization<
+    Cursor,
+    Request,
+    ResponseTransformed
+  >['serialize']
 ) => (
   request: RequestWithCursor<Request, Cursor>,
   responsesRaw: ResponseRaw[],
@@ -24,7 +31,7 @@ const createMeta = <
   const metaBuilder: ResponseMeta = {};
   if (typeof lastTransformedResponse !== 'undefined') {
     metaBuilder.isLastPage = responsesRaw.length < request.limit;
-    metaBuilder.lastCursor = encode(request, lastTransformedResponse);
+    metaBuilder.lastCursor = serialize(request, lastTransformedResponse);
   }
   return metaBuilder;
 };
@@ -39,7 +46,11 @@ export const transformResults = <
     results: ResponseRaw,
     request?: RequestWithCursor<Request, Cursor>
   ) => ResponseTransformed,
-  encode: CursorEncode<Request, ResponseTransformed>
+  serialize: CursorSerialization<
+    Cursor,
+    Request,
+    ResponseTransformed
+  >['serialize']
 ) => (
   responses: ResponseRaw[],
   request: RequestWithCursor<Request, Cursor>
@@ -51,6 +62,6 @@ export const transformResults = <
 
   return list(
     transformedData,
-    createMeta(encode)(request, responses, last(transformedData))
+    createMeta(serialize)(request, responses, last(transformedData))
   );
 };

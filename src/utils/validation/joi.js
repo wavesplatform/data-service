@@ -323,10 +323,13 @@ module.exports = rawJoi
       {
         name: 'valid',
         params: {
-          decode: joi.func().arity(1).required(),
+          deserialize: joi
+            .func()
+            .arity(1)
+            .required(),
         },
         validate(params, value, state, options) {
-          return params.decode(value).matchWith({
+          return params.deserialize(value).matchWith({
             Ok: () => value,
             Error: () =>
               this.createError('cursor.wrong', { v: value }, state, options),

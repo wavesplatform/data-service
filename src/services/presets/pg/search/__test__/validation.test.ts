@@ -7,7 +7,7 @@ import { searchPreset } from '..';
 import {
   Serializable,
   toSerializable,
-} from '../../../../../types/serialization';
+} from '../../../../../types/serializable';
 import { PgDriver } from '../../../../../db/driver';
 
 type TestTransaction = {

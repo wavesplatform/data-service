@@ -5,12 +5,14 @@ import { AssetsSearchRequest } from './types';
 
 export type Cursor = string;
 
-export const encode = <ResponseTransformed extends Asset>(
+export const serialize = <ResponseTransformed extends Asset>(
   request: AssetsSearchRequest,
   response: ResponseTransformed
 ): string | undefined =>
   response.data === null ? undefined : response.data.id;
 
-export const decode = (cursor: string): Result<ValidationError, Cursor> => {
+export const deserialize = (
+  cursor: string
+): Result<ValidationError, Cursor> => {
   return ok<ValidationError, Cursor>(cursor);
 };

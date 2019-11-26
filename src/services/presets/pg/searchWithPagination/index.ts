@@ -43,13 +43,13 @@ export const searchWithPaginationPreset = <
     ResponseRaw,
     List<Res>
   >({
-    transformInput: transformInput(cursorSerialization.decode),
+    transformInput: transformInput(cursorSerialization.deserialize),
     transformResult: transformResults<
       Cursor,
       RequestWithCursor<Request, Cursor>,
       ResponseRaw,
       Res
-    >(transformResult, cursorSerialization.encode),
+    >(transformResult, cursorSerialization.serialize),
     validateInput: validateInput(inputSchema, name),
     validateResult: validateResult(resultSchema, name),
     getData: getData<RequestWithCursor<Request, Cursor>, ResponseRaw>({

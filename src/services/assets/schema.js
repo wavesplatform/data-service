@@ -1,11 +1,11 @@
 const Joi = require('../../utils/validation/joi');
-const { decode } = require('./cursor');
+const { deserialize } = require('./cursor');
 
 const inputSearch = Joi.object()
   .keys({
     ticker: Joi.string().noNullChars(),
     search: Joi.string().saneForDbLike(),
-    after: Joi.cursor().valid(decode),
+    after: Joi.cursor().valid(deserialize),
     limit: Joi.number()
       .min(0)
       .max(100),
