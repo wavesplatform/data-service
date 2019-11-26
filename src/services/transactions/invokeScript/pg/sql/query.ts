@@ -49,7 +49,7 @@ export const txs = (filteringQ: knex.QueryBuilder) =>
     .whereIn('t.tx_uid', filteringQ)
     .orderBy('t.tx_uid', 'desc');
 
-export const select = (s: string) =>
+export const blank = (s: string) =>
   pg
     .select('t.tx_uid')
     .from({ t: 'txs_16' })

@@ -1,9 +1,9 @@
 const createSql = require('../../../_common/sql');
 
 const { filters } = require('./filters');
-const { select } = require('./query');
+const { blank } = require('./query');
 
 module.exports = createSql({
-  query: select,
+  query: blank,
   filters,
 });

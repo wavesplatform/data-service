@@ -11,7 +11,7 @@ const selectIdsWhereRecipient = recipient =>
         .limit(1);
     });
 
-const select = pg({ t: 'txs_11' });
+const blank = pg({ t: 'txs_11' });
 
 const withTransfers = q =>
   q
@@ -85,7 +85,7 @@ const selectOnFiltered = pipe(
 );
 
 module.exports = {
-  select,
+  blank,
   selectOnFiltered,
   selectIdsWhereRecipient,
 };

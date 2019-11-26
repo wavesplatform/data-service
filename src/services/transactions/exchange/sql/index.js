@@ -2,7 +2,7 @@ const { compose } = require('ramda');
 
 const createSql = require('../../_common/sql/index');
 
-const { select, selectOnFiltered } = require('./query');
+const { blank, selectOnFiltered } = require('./query');
 const { filters, filtersOrder } = require('./filters');
 
 const queryAfterFilters = {
@@ -13,7 +13,7 @@ const queryAfterFilters = {
 };
 
 module.exports = createSql({
-  query: select,
+  query: blank,
   filters,
   filtersOrder,
   queryAfterFilters,
