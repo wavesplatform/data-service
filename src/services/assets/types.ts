@@ -1,4 +1,8 @@
 import { CacheSync, Service, XOR, Asset } from '../../types';
+import { RequestWithCursor } from '../_common/pagination';
+import { WithSortOrder, WithLimit } from '../_common';
+
+type Cursor = string;
 
 export type AssetsCache = CacheSync<string, AssetDbResponse>;
 
@@ -8,11 +12,12 @@ export type SearchByTicker = {
 
 export type SearchFullText = {
   search: string;
-  limit: number;
-  after?: string;
 };
 
-export type AssetsSearchRequest = XOR<SearchByTicker, SearchFullText>;
+export type AssetsSearchRequest = RequestWithCursor<
+  XOR<SearchByTicker, SearchFullText> & WithSortOrder & WithLimit,
+  Cursor
+>;
 
 export type AssetsService = Service<
   string,

@@ -4,7 +4,7 @@ const { pipe } = require('ramda');
 const selectIdsWhereRecipient = recipient =>
   pg('txs_11_transfers')
     .select('tx_uid')
-    .where('recipient_uid', function() {
+    .where('recipient_address_uid', function() {
       this.select('uid')
         .from('addresses')
         .where('address', recipient)
@@ -20,7 +20,7 @@ const withTransfers = q =>
     .leftJoin(
       { recipient_addr: 'addresses' },
       'recipient_addr.uid',
-      'tfs.recipient_uid'
+      'tfs.recipient_address_uid'
     );
 
 const withGrouping = q =>

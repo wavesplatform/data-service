@@ -39,7 +39,7 @@ const selectOnFiltered = filtered =>
     .leftJoin(
       { recipient_addr: 'addresses' },
       'recipient_addr.uid',
-      't.recipient_uid'
+      't.recipient_address_uid'
     )
     .leftJoin(
       { recipient_alias: 'txs_10' },

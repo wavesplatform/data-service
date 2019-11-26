@@ -56,7 +56,7 @@ const searchByName = (qb: knex.QueryBuilder, q: string) => {
   const cleanedQuery = escapeForTsQuery(q);
   return compose((q: knex.QueryBuilder) =>
     cleanedQuery.length
-      ? q.orWhereRaw('am.searchable_asset_name @@ to_tsquery(?)', [
+      ? q.orWhereRaw('a.searchable_asset_name @@ to_tsquery(?)', [
           `${cleanedQuery}:*`,
         ])
       : q

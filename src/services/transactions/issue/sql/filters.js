@@ -10,7 +10,8 @@ const byAssetId = assetId =>
   where('asset_uid', function() {
     this.select('uid')
       .from('assets')
-      .where('asset_id', assetId);
+      .where('asset_id', assetId)
+      .limit(1);
   });
 
 module.exports = {

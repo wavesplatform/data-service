@@ -4,7 +4,7 @@ const commonFilters = require('../../_common/sql/filters');
 const commonFiltersOrder = require('../../_common/sql/filtersOrder');
 
 const byRecipient = recipient =>
-  where('recipient_uid', function() {
+  where('recipient_address_uid', function() {
     this.select('uid')
       .from('addresses')
       .where('address', recipient);

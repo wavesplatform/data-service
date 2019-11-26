@@ -70,13 +70,13 @@ const query = (pairs: AssetIdsPair[], matcher: string): string =>
     .leftJoin(
       { matcher_addr: 'addresses' },
       'matcher_addr.uid',
-      't.matcher_uid'
+      't.matcher_address_uid'
     )
     .whereIn(
       ['aa.asset_id', 'pa.asset_id'],
       pairs.map(pair => [pair.amountAsset, pair.priceAsset])
     )
-    .whereIn('matcher_uid', function() {
+    .whereIn('matcher_address_uid', function() {
       this.select('uid')
         .from('addresses')
         .where('address', matcher)

@@ -11,7 +11,7 @@ const selectOnFiltered = filtered =>
           tx_uid: 't.tx_uid',
           sender_uid: 't.sender_uid',
           height: 't.height',
-          recipient_uid: 't.recipient_uid',
+          recipient_address_uid: 't.recipient_address_uid',
           amount: pg.raw('t.amount * 10^(-8)'),
           recipient_alias: 'recipient_alias.alias',
         })
@@ -31,7 +31,7 @@ const selectOnFiltered = filtered =>
         .leftJoin(
           { recipient_addr: 'addresses' },
           'recipient_addr.uid',
-          't.recipient_uid'
+          't.recipient_address_uid'
         )
     )
     .select({

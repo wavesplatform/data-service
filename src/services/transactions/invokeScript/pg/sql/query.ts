@@ -69,6 +69,6 @@ export const selectOnFiltered = (filtered: knex.QueryBuilder) =>
     .from({ t: txs(filtered) })
     .leftJoin({ a: 'assets' }, 'a.uid', 't.asset_uid')
     .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid')
-    .leftJoin({ daddr: 'addresses' }, 'daddr.uid', 't.dapp_uid')
+    .leftJoin({ daddr: 'addresses' }, 'daddr.uid', 't.dapp_address_uid')
     .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tx_uid')
     .orderBy('t.tx_uid', 'desc');

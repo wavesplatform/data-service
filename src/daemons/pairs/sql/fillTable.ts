@@ -48,7 +48,7 @@ const selectPairsCTE = pg
       high: pg.raw('max(e.price * 10 ^(-8 - p.decimals + a.decimals))'),
       low: pg.raw('min(e.price * 10 ^(-8 - p.decimals + a.decimals))'),
       txs_count: pg.raw('count(e.price)'),
-      matcher_uid: 'sender_uid',
+      matcher_address_uid: 'sender_uid',
     })
       .from(selectExchanges.clone().as('e'))
       .leftJoin({ a: 'assets' }, 'e.amount_asset_uid', 'a.uid')
@@ -72,17 +72,17 @@ const selectPairsCTE = pg
     'p.low',
     'p.weighted_average_price',
     'p.txs_count',
-    'p.matcher_uid'
+    'p.matcher_address_uid'
   )
   .leftJoin({ p1: 'pairs_cte' }, function() {
     this.on(pg.raw('p1.amount_asset_uid is null'))
       .andOn('p1.price_asset_uid', 'p.price_asset_uid')
-      .andOn('p1.matcher_uid', 'p.matcher_uid');
+      .andOn('p1.matcher_address_uid', 'p.matcher_address_uid');
   })
   .leftJoin({ p2: 'pairs_cte' }, function() {
     this.on('p2.amount_asset_uid', 'p.amount_asset_uid')
       .andOn(pg.raw('p2.price_asset_uid is null'))
-      .andOn('p2.matcher_uid', 'p.matcher_uid');
+      .andOn('p2.matcher_address_uid', 'p.matcher_address_uid');
   });
 
 export const fillTable = (tableName: string): string =>

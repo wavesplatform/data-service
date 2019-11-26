@@ -1,7 +1,7 @@
 const { compose } = require('ramda');
 
 const createSql = require('../../_common/sql');
-const { outerSort } = require('../../_common/filters');
+const { outerSort } = require('../../_common/sql/filters');
 
 const { select, selectOnFiltered } = require('./query');
 const { filters, filtersOrder } = require('./filters');

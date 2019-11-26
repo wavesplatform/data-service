@@ -1,7 +1,8 @@
 import * as knex from 'knex';
-import { complement, compose, ifElse, isNil, map } from 'ramda';
+import { complement, compose, cond, isNil, map } from 'ramda';
 import { columns } from './common';
 import { searchAssets } from './searchAssets';
+import { AssetsSearchRequest } from '../types';
 
 const pg = knex({ client: 'pg' });
 
@@ -29,17 +30,7 @@ export const mget = (ids: string[]): string =>
 
 export const get = (id: string): string => mget([id]);
 
-export const search = ({
-  ticker,
-  search,
-  after,
-  limit,
-}: {
-  ticker: string;
-  search: string;
-  after: string;
-  limit: number;
-}): string => {
+export const search = (request: AssetsSearchRequest): string => {
   const filter = (ticker: string) => (q: knex.QueryBuilder) => {
     if (ticker === '*') return q.whereNotNull('ticker');
     else return q.where('ticker', ticker);
@@ -55,15 +46,27 @@ export const search = ({
         })
         .leftJoin({ t: 'txs_3' }, 't.asset_uid', 'a.uid')
         .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid'),
-    ifElse(
-      complement(isNil),
-      ticker => compose(filter(ticker))(pg({ a: 'assets' }).select(columns)),
-      () =>
-        compose(
-          (q: knex.QueryBuilder) => (limit ? q.clone().limit(limit) : q),
-          (q: knex.QueryBuilder) =>
-            after ? q.clone().where('rn', '>', getAssetIndex(after)) : q
-        )(searchAssets(search))
-    )
-  )(ticker);
+    (request: AssetsSearchRequest) =>
+      cond([
+        [
+          request => isNil(request.ticker),
+          request =>
+            compose(
+              (q: knex.QueryBuilder) =>
+                request.limit ? q.clone().limit(request.limit) : q,
+              (q: knex.QueryBuilder) =>
+                request.after
+                  ? q.clone().where('rn', '>', getAssetIndex(request.after))
+                  : q
+            )(searchAssets(request.search)),
+        ],
+        [
+          complement(isNil),
+          request =>
+            compose(filter(request.ticker))(
+              pg({ a: 'assets' }).select(columns)
+            ),
+        ],
+      ])(request)
+  )(request);
 };

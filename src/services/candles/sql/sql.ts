@@ -26,11 +26,14 @@ const FIELDS = {
   open: 'c.open',
   close: 'c.close',
   interval_in_secs: 'c.interval_in_secs',
-  matcher_uid: 'c.matcher_uid',
+  matcher_address_uid: 'c.matcher_address_uid',
 };
 
 const FULL_FIELDS: Record<string, string> = {
-  ...omit(['amount_asset_uid', 'price_asset_uid', 'matcher_uid'], FIELDS),
+  ...omit(
+    ['amount_asset_uid', 'price_asset_uid', 'matcher_address_uid'],
+    FIELDS
+  ),
   amount_asset_id: 'a.asset_id',
   price_asset_id: 'p.asset_id',
   matcher: 'addr.address',
@@ -73,7 +76,7 @@ export const selectCandles = ({
     })
     .where('time_start', '>=', timeStart)
     .where('time_start', '<=', timeEnd)
-    .whereIn('matcher_uid', function() {
+    .whereIn('matcher_address_uid', function() {
       this.select('uid')
         .from('addresses')
         .where('address', matcher);
@@ -183,7 +186,7 @@ export const sql = ({
     )
     .innerJoin({ a: 'assets' }, 'a.uid', 'c.amount_asset_uid')
     .innerJoin({ p: 'assets' }, 'p.uid', 'c.price_asset_uid')
-    .innerJoin({ addr: 'addresses' }, 'addr.uid', 'c.matcher_uid')
+    .innerJoin({ addr: 'addresses' }, 'addr.uid', 'c.matcher_address_uid')
     .orderBy('c.time_start', 'asc')
     .toString();
 };

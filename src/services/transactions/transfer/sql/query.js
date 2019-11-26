@@ -17,7 +17,7 @@ const selectOnFiltered = filtered =>
           amount: pg.raw(
             't.amount * 10^(-coalesce(a.decimals, 8))::double precision'
           ),
-          recipient_uid: 't.recipient_uid',
+          recipient_address_uid: 't.recipient_address_uid',
           recipient_alias_uid: 't.recipient_alias_uid',
           fee_asset_uid: 't.fee_asset_uid',
         })
@@ -64,7 +64,7 @@ const selectOnFiltered = filtered =>
     .leftJoin(
       { recipient_addr: pg('addresses').select('uid', 'address') },
       'recipient_addr.uid',
-      't.recipient_uid'
+      't.recipient_address_uid'
     )
     .leftJoin(
       { recipient_alias: pg('txs_10').select('tx_uid', 'alias') },
