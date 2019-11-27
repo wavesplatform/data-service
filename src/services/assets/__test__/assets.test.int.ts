@@ -70,7 +70,7 @@ describe('Assets service', () => {
   describe('search', () => {
     it('fetches WAVES by ticker', async done => {
       service
-        .search({ ticker: 'WAVES' })
+        .search({ ticker: 'WAVES', limit: 100 })
         .run()
         .promise()
         .then(xs => {
@@ -89,7 +89,7 @@ describe('Assets service', () => {
           res.on('end', () => {
             const assetInfoFromNode: any = json.parse(data);
             service
-              .search({ ticker: 'BTC' })
+              .search({ ticker: 'BTC', limit: 100 })
               .run()
               .promise()
               .then(xs => {
@@ -113,7 +113,7 @@ describe('Assets service', () => {
 
     it('fetches all assets with tickers by ticker=*', () =>
       service
-        .search({ ticker: '*' })
+        .search({ ticker: '*', limit: 100 })
         .run()
         .promise()
         .then(as => {

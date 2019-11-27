@@ -4,23 +4,28 @@ import { search } from '../../../_common/createResolver';
 import { validateInput, validateResult } from '../../validation';
 import { Serializable, List } from '../../../../types';
 import { ServicePresetInitOptions } from '../../../presets/types';
-import { WithSortOrder, WithLimit } from '../../../_common';
-import { Cursor, RequestWithCursor } from '../../../_common/pagination';
+import { WithLimit } from '../../../_common';
+import {
+  RequestWithCursor,
+  CursorSerialization,
+} from '../../../_common/pagination';
 import { transformInput } from './transformInput';
 import { transformResults } from './transformResult';
 import { getData } from './pg';
 
 export const searchWithPaginationPreset = <
-  Request extends WithSortOrder & WithLimit,
+  Cursor,
+  Request extends WithLimit,
   ResponseRaw,
   ResponseTransformed,
-  Result extends Serializable<string, ResponseTransformed | null>
+  Res extends Serializable<string, ResponseTransformed | null>
 >({
   name,
   sql,
   inputSchema,
   resultSchema,
   transformResult,
+  cursorSerialization,
 }: {
   name: string;
   sql: (r: RequestWithCursor<Request, Cursor>) => string;
@@ -29,16 +34,22 @@ export const searchWithPaginationPreset = <
   transformResult: (
     response: ResponseRaw,
     request?: RequestWithCursor<Request, Cursor>
-  ) => Result;
+  ) => Res;
+  cursorSerialization: CursorSerialization<Cursor, Request, Res>;
 }) => ({ pg, emitEvent }: ServicePresetInitOptions) =>
   search<
     RequestWithCursor<Request, string>,
     RequestWithCursor<Request, Cursor>,
     ResponseRaw,
-    List<Result>
+    List<Res>
   >({
-    transformInput,
-    transformResult: transformResults(transformResult),
+    transformInput: transformInput(cursorSerialization.deserialize),
+    transformResult: transformResults<
+      Cursor,
+      RequestWithCursor<Request, Cursor>,
+      ResponseRaw,
+      Res
+    >(transformResult, cursorSerialization.serialize),
     validateInput: validateInput(inputSchema, name),
     validateResult: validateResult(resultSchema, name),
     getData: getData<RequestWithCursor<Request, Cursor>, ResponseRaw>({
