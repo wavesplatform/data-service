@@ -1,8 +1,8 @@
 const pg = require('knex')({ client: 'pg' });
 
-const blank = pg({ t: 'txs_1' }).select('*');
+const select = pg({ t: 'txs_1' }).select('*');
 
-const selectOnFiltered = filtered =>
+const selectFromFiltered = filtered =>
   pg({ t: filtered })
     .select({
       height: 't.height',
@@ -31,4 +31,4 @@ const selectOnFiltered = filtered =>
       't.recipient_alias_uid'
     );
 
-module.exports = { blank, selectOnFiltered };
+module.exports = { select, selectFromFiltered };

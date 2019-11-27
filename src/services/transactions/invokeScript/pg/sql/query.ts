@@ -49,13 +49,13 @@ export const txs = (filteringQ: knex.QueryBuilder) =>
     .whereIn('t.tx_uid', filteringQ)
     .orderBy('t.tx_uid', 'desc');
 
-export const blank = (s: string) =>
+export const select = (s: string) =>
   pg
     .select('t.tx_uid')
     .from({ t: 'txs_16' })
     .orderBy('t.tx_uid', s);
 
-export const selectOnFiltered = (filtered: knex.QueryBuilder) =>
+export const selectFromFiltered = (filtered: knex.QueryBuilder) =>
   pg
     .select(columnsWithoutFeeAndPaymentAssetId)
     .select({

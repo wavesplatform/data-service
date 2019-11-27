@@ -63,9 +63,9 @@ const columns = {
 };
 
 // filters would be applied on this
-const blank = pg({ t: 'txs_7_orders' }).select('tx_uid');
+const select = pg({ t: 'txs_7_orders' }).select('tx_uid');
 
-const selectOnFiltered = filtered =>
+const selectFromFiltered = filtered =>
   pg({
     t: pg({ t: 'txs_7' })
       .columns(columns)
@@ -107,6 +107,6 @@ const selectOnFiltered = filtered =>
     .leftJoin({ p_dec: 'assets' }, 't.price_asset', 'p_dec.asset_id');
 
 module.exports = {
-  blank,
-  selectOnFiltered,
+  select,
+  selectFromFiltered,
 };

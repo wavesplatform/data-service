@@ -1,14 +1,14 @@
 const { assoc, compose, merge, pick, pipe } = require('ramda');
 
-const { blank, selectOnFiltered } = require('./query');
+const { select, selectFromFiltered } = require('./query');
 const { pickBindFilters } = require('../../../../../utils/db');
 
 // one — get by id
 // many — apply filters
 module.exports = ({ filters: F }) => ({
-  get: id => pipe(selectOnFiltered, F.id(id), String)(blank),
+  get: id => pipe(selectFromFiltered, F.id(id), String)(select),
 
-  mget: ids => pipe(selectOnFiltered, F.ids(ids), String)(blank),
+  mget: ids => pipe(selectFromFiltered, F.ids(ids), String)(select),
 
   search: (fValues = {}) => {
     const defaultValues = { limit: 100, sort: 'desc' };
@@ -37,8 +37,8 @@ module.exports = ({ filters: F }) => ({
         : F;
 
     const fs = pickBindFilters(withValueF, fNames, withDefaults);
-    const fQuery = pipe(...fs)(blank);
+    const fQuery = pipe(...fs)(select);
 
-    return pipe(selectOnFiltered, F.sort(withDefaults.sort), String)(fQuery);
+    return pipe(selectFromFiltered, F.sort(withDefaults.sort), String)(fQuery);
   },
 });

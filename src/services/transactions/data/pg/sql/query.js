@@ -1,6 +1,6 @@
 const pg = require('knex')({ client: 'pg' });
 
-const selectOnFiltered = filtered =>
+const selectFromFiltered = filtered =>
   pg
     .columns({
       tx_type: 'txs.tx_type',
@@ -31,13 +31,13 @@ const selectOnFiltered = filtered =>
     .leftJoin({ td: 'txs_12_data' }, 'td.tx_uid', 't.tx_uid')
     .whereIn('t.tx_uid', filtered);
 
-const blank = pg
+const select = pg
   .select('t.tx_uid')
   .from({ t: 'txs_12' })
   .leftJoin({ td: 'txs_12_data' }, 't.tx_uid', 'td.tx_uid')
   .groupBy('t.tx_uid');
 
 module.exports = {
-  selectOnFiltered,
-  blank,
+  selectFromFiltered,
+  select,
 };
