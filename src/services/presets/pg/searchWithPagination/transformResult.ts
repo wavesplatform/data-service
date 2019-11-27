@@ -13,25 +13,20 @@ type ResponseMeta = {
 };
 
 const createMeta = <
-  Cursor extends Partial<Request> & Partial<ResponseTransformed>,
+  Cursor extends Partial<Request>,
   Request extends WithLimit,
-  ResponseRaw,
-  ResponseTransformed
+  ResponseRaw
 >(
-  serialize: CursorSerialization<
-    Cursor,
-    Request,
-    ResponseTransformed
-  >['serialize']
+  serialize: CursorSerialization<Cursor, Request, ResponseRaw>['serialize']
 ) => (
   request: RequestWithCursor<Request, Cursor>,
-  responsesRaw: ResponseRaw[],
-  lastTransformedResponse: ResponseTransformed | undefined
+  responsesRaw: ResponseRaw[]
 ): ResponseMeta => {
   const metaBuilder: ResponseMeta = {};
-  if (typeof lastTransformedResponse !== 'undefined') {
+  const lastResponse = last(responsesRaw);
+  if (typeof lastResponse !== 'undefined') {
     metaBuilder.isLastPage = responsesRaw.length < request.limit;
-    metaBuilder.lastCursor = serialize(request, lastTransformedResponse);
+    metaBuilder.lastCursor = serialize(request, lastResponse);
   }
   return metaBuilder;
 };
@@ -46,11 +41,7 @@ export const transformResults = <
     results: ResponseRaw,
     request?: RequestWithCursor<Request, Cursor>
   ) => ResponseTransformed,
-  serialize: CursorSerialization<
-    Cursor,
-    Request,
-    ResponseTransformed
-  >['serialize']
+  serialize: CursorSerialization<Cursor, Request, ResponseRaw>['serialize']
 ) => (
   responses: ResponseRaw[],
   request: RequestWithCursor<Request, Cursor>
@@ -60,8 +51,5 @@ export const transformResults = <
     take<ResponseRaw>(request.limit - 1)
   )(responses);
 
-  return list(
-    transformedData,
-    createMeta(serialize)(request, responses, last(transformedData))
-  );
+  return list(transformedData, createMeta(serialize)(request, responses));
 };

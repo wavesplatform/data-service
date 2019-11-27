@@ -1,15 +1,13 @@
 import { Result, Ok as ok } from 'folktale/result';
-import { Asset } from '../../types';
 import { ValidationError } from '../../errorHandling';
-import { AssetsSearchRequest } from './types';
+import { AssetsSearchRequest, AssetDbResponse } from './types';
 
 export type Cursor = string;
 
-export const serialize = <ResponseTransformed extends Asset>(
+export const serialize = <Response extends AssetDbResponse>(
   request: AssetsSearchRequest,
-  response: ResponseTransformed
-): string | undefined =>
-  response.data === null ? undefined : response.data.id;
+  response: Response
+): string | undefined => (response === null ? undefined : response.asset_id);
 
 export const deserialize = (
   cursor: string

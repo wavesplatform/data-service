@@ -6,9 +6,9 @@ const { pickBindFilters } = require('../../../../../utils/db');
 // one — get by id
 // many — apply filters
 module.exports = ({ filters: F }) => ({
-  get: id => pipe(selectFromFiltered, F.id(id), String)(select),
+  get: id => pipe(F.id(id), selectFromFiltered, String)(select),
 
-  mget: ids => pipe(selectFromFiltered, F.ids(ids), String)(select),
+  mget: ids => pipe(F.ids(ids), selectFromFiltered, String)(select),
 
   search: (fValues = {}) => {
     const defaultValues = { limit: 100, sort: 'desc' };

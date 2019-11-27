@@ -6,6 +6,7 @@ const selectFromFiltered = filtered =>
   pg({ t: filtered })
     .select({
       // common
+      tx_uid: 't.tx_uid',
       height: 't.height',
       tx_type: 'txs.tx_type',
       id: 'txs.id',

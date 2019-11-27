@@ -95,10 +95,12 @@ export default ({
       List<Transaction>
     >({
       transformInput: transformInputSearch(deserialize),
-      transformResult: transformResultSearch(
-        compose(transaction, transformTxInfo),
-        serialize
-      ),
+      transformResult: transformResultSearch<
+        Cursor,
+        InvokeScriptTxsSearchRequest,
+        RawInvokeScriptTx,
+        Transaction
+      >(compose(transaction, transformTxInfo), serialize),
       validateInput: validateInput<InvokeScriptTxsSearchRequest>(
         inputSearchSchema,
         createServiceName('search')

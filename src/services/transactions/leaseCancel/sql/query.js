@@ -16,6 +16,7 @@ const selectFromFiltered = filtered =>
         .leftJoin({ l: 'txs' }, 'l.uid', 't.lease_tx_uid')
     )
     .select({
+      tx_uid: 't.tx_uid',
       height: 't.height',
       tx_type: 'txs.tx_type',
       id: 'txs.id',

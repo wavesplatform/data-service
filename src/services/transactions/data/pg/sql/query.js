@@ -3,6 +3,7 @@ const pg = require('knex')({ client: 'pg' });
 const selectFromFiltered = filtered =>
   pg
     .columns({
+      tx_uid: 't.tx_uid',
       tx_type: 'txs.tx_type',
       tx_version: 'txs.tx_version',
       height: 't.height',

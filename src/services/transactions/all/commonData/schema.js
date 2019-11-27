@@ -3,6 +3,7 @@ const Joi = require('../../../../utils/validation/joi');
 const commonFilters = require('../../_common/commonFilterSchemas').default;
 
 const result = Joi.object().keys({
+  tx_uid: Joi.number(),
   tx_type: Joi.number()
     .min(1)
     .max(16)

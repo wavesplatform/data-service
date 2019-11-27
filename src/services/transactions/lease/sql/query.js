@@ -35,6 +35,7 @@ const selectFromFiltered = filtered =>
         )
     )
     .select({
+      tx_uid: 't.tx_uid',
       height: 't.height',
       tx_type: 'txs.tx_type',
       id: 'txs.id',

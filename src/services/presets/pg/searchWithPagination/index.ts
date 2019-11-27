@@ -35,7 +35,7 @@ export const searchWithPaginationPreset = <
     response: ResponseRaw,
     request?: RequestWithCursor<Request, Cursor>
   ) => Res;
-  cursorSerialization: CursorSerialization<Cursor, Request, Res>;
+  cursorSerialization: CursorSerialization<Cursor, Request, ResponseRaw>;
 }) => ({ pg, emitEvent }: ServicePresetInitOptions) =>
   search<
     RequestWithCursor<Request, string>,

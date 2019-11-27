@@ -34,17 +34,9 @@ const byTimeStamp = comparator => ts =>
 const sort = s => q => q.clone().orderBy('t.tx_uid', s);
 const outerSort = s => q => q.clone().orderBy('txs.uid', s);
 
-const after = ({ id, sort }) => q => {
+const after = ({ tx_uid, sort }) => {
   const comparator = sort === 'desc' ? '<' : '>';
-  return q.clone().whereIn('t.tx_uid', function() {
-    this.select('uid')
-      .from('txs')
-      .where('uid', comparator, function() {
-        this.select('uid')
-          .from('txs')
-          .where('id', id);
-      });
-  });
+  return where('t.tx_uid', comparator, tx_uid);
 };
 
 module.exports = {

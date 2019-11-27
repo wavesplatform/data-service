@@ -5,6 +5,7 @@ const select = pg({ t: 'txs_3' }).select('*');
 const selectFromFiltered = filtered =>
   pg({ t: filtered })
     .select({
+      tx_uid: 't.tx_uid',
       height: 't.height',
       tx_type: 'txs.tx_type',
       id: 'txs.id',

@@ -38,7 +38,8 @@ const withGrouping = q =>
       'addr.address',
       'addr.public_key',
       't.asset_id',
-      't.attachment'
+      't.attachment',
+      't.tx_uid'
     );
 
 const selectFromFiltered = pipe(
@@ -63,6 +64,7 @@ const selectFromFiltered = pipe(
           .leftJoin({ a: 'assets' }, 'a.uid', 't.asset_uid')
       )
       .select({
+        tx_uid: 't.tx_uid',
         id: 'txs.id',
         fee: pg.raw('(txs.fee * 10^(-8)) :: DOUBLE PRECISION'),
         recipients: pg.raw('array_agg(t.address order by t.position_in_tx)'),

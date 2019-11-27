@@ -3,6 +3,7 @@ const pg = knex({ client: 'pg' });
 
 const columnsWithoutFeeAndPaymentAssetId = [
   // common
+  't.tx_uid',
   't.height',
   'txs.tx_type',
   'txs.id',

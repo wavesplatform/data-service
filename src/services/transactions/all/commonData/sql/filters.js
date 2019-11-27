@@ -25,6 +25,11 @@ const byTimeStamp = comparator => ts =>
       .limit(1);
   });
 
+const after = ({ tx_uid, sort }) => {
+  const comparator = sort === 'desc' ? '<' : '>';
+  return where('t.uid', comparator, tx_uid);
+};
+
 module.exports = {
   filters: {
     ...commonFilters,
@@ -33,5 +38,6 @@ module.exports = {
     timeStart: byTimeStamp('>='),
     timeEnd: byTimeStamp('<='),
     sort: s => q => q.clone().orderBy('t.uid', s),
+    after,
   },
 };

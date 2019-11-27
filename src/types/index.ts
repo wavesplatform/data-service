@@ -96,9 +96,12 @@ export type PairInfo = {
   txsCount: number;
 };
 
-export type Pair = Serializable<'pair', PairInfo | null> & Partial<AssetIdsPair>;
-export const pair = (data: PairInfo | null, pairData: AssetIdsPair | null): Pair =>
-  ({...toSerializable('pair', data), ...pairData});
+export type Pair = Serializable<'pair', PairInfo | null> &
+  Partial<AssetIdsPair>;
+export const pair = (
+  data: PairInfo | null,
+  pairData: AssetIdsPair | null
+): Pair => ({ ...toSerializable('pair', data), ...pairData });
 
 // @todo TransactionInfo
 export type DataTxEntryType = 'binary' | 'boolean' | 'integer' | 'string';
@@ -132,5 +135,7 @@ export type RateInfo = {
   rate: BigNumber;
 };
 export type Rate = Serializable<'rate', RateInfo | null> & AssetIdsPair;
-export const rate = (data: RateInfo | null, assetMeta: AssetIdsPair): Rate =>
-  ({...toSerializable('rate', data === null ? null : data), ...assetMeta});
+export const rate = (data: RateInfo | null, assetMeta: AssetIdsPair): Rate => ({
+  ...toSerializable('rate', data === null ? null : data),
+  ...assetMeta,
+});

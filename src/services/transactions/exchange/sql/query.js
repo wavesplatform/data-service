@@ -79,7 +79,6 @@ const selectFromFiltered = filtered =>
       compose(
         keys,
         omit([
-          'tx_uid',
           'price',
           'amount',
           'o1_price',

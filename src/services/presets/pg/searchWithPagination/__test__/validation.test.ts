@@ -13,10 +13,11 @@ import { SortOrder, WithLimit } from '../../../../_common';
 import { searchWithPaginationPreset } from '..';
 import commonFilterSchemas from '../commonFilterSchemas';
 import { AppError, ValidationError } from './../../../../../errorHandling';
+import { RawTxWithUid } from 'services/transactions/_common/types';
 
 const mockTxs: ResponseRaw[] = [
-  { id: 'q', timestamp: new Date() },
-  { id: 'w', timestamp: new Date() },
+  { tx_uid: 1, id: 'q', timestamp: new Date() },
+  { tx_uid: 2, id: 'w', timestamp: new Date() },
 ];
 
 type Request = WithLimit & {
@@ -26,24 +27,26 @@ type Request = WithLimit & {
 };
 
 type ResponseRaw = {
+  tx_uid: number;
   id: string;
   timestamp: Date;
 };
 
 type Cursor = {
-  timestamp: Date;
-  id: string;
+  tx_uid: number;
+  sort: SortOrder;
 };
 
-const serialize = <ResponseRaw extends Serializable<string, any>>(
+const isSortOrder = (s: string): s is SortOrder =>
+  s === SortOrder.Ascending || s === SortOrder.Descending;
+
+const serialize = <ResponseRaw extends RawTxWithUid>(
   request: Request,
   response: ResponseRaw
 ): string | undefined =>
   response === null
     ? undefined
-    : Buffer.from(
-        `${response.data.timestamp.toISOString()}::${response.data.id}`
-      ).toString('base64');
+    : Buffer.from(`${response.tx_uid}::${request.sort}`).toString('base64');
 
 const deserialize = (cursor: string): Result<ValidationError, Cursor> => {
   const data = Buffer.from(cursor, 'base64')
@@ -51,22 +54,35 @@ const deserialize = (cursor: string): Result<ValidationError, Cursor> => {
     .split('::');
 
   const err = (message?: string) =>
-    new ValidationError('Cursor deserialization is failed', { cursor, message });
+    new ValidationError('Cursor deserialization is failed', {
+      cursor,
+      message,
+    });
 
   return (
     ok<ValidationError, string[]>(data)
       // validate length
       .chain(d =>
-        d.length > 1
+        d.length === 2
           ? ok<ValidationError, string[]>(d)
-          : error<ValidationError, string[]>(err('Cursor length <2'))
+          : error<ValidationError, string[]>(
+              err('Cursor length is not equals to 2')
+            )
       )
-      .chain(d =>
-        parseDate(d[0]).map(date => ({
-          timestamp: date,
-          id: d[1],
-        }))
-      )
+      .chain(d => {
+        const s = d[1];
+        if (isSortOrder(s)) {
+          return ok<ValidationError, [number, SortOrder]>([parseInt(d[0]), s]);
+        } else {
+          return error<ValidationError, [number, SortOrder]>(
+            err('Sort is not valid')
+          );
+        }
+      })
+      .map(([tx_uid, sort]) => ({
+        tx_uid,
+        sort,
+      }))
   );
 };
 

@@ -7,11 +7,7 @@ const pgp: IMain = pgPromise();
 
 const toBigNumber = (x: BigNumber.Value): BigNumber => new BigNumber(x);
 
-const parsePgArray = compose(
-  split(','),
-  init,
-  tail
-);
+const parsePgArray = compose(split(','), init, tail);
 
 const toBigNumberAll = (s: string): BigNumber[] =>
   parsePgArray(s).map(toBigNumber);

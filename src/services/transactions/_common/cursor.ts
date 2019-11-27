@@ -1,32 +1,26 @@
 import { Result, Error as error, Ok as ok } from 'folktale/result';
-import { Transaction } from '../../../types';
 import { ValidationError } from '../../../errorHandling';
-import { parseDate } from '../../../utils/parseDate';
 import { SortOrder, WithSortOrder } from '../../_common';
+import { RawTxWithUid } from './types';
 
 const isSortOrder = (s: string): s is SortOrder =>
   s === SortOrder.Ascending || s === SortOrder.Descending;
 
 export type Cursor = {
-  timestamp: Date;
-  id: string;
+  tx_uid: number;
   sort: SortOrder;
 };
 
 export const serialize = <
   Request extends WithSortOrder,
-  ResponseTransformed extends Transaction
+  Response extends RawTxWithUid
 >(
   request: Request,
-  response: ResponseTransformed
+  response: Response
 ): string | undefined =>
-  response.data === null
+  response === null
     ? undefined
-    : Buffer.from(
-        `${response.data.timestamp.toISOString()}::${response.data.id}::${
-          request.sort
-        }`
-      ).toString('base64');
+    : Buffer.from(`${response.tx_uid}::${request.sort}`).toString('base64');
 
 export const deserialize = (
   cursor: string
@@ -36,35 +30,34 @@ export const deserialize = (
     .split('::');
 
   const err = (message?: string) =>
-    new ValidationError('Cursor deserialization is failed', { cursor, message });
+    new ValidationError('Cursor deserialization is failed', {
+      cursor,
+      message,
+    });
 
   return (
     ok<ValidationError, string[]>(data)
       // validate length
       .chain(d =>
-        d.length > 2
+        d.length === 2
           ? ok<ValidationError, string[]>(d)
-          : error<ValidationError, string[]>(err('Cursor length <3'))
+          : error<ValidationError, string[]>(
+              err('Cursor length is not equals to 2')
+            )
       )
-      .chain(d =>
-        parseDate(d[0])
-          .mapError(e => err())
-          // validate sort order 'asc' | 'desc'
-          .chain(date => {
-            const s = d[2];
-            if (isSortOrder(s)) {
-              return ok<ValidationError, [Date, SortOrder]>([date, s]);
-            } else {
-              return error<ValidationError, [Date, SortOrder]>(
-                err('Sort is not valid')
-              );
-            }
-          })
-          .map(([date, sort]) => ({
-            timestamp: date,
-            id: d[1],
-            sort,
-          }))
-      )
+      .chain(d => {
+        const s = d[1];
+        if (isSortOrder(s)) {
+          return ok<ValidationError, [number, SortOrder]>([parseInt(d[0]), s]);
+        } else {
+          return error<ValidationError, [number, SortOrder]>(
+            err('Sort is not valid')
+          );
+        }
+      })
+      .map(([tx_uid, sort]) => ({
+        tx_uid,
+        sort,
+      }))
   );
 };
