@@ -1,7 +1,7 @@
 import * as Joi from '../../../utils/validation/joi';
 
 import * as commonFields from '../_common/commonFieldsSchemas';
-import commonFilters from '../../presets/pg/searchWithPagination/commonFilterSchemas';
+import commonFilters from '../_common/commonFilterSchemas';
 
 export const result = Joi.object().keys({
   ...commonFields,

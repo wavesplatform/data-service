@@ -8,6 +8,7 @@ export type AssetsCache = CacheSync<string, AssetDbResponse>;
 
 export type SearchByTicker = {
   ticker: string;
+  limit: number;
 };
 
 export type SearchFullText = {

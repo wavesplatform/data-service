@@ -36,6 +36,10 @@ export const createApi = ({ filters: F }: { filters: any }) => ({
       select(defaultTo(defaultValues.sort, fValues['sort']))
     );
 
+<<<<<<< HEAD
     return pipe(selectFromFiltered, String)(fQuery);
+=======
+    return pipe(composeQuery, F.sort(withDefaults.sort), String)(fQuery);
+>>>>>>> develop
   },
 });

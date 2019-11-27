@@ -1,4 +1,4 @@
-import { propEq, identity } from 'ramda';
+import { compose, propEq, identity } from 'ramda';
 import { of as taskOf } from 'folktale/concurrency/task';
 import { of as just, Maybe } from 'folktale/maybe';
 import { tap } from '../../utils/tap';
@@ -17,7 +17,7 @@ import { getData as getByIdPg } from '../presets/pg/getById/pg';
 import { getData as mgetByIdsPg } from '../presets/pg/mgetByIds/pg';
 import { validateInput, validateResult } from '../presets/validation';
 import { transformResults as transformMgetResults } from '../presets/pg/mgetByIds/transformResult';
-import { searchPreset } from '../presets/pg/search';
+import { searchWithPaginationPreset } from '../presets/pg/searchWithPagination';
 
 // validation
 import { inputGet } from '../presets/pg/getById/inputSchema';
@@ -28,18 +28,15 @@ import {
 } from './schema';
 
 import { transformDbResponse } from './transformAsset';
-import { transformResults as createTransformResult } from '../presets/pg/search/transformResult';
 import * as sql from './sql';
-
 import {
   AssetsCache,
   AssetDbResponse,
   AssetsService,
   AssetsSearchRequest,
 } from './types';
-
+import { Cursor, serialize, deserialize } from './cursor';
 export { create as createCache } from './cache';
-
 export { AssetsService } from './types';
 
 export default ({
@@ -117,21 +114,22 @@ export default ({
       emitEvent,
     }),
 
-    search: searchPreset<
+    search: searchWithPaginationPreset<
+      Cursor,
       AssetsSearchRequest,
       AssetDbResponse,
       AssetInfo,
-      List<Asset>
+      Asset
     >({
       name: SERVICE_NAME.SEARCH,
       sql: sql.search,
       inputSchema: inputSearchSchema,
       resultSchema,
-      transformResult: createTransformResult<
-        AssetsSearchRequest,
-        AssetDbResponse,
-        Asset
-      >(asset)(transformDbResponse),
+      transformResult: compose(asset, transformDbResponse),
+      cursorSerialization: {
+        serialize,
+        deserialize,
+      },
     })({
       pg: withStatementTimeout(pg, timeouts.search),
       emitEvent,
