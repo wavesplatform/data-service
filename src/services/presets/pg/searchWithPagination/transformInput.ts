@@ -6,14 +6,6 @@ import {
   CursorSerialization,
 } from '../../../_common/pagination';
 
-const decodeAfter = <Cursor, Request, Response>(
-  deserialize: CursorSerialization<Cursor, Request, Response>['deserialize']
-) => (cursorString: string) =>
-  deserialize(cursorString).matchWith({
-    Ok: ({ value }) => value,
-    Error: () => ({}),
-  });
-
 export const transformInput = <Cursor, Request extends WithLimit>(
   deserialize: CursorSerialization<Cursor, Request, Response>['deserialize']
 ) => (
@@ -33,7 +25,7 @@ export const transformInput = <Cursor, Request extends WithLimit>(
   } else {
     return {
       ...requestWithoutAfter,
-      after: decodeAfter(deserialize)(request.after),
+      after: deserialize(request.after).getOrElse({}),
     };
   }
 };

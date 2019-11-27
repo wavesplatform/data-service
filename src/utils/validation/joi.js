@@ -1,13 +1,7 @@
 const rawJoi = require('joi');
 
 const { BigNumber } = require('@waves/data-entities');
-const {
-  base58: base58Regex,
-  interval: intervalRegex,
-  assetId: assetIdRegex,
-  noNullChars: noNullCharsRegex,
-  saneForDbLike: saneForDbLikeRegex,
-} = require('../regex');
+const regex = require('../regex');
 const { interval } = require('../../types');
 const { div } = require('../interval');
 const Maybe = require('folktale/maybe');
@@ -50,20 +44,20 @@ module.exports = rawJoi
     },
     rules: [
       regexRule(joi, 'base58', [
-        { regex: base58Regex, errorCode: 'string.base58' },
+        { regex: regex.base58, errorCode: 'string.base58' },
       ]),
       regexRule(joi, 'assetId', [
-        { regex: assetIdRegex, errorCode: 'string.assetId' },
+        { regex: regex.assetId, errorCode: 'string.assetId' },
       ]),
       regexRule(joi, 'noNullChars', [
-        { regex: noNullCharsRegex, errorCode: 'string.noNullChars' },
+        { regex: regex.noNullChars, errorCode: 'string.noNullChars' },
       ]),
       regexRule(joi, 'period', [
-        { regex: intervalRegex, errorCode: 'string.period.value' },
+        { regex: regex.interval, errorCode: 'string.period.value' },
       ]),
       regexRule(joi, 'saneForDbLike', [
-        { regex: saneForDbLikeRegex, errorCode: 'string.saneForDbLike' },
-        { regex: noNullCharsRegex, errorCode: 'string.noNullChars' },
+        { regex: regex.saneForDbLike, errorCode: 'string.saneForDbLike' },
+        { regex: regex.noNullChars, errorCode: 'string.noNullChars' },
       ]),
       {
         name: 'base64Prefixed',
@@ -127,7 +121,7 @@ module.exports = rawJoi
       {
         name: 'divisibleBy',
         params: {
-          divisibleBy: joi.string().regex(intervalRegex),
+          divisibleBy: joi.string().regex(regex.interval),
         },
         validate(params, value, state, options) {
           const i = interval(value);
@@ -169,7 +163,7 @@ module.exports = rawJoi
       {
         name: 'min',
         params: {
-          min: joi.string().regex(intervalRegex),
+          min: joi.string().regex(regex.interval),
         },
         validate(params, value, state, options) {
           const i = interval(value);
@@ -210,7 +204,7 @@ module.exports = rawJoi
       {
         name: 'max',
         params: {
-          max: joi.string().regex(intervalRegex),
+          max: joi.string().regex(regex.interval),
         },
         validate(params, value, state, options) {
           const i = interval(value);
