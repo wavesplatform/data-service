@@ -1,5 +1,6 @@
 const http = require('http');
-const json = require('@waves/json-bigint');
+
+import { parse } from '../../../utils/json';
 
 import createService, { createCache } from '../index';
 
@@ -70,7 +71,7 @@ describe('Assets service', () => {
   describe('search', () => {
     it('fetches WAVES by ticker', async done => {
       service
-        .search({ ticker: 'WAVES' })
+        .search({ ticker: 'WAVES', limit: 100 })
         .run()
         .promise()
         .then(xs => {
@@ -87,24 +88,37 @@ describe('Assets service', () => {
           let data: string = '';
           res.on('data', (chunk: string) => (data += chunk));
           res.on('end', () => {
-            const assetInfoFromNode: any = json.parse(data);
+            const assetInfoFromNode: any = parse(data);
             service
-              .search({ ticker: 'BTC' })
+              .search({ ticker: 'BTC', limit: 100 })
               .run()
               .promise()
               .then(xs => {
-                expect(xs.data[0].data).toMatchObject({
-                  description: assetInfoFromNode.description,
-                  height: assetInfoFromNode.issueHeight,
-                  id: assetInfoFromNode.assetId,
-                  name: assetInfoFromNode.name,
-                  precision: assetInfoFromNode.decimals,
-                  quantity: assetInfoFromNode.quantity,
-                  reissuable: assetInfoFromNode.reissuable,
-                  sender: assetInfoFromNode.issuer,
-                  ticker: 'BTC',
-                });
-                done();
+                const assetInfo = xs.data[0].data;
+                if (assetInfo !== null) {
+                  expect(assetInfo.description).toMatch(
+                    assetInfoFromNode.description
+                  );
+                  expect(assetInfo.height.toString()).toMatch(
+                    assetInfoFromNode.issueHeight.toString()
+                  );
+                  expect(assetInfo.id).toMatch(assetInfoFromNode.assetId);
+                  expect(assetInfo.name).toMatch(assetInfoFromNode.name);
+                  expect(assetInfo.precision.toString()).toMatch(
+                    assetInfoFromNode.decimals.toString()
+                  );
+                  expect(assetInfo.quantity.toString()).toMatch(
+                    assetInfoFromNode.quantity.toString()
+                  );
+                  expect(assetInfo.reissuable.toString()).toMatch(
+                    assetInfoFromNode.reissuable.toString()
+                  );
+                  expect(assetInfo.sender).toMatch(assetInfoFromNode.issuer);
+                  expect(assetInfo.ticker).toMatch('BTC');
+                  done();
+                } else {
+                  done('Asset not found in Data Service');
+                }
               });
           });
         }
@@ -113,7 +127,7 @@ describe('Assets service', () => {
 
     it('fetches all assets with tickers by ticker=*', () =>
       service
-        .search({ ticker: '*' })
+        .search({ ticker: '*', limit: 100 })
         .run()
         .promise()
         .then(as => {

@@ -1,5 +1,5 @@
 const { parseDate } = require('../../../../utils/parseDate');
-const { encode } = require('../../../_common/pagination/cursor');
+const { serialize } = require('../../_common/cursor');
 
 const TIMEOUT = 10000;
 
@@ -72,7 +72,7 @@ const search = service =>
     describe('Pagination ', () => {
       const LIMIT = 21;
       const createCursor = sort => ({ data }) =>
-        encode({
+        serialize({
           sort,
           id: data.id,
           timestamp: new Date(data.timestamp),

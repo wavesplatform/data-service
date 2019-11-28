@@ -1,19 +1,14 @@
 import { omit, compose, evolve, inc } from 'ramda';
 
-import { WithSortOrder, WithLimit } from '../../../_common';
-import { Cursor, RequestWithCursor } from '../../../_common/pagination';
-import { decode } from '../../../_common/pagination/cursor';
+import { WithLimit } from '../../../_common';
+import {
+  RequestWithCursor,
+  CursorSerialization,
+} from '../../../_common/pagination';
 
-const decodeAfter = (cursorString: string) =>
-  decode(cursorString).matchWith({
-    Ok: ({ value }) => ({
-      after: value,
-      sort: value.sort,
-    }),
-    Error: () => ({}),
-  });
-
-export const transformInput = <Request extends WithSortOrder & WithLimit>(
+export const transformInput = <Cursor, Request extends WithLimit>(
+  deserialize: CursorSerialization<Cursor, Request, Response>['deserialize']
+) => (
   request: RequestWithCursor<Request, string>
 ): RequestWithCursor<Request, Cursor> => {
   const requestWithoutAfter = compose<
@@ -30,7 +25,7 @@ export const transformInput = <Request extends WithSortOrder & WithLimit>(
   } else {
     return {
       ...requestWithoutAfter,
-      ...decodeAfter(request.after),
+      after: deserialize(request.after).getOrElse({}),
     };
   }
 };

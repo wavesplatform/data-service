@@ -26,6 +26,7 @@ import { transformResults as transformResultMget } from '../../presets/pg/mgetBy
 import { transformInput as transformInputSearch } from '../../presets/pg/searchWithPagination/transformInput';
 import { transformResults as transformResultSearch } from '../../presets/pg/searchWithPagination/transformResult';
 
+import { serialize, deserialize } from '../_common/cursor';
 import {
   result as resultSchema,
   inputSearch as inputSearchSchema,
@@ -77,9 +78,7 @@ export default ({
       >(transaction)(transformTxInfo),
       validateInput: validateInput(inputGet, createServiceName('get')),
       validateResult: validateResult(resultSchema, createServiceName('get')),
-      getData: pgData.get(
-        withStatementTimeout(pg, timeouts.get)
-      ),
+      getData: pgData.get(withStatementTimeout(pg, timeouts.get)),
       emitEvent,
     }),
 
@@ -93,9 +92,7 @@ export default ({
       >(transaction)(transformTxInfo),
       validateInput: validateInput(inputMget, createServiceName('mget')),
       validateResult: validateResult(resultSchema, createServiceName('mget')),
-      getData: pgData.mget(
-        withStatementTimeout(pg, timeouts.mget)
-      ),
+      getData: pgData.mget(withStatementTimeout(pg, timeouts.mget)),
       emitEvent,
     }),
 
@@ -105,21 +102,20 @@ export default ({
       DataTxDbResponse,
       List<Transaction>
     >({
-      transformInput: transformInputSearch,
+      transformInput: transformInputSearch(deserialize),
       transformResult: transformResultSearch(
-        compose(
+        compose<DataTxDbResponse, TransactionInfo | null, Transaction>(
           transaction,
           transformTxInfo
-        )
+        ),
+        serialize
       ),
       validateInput: validateInput(
         inputSearchSchema,
         createServiceName('search')
       ),
       validateResult: validateResult(resultSchema, createServiceName('search')),
-      getData: pgData.search(
-        withStatementTimeout(pg, timeouts.search)
-      ),
+      getData: pgData.search(withStatementTimeout(pg, timeouts.search)),
       emitEvent,
     }),
   };

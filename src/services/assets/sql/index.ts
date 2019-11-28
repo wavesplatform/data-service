@@ -1,5 +1,5 @@
 import * as knex from 'knex';
-import { compose } from 'ramda';
+import { compose, isNil } from 'ramda';
 import { columns } from './common';
 import { searchAssets } from './searchAssets';
 import { AssetsSearchRequest, SearchByTicker } from '../types';
@@ -20,12 +20,13 @@ export const mget = (ids: string[]): string =>
 export const get = (id: string): string => mget([id]);
 
 export const search = (req: AssetsSearchRequest): string => {
-  const isSearchByTicker = (asr: AssetsSearchRequest): asr is SearchByTicker =>
-    typeof asr.ticker !== 'undefined';
+  const isSearchByTicker = (req: AssetsSearchRequest): req is SearchByTicker =>
+    !isNil(req.ticker);
 
   if (isSearchByTicker(req)) {
     return compose(
       (q: knex.QueryBuilder) => q.toString(),
+      (q: knex.QueryBuilder) => q.clone().limit(req.limit),
       (q: knex.QueryBuilder) =>
         req.ticker === '*'
           ? q.whereNotNull('ticker')
