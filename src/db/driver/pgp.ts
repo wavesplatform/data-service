@@ -3,9 +3,9 @@ import { compose, tail, init, split } from 'ramda';
 import { IMain } from 'pg-promise';
 import * as pgPromise from 'pg-promise';
 
-const pgp: IMain = pgPromise();
+import { toBigNumber } from '../../utils/bigNumber';
 
-const toBigNumber = (x: BigNumber.Value): BigNumber => new BigNumber(x);
+const pgp: IMain = pgPromise();
 
 const parsePgArray = compose(split(','), init, tail);
 
