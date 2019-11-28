@@ -4,6 +4,7 @@ import { Interval, Unit } from '../../types';
 const precisions: Record<Unit, number> = {
   [Unit.Year]: 4,
   [Unit.Month]: 7,
+  [Unit.Week]: 10,
   [Unit.Day]: 10,
   [Unit.Hour]: 13,
   [Unit.Minute]: 16,
@@ -13,6 +14,7 @@ const precisions: Record<Unit, number> = {
 const suffixes: Record<Unit, string> = {
   [Unit.Year]: '-01-01T00:00:00.000Z',
   [Unit.Month]: '-01T00:00:00.000Z',
+  [Unit.Week]: 'T00:00:00.000Z',
   [Unit.Day]: 'T00:00:00.000Z',
   [Unit.Hour]: ':00:00.000Z',
   [Unit.Minute]: ':00.000Z',
@@ -22,6 +24,7 @@ const suffixes: Record<Unit, string> = {
 const units = [
   Unit.Year,
   Unit.Month,
+  Unit.Week,
   Unit.Day,
   Unit.Hour,
   Unit.Minute,
@@ -45,11 +48,17 @@ const roundTo = curry(
 
     switch (interval.unit) {
       case Unit.Year:
+        // set the first month of the year
         newDate.setMonth(roundFn(newDate.getMonth() / 12) * 12);
         break;
       case Unit.Month:
+        // set the first day of the month
         const d = daysInMonth(date.getFullYear(), date.getMonth()) - 1;
         newDate.setUTCDate(roundFn((date.getUTCDate() - 1) / d) * d + 1);
+        break;
+      case Unit.Week:
+        // set monday
+        newDate.setDate(newDate.getDate() - newDate.getDay() + 1);
         break;
       default:
         newDate = new Date(
@@ -78,11 +87,17 @@ const roundTo = curry(
   }
 );
 
-export const trunc = curry(
-  (unit: Unit, date: Date): string => {
+export const trunc = curry((unit: Unit, date: Date): string => {
+  if (unit === Unit.Week) {
+    return (
+      new Date(date.setDate(date.getDate() - date.getDay() + 1))
+        .toISOString()
+        .substr(0, precisions[Unit.Day]) + suffixes[Unit.Day]
+    );
+  } else {
     return date.toISOString().substr(0, precisions[unit]) + suffixes[unit];
   }
-);
+});
 
 export const round = roundTo(defaultRound);
 export const floor = roundTo(roundDown);

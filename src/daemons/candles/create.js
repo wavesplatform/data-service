@@ -3,6 +3,7 @@ const Task = require('folktale/concurrency/task');
 const { fromNullable } = require('folktale/maybe');
 
 const getErrorMessage = require('../../errorHandling/getErrorMessage');
+const { CandleInterval } = require('../../types');
 
 const logTaskProgress = require('../utils/logTaskProgress');
 
@@ -10,7 +11,7 @@ const {
   truncateTable,
   insertAllMinuteCandles,
   insertAllCandles,
-  selectCandlesByMinute,
+  selectCandlesAfterTimestamp,
   insertOrUpdateCandles,
   selectLastCandle,
   selectLastExchangeTx,
@@ -20,14 +21,18 @@ const {
 
 /** for combining candles */
 const intervalPairs = [
-  [60, 300], // 1m -> 5m
-  [300, 900], // 5m -> 15m
-  [900, 1800], // 15m -> 30m
-  [1800, 3600], // 30m -> 1h
-  [3600, 10800], // 1h -> 3h
-  [10800, 21600], // 3h -> 6h
-  [21600, 43200], // 6h -> 12h
-  [43200, 86400], // 12h -> 24h
+  [CandleInterval.Minute1, CandleInterval.Minute5], // 1m -> 5m
+  [CandleInterval.Minute5, CandleInterval.Minute15], // 5m -> 15m
+  [CandleInterval.Minute15, CandleInterval.Minute30], // 15m -> 30m
+  [CandleInterval.Minute30, CandleInterval.Hour1], // 30m -> 1h
+  [CandleInterval.Hour1, CandleInterval.Hour2], // 1h -> 2h
+  [CandleInterval.Hour1, CandleInterval.Hour3], // 1h -> 3h
+  [CandleInterval.Hour2, CandleInterval.Hour4], // 2h -> 4h
+  [CandleInterval.Hour3, CandleInterval.Hour6], // 3h -> 6h
+  [CandleInterval.Hour6, CandleInterval.Hour12], // 6h -> 12h
+  [CandleInterval.Hour12, CandleInterval.Day1], // 12h -> 24h
+  [CandleInterval.Day1, CandleInterval.Week1], // 24h -> 1w
+  [CandleInterval.Day1, CandleInterval.Month1], // 24h -> 1M
 ];
 
 /** getStartBlock :: (Object, Object) -> Number */
@@ -65,7 +70,7 @@ const updateCandlesLoop = (logTask, pg, tableName) => {
 
   const pgPromiseUpdateCandles = (t, fromTimetamp) =>
     t
-      .any(selectCandlesByMinute(fromTimetamp))
+      .any(selectCandlesAfterTimestamp(fromTimetamp))
       .then(candles => t.any(insertOrUpdateCandles(tableName, candles)));
 
   return logTask(

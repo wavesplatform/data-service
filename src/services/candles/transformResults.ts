@@ -17,14 +17,22 @@ import {
   omit,
 } from 'ramda';
 import { renameKeys } from 'ramda-adjunct';
-import { interval, list, candle, List, Candle, Unit } from '../../types';
+import {
+  interval,
+  list,
+  candle,
+  List,
+  Candle,
+  Unit,
+  CandleInterval,
+} from '../../types';
 import { concatAll } from '../../utils/fp/concatAll';
 import { floor, ceil, add, trunc } from '../../utils/date';
 import { candleMonoid } from './candleMonoid';
 import { CandlesSearchRequest } from '.';
 
 const truncToMinutes = trunc(Unit.Minute);
-const defaultInterval = interval('1m');
+const defaultInterval = interval(CandleInterval.Minute1);
 
 export type CandleDbResponse = {
   time_start: Date;
@@ -40,7 +48,7 @@ export type CandleDbResponse = {
   quote_volume: BigNumber;
   weighted_average_price: BigNumber;
   txs_count: number;
-  interval_in_secs: number;
+  interval: string;
   a_dec: number;
   p_dec: number;
 };

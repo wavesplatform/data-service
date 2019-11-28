@@ -1,6 +1,6 @@
 import * as knex from 'knex';
 import { repeat } from 'ramda';
-import { Interval, Unit, interval } from '../../../types';
+import { Interval, Unit, interval, CandleInterval } from '../../../types';
 import { add, trunc } from '../../../utils/date';
 import {
   fromMilliseconds,
@@ -25,7 +25,7 @@ const FIELDS = [
   'weighted_average_price',
   'open',
   'close',
-  'interval_in_secs',
+  'interval',
   'matcher',
 ];
 
@@ -35,7 +35,20 @@ const FIELDS_WITH_DECIMALS: knex.ColumnName[] = [
   { p_dec: 'p_dec.decimals' },
 ];
 
-const DIVIDERS = ['1m', '5m', '15m', '30m', '1h', '3h', '6h', '12h', '1d'];
+const DIVIDERS = [
+  CandleInterval.Minute1,
+  CandleInterval.Minute5,
+  CandleInterval.Minute15,
+  CandleInterval.Minute30,
+  CandleInterval.Hour1,
+  CandleInterval.Hour2,
+  CandleInterval.Hour3,
+  CandleInterval.Hour6,
+  CandleInterval.Hour12,
+  CandleInterval.Day1,
+  CandleInterval.Week1,
+  CandleInterval.Month1,
+];
 
 export interface CandleSelectionParams {
   amountAsset: string;
@@ -62,14 +75,14 @@ export const selectCandles = ({
     .where('time_start', '<=', timeEnd)
     .where('matcher', matcher)
     .where(
-      'interval_in_secs',
+      'interval',
       // should always be valid after validation
       highestDividerLessThan(
         interval(inter).unsafeGet(),
         unsafeIntervalsFromStrings(DIVIDERS)
       ).matchWith({
-        Ok: ({ value: i }) => i.length / 1000,
-        Error: ({ value: error }) => interval('1m').unsafeGet().length / 1000,
+        Ok: ({ value: i }) => i.source,
+        Error: ({ value: error }) => CandleInterval.Minute1,
       })
     );
 

@@ -7,6 +7,7 @@ export enum Unit {
   Minute = 'm',
   Hour = 'h',
   Day = 'd',
+  Week = 'w',
   Month = 'M',
   Year = 'Y',
 }
@@ -16,6 +17,7 @@ export const units: Record<Unit, number> = {
   [Unit.Minute]: 60,
   [Unit.Hour]: 60 * 60,
   [Unit.Day]: 60 * 60 * 24,
+  [Unit.Week]: 60 * 60 * 24 * 7,
   [Unit.Month]: 60 * 60 * 24 * 31,
   [Unit.Year]: 60 * 60 * 24 * 31 * 366,
 };
@@ -30,6 +32,8 @@ export const parseUnit = (s: string): Result<ValidationError, Unit> => {
       return ok(Unit.Hour);
     case Unit.Day:
       return ok(Unit.Day);
+    case Unit.Week:
+      return ok(Unit.Week);
     case Unit.Month:
       return ok(Unit.Month);
     case Unit.Year:

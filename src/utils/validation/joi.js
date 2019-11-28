@@ -35,7 +35,7 @@ module.exports = rawJoi
       saneForDbLike: 'must not end with unescaped slash symbol',
       pair: 'must be a valid pair string',
       period: {
-        value: 'must be a valid interval value',
+        value: 'interval must be a valid interval value',
         accept: 'must be in accepted',
         divisibleBy: 'must be divisible by divider',
         min: 'must be more then min',
