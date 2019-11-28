@@ -43,6 +43,7 @@ const DIVIDERS = [
   CandleInterval.Hour1,
   CandleInterval.Hour2,
   CandleInterval.Hour3,
+  CandleInterval.Hour4,
   CandleInterval.Hour6,
   CandleInterval.Hour12,
   CandleInterval.Day1,
