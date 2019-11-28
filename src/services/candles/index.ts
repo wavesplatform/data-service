@@ -46,9 +46,10 @@ export default ({
       transformInput: identity,
       transformResult: transformResults,
       validateInput: req =>
-        validateInput<CandlesSearchRequest>(inputSearch, SERVICE_NAME)(
-          req
-        ).chain(() =>
+        validateInput<CandlesSearchRequest>(
+          inputSearch,
+          SERVICE_NAME
+        )(req).chain(() =>
           validatePair(req.matcher, {
             amountAsset: req.amountAsset,
             priceAsset: req.priceAsset,

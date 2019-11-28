@@ -1,5 +1,21 @@
 const Joi = require('../../utils/validation/joi');
-const { interval } = require('../../types');
+const { interval, CandleIntervals } = require('../../types');
+
+const candleIntervals = [
+  CandleIntervals.Month1,
+  CandleIntervals.Week1,
+  CandleIntervals.Day1,
+  CandleIntervals.Hour12,
+  CandleIntervals.Hour6,
+  CandleIntervals.Hour4,
+  CandleIntervals.Hour3,
+  CandleIntervals.Hour2,
+  CandleIntervals.Hour1,
+  CandleIntervals.Minute30,
+  CandleIntervals.Minute15,
+  CandleIntervals.Minute5,
+  CandleIntervals.Minute1,
+];
 
 const customJoi = Joi.extend(joi => ({
   base: joi.object(),
@@ -10,7 +26,7 @@ const customJoi = Joi.extend(joi => ({
       timeEnd: 'must be a valid time value',
       timeEndGt: 'time end must be greater then time start',
       interval: {
-        valid: 'must be a valid interval value',
+        valid: 'interval must be a valid interval value',
       },
       divisibleByLeftBound: 'must be divisible by left bound in {{bounds}}',
       limit: '{{candlesCount}} of candles is more then allowed of {{limit}}',
@@ -69,10 +85,10 @@ const customJoi = Joi.extend(joi => ({
           joi
             .string()
             .period()
-            .accept(['s', 'm', 'h', 'd', 'M', 'Y'])
-            .divisibleBy('1m')
-            .min('1m')
-            .max('1M')
+            .accept(['s', 'm', 'h', 'd', 'w', 'M', 'Y'])
+            .divisibleBy(CandleIntervals.Minute1)
+            .min(CandleIntervals.Minute1)
+            .max(CandleIntervals.Month1)
             .required()
             .validate(value.interval).error
         ) {
@@ -153,12 +169,14 @@ const inputSearch = customJoi
       .required(),
     timeStart: Joi.date().required(),
     timeEnd: Joi.date().required(),
-    interval: Joi.string().noNullChars().required(),
+    interval: Joi.string()
+      .noNullChars()
+      .required(),
     matcher: Joi.string().base58(),
   })
   .period({
     limit: 1440,
-    allow: ['1d', '12h', '6h', '3h', '1h', '30m', '15m', '5m', '1m'],
+    allow: candleIntervals,
   })
   .required();
 
@@ -196,9 +214,8 @@ const output = Joi.object().keys({
     .bignumber()
     .required(),
   txs_count: Joi.number().required(),
-  interval_in_secs: Joi.number()
-    .integer()
-    .valid([60, 300, 900, 1800, 3600, 10800, 21600, 43200, 86400]) // 1min, 5min, 15min, 30min, 1hour, 3hours, 6hours, 12hours, 1day
+  interval: Joi.string()
+    .valid(candleIntervals)
     .required(),
   a_dec: Joi.number().required(),
   p_dec: Joi.number().required(),
