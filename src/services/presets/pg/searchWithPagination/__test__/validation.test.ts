@@ -1,4 +1,5 @@
 import { of as task } from 'folktale/concurrency/task';
+import { Result, Error as error, Ok as ok } from 'folktale/result';
 import { always, T } from 'ramda';
 
 import { parseDate } from '../../../../../utils/parseDate';
@@ -6,30 +7,71 @@ import { Joi } from '../../../../../utils/validation';
 import {
   Serializable,
   toSerializable,
-} from '../../../../../types/serialization';
+} from '../../../../../types/serializable';
 import { PgDriver } from '../../../../../db/driver';
-import { SortOrder, WithSortOrder, WithLimit } from '../../../../_common';
+import { SortOrder, WithLimit } from '../../../../_common';
 import { searchWithPaginationPreset } from '..';
 import commonFilterSchemas from '../commonFilterSchemas';
-import { AppError } from './../../../../../errorHandling';
+import { AppError, ValidationError } from './../../../../../errorHandling';
 
 const mockTxs: ResponseRaw[] = [
   { id: 'q', timestamp: new Date() },
   { id: 'w', timestamp: new Date() },
 ];
 
-type Request = WithSortOrder &
-  WithLimit & {
-    timeEnd?: Date;
-    timeStart?: Date;
-  };
+type Request = WithLimit & {
+  timeEnd?: Date;
+  timeStart?: Date;
+  sort: SortOrder;
+};
 
 type ResponseRaw = {
   id: string;
   timestamp: Date;
 };
 
+type Cursor = {
+  timestamp: Date;
+  id: string;
+};
+
+const serialize = <ResponseRaw extends Serializable<string, any>>(
+  request: Request,
+  response: ResponseRaw
+): string | undefined =>
+  response === null
+    ? undefined
+    : Buffer.from(
+        `${response.data.timestamp.toISOString()}::${response.data.id}`
+      ).toString('base64');
+
+const deserialize = (cursor: string): Result<ValidationError, Cursor> => {
+  const data = Buffer.from(cursor, 'base64')
+    .toString('utf8')
+    .split('::');
+
+  const err = (message?: string) =>
+    new ValidationError('Cursor deserialization is failed', { cursor, message });
+
+  return (
+    ok<ValidationError, string[]>(data)
+      // validate length
+      .chain(d =>
+        d.length > 1
+          ? ok<ValidationError, string[]>(d)
+          : error<ValidationError, string[]>(err('Cursor length <2'))
+      )
+      .chain(d =>
+        parseDate(d[0]).map(date => ({
+          timestamp: date,
+          id: d[1],
+        }))
+      )
+  );
+};
+
 const service = searchWithPaginationPreset<
+  Cursor,
   Request,
   ResponseRaw,
   ResponseRaw,
@@ -37,10 +79,14 @@ const service = searchWithPaginationPreset<
 >({
   name: 'some_name',
   sql: () => '',
-  inputSchema: Joi.object().keys(commonFilterSchemas),
+  inputSchema: Joi.object().keys(commonFilterSchemas(deserialize)),
   resultSchema: Joi.any(),
   transformResult: (response: ResponseRaw) =>
     toSerializable<'tx', ResponseRaw>('tx', response),
+  cursorSerialization: {
+    serialize,
+    deserialize,
+  },
 })({
   pg: { any: filters => task(mockTxs) } as PgDriver,
   emitEvent: always(T),

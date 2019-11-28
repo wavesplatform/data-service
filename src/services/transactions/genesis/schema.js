@@ -3,8 +3,7 @@ const { omit } = require('ramda');
 const Joi = require('../../../utils/validation/joi');
 
 const commonFields = require('../_common/commonFieldsSchemas');
-const commonFilters = require('../../presets/pg/searchWithPagination/commonFilterSchemas')
-  .default;
+const commonFilters = require('../_common/commonFilterSchemas').default;
 
 const result = Joi.object().keys({
   // genesis txs do not have a sender

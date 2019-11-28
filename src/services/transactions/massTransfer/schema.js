@@ -1,7 +1,7 @@
 const Joi = require('../../../utils/validation/joi');
 
 const commonFields = require('../_common/commonFieldsSchemas');
-const commonFilters = require('../../presets/pg/searchWithPagination/commonFilterSchemas').default;
+const commonFilters = require('../_common/commonFilterSchemas').default;
 
 const result = Joi.object().keys({
   ...commonFields,
@@ -12,8 +12,12 @@ const result = Joi.object().keys({
   attachment: Joi.string()
     .required()
     .allow(''),
-  sender: Joi.string().base58().required(),
-  sender_public_key: Joi.string().base58().required(),
+  sender: Joi.string()
+    .base58()
+    .required(),
+  sender_public_key: Joi.string()
+    .base58()
+    .required(),
   recipients: Joi.array().items(Joi.string()),
   amounts: Joi.array().items(
     Joi.object()

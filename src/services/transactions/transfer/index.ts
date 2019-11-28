@@ -17,6 +17,7 @@ import { searchWithPaginationPreset } from '../../presets/pg/searchWithPaginatio
 import { inputGet } from '../../presets/pg/getById/inputSchema';
 import { inputMget } from '../../presets/pg/mgetByIds/inputSchema';
 
+import { Cursor, serialize, deserialize } from '../_common/cursor';
 import { RawTx, CommonFilters } from '../_common/types';
 
 import { result, inputSearch } from './schema';
@@ -90,6 +91,7 @@ export default ({
     }),
 
     search: searchWithPaginationPreset<
+      Cursor,
       TransferTxsSearchRequest,
       TransferTxDbResponse,
       TransactionInfo,
@@ -99,10 +101,11 @@ export default ({
       sql: sql.search,
       inputSchema: inputSearch,
       resultSchema: result,
-      transformResult: compose(
-        transaction,
-        transformTxInfo
-      ),
+      transformResult: compose(transaction, transformTxInfo),
+      cursorSerialization: {
+        serialize,
+        deserialize,
+      },
     })({
       pg: withStatementTimeout(pg, timeouts.search),
       emitEvent,

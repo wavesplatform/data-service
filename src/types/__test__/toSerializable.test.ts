@@ -1,4 +1,4 @@
-import { toSerializable } from '../serialization';
+import { toSerializable } from '../serializable';
 
 describe('toSerializable function', () => {
   it('should create a simple named type', () => {

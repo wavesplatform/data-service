@@ -6,6 +6,7 @@ import { matchRequestsResults } from '../../../../utils/db';
 
 import { addMeta } from '../../../../errorHandling';
 
+import { InvokeScriptTxsSearchRequest } from '..';
 import sql from './sql';
 import { transformResult } from './transformResult';
 import {
@@ -39,7 +40,7 @@ export default {
         })
       ),
 
-  search: (pg: PgDriver) => (filters: Record<string, any>) =>
+  search: (pg: PgDriver) => (filters: InvokeScriptTxsSearchRequest) =>
     pg
       .any<DbRawInvokeScriptTx>(sql.search(filters))
       .map(transformResult)

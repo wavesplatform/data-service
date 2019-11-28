@@ -1,7 +1,7 @@
 const createService = require('..').default;
 const { createPgDriver } = require('../../../../db');
 const { parseDate } = require('../../../../utils/parseDate');
-const { encode } = require('../../../_common/pagination/cursor');
+const { serialize } = require('../../_common/cursor');
 
 const { loadConfig } = require('../../../../loadConfig');
 const options = loadConfig();
@@ -29,7 +29,7 @@ describe('Genesis transaction service', () => {
 
     describe('Pagination ', () => {
       const createCursor = sort => ({ id, timestamp }) =>
-        encode({ sort, id, timestamp });
+        serialize({ sort, id, timestamp });
 
       it('doesnt get 2 identical entries for limit 1 asc with next page fetching', async () => {
         const baseParams = {

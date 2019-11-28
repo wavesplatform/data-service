@@ -10,7 +10,7 @@ export const transformResults = <
   ) => ResponseTransformed
 ) => (
   transformDbResponse: (
-    results: ResponseRaw,
+    response: ResponseRaw,
     request?: Request
   ) => FromSerializable<ResponseTransformed>
 ) => (responses: ResponseRaw[], request?: Request): List<ResponseTransformed> =>

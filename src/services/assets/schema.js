@@ -1,10 +1,11 @@
 const Joi = require('../../utils/validation/joi');
+const { deserialize } = require('./cursor');
 
 const inputSearch = Joi.object()
   .keys({
     ticker: Joi.string().noNullChars(),
     search: Joi.string().saneForDbLike(),
-    after: Joi.string().base58(),
+    after: Joi.cursor().valid(deserialize),
     limit: Joi.number()
       .min(0)
       .max(100),
@@ -13,7 +14,9 @@ const inputSearch = Joi.object()
   .required();
 
 const result = Joi.object().keys({
-  asset_id: Joi.string().assetId().required(),
+  asset_id: Joi.string()
+    .assetId()
+    .required(),
   asset_name: Joi.string().required(),
   description: Joi.string().allow(''),
   sender: Joi.string()
