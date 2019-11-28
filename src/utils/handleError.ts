@@ -40,7 +40,7 @@ export const handleError = ({ ctx, error }: { ctx: any; error: AppError }) => {
       };
     },
     Timeout: () => {
-      ctx.status = 524;
+      ctx.status = 504;
       ctx.state.returnValue = {
         message: DEFAULT_TIMEOUT_OCCURRED_MESSAGE,
       };

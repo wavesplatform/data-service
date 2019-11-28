@@ -4,10 +4,6 @@ import * as createRequestId from 'koa-requestid';
 import * as bodyParser from 'koa-bodyparser';
 import { unsafeKoaQs } from './utils/koaQs';
 
-const statuses = require('statuses');
-import { DEFAULT_TIMEOUT_OCCURRED_MESSAGE } from './errorHandling';
-statuses['524'] = DEFAULT_TIMEOUT_OCCURRED_MESSAGE;
-
 import { createPgDriver } from './db';
 import createEventBus from './eventBus/';
 import * as createAndSubscribeLogger from './logger';
