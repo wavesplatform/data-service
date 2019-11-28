@@ -1,20 +1,20 @@
 const Joi = require('../../utils/validation/joi');
-const { interval, CandleIntervals } = require('../../types');
+const { interval, CandleInterval } = require('../../types');
 
-const candleIntervals = [
-  CandleIntervals.Month1,
-  CandleIntervals.Week1,
-  CandleIntervals.Day1,
-  CandleIntervals.Hour12,
-  CandleIntervals.Hour6,
-  CandleIntervals.Hour4,
-  CandleIntervals.Hour3,
-  CandleIntervals.Hour2,
-  CandleIntervals.Hour1,
-  CandleIntervals.Minute30,
-  CandleIntervals.Minute15,
-  CandleIntervals.Minute5,
-  CandleIntervals.Minute1,
+const CandleIntervals = [
+  CandleInterval.Month1,
+  CandleInterval.Week1,
+  CandleInterval.Day1,
+  CandleInterval.Hour12,
+  CandleInterval.Hour6,
+  CandleInterval.Hour4,
+  CandleInterval.Hour3,
+  CandleInterval.Hour2,
+  CandleInterval.Hour1,
+  CandleInterval.Minute30,
+  CandleInterval.Minute15,
+  CandleInterval.Minute5,
+  CandleInterval.Minute1,
 ];
 
 const customJoi = Joi.extend(joi => ({
@@ -86,9 +86,9 @@ const customJoi = Joi.extend(joi => ({
             .string()
             .period()
             .accept(['s', 'm', 'h', 'd', 'w', 'M', 'Y'])
-            .divisibleBy(CandleIntervals.Minute1)
-            .min(CandleIntervals.Minute1)
-            .max(CandleIntervals.Month1)
+            .divisibleBy(CandleInterval.Minute1)
+            .min(CandleInterval.Minute1)
+            .max(CandleInterval.Month1)
             .required()
             .validate(value.interval).error
         ) {
@@ -176,7 +176,7 @@ const inputSearch = customJoi
   })
   .period({
     limit: 1440,
-    allow: candleIntervals,
+    allow: CandleIntervals,
   })
   .required();
 
@@ -215,7 +215,7 @@ const output = Joi.object().keys({
     .required(),
   txs_count: Joi.number().required(),
   interval: Joi.string()
-    .valid(candleIntervals)
+    .valid(CandleIntervals)
     .required(),
   a_dec: Joi.number().required(),
   p_dec: Joi.number().required(),

@@ -1,7 +1,7 @@
 const knex = require('knex');
 const pg = knex({ client: 'pg' });
 
-const { CandleIntervals } = require('../../../types');
+const { CandleInterval } = require('../../../types');
 
 /**
  *
@@ -22,38 +22,38 @@ const pgRawDateTrunc = from => /** @param {string} interval */ interval =>
 /**
  *
  * @param {string} from
- * @param {keyof CandleIntervals} interval
+ * @param {keyof CandleInterval} interval
  */
 const toRawTimestamp = (from, interval) => {
   const nf = pgRawExtractFromToTimestamp(from);
   const sf = pgRawDateTrunc(from);
 
   switch (interval) {
-    case CandleIntervals.Minute1:
+    case CandleInterval.Minute1:
       return nf(60);
-    case CandleIntervals.Minute5:
+    case CandleInterval.Minute5:
       return nf(300);
-    case CandleIntervals.Minute15:
+    case CandleInterval.Minute15:
       return nf(900);
-    case CandleIntervals.Minute30:
+    case CandleInterval.Minute30:
       return nf(1800);
-    case CandleIntervals.Hour1:
+    case CandleInterval.Hour1:
       return nf(3600);
-    case CandleIntervals.Hour2:
+    case CandleInterval.Hour2:
       return nf(7200);
-    case CandleIntervals.Hour3:
+    case CandleInterval.Hour3:
       return nf(10800);
-    case CandleIntervals.Hour4:
+    case CandleInterval.Hour4:
       return nf(14400);
-    case CandleIntervals.Hour6:
+    case CandleInterval.Hour6:
       return nf(21600);
-    case CandleIntervals.Hour12:
+    case CandleInterval.Hour12:
       return nf(43200);
-    case CandleIntervals.Day1:
+    case CandleInterval.Day1:
       return nf(86400);
-    case CandleIntervals.Week1:
+    case CandleInterval.Week1:
       return sf('week');
-    case CandleIntervals.Month1:
+    case CandleInterval.Month1:
       return sf('month');
   }
 };
@@ -86,7 +86,7 @@ const serializeCandle = candle => ({
   weighted_average_price: candle.weighted_average_price.toString(),
   open: candle.open.toString(),
   close: candle.close.toString(),
-  interval: CandleIntervals.Minute1,
+  interval: CandleInterval.Minute1,
 });
 
 const candlePresets = {

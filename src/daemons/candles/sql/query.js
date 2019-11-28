@@ -1,7 +1,7 @@
 const knex = require('knex');
 const pg = knex({ client: 'pg' });
 
-const { CandleIntervals } = require('../../../types');
+const { CandleInterval } = require('../../../types');
 
 const {
   pgRawDateTrunc,
@@ -72,7 +72,7 @@ const candleSelectColumns = [
     ),
   },
   {
-    interval: pg.raw(`'${CandleIntervals.Minute1}'`),
+    interval: pg.raw(`'${CandleInterval.Minute1}'`),
   },
   'sender as matcher',
 ];

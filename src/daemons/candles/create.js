@@ -3,7 +3,7 @@ const Task = require('folktale/concurrency/task');
 const { fromNullable } = require('folktale/maybe');
 
 const getErrorMessage = require('../../errorHandling/getErrorMessage');
-const { CandleIntervals } = require('../../types');
+const { CandleInterval } = require('../../types');
 
 const logTaskProgress = require('../utils/logTaskProgress');
 
@@ -21,18 +21,18 @@ const {
 
 /** for combining candles */
 const intervalPairs = [
-  [CandleIntervals.Minute1, CandleIntervals.Minute5], // 1m -> 5m
-  [CandleIntervals.Minute5, CandleIntervals.Minute15], // 5m -> 15m
-  [CandleIntervals.Minute15, CandleIntervals.Minute30], // 15m -> 30m
-  [CandleIntervals.Minute30, CandleIntervals.Hour1], // 30m -> 1h
-  [CandleIntervals.Hour1, CandleIntervals.Hour2], // 1h -> 2h
-  [CandleIntervals.Hour1, CandleIntervals.Hour3], // 1h -> 3h
-  [CandleIntervals.Hour2, CandleIntervals.Hour4], // 2h -> 4h
-  [CandleIntervals.Hour3, CandleIntervals.Hour6], // 3h -> 6h
-  [CandleIntervals.Hour6, CandleIntervals.Hour12], // 6h -> 12h
-  [CandleIntervals.Hour12, CandleIntervals.Day1], // 12h -> 24h
-  [CandleIntervals.Day1, CandleIntervals.Week1], // 24h -> 1w
-  [CandleIntervals.Day1, CandleIntervals.Month1], // 24h -> 1M
+  [CandleInterval.Minute1, CandleInterval.Minute5], // 1m -> 5m
+  [CandleInterval.Minute5, CandleInterval.Minute15], // 5m -> 15m
+  [CandleInterval.Minute15, CandleInterval.Minute30], // 15m -> 30m
+  [CandleInterval.Minute30, CandleInterval.Hour1], // 30m -> 1h
+  [CandleInterval.Hour1, CandleInterval.Hour2], // 1h -> 2h
+  [CandleInterval.Hour1, CandleInterval.Hour3], // 1h -> 3h
+  [CandleInterval.Hour2, CandleInterval.Hour4], // 2h -> 4h
+  [CandleInterval.Hour3, CandleInterval.Hour6], // 3h -> 6h
+  [CandleInterval.Hour6, CandleInterval.Hour12], // 6h -> 12h
+  [CandleInterval.Hour12, CandleInterval.Day1], // 12h -> 24h
+  [CandleInterval.Day1, CandleInterval.Week1], // 24h -> 1w
+  [CandleInterval.Day1, CandleInterval.Month1], // 24h -> 1M
 ];
 
 /** getStartBlock :: (Object, Object) -> Number */

@@ -84,7 +84,7 @@ export type Candle = Serializable<'candle', CandleInfo | null>;
 export const candle = (data: CandleInfo | null = null): Candle =>
   toSerializable('candle', data);
 
-export enum CandleIntervals {
+export enum CandleInterval {
   Minute1 = '1m',
   Minute5 = '5m',
   Minute15 = '15m',

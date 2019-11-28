@@ -1,6 +1,6 @@
 import * as knex from 'knex';
 import { repeat } from 'ramda';
-import { Interval, Unit, interval, CandleIntervals } from '../../../types';
+import { Interval, Unit, interval, CandleInterval } from '../../../types';
 import { add, trunc } from '../../../utils/date';
 import {
   fromMilliseconds,
@@ -36,18 +36,18 @@ const FIELDS_WITH_DECIMALS: knex.ColumnName[] = [
 ];
 
 const DIVIDERS = [
-  CandleIntervals.Minute1,
-  CandleIntervals.Minute5,
-  CandleIntervals.Minute15,
-  CandleIntervals.Minute30,
-  CandleIntervals.Hour1,
-  CandleIntervals.Hour2,
-  CandleIntervals.Hour3,
-  CandleIntervals.Hour6,
-  CandleIntervals.Hour12,
-  CandleIntervals.Day1,
-  CandleIntervals.Week1,
-  CandleIntervals.Month1,
+  CandleInterval.Minute1,
+  CandleInterval.Minute5,
+  CandleInterval.Minute15,
+  CandleInterval.Minute30,
+  CandleInterval.Hour1,
+  CandleInterval.Hour2,
+  CandleInterval.Hour3,
+  CandleInterval.Hour6,
+  CandleInterval.Hour12,
+  CandleInterval.Day1,
+  CandleInterval.Week1,
+  CandleInterval.Month1,
 ];
 
 export interface CandleSelectionParams {
@@ -82,7 +82,7 @@ export const selectCandles = ({
         unsafeIntervalsFromStrings(DIVIDERS)
       ).matchWith({
         Ok: ({ value: i }) => i.source,
-        Error: ({ value: error }) => CandleIntervals.Minute1,
+        Error: ({ value: error }) => CandleInterval.Minute1,
       })
     );
 

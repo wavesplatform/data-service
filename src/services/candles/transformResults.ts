@@ -24,7 +24,7 @@ import {
   List,
   Candle,
   Unit,
-  CandleIntervals,
+  CandleInterval,
 } from '../../types';
 import { concatAll } from '../../utils/fp/concatAll';
 import { floor, ceil, add, trunc } from '../../utils/date';
@@ -32,7 +32,7 @@ import { candleMonoid } from './candleMonoid';
 import { CandlesSearchRequest } from '.';
 
 const truncToMinutes = trunc(Unit.Minute);
-const defaultInterval = interval(CandleIntervals.Minute1);
+const defaultInterval = interval(CandleInterval.Minute1);
 
 export type CandleDbResponse = {
   time_start: Date;
