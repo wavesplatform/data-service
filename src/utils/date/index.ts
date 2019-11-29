@@ -1,5 +1,6 @@
 import { curry } from 'ramda';
 import { Interval, Unit } from '../../types';
+import { units } from '../../types/interval';
 
 const precisions: Record<Unit, number> = {
   [Unit.Year]: 4,
@@ -21,18 +22,28 @@ const suffixes: Record<Unit, string> = {
   [Unit.Second]: 'Z',
 };
 
-const units = [
-  Unit.Year,
-  Unit.Month,
-  Unit.Week,
-  Unit.Day,
-  Unit.Hour,
-  Unit.Minute,
+const unitsAsc = [
   Unit.Second,
+  Unit.Minute,
+  Unit.Hour,
+  Unit.Day,
+  Unit.Week,
+  Unit.Month,
+  Unit.Year,
 ];
 
-const unitBiggerThan = (unit: Unit, interval: Interval) =>
-  units.indexOf(interval.unit) <= units.indexOf(unit);
+enum Order {
+  Less = -1,
+  Equals = 0,
+  Bigger = 1,
+}
+
+const unitsOrder = (a: Unit, b: Unit) =>
+  unitsAsc.indexOf(a) < unitsAsc.indexOf(b)
+    ? Order.Less
+    : unitsAsc.indexOf(a) === unitsAsc.indexOf(b)
+    ? Order.Equals
+    : Order.Bigger;
 
 type RoundFunction = (a: number) => number;
 const roundUp = (x: number) => Math.ceil(x);
@@ -44,49 +55,42 @@ const roundTo = curry(
     if (!interval) {
       throw new Error('Invalid Interval');
     }
+
     let newDate = new Date(date);
 
-    switch (interval.unit) {
-      case Unit.Year:
-        // set the first month of the year
-        newDate.setUTCMonth(roundFn(date.getUTCMonth() / 12) * 12);
-        break;
-      case Unit.Month:
-        // set the first day of the month
-        const d = daysInMonth(date.getUTCFullYear(), date.getUTCMonth());
-        newDate.setUTCDate(roundFn((date.getUTCDate() - 1) / d) * d + 1);
-        break;
-      case Unit.Week:
-        // set monday
-        newDate.setUTCDate(
-          date.getUTCDate() -
-            date.getUTCDay() +
-            roundFn(date.getUTCDay() / 7) * 7 +
-            1
-        );
-        break;
-      default:
-        newDate = new Date(
-          roundFn(date.getTime() / interval.length) * interval.length
-        );
-    }
-
-    if (unitBiggerThan(Unit.Year, interval)) {
-      newDate.setUTCMonth(0);
-    }
-    if (unitBiggerThan(Unit.Month, interval)) {
-      newDate.setUTCDate(1);
-    }
-    if (unitBiggerThan(Unit.Day, interval)) {
-      newDate.setUTCHours(0);
-    }
-    if (unitBiggerThan(Unit.Hour, interval)) {
-      newDate.setUTCMinutes(0);
-    }
-    if (unitBiggerThan(Unit.Minute, interval)) {
-      newDate.setUTCSeconds(0);
-    }
-    newDate.setUTCMilliseconds(0);
+    unitsAsc.forEach(unit => {
+      if (
+        [Order.Less, Order.Equals].includes(unitsOrder(unit, interval.unit))
+      ) {
+        // round week
+        if (unit === Unit.Week) {
+          if (interval.unit === Unit.Week) {
+            newDate.setUTCDate(
+              newDate.getUTCDate() -
+                newDate.getUTCDay() +
+                roundFn(newDate.getUTCDay() / 7) * 7 +
+                1
+            );
+          }
+        } else if (unit === Unit.Month) {
+          // round month
+          const d = daysInMonth(
+            newDate.getUTCFullYear(),
+            newDate.getUTCMonth()
+          );
+          newDate.setUTCDate(roundFn((newDate.getUTCDate() - 1) / d) * d + 1);
+        } else if (unit === Unit.Year) {
+          // round year
+          newDate.setUTCMonth(roundFn(newDate.getUTCMonth() / 12) * 12);
+        } else {
+          // round seconds, minutes, hours, days
+          const unitLength = units[unit] * 1000;
+          newDate = new Date(
+            roundFn(newDate.getTime() / unitLength) * unitLength
+          );
+        }
+      }
+    });
 
     return newDate;
   }

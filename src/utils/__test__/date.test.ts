@@ -65,7 +65,7 @@ describe('date helper functions', () => {
 
     describe('should round down to a week', () => {
       const i = interval('1w').unsafeGet();
-      const d = new Date('2018-11-21T23:55:46.045+00:00');
+      const d = new Date('2018-11-20T23:55:46.045+00:00');
 
       it('with floor/ceil', () => {
         expect(ceil(i, d)).toEqual(new Date('2018-11-26T00:00:00.000Z'));
