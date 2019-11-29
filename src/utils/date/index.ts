@@ -49,16 +49,21 @@ const roundTo = curry(
     switch (interval.unit) {
       case Unit.Year:
         // set the first month of the year
-        newDate.setMonth(roundFn(newDate.getMonth() / 12) * 12);
+        newDate.setUTCMonth(roundFn(date.getUTCMonth() / 12) * 12);
         break;
       case Unit.Month:
         // set the first day of the month
-        const d = daysInMonth(date.getFullYear(), date.getMonth()) - 1;
+        const d = daysInMonth(date.getFullYear(), date.getMonth());
         newDate.setUTCDate(roundFn((date.getUTCDate() - 1) / d) * d + 1);
         break;
       case Unit.Week:
         // set monday
-        newDate.setDate(newDate.getDate() - newDate.getDay() + 1);
+        newDate.setUTCDate(
+          date.getUTCDate() -
+            date.getUTCDay() +
+            roundFn(date.getUTCDay() / 7) * 7 +
+            1
+        );
         break;
       default:
         newDate = new Date(
@@ -88,14 +93,15 @@ const roundTo = curry(
 );
 
 export const trunc = curry((unit: Unit, date: Date): string => {
+  const newDate = new Date(date);
   if (unit === Unit.Week) {
     return (
-      new Date(date.setDate(date.getDate() - date.getDay() + 1))
+      new Date(newDate.setDate(newDate.getDate() - newDate.getDay() + 1))
         .toISOString()
         .substr(0, precisions[Unit.Day]) + suffixes[Unit.Day]
     );
   } else {
-    return date.toISOString().substr(0, precisions[unit]) + suffixes[unit];
+    return newDate.toISOString().substr(0, precisions[unit]) + suffixes[unit];
   }
 });
 
@@ -114,4 +120,5 @@ export const subtract = curry(
 );
 
 const daysInMonth = (year: number, month: number) =>
-  new Date(year, month, 0).getDate();
+  // next month (month + 1) with 0 date of month -> last date of month
+  new Date(year, month + 1, 0).getDate();

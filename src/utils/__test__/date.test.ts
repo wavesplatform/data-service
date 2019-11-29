@@ -56,9 +56,29 @@ describe('date helper functions', () => {
       it('with round, up', () => {
         expect(round(i, d)).toEqual(new Date('2018-11-23T00:00:00.000+00:00'));
       });
+
       it('with round, down', () => {
         const d2 = new Date('2018-11-22T23:25:46.045Z');
         expect(round(i, d2)).toEqual(new Date('2018-11-22T23:00:00.000+00:00'));
+      });
+    });
+
+    describe('should round down to a week', () => {
+      const i = interval('1w').unsafeGet();
+      const d = new Date('2018-11-21T23:55:46.045+00:00');
+
+      it('with floor/ceil', () => {
+        expect(ceil(i, d)).toEqual(new Date('2018-11-26T00:00:00.000Z'));
+        expect(floor(i, d)).toEqual(new Date('2018-11-19T00:00:00.000Z'));
+      });
+
+      it('with round, down', () => {
+        expect(round(i, d)).toEqual(new Date('2018-11-19T00:00:00.000Z'));
+      });
+
+      it('with round, up', () => {
+        const d2 = new Date('2018-11-22T23:25:46.045Z');
+        expect(round(i, d2)).toEqual(new Date('2018-11-26T00:00:00.000Z'));
       });
     });
 
@@ -76,7 +96,8 @@ describe('date helper functions', () => {
       });
 
       it('with round, down', () => {
-        expect(floor(i, d)).toEqual(new Date('2018-11-01T00:00:00.000Z'));
+        const d2 = new Date('2018-11-14T00:00:00.000Z');
+        expect(round(i, d2)).toEqual(new Date('2018-11-01T00:00:00.000Z'));
       });
     });
 
@@ -94,7 +115,8 @@ describe('date helper functions', () => {
       });
 
       it('with round, down', () => {
-        expect(floor(i, d)).toEqual(new Date('2018-01-01T00:00:00.000Z'));
+        const d2 = new Date('2018-02-03T04:05:06.789Z');
+        expect(round(i, d2)).toEqual(new Date('2018-01-01T00:00:00.000Z'));
       });
     });
   });
