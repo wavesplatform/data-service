@@ -53,7 +53,7 @@ const roundTo = curry(
         break;
       case Unit.Month:
         // set the first day of the month
-        const d = daysInMonth(date.getFullYear(), date.getMonth());
+        const d = daysInMonth(date.getUTCFullYear(), date.getUTCMonth());
         newDate.setUTCDate(roundFn((date.getUTCDate() - 1) / d) * d + 1);
         break;
       case Unit.Week:
@@ -96,7 +96,9 @@ export const trunc = curry((unit: Unit, date: Date): string => {
   const newDate = new Date(date);
   if (unit === Unit.Week) {
     return (
-      new Date(newDate.setDate(newDate.getDate() - newDate.getDay() + 1))
+      new Date(
+        newDate.setUTCDate(newDate.getUTCDate() - newDate.getUTCDay() + 1)
+      )
         .toISOString()
         .substr(0, precisions[Unit.Day]) + suffixes[Unit.Day]
     );
