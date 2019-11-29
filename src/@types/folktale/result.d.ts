@@ -16,7 +16,7 @@ declare module 'folktale/result' {
     // @todo consider using `never` instead
     apply<C, D>(
       f: Result<C, D>
-    ): B extends (d: D) => infer R ? Result<C, R> : unknown;
+    ): B extends (d: D) => infer R ? Result<A | C, R> : unknown;
     bimap<C, D>(lf: (a: A) => C, rf: (b: B) => D): Result<C, D>;
 
     // extracting values
