@@ -61,16 +61,17 @@ const roundTo = curry(
       throw new Error('Invalid Interval');
     }
 
-    let newDate = new Date(date);
-
     const unitsAscOrder = unitsOrder(ascOrderedUnits);
 
-    ascOrderedUnits.forEach(unit => {
+    return ascOrderedUnits.reduce((date, currentUnit) => {
       if (
-        [Order.Less, Order.Equals].includes(unitsAscOrder(unit, interval.unit))
+        [Order.Less, Order.Equals].includes(
+          unitsAscOrder(currentUnit, interval.unit)
+        )
       ) {
         // round week
-        if (unit === Unit.Week) {
+        if (currentUnit === Unit.Week) {
+          const newDate = new Date(date);
           if (interval.unit === Unit.Week) {
             newDate.setUTCDate(
               newDate.getUTCDate() -
@@ -79,28 +80,33 @@ const roundTo = curry(
                 1
             );
           }
-        } else if (unit === Unit.Month) {
+          return newDate;
+        } else if (currentUnit === Unit.Month) {
+          const newDate = new Date(date);
           // round month (not greater than 1 month)
           const d = daysInMonth(
             newDate.getUTCFullYear(),
             newDate.getUTCMonth()
           );
           newDate.setUTCDate(roundFn((newDate.getUTCDate() - 1) / d) * d + 1);
-        } else if (unit === Unit.Year) {
+          return newDate;
+        } else if (currentUnit === Unit.Year) {
           // round year  (not greater than 1 year)
+          const newDate = new Date(date);
           newDate.setUTCMonth(roundFn(newDate.getUTCMonth() / 12) * 12);
+          return newDate;
         } else {
           // round ms, seconds, minutes, hours
           const unitLength =
-            unit === interval.unit ? interval.length : units[unit] * 1000;
-          newDate = new Date(
-            roundFn(newDate.getTime() / unitLength) * unitLength
-          );
+            currentUnit === interval.unit
+              ? interval.length
+              : units[currentUnit] * 1000;
+          return new Date(roundFn(date.getTime() / unitLength) * unitLength);
         }
+      } else {
+        return date;
       }
-    });
-
-    return newDate;
+    }, new Date(date));
   }
 );
 
