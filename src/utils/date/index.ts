@@ -38,10 +38,10 @@ enum Order {
   Bigger = 1,
 }
 
-const unitsOrder = (a: Unit, b: Unit) =>
-  unitsAsc.indexOf(a) < unitsAsc.indexOf(b)
+const unitsOrder = (units: Unit[]) => (a: Unit, b: Unit) =>
+  units.indexOf(a) < units.indexOf(b)
     ? Order.Less
-    : unitsAsc.indexOf(a) === unitsAsc.indexOf(b)
+    : units.indexOf(a) === units.indexOf(b)
     ? Order.Equals
     : Order.Bigger;
 
@@ -51,18 +51,25 @@ const roundDown = (x: number) => Math.floor(x);
 const defaultRound = (x: number) => Math.round(x);
 
 const roundTo = curry(
-  (roundFn: RoundFunction, interval: Interval | null, date: Date): Date => {
+  (
+    ascOrderedUnits: Unit[],
+    roundFn: RoundFunction,
+    interval: Interval | null,
+    date: Date
+  ): Date => {
     if (!interval) {
       throw new Error('Invalid Interval');
     }
 
     let newDate = new Date(date);
 
-    unitsAsc.forEach(unit => {
+    const unitsAscOrder = unitsOrder(ascOrderedUnits);
+
+    ascOrderedUnits.forEach(unit => {
       if (
-        [Order.Less, Order.Equals].includes(unitsOrder(unit, interval.unit))
+        [Order.Less, Order.Equals].includes(unitsAscOrder(unit, interval.unit))
       ) {
-        // round week (not greater than 1 week)
+        // round week
         if (unit === Unit.Week) {
           if (interval.unit === Unit.Week) {
             newDate.setUTCDate(
@@ -97,6 +104,12 @@ const roundTo = curry(
   }
 );
 
+const roundToWithUnits = roundTo(unitsAsc);
+
+export const round = roundToWithUnits(defaultRound);
+export const floor = roundToWithUnits(roundDown);
+export const ceil = roundToWithUnits(roundUp);
+
 export const trunc = curry((unit: Unit, date: Date): string => {
   const newDate = new Date(date);
   if (unit === Unit.Week) {
@@ -111,10 +124,6 @@ export const trunc = curry((unit: Unit, date: Date): string => {
     return newDate.toISOString().substr(0, precisions[unit]) + suffixes[unit];
   }
 });
-
-export const round = roundTo(defaultRound);
-export const floor = roundTo(roundDown);
-export const ceil = roundTo(roundUp);
 
 export const add = curry(
   (interval: Interval, date: Date): Date =>
