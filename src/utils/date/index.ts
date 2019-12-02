@@ -1,6 +1,5 @@
 import { curry } from 'ramda';
 import { Interval, Unit } from '../../types';
-import { units } from '../../types/interval';
 
 const precisions: Record<Unit, number> = {
   [Unit.Year]: 4,
@@ -62,7 +61,7 @@ const roundTo = curry(
       if (
         [Order.Less, Order.Equals].includes(unitsOrder(unit, interval.unit))
       ) {
-        // round week
+        // round week (not greater than 1 week)
         if (unit === Unit.Week) {
           if (interval.unit === Unit.Week) {
             newDate.setUTCDate(
@@ -73,20 +72,19 @@ const roundTo = curry(
             );
           }
         } else if (unit === Unit.Month) {
-          // round month
+          // round month (not greater than 1 month)
           const d = daysInMonth(
             newDate.getUTCFullYear(),
             newDate.getUTCMonth()
           );
           newDate.setUTCDate(roundFn((newDate.getUTCDate() - 1) / d) * d + 1);
         } else if (unit === Unit.Year) {
-          // round year
+          // round year  (not greater than 1 year)
           newDate.setUTCMonth(roundFn(newDate.getUTCMonth() / 12) * 12);
         } else {
-          // round seconds, minutes, hours, days
-          const unitLength = units[unit] * 1000;
+          // round ms, seconds, minutes, hours
           newDate = new Date(
-            roundFn(newDate.getTime() / unitLength) * unitLength
+            roundFn(newDate.getTime() / interval.length) * interval.length
           );
         }
       }
