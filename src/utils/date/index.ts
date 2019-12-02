@@ -1,5 +1,6 @@
 import { curry } from 'ramda';
 import { Interval, Unit } from '../../types';
+import { units } from '../../types/interval';
 
 const precisions: Record<Unit, number> = {
   [Unit.Year]: 4,
@@ -83,8 +84,10 @@ const roundTo = curry(
           newDate.setUTCMonth(roundFn(newDate.getUTCMonth() / 12) * 12);
         } else {
           // round ms, seconds, minutes, hours
+          const unitLength =
+            unit === interval.unit ? interval.length : units[unit] * 1000;
           newDate = new Date(
-            roundFn(newDate.getTime() / interval.length) * interval.length
+            roundFn(newDate.getTime() / unitLength) * unitLength
           );
         }
       }
