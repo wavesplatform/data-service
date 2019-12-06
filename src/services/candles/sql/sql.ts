@@ -1,13 +1,7 @@
 import * as knex from 'knex';
-import { repeat } from 'ramda';
-import { Interval, Unit, interval } from '../../../types';
-import { add, trunc } from '../../../utils/date';
-import {
-  fromMilliseconds,
-  unsafeIntervalsFromStrings,
-  unsafeIntervalsFromStringsReversed,
-} from '../../../utils/interval';
-import { highestDividerLessThan, numberToUnitsPolynom } from './utils';
+import { interval } from '../../../types';
+import { unsafeIntervalsFromStrings } from '../../../utils/interval';
+import { highestDividerLessThan } from './utils';
 import { CandlesSearchRequest } from '..';
 
 const pg = knex({ client: 'pg' });
@@ -73,43 +67,6 @@ export const selectCandles = ({
       })
     );
 
-export const periodsToQueries = ({
-  amountAsset,
-  priceAsset,
-  timeStart,
-  periods,
-  matcher,
-}: {
-  amountAsset: string;
-  priceAsset: string;
-  timeStart: Date;
-  periods: Interval[];
-  matcher: string;
-}): knex.QueryBuilder[] => {
-  const queries: knex.QueryBuilder[] = [];
-
-  let itTimestamp = new Date(trunc(Unit.Minute, timeStart)).getTime();
-
-  periods.forEach(period => {
-    const timeEnd = add(period, new Date(itTimestamp));
-
-    queries.push(
-      selectCandles({
-        amountAsset,
-        priceAsset,
-        matcher,
-        timeStart: new Date(itTimestamp),
-        timeEnd: timeEnd,
-        interval: period.source,
-      }).limit(1)
-    );
-
-    itTimestamp = timeEnd.getTime();
-  });
-
-  return queries;
-};
-
 export const sql = ({
   amountAsset,
   priceAsset,
@@ -117,53 +74,19 @@ export const sql = ({
   timeEnd,
   interval: inter,
   matcher,
-}: CandlesSearchRequest): string => {
-  // should always be valid after validation
-  const paramsInterval = interval(inter).unsafeGet();
-
-  const ts = new Date(trunc(paramsInterval.unit, timeEnd));
-  const te = new Date(trunc(Unit.Minute, timeEnd));
-  const periodInMinutes = (te.getTime() - ts.getTime()) / (1000 * 60);
-
-  const periodsForQueries = numberToUnitsPolynom(
-    unsafeIntervalsFromStringsReversed(DIVIDERS).map(
-      i => i.length / (1000 * 60)
-    ),
-    periodInMinutes
-  ).reduce<Interval[]>(
-    (periods, polynom) => [
-      ...periods,
-      ...repeat(
-        fromMilliseconds(polynom[0] * 1000 * 60).unsafeGet(),
-        polynom[1]
-      ),
-    ],
-    []
-  );
-
-  return pg('candles')
+}: CandlesSearchRequest): string =>
+  pg('candles')
     .select(FIELDS_WITH_DECIMALS)
-    .from(
-      selectCandles({
+    .from({
+      c: selectCandles({
         amountAsset,
         priceAsset,
         timeStart,
         timeEnd,
         interval: inter,
         matcher,
-      })
-        .union(
-          periodsToQueries({
-            amountAsset,
-            priceAsset,
-            timeStart: ts,
-            periods: periodsForQueries,
-            matcher,
-          }),
-          true
-        )
-        .as('c')
-    )
+      }),
+    })
     .innerJoin(
       { a_dec: 'asset_decimals' },
       'c.amount_asset_id',
@@ -176,7 +99,6 @@ export const sql = ({
     )
     .orderBy('c.time_start', 'asc')
     .toString();
-};
 
 export const assetDecimals = (asset: string): string =>
   pg('asset_decimals')
@@ -186,6 +108,5 @@ export const assetDecimals = (asset: string): string =>
 
 module.exports = {
   assetDecimals,
-  periodsToQueries,
   sql,
 };
