@@ -34,9 +34,11 @@ The service uses following environment variables:
 |`PGUSER`||YES|Postgres user name|
 |`PGPASSWORD`||YES|Postgres password|
 |`PGPOOLSIZE`|`20`|NO|Postgres pool size|
+|`PGSTATEMENTTIMEOUT`|false|NO|Postgres `statement_timeout` number in ms. 0 disables timeout, false — use server settings; at this moment used only as default `STATEMENT_TIMEOUT`|
 |`LOG_LEVEL`|`info`|NO|Log level `['info','warn','error']`|
 |`DEFAULT_MATCHER`||YES|Default matcher public address|
 |`MATCHER_SETTINGS_URL`||NO|Default matcher URL for getting settings|
+|`DEFAULT_TIMEOUT`|30000|NO|Default timeout in ms; at this moment used only as `PG STATEMENT_TIMEOUT`|
 
 `PGPOOLSIZE` is used by the `pg-pool` library to determine Postgres connection pool size per NodeJS process instance. A good value depends on your server and db configuration and can be found empirically. You can leave it at the default value to start with.
 

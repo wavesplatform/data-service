@@ -117,7 +117,7 @@ describe('Preset for create daemon', () => {
       daemon({ loop }, {}, 1, 1, logger)
         .promise()
         .catch(e => {
-          expect(e.toString()).toEqual('Error: [DAEMON] timeout expired');
+          expect(e.toString()).toEqual('Error: Daemon timeout expired');
           expect(loop).toHaveBeenCalledTimes(1);
           done();
         });

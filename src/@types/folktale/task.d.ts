@@ -49,7 +49,8 @@ declare module 'folktale/concurrency/task' {
     // @todo consider using `never` instead
     apply<C, D>(
       f: Task<C, D>
-    ): B extends (d: D) => infer R ? Task<C, R> : unknown;
+    ): B extends (d: D) => infer R ? Task<A | C, R> : unknown;
+    
     bimap<C, D>(lf: (a: A) => C, rf: (b: B) => D): Task<C, D>;
 
     orElse<C, D>(f: (a: A) => Task<C, D>): Task<C, D>;

@@ -1,6 +1,6 @@
 import { fromMaybe } from '../';
 import { of as maybeOf, empty as maybeEmpty } from 'folktale/maybe';
-import { toSerializable, Serializable } from '../serialization';
+import { toSerializable, Serializable } from '../serializable';
 
 type RawData = {
   id: string;

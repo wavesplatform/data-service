@@ -1,10 +1,7 @@
 const rawJoi = require('joi');
 
 const { BigNumber } = require('@waves/data-entities');
-const { decode } = require('../../services/_common/pagination/cursor');
-const { base58: base58Regex, interval: intervalRegex,
-        assetId: assetIdRegex, noNullChars: noNullCharsRegex,
-        saneForDbLike: saneForDbLikeRegex } = require('../regex');
+const regex = require('../regex');
 const { interval } = require('../../types');
 const { div } = require('../interval');
 const Maybe = require('folktale/maybe');
@@ -36,10 +33,9 @@ module.exports = rawJoi
       base64Prefixed: 'must be a string of "base64:${base64EncodedString}"',
       noNullChars: 'must not contain unicode null characters',
       saneForDbLike: 'must not end with unescaped slash symbol',
-      cursor: 'must be a valid cursor string',
       pair: 'must be a valid pair string',
       period: {
-        value: 'must be a valid interval value',
+        value: 'interval must be a valid interval value',
         accept: 'must be in accepted',
         divisibleBy: 'must be divisible by divider',
         min: 'must be more then min',
@@ -47,13 +43,21 @@ module.exports = rawJoi
       },
     },
     rules: [
-      regexRule(joi, 'base58', [{ regex: base58Regex, errorCode: 'string.base58' }]),
-      regexRule(joi, 'assetId', [{ regex: assetIdRegex, errorCode: 'string.assetId' }]),
-      regexRule(joi, 'noNullChars', [{ regex: noNullCharsRegex, errorCode: 'string.noNullChars' }]),
-      regexRule(joi, 'period', [{ regex: intervalRegex, errorCode: 'string.period.value' }]),
+      regexRule(joi, 'base58', [
+        { regex: regex.base58, errorCode: 'string.base58' },
+      ]),
+      regexRule(joi, 'assetId', [
+        { regex: regex.assetId, errorCode: 'string.assetId' },
+      ]),
+      regexRule(joi, 'noNullChars', [
+        { regex: regex.noNullChars, errorCode: 'string.noNullChars' },
+      ]),
+      regexRule(joi, 'period', [
+        { regex: regex.interval, errorCode: 'string.period.value' },
+      ]),
       regexRule(joi, 'saneForDbLike', [
-        { regex: saneForDbLikeRegex, errorCode: 'string.saneForDbLike' },
-        { regex: noNullCharsRegex, errorCode: 'string.noNullChars' }        
+        { regex: regex.saneForDbLike, errorCode: 'string.saneForDbLike' },
+        { regex: regex.noNullChars, errorCode: 'string.noNullChars' },
       ]),
       {
         name: 'base64Prefixed',
@@ -64,35 +68,23 @@ module.exports = rawJoi
             .map(it => it.split(':'))
             .filter(it => it.length === 2)
             .filter(
-              ([prefix, val]) => prefix === 'base64'
-                && !joi.string().base64({ paddingRequired: false }).validate(val).error
-            ).matchWith(
-              {
-                Just: () => value,
-                Nothing: () =>
-                  this.createError('string.base64Prefixed', { value }, state, options)
-              }
-            );
-        }
-      },
-      {
-        name: 'cursor',
-        validate(_, value, state, options) {
-          // assert base64
-          if (
-            joi
-              .string()
-              .base64({ paddingRequired: false })
-              .validate(value).error
-          ) {
-            return this.createError('string.base64', { value }, state, options);
-          }
-
-          return decode(value).matchWith({
-            Ok: () => value,
-            Error: () =>
-              this.createError('string.cursor', { value }, state, options),
-          });
+              ([prefix, val]) =>
+                prefix === 'base64' &&
+                !joi
+                  .string()
+                  .base64({ paddingRequired: false })
+                  .validate(val).error
+            )
+            .matchWith({
+              Just: () => value,
+              Nothing: () =>
+                this.createError(
+                  'string.base64Prefixed',
+                  { value },
+                  state,
+                  options
+                ),
+            });
         },
       },
       {
@@ -129,7 +121,7 @@ module.exports = rawJoi
       {
         name: 'divisibleBy',
         params: {
-          divisibleBy: joi.string().regex(intervalRegex),
+          divisibleBy: joi.string().regex(regex.interval),
         },
         validate(params, value, state, options) {
           const i = interval(value);
@@ -171,7 +163,7 @@ module.exports = rawJoi
       {
         name: 'min',
         params: {
-          min: joi.string().regex(intervalRegex),
+          min: joi.string().regex(regex.interval),
         },
         validate(params, value, state, options) {
           const i = interval(value);
@@ -212,7 +204,7 @@ module.exports = rawJoi
       {
         name: 'max',
         params: {
-          max: joi.string().regex(intervalRegex),
+          max: joi.string().regex(regex.interval),
         },
         validate(params, value, state, options) {
           const i = interval(value);
@@ -311,6 +303,31 @@ module.exports = rawJoi
             );
           }
           return value;
+        },
+      },
+    ],
+  }))
+  .extend(joi => ({
+    base: joi.string().base64({ paddingRequired: false }),
+    name: 'cursor',
+    language: {
+      wrong: 'must be a valid cursor string',
+    },
+    rules: [
+      {
+        name: 'valid',
+        params: {
+          deserialize: joi
+            .func()
+            .arity(1)
+            .required(),
+        },
+        validate(params, value, state, options) {
+          return params.deserialize(value).matchWith({
+            Ok: () => value,
+            Error: () =>
+              this.createError('cursor.wrong', { v: value }, state, options),
+          });
         },
       },
     ],

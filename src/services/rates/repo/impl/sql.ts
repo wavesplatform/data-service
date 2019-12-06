@@ -1,4 +1,5 @@
 import { repeat } from 'ramda';
+import { CandleInterval } from '../../../../types';
 
 export default (tuplesCount: number): string => `
 select
@@ -13,7 +14,7 @@ select
        amount_asset_id = p.amount_asset_id
        and price_asset_id = p.price_asset_id
        and matcher = p.matcher
-       and interval_in_secs = 60
+       and interval = '${CandleInterval.Minute1}'
        and volume > 0
        and time_start < ?
        order by time_start desc
@@ -26,7 +27,7 @@ from (
     matcher
     from candles
   where
-    interval_in_secs = 86400
+    interval = '${CandleInterval.Day1}'
     and matcher = ?
     and (amount_asset_id,
 	 price_asset_id) in (${repeat('(?, ?)', tuplesCount)})
@@ -34,4 +35,4 @@ from (
     amount_asset_id,
     price_asset_id,
     matcher) as p;
-`
+`;

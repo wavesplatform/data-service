@@ -5,6 +5,7 @@ import { of as just, Maybe } from 'folktale/maybe';
 import { forEach, isEmpty } from '../../utils/fp/maybeOps';
 import { tap } from '../../utils/tap';
 
+import { withStatementTimeout } from '../../db/driver';
 import { AppError } from '../../errorHandling';
 import {
   pair,
@@ -84,6 +85,7 @@ export { create as createCache } from './cache';
 export default ({
   drivers,
   emitEvent,
+  timeouts,
   validatePairs,
   cache,
 }: CommonServiceDependencies & {
@@ -107,9 +109,10 @@ export default ({
   >({
     transformInput: identity,
     validateInput: value =>
-      validateInput<PairsGetRequest>(inputGet, SERVICE_NAME.GET)(value).chain(
-        v => validatePairs(v.matcher, [v.pair]).map(() => v)
-      ),
+      validateInput<PairsGetRequest>(
+        inputGet,
+        SERVICE_NAME.GET
+      )(value).chain(v => validatePairs(v.matcher, [v.pair]).map(() => v)),
 
     // cache first
     getData: req =>
@@ -119,15 +122,19 @@ export default ({
           getByIdPg<PairDbResponse, PairsGetRequest>({
             name: SERVICE_NAME.GET,
             sql: sql.get,
-            pg: drivers.pg,
+            pg: withStatementTimeout(drivers.pg, timeouts.get),
           })(req).map(
             tap(maybeResp => forEach(x => cache.set(req, x), maybeResp))
           ),
       }),
     validateResult: validateResult(resultSchema, SERVICE_NAME.GET),
-    transformResult: res => res.map(
-      res => pair(transformResult(res), { amountAsset: res.amount_asset_id, priceAsset: res.price_asset_id })
-    ),
+    transformResult: res =>
+      res.map(res =>
+        pair(transformResult(res), {
+          amountAsset: res.amount_asset_id,
+          priceAsset: res.price_asset_id,
+        })
+      ),
     emitEvent,
   });
 
@@ -139,9 +146,10 @@ export default ({
   >({
     transformInput: identity,
     validateInput: value =>
-      validateInput<PairsMgetRequest>(inputMget, SERVICE_NAME.MGET)(
-        value
-      ).chain(v => validatePairs(v.matcher, v.pairs).map(() => v)),
+      validateInput<PairsMgetRequest>(
+        inputMget,
+        SERVICE_NAME.MGET
+      )(value).chain(v => validatePairs(v.matcher, v.pairs).map(() => v)),
     getData: request => {
       let results: Array<Maybe<PairDbResponse>> = request.pairs.map(p =>
         cache.get({
@@ -161,7 +169,7 @@ export default ({
         name: SERVICE_NAME.MGET,
         sql: sql.mget,
         matchRequestResult,
-        pg: drivers.pg,
+        pg: withStatementTimeout(drivers.pg, timeouts.mget),
       })({
         pairs: notCachedPairs,
         matcher: request.matcher,
@@ -197,7 +205,10 @@ export default ({
     inputSchema: inputSearch,
     resultSchema,
     transformResult: transformResultSearch,
-  })({ pg: drivers.pg, emitEvent });
+  })({
+    pg: withStatementTimeout(drivers.pg, timeouts.search),
+    emitEvent,
+  });
 
   return {
     get,

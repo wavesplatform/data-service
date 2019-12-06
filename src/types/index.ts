@@ -2,7 +2,7 @@ import { Task } from 'folktale/concurrency/task';
 import { Maybe } from 'folktale/maybe';
 import { Asset as AssetInfo, BigNumber } from '@waves/data-entities';
 import { AppError } from '../errorHandling';
-import { toSerializable, Serializable } from './serialization';
+import { toSerializable, Serializable } from './serializable';
 import { Interval, interval, Unit } from './interval';
 import { List, list } from './list';
 
@@ -11,7 +11,7 @@ export { CacheSync } from './cache';
 export { List, list };
 export { Interval, interval, Unit };
 
-export { Serializable, FromSerializable } from './serialization';
+export { Serializable, FromSerializable } from './serializable';
 
 export { Without, XOR } from './generic';
 
@@ -84,6 +84,22 @@ export type Candle = Serializable<'candle', CandleInfo | null>;
 export const candle = (data: CandleInfo | null = null): Candle =>
   toSerializable('candle', data);
 
+export enum CandleInterval {
+  Minute1 = '1m',
+  Minute5 = '5m',
+  Minute15 = '15m',
+  Minute30 = '30m',
+  Hour1 = '1h',
+  Hour2 = '2h',
+  Hour3 = '3h',
+  Hour4 = '4h',
+  Hour6 = '6h',
+  Hour12 = '12h',
+  Day1 = '1d',
+  Week1 = '1w',
+  Month1 = '1M',
+}
+
 export type PairInfo = {
   firstPrice: BigNumber;
   lastPrice: BigNumber;
@@ -96,9 +112,12 @@ export type PairInfo = {
   txsCount: number;
 };
 
-export type Pair = Serializable<'pair', PairInfo | null> & Partial<AssetIdsPair>;
-export const pair = (data: PairInfo | null, pairData: AssetIdsPair | null): Pair =>
-  ({...toSerializable('pair', data), ...pairData});
+export type Pair = Serializable<'pair', PairInfo | null> &
+  Partial<AssetIdsPair>;
+export const pair = (
+  data: PairInfo | null,
+  pairData: AssetIdsPair | null
+): Pair => ({ ...toSerializable('pair', data), ...pairData });
 
 // @todo TransactionInfo
 export type DataTxEntryType = 'binary' | 'boolean' | 'integer' | 'string';
@@ -133,5 +152,7 @@ export type RateInfo = {
   rate: BigNumber;
 };
 export type Rate = Serializable<'rate', RateInfo | null> & AssetIdsPair;
-export const rate = (data: RateInfo | null, assetMeta: AssetIdsPair): Rate =>
-  ({...toSerializable('rate', data === null ? null : data), ...assetMeta});
+export const rate = (data: RateInfo | null, assetMeta: AssetIdsPair): Rate => ({
+  ...toSerializable('rate', data === null ? null : data),
+  ...assetMeta,
+});

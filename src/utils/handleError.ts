@@ -1,6 +1,7 @@
 import {
   AppError,
   DEFAULT_INTERNAL_SERVER_ERROR_MESSAGE,
+  DEFAULT_TIMEOUT_OCCURRED_MESSAGE,
 } from '../errorHandling';
 
 export const handleError = ({ ctx, error }: { ctx: any; error: AppError }) => {
@@ -36,6 +37,12 @@ export const handleError = ({ ctx, error }: { ctx: any; error: AppError }) => {
                 }))
               : errorInfo.meta
             : undefined,
+      };
+    },
+    Timeout: () => {
+      ctx.status = 504;
+      ctx.state.returnValue = {
+        message: DEFAULT_TIMEOUT_OCCURRED_MESSAGE,
       };
     },
   });

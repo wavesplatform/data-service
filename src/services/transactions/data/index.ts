@@ -1,5 +1,6 @@
 import { identity, compose } from 'ramda';
 
+import { withStatementTimeout } from '../../../db/driver';
 import { CommonServiceDependencies } from '../..';
 import { DataTxEntryType } from '../../../types';
 import {
@@ -25,6 +26,7 @@ import { transformResults as transformResultMget } from '../../presets/pg/mgetBy
 import { transformInput as transformInputSearch } from '../../presets/pg/searchWithPagination/transformInput';
 import { transformResults as transformResultSearch } from '../../presets/pg/searchWithPagination/transformResult';
 
+import { serialize, deserialize } from '../_common/cursor';
 import {
   result as resultSchema,
   inputSearch as inputSearchSchema,
@@ -63,6 +65,7 @@ export type DataTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
+  timeouts,
 }: CommonServiceDependencies): DataTxsService => {
   return {
     get: get<string, string, DataTxDbResponse, Transaction>({
@@ -75,7 +78,7 @@ export default ({
       >(transaction)(transformTxInfo),
       validateInput: validateInput(inputGet, createServiceName('get')),
       validateResult: validateResult(resultSchema, createServiceName('get')),
-      getData: pgData.get(pg),
+      getData: pgData.get(withStatementTimeout(pg, timeouts.get)),
       emitEvent,
     }),
 
@@ -89,7 +92,7 @@ export default ({
       >(transaction)(transformTxInfo),
       validateInput: validateInput(inputMget, createServiceName('mget')),
       validateResult: validateResult(resultSchema, createServiceName('mget')),
-      getData: pgData.mget(pg),
+      getData: pgData.mget(withStatementTimeout(pg, timeouts.mget)),
       emitEvent,
     }),
 
@@ -99,19 +102,20 @@ export default ({
       DataTxDbResponse,
       List<Transaction>
     >({
-      transformInput: transformInputSearch,
+      transformInput: transformInputSearch(deserialize),
       transformResult: transformResultSearch(
-        compose(
+        compose<DataTxDbResponse, TransactionInfo | null, Transaction>(
           transaction,
           transformTxInfo
-        )
+        ),
+        serialize
       ),
       validateInput: validateInput(
         inputSearchSchema,
         createServiceName('search')
       ),
       validateResult: validateResult(resultSchema, createServiceName('search')),
-      getData: pgData.search(pg),
+      getData: pgData.search(withStatementTimeout(pg, timeouts.search)),
       emitEvent,
     }),
   };

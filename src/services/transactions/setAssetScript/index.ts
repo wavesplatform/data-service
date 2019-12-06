@@ -1,5 +1,6 @@
 import { propEq, compose } from 'ramda';
 
+import { withStatementTimeout } from '../../../db/driver';
 import { CommonServiceDependencies } from '../..';
 import {
   transaction,
@@ -15,6 +16,7 @@ import { searchWithPaginationPreset } from '../../presets/pg/searchWithPaginatio
 import { inputGet } from '../../presets/pg/getById/inputSchema';
 import { inputMget } from '../../presets/pg/mgetByIds/inputSchema';
 
+import { Cursor, serialize, deserialize } from '../_common/cursor';
 import { RawTx, CommonFilters } from '../_common/types';
 
 import { result, inputSearch } from './schema';
@@ -45,6 +47,7 @@ export type SetAssetScriptTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
+  timeouts,
 }: CommonServiceDependencies): SetAssetScriptTxsService => {
   return {
     get: getByIdPreset<
@@ -59,7 +62,10 @@ export default ({
       resultSchema: result,
       resultTypeFactory: transaction,
       transformResult: transformTxInfo,
-    })({ pg, emitEvent }),
+    })({
+      pg: withStatementTimeout(pg, timeouts.get),
+      emitEvent,
+    }),
 
     mget: mgetByIdsPreset<
       string,
@@ -74,9 +80,13 @@ export default ({
       resultTypeFactory: transaction,
       resultSchema: result,
       transformResult: transformTxInfo,
-    })({ pg, emitEvent }),
+    })({
+      pg: withStatementTimeout(pg, timeouts.mget),
+      emitEvent,
+    }),
 
     search: searchWithPaginationPreset<
+      Cursor,
       SetAssetScriptTxsSearchRequest,
       SetAssetScriptTxDbResponse,
       TransactionInfo,
@@ -86,10 +96,14 @@ export default ({
       sql: sql.search,
       inputSchema: inputSearch,
       resultSchema: result,
-      transformResult: compose(
-        transaction,
-        transformTxInfo
-      ),
-    })({ pg, emitEvent }),
+      transformResult: compose(transaction, transformTxInfo),
+      cursorSerialization: {
+        serialize,
+        deserialize,
+      },
+    })({
+      pg: withStatementTimeout(pg, timeouts.search),
+      emitEvent,
+    }),
   };
 };

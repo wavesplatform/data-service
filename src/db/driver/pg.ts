@@ -1,10 +1,11 @@
 // Module transforms pg-promise into pg-task
 import { pgpConnect } from './pgp';
 import { ITask, IDatabase } from 'pg-promise';
-import { fromPromised } from 'folktale/concurrency/task';
+import { fromPromised, Task } from 'folktale/concurrency/task';
+import { defaultTo } from 'ramda';
 
-import { Task } from 'folktale/concurrency/task';
-import { DbError, toDbError } from '../../errorHandling';
+import { DbError, toDbError, Timeout, toTimeout } from '../../errorHandling';
+import { isStatementTimeoutErrorMessage } from './utils';
 
 export type PgDriverOptions = {
   postgresHost: string;
@@ -13,28 +14,29 @@ export type PgDriverOptions = {
   postgresUser: string;
   postgresPassword: string;
   postgresPoolSize: number;
+  postgresStatementTimeout?: number | false;
 };
 
 export type SqlQuery = string;
 
 export type PgDriver = {
-  none(query: SqlQuery, values?: any): Task<DbError, null>;
+  none(query: SqlQuery, values?: any): Task<DbError | Timeout, null>;
   one<T>(
     query: SqlQuery,
     values?: any,
     cb?: (value: any) => T,
     thisArg?: any
-  ): Task<DbError, T>;
+  ): Task<DbError | Timeout, T>;
   oneOrNone<T>(
     query: SqlQuery,
     values?: any,
     cb?: (value: any) => T,
     thisArg?: any
-  ): Task<DbError, T>;
-  many<T>(query: SqlQuery, values?: any): Task<DbError, T[]>;
-  any<T>(query: SqlQuery, values?: any): Task<DbError, T[]>;
-  task<T>(cb: (t: ITask<{}>) => T | Promise<T>): Task<DbError, T>;
-  tx<T>(cb: (t: ITask<{}>) => T | Promise<T>): Task<DbError, T>;
+  ): Task<DbError | Timeout, T>;
+  many<T>(query: SqlQuery, values?: any): Task<DbError | Timeout, T[]>;
+  any<T>(query: SqlQuery, values?: any): Task<DbError | Timeout, T[]>;
+  task<T>(cb: (t: ITask<{}>) => T | Promise<T>): Task<DbError | Timeout, T>;
+  tx<T>(cb: (t: ITask<{}>) => T | Promise<T>): Task<DbError | Timeout, T>;
 };
 
 export const createPgDriver = (
@@ -48,10 +50,15 @@ export const createPgDriver = (
     user: options.postgresUser,
     password: options.postgresPassword,
     max: options.postgresPoolSize, // max connection pool size
+    statement_timeout: defaultTo(false, options.postgresStatementTimeout),
   });
 
   const toTasked = <T>(promised: () => Promise<T>) =>
-    fromPromised<Error, T>(promised)().mapRejected(toDbError({}));
+    fromPromised<Error, T>(promised)().mapRejected(e =>
+      isStatementTimeoutErrorMessage(e.message)
+        ? toTimeout({}, e)
+        : toDbError({}, e)
+    );
 
   const driverT: PgDriver = {
     none: (query: SqlQuery, values?: any) =>

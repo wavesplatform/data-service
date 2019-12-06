@@ -4,13 +4,13 @@ import { Maybe } from 'folktale/maybe';
 
 import { tap } from '../../utils/tap';
 import { AssetIdsPair, RateMgetParams } from '../../types';
-import { AppError, DbError } from '../../errorHandling';
+import { AppError, DbError, Timeout } from '../../errorHandling';
 
 import { partitionByPreCount, AsyncMget, RateCache } from './repo';
 import { RateCacheKey } from './repo/impl/RateCache';
 import RateInfoLookup from './repo/impl/RateInfoLookup';
 import { isEmpty } from '../../utils/fp/maybeOps';
-import { RateWithPairIds } from '../rates'
+import { RateWithPairIds } from '../rates';
 
 type ReqAndRes<TReq, TRes> = {
   req: TReq;
@@ -19,10 +19,18 @@ type ReqAndRes<TReq, TRes> = {
 
 export default class RateEstimator
   implements
-    AsyncMget<RateMgetParams, ReqAndRes<AssetIdsPair, RateWithPairIds>, AppError> {
+    AsyncMget<
+      RateMgetParams,
+      ReqAndRes<AssetIdsPair, RateWithPairIds>,
+      AppError
+    > {
   constructor(
     private readonly cache: RateCache,
-    private readonly remoteGet: AsyncMget<RateMgetParams, RateWithPairIds, DbError>
+    private readonly remoteGet: AsyncMget<
+      RateMgetParams,
+      RateWithPairIds,
+      DbError | Timeout
+    >
   ) {}
 
   mget(
@@ -38,12 +46,12 @@ export default class RateEstimator
     });
 
     const cacheUnlessCached = (item: AssetIdsPair, rate: BigNumber) => {
-      const key = getCacheKey(item)
+      const key = getCacheKey(item);
 
       if (!this.cache.has(key)) {
-        this.cache.set(key, rate)
+        this.cache.set(key, rate);
       }
-    }
+    };
 
     const cacheAll = (items: Array<RateWithPairIds>) =>
       items.forEach(it => cacheUnlessCached(it, it.rate));

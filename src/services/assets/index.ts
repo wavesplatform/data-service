@@ -1,9 +1,9 @@
-import { propEq, identity } from 'ramda';
+import { compose, propEq, identity } from 'ramda';
 import { of as taskOf } from 'folktale/concurrency/task';
 import { of as just, Maybe } from 'folktale/maybe';
 import { tap } from '../../utils/tap';
 import { forEach, isEmpty } from '../../utils/fp/maybeOps';
-
+import { withStatementTimeout } from '../../db/driver/utils';
 import { asset, Asset, AssetInfo, List } from '../../types';
 
 import { CommonServiceDependencies } from '..';
@@ -17,7 +17,7 @@ import { getData as getByIdPg } from '../presets/pg/getById/pg';
 import { getData as mgetByIdsPg } from '../presets/pg/mgetByIds/pg';
 import { validateInput, validateResult } from '../presets/validation';
 import { transformResults as transformMgetResults } from '../presets/pg/mgetByIds/transformResult';
-import { searchPreset } from '../presets/pg/search';
+import { searchWithPaginationPreset } from '../presets/pg/searchWithPagination';
 
 // validation
 import { inputGet } from '../presets/pg/getById/inputSchema';
@@ -28,25 +28,25 @@ import {
 } from './schema';
 
 import { transformDbResponse } from './transformAsset';
-import { transformResults as createTransformResult } from '../presets/pg/search/transformResult';
 import * as sql from './sql';
-
 import {
   AssetsCache,
   AssetDbResponse,
   AssetsService,
   AssetsSearchRequest,
 } from './types';
-
+import { Cursor, serialize, deserialize } from './cursor';
 export { create as createCache } from './cache';
-
 export { AssetsService } from './types';
 
 export default ({
   drivers: { pg },
   emitEvent,
   cache,
-}: CommonServiceDependencies & { cache: AssetsCache }): AssetsService => {
+  timeouts,
+}: CommonServiceDependencies & {
+  cache: AssetsCache;
+}): AssetsService => {
   const SERVICE_NAME = {
     GET: 'assets.get',
     MGET: 'assets.mget',
@@ -64,7 +64,7 @@ export default ({
             getByIdPg<AssetDbResponse, string>({
               name: SERVICE_NAME.GET,
               sql: sql.get,
-              pg,
+              pg: withStatementTimeout(pg, timeouts.get),
             })(req).map(
               tap(maybeResp => forEach(x => cache.set(req, x), maybeResp))
             ),
@@ -93,7 +93,7 @@ export default ({
           name: SERVICE_NAME.MGET,
           sql: sql.mget,
           matchRequestResult: propEq('asset_id'),
-          pg,
+          pg: withStatementTimeout(pg, timeouts.mget),
         })(notCachedAssetIds).map(fromDb => {
           fromDb.forEach((assetInfo, index) =>
             forEach(value => {
@@ -114,21 +114,25 @@ export default ({
       emitEvent,
     }),
 
-    search: searchPreset<
+    search: searchWithPaginationPreset<
+      Cursor,
       AssetsSearchRequest,
       AssetDbResponse,
       AssetInfo,
-      List<Asset>
+      Asset
     >({
       name: SERVICE_NAME.SEARCH,
       sql: sql.search,
       inputSchema: inputSearchSchema,
       resultSchema,
-      transformResult: createTransformResult<
-        AssetsSearchRequest,
-        AssetDbResponse,
-        Asset
-      >(asset)(transformDbResponse),
-    })({ pg, emitEvent }),
+      transformResult: compose(asset, transformDbResponse),
+      cursorSerialization: {
+        serialize,
+        deserialize,
+      },
+    })({
+      pg: withStatementTimeout(pg, timeouts.search),
+      emitEvent,
+    }),
   };
 };

@@ -7,7 +7,7 @@ import { mgetByIdsPreset } from '..';
 import {
   toSerializable,
   Serializable,
-} from '../../../../../types/serialization';
+} from '../../../../../types/serializable';
 import { PgDriver } from '../../../../../db/driver';
 const { inputMget: input } = require('../inputSchema');
 

@@ -1,24 +1,15 @@
 const Task = require('folktale/concurrency/task');
 const Maybe = require('folktale/maybe');
 
-const { AppError } = require('../../errorHandling');
+const getErrorMessage = require('../../errorHandling/getErrorMessage');
 const { tap } = require('../../utils/tap');
+
 const logTaskProgress = require('../utils/logTaskProgress');
 
 /** getSleepTime :: Date -> Number ms -> Number ms */
 const getSleepTime = (start, interval) => {
   let diff = interval - (new Date() - start);
   return diff < 0 ? 0 : diff;
-};
-
-const errorToString = e => {
-  if (e instanceof AppError) {
-    return e.error.message;
-  } else if (e instanceof Error) {
-    return e.message;
-  } else {
-    return String(e);
-  }
 };
 
 /** loop :: (Object -> Task) -> Object -> Number -> Number -> Promise */
@@ -29,7 +20,7 @@ const loop = (func, cfg, interval, timeout) => {
     func(cfg),
     Task.task(resolver => {
       const timerId = setTimeout(
-        () => resolver.reject(new Error('[DAEMON] timeout expired')),
+        () => resolver.reject(new Error('Daemon timeout expired')),
         timeout
       );
       resolver.cleanup(() => clearTimeout(timerId));
@@ -101,7 +92,7 @@ const main = (daemon, config, interval, timeout, logger) =>
           error: (e, timeTaken) => ({
             message: '[DAEMON] loop error',
             time: timeTaken,
-            error: e,
+            error: getErrorMessage(e),
           }),
           success: (_, timeTaken) => ({
             message: '[DAEMON] loop successfully stopped',
@@ -126,8 +117,8 @@ const main = (daemon, config, interval, timeout, logger) =>
       },
       onRejected: error =>
         logger.error({
-          message: `[DAEMON] error: ${errorToString(error)}`,
-          error,
+          message: `[DAEMON] loop is stopped with error`,
+          error: getErrorMessage(error),
         }),
       onCancelled: () =>
         logger.error({

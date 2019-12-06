@@ -1,5 +1,6 @@
 const { propEq, compose } = require('ramda');
 
+const { withStatementTimeout } = require('../../../../db/driver');
 const { getByIdPreset } = require('../../../presets/pg/getById');
 const { mgetByIdsPreset } = require('../../../presets/pg/mgetByIds');
 const {
@@ -15,7 +16,9 @@ const { inputGet } = require('../../../presets/pg/getById/inputSchema');
 const { inputMget } = require('../../../presets/pg/mgetByIds/inputSchema');
 const { result, inputSearch } = require('./schema');
 
-module.exports = ({ drivers: { pg }, emitEvent }) => {
+const { serialize, deserialize } = require('../../_common/cursor');
+
+module.exports = ({ drivers: { pg }, emitEvent, timeouts }) => {
   return {
     get: getByIdPreset({
       name: 'transactions.all.commonData.get',
@@ -24,7 +27,10 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       resultSchema: result,
       resultTypeFactory: transaction,
       transformResult: transformTxInfo,
-    })({ pg, emitEvent }),
+    })({
+      pg: withStatementTimeout(pg, timeouts.get),
+      emitEvent,
+    }),
 
     mget: mgetByIdsPreset({
       name: 'transactions.all.commonData.mget',
@@ -34,17 +40,24 @@ module.exports = ({ drivers: { pg }, emitEvent }) => {
       inputSchema: inputMget,
       resultSchema: result,
       transformResult: transformTxInfo,
-    })({ pg, emitEvent }),
+    })({
+      pg: withStatementTimeout(pg, timeouts.mget),
+      emitEvent,
+    }),
 
     search: searchWithPaginationPreset({
       name: 'transactions.all.commonData.search',
       sql: sql.search,
       inputSchema: inputSearch,
       resultSchema: result,
-      transformResult: compose(
-        transaction,
-        transformTxInfo
-      ),
-    })({ pg, emitEvent }),
+      transformResult: compose(transaction, transformTxInfo),
+      cursorSerialization: {
+        serialize,
+        deserialize,
+      },
+    })({
+      pg: withStatementTimeout(pg, timeouts.search),
+      emitEvent,
+    }),
   };
 };

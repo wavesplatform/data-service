@@ -3,15 +3,11 @@ import { compose, tail, init, split } from 'ramda';
 import { IMain } from 'pg-promise';
 import * as pgPromise from 'pg-promise';
 
+import { toBigNumber } from '../../utils/bigNumber';
+
 const pgp: IMain = pgPromise();
 
-const toBigNumber = (x: BigNumber.Value): BigNumber => new BigNumber(x);
-
-const parsePgArray = compose(
-  split(','),
-  init,
-  tail
-);
+const parsePgArray = compose(split(','), init, tail);
 
 const toBigNumberAll = (s: string): BigNumber[] =>
   parsePgArray(s).map(toBigNumber);
@@ -33,5 +29,9 @@ types.setTypeParser(1231, toBigNumberAll); // array/numeric
 
 // types.setTypeParser(700, toBigNumber); // real/float4
 // types.setTypeParser(1021, toBigNumberAll); // array/float
+
+// timestamp without tz
+// @todo remove when postgres will use timestamp with tz
+types.setTypeParser(1114, s => new Date(`${s}Z`));
 
 export const pgpConnect = pgp;

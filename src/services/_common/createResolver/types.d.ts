@@ -6,6 +6,7 @@ import {
   ResolverError,
   DbError,
   AppError,
+  Timeout,
 } from '../../../errorHandling/';
 
 import { PgDriver } from '../../../db/driver';
@@ -38,7 +39,7 @@ export type GetResolverDependencies<
   ResRaw,
   ResTransformed
 > & {
-  getData: (r: ReqTransformed) => Task<DbError, Maybe<ResRaw>>;
+  getData: (r: ReqTransformed) => Task<DbError | Timeout, Maybe<ResRaw>>;
   transformResult: (
     result: Maybe<ResRaw>,
     request: ReqRaw
@@ -56,7 +57,7 @@ export type MgetResolverDependencies<
   ResRaw,
   ResTransformed
 > & {
-  getData: (r: ReqTransformed) => Task<DbError, Maybe<ResRaw>[]>;
+  getData: (r: ReqTransformed) => Task<DbError | Timeout, Maybe<ResRaw>[]>;
   transformResult: (result: Maybe<ResRaw>[], request: ReqRaw) => ResTransformed;
 };
 
@@ -71,7 +72,7 @@ export type SearchResolverDependencies<
   ResRaw,
   ResTransformed
 > & {
-  getData: (r: ReqTransformed) => Task<DbError, ResRaw[]>;
+  getData: (r: ReqTransformed) => Task<DbError | Timeout, ResRaw[]>;
   transformResult: (
     results: ResRaw[],
     request: ReqTransformed

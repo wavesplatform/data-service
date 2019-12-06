@@ -1,7 +1,7 @@
 const Joi = require('../../../utils/validation/joi');
 
 const commonFields = require('../_common/commonFieldsSchemas');
-const commonFilters = require('../../presets/pg/searchWithPagination/commonFilterSchemas').default;
+const commonFilters = require('../_common/commonFilterSchemas').default;
 
 const result = Joi.object().keys({
   ...commonFields,
@@ -18,11 +18,11 @@ const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
 
-    assetId: Joi.string().assetId()
+    assetId: Joi.string().assetId(),
   })
   .required();
 
 module.exports = {
   result,
-  inputSearch
+  inputSearch,
 };

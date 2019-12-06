@@ -1,5 +1,5 @@
 import * as checkEnv from 'check-env';
-import { memoizeWith, always } from 'ramda';
+import { always, isNil, memoizeWith } from 'ramda';
 
 export type PostgresConfig = {
   postgresHost: string;
@@ -8,6 +8,7 @@ export type PostgresConfig = {
   postgresUser: string;
   postgresPassword: string;
   postgresPoolSize: number;
+  postgresStatementTimeout: number | false;
 };
 
 export type LoggerConfig = {
@@ -30,7 +31,9 @@ export type DefaultConfig = PostgresConfig & ServerConfig & LoggerConfig;
 export type DataServiceConfig = PostgresConfig &
   ServerConfig &
   LoggerConfig &
-  MatcherConfig;
+  MatcherConfig & {
+    defaultTimeout: number;
+  };
 
 const commonEnvVariables = ['PGHOST', 'PGDATABASE', 'PGUSER', 'PGPASSWORD'];
 
@@ -48,6 +51,11 @@ export const loadDefaultConfig = (): DefaultConfig => {
     postgresPoolSize: process.env.PGPOOLSIZE
       ? parseInt(process.env.PGPOOLSIZE)
       : 20,
+    postgresStatementTimeout:
+      isNil(process.env.PGSTATEMENTTIMEOUT) ||
+      isNaN(parseInt(process.env.PGSTATEMENTTIMEOUT))
+        ? false
+        : parseInt(process.env.PGSTATEMENTTIMEOUT),
     logLevel: process.env.LOG_LEVEL || 'info',
   };
 };
@@ -74,6 +82,10 @@ const load = (): DataServiceConfig => {
   return {
     ...loadDefaultConfig(),
     ...matcher,
+
+    defaultTimeout: process.env.DEFAULT_TIMEOUT
+      ? parseInt(process.env.DEFAULT_TIMEOUT)
+      : 30000,
   };
 };
 
