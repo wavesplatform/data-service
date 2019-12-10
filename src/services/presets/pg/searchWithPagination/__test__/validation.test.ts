@@ -2,29 +2,23 @@ import { of as task } from 'folktale/concurrency/task';
 import { Result, Error as error, Ok as ok } from 'folktale/result';
 import { always, T } from 'ramda';
 
-import { parseDate } from '../../../../../utils/parseDate';
 import { Joi } from '../../../../../utils/validation';
 import {
   Serializable,
   toSerializable,
 } from '../../../../../types/serializable';
 import { PgDriver } from '../../../../../db/driver';
-import { SortOrder, WithLimit } from '../../../../_common';
+import { WithLimit } from '../../../../_common';
 import { searchWithPaginationPreset } from '..';
 import commonFilterSchemas from '../commonFilterSchemas';
 import { AppError, ValidationError } from './../../../../../errorHandling';
 import { RawTxWithUid } from 'services/transactions/_common/types';
+import { RequestWithCursor } from 'services/_common/pagination';
 
 const mockTxs: ResponseRaw[] = [
   { tx_uid: 1, id: 'q', timestamp: new Date() },
   { tx_uid: 2, id: 'w', timestamp: new Date() },
 ];
-
-type Request = WithLimit & {
-  timeEnd?: Date;
-  timeStart?: Date;
-  sort: SortOrder;
-};
 
 type ResponseRaw = {
   tx_uid: number;
@@ -34,11 +28,9 @@ type ResponseRaw = {
 
 type Cursor = {
   tx_uid: number;
-  sort: SortOrder;
 };
 
-const isSortOrder = (s: string): s is SortOrder =>
-  s === SortOrder.Ascending || s === SortOrder.Descending;
+type Request = RequestWithCursor<WithLimit, Cursor>;
 
 const serialize = <ResponseRaw extends RawTxWithUid>(
   request: Request,
@@ -46,7 +38,7 @@ const serialize = <ResponseRaw extends RawTxWithUid>(
 ): string | undefined =>
   response === null
     ? undefined
-    : Buffer.from(`${response.tx_uid}::${request.sort}`).toString('base64');
+    : Buffer.from(response.tx_uid.toString()).toString('base64');
 
 const deserialize = (cursor: string): Result<ValidationError, Cursor> => {
   const data = Buffer.from(cursor, 'base64')
@@ -63,25 +55,14 @@ const deserialize = (cursor: string): Result<ValidationError, Cursor> => {
     ok<ValidationError, string[]>(data)
       // validate length
       .chain(d =>
-        d.length === 2
-          ? ok<ValidationError, string[]>(d)
-          : error<ValidationError, string[]>(
-              err('Cursor length is not equals to 2')
+        d.length === 1
+          ? ok<ValidationError, number>(parseInt(d[0]))
+          : error<ValidationError, number>(
+              err('Cursor length is not equals to 1')
             )
       )
-      .chain(d => {
-        const s = d[1];
-        if (isSortOrder(s)) {
-          return ok<ValidationError, [number, SortOrder]>([parseInt(d[0]), s]);
-        } else {
-          return error<ValidationError, [number, SortOrder]>(
-            err('Sort is not valid')
-          );
-        }
-      })
-      .map(([tx_uid, sort]) => ({
+      .map(tx_uid => ({
         tx_uid,
-        sort,
       }))
   );
 };
@@ -120,42 +101,30 @@ const assertValidationError = (done: jest.DoneCallback, v: Request) =>
 
 describe('searchWithPagination preset validation', () => {
   describe('common filters', () => {
-    it('fails if timeEnd < 0', done =>
+    it('fails if limit <= 0', done =>
       assertValidationError(done, {
-        timeEnd: parseDate('-1525132900000').unsafeGet(),
-        limit: 10,
-        sort: SortOrder.Ascending,
+        limit: 0,
       }));
-    it('fails if timeStart < 0', done =>
+    it('fails if after is incorrect', done =>
       assertValidationError(done, {
-        timeEnd: parseDate('1525132900000').unsafeGet(),
-        timeStart: parseDate('-1525132800000').unsafeGet(),
         limit: 10,
-        sort: SortOrder.Ascending,
+        after: {
+          tx_uid: 1,
+        },
       }));
-    it('fails if timeEnd < timeStart', done =>
-      assertValidationError(done, {
-        timeEnd: parseDate('1525132700000').unsafeGet(),
-        timeStart: parseDate('1525132800000').unsafeGet(),
-        limit: 10,
-        sort: SortOrder.Ascending,
-      }));
-    it('fails if timeStart->invalid Date', done => {
-      expect(parseDate('').unsafeGet).toThrowError();
-      done();
-    });
     it('passes if correct object is provided', done =>
       service({
-        timeStart: new Date(0),
-        timeEnd: new Date(),
         limit: 1,
-        sort: SortOrder.Ascending,
       })
         .run()
         .listen({
           onResolved: (x: Serializable<string, any>) => {
+            console.log('here ', x);
             expect(x.__type).toBe('list');
             done();
+          },
+          onRejected: (e: AppError) => {
+            done(e.error.message);
           },
         }));
   });

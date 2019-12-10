@@ -14,10 +14,6 @@ describe('candles daemon sql test', () => {
     expect(sql.insertAllCandles('candles', 60, 300)).toMatchSnapshot();
   });
 
-  it('get all candles from exchange tx grouped by 1 minute and after timestamp', () => {
-    expect(sql.selectCandlesByMinute(new Date('2019-01-01T00:00:00.000Z'))).toMatchSnapshot();
-  });
-
   it('insert or update array of candles', () => {
     expect(
       sql.insertOrUpdateCandles('candles', [
