@@ -8,4 +8,5 @@ export const parseDate = (str: string): Result<ValidationError, Date> => {
     : ok(d);
 };
 
-export const dateOrNull = (str: string): Date | null => parseDate(str).getOrElse(null);
+export const dateOrNull = (str: string): Date | null =>
+  parseDate(str).getOrElse(null);

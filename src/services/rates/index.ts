@@ -24,9 +24,7 @@ export default function({
 }: RateSerivceCreatorDependencies): ServiceMget<RateMgetParams, Rate> {
   const estimator = new RateEstimator(
     cache,
-    new RemoteRateRepo(
-      withStatementTimeout(drivers.pg, timeouts.mget)
-    )
+    new RemoteRateRepo(withStatementTimeout(drivers.pg, timeouts.mget))
   );
 
   return {
@@ -37,7 +35,10 @@ export default function({
           data.map(item =>
             rate(
               {
-                rate: item.res.fold(() => new BigNumber(0), it => it.rate),
+                rate: item.res.fold(
+                  () => new BigNumber(0),
+                  it => it.rate
+                ),
               },
               {
                 amountAsset: item.req.amountAsset,

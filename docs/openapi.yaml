@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 0.26.3
+  version: 0.27.0
   title: Waves Data Service
   description: This is a a public Waves Data Services API documentation. The goal of the API is to provide a simple and convenient way to get data from Waves blockchain.
 servers:
@@ -134,7 +134,7 @@ paths:
               - type: number
         - in: query
           name: interval
-          description: 'Candle interval. One of 1d, 12h, 6h, 3h, 1h, 30m, 15m, 5m, 1m.'
+          description: 'Candle interval. One of 1M, 1w, 1d, 12h, 6h, 4h, 3h, 2h, 1h, 30m, 15m, 5m, 1m.'
           required: true
           schema:
             type: string
@@ -1928,7 +1928,7 @@ paths:
               - type: number
         - in: query
           name: interval
-          description: 'Candle interval. One of 1d, 12h, 6h, 3h, 1h, 30m, 15m, 5m, 1m.'
+          description: 'Candle interval. One of 1M, 1w, 1d, 12h, 6h, 4h, 3h, 2h, 1h, 30m, 15m, 5m, 1m.'
           required: true
           schema:
             type: string

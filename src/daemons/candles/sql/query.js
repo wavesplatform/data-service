@@ -1,14 +1,21 @@
 const knex = require('knex');
 const pg = knex({ client: 'pg' });
 
-const { serializeCandle, candlePresets } = require('./utils');
+const { CandleInterval } = require('../../../types');
 
-/** makeCandleCalculateColumns :: Number -> Array */
-const makeCandleCalculateColumns = longerInterval => {
+const {
+  pgRawDateTrunc,
+  makeRawTimestamp,
+  serializeCandle,
+  candlePresets,
+} = require('./utils');
+
+/** makeCandleCalculateColumns :: String -> Array */
+const makeCandleCalculateColumns = interval => {
   return {
-    candle_time: candlePresets.aggregate.candle_time(longerInterval),
-    amount_asset_uid: 'amount_asset_uid',
-    price_asset_uid: 'price_asset_uid',
+    candle_time: candlePresets.aggregate.candle_time(interval),
+    amount_asset_id: 'amount_asset_id',
+    price_asset_id: 'price_asset_id',
     low: candlePresets.aggregate.low,
     high: candlePresets.aggregate.high,
     volume: candlePresets.aggregate.volume,
@@ -18,7 +25,7 @@ const makeCandleCalculateColumns = longerInterval => {
     weighted_average_price: candlePresets.aggregate.weighted_average_price,
     open: candlePresets.aggregate.open,
     close: candlePresets.aggregate.close,
-    interval_in_secs: longerInterval,
+    interval: pg.raw(`'${interval}'`),
     matcher_address_uid: 'matcher_address_uid',
   };
 };
@@ -52,7 +59,9 @@ const candleSelectColumns = [
       '(array_agg(e.price * 10 ^(-8 - p.decimals + a.decimals) ORDER BY e.candle_time DESC)::numeric[])[1]'
     ),
   },
-  { interval_in_secs: 60 },
+  {
+    interval: pg.raw(`'${CandleInterval.Minute1}'`),
+  },
   { matcher_address_uid: 'sender_uid' },
 ];
 
@@ -67,7 +76,7 @@ const selectExchanges = pg({ t: 'txs_7' })
     'o.price_asset_uid',
     't.sender_uid',
     't.height',
-    { candle_time: pg.raw(`date_trunc('minute', txs.time_stamp)`) },
+    { candle_time: pgRawDateTrunc('t.time_stamp')('minute') },
     `t.amount`,
     `t.price`
   )
@@ -83,7 +92,9 @@ const selectExchangesAfterTimestamp = fromTimestamp =>
       .select('uid')
       .from('txs')
       .whereRaw(
-        `txs.time_stamp >= date_trunc('minute', '${fromTimestamp.toISOString()}'::timestamp)`
+        `t.time_stamp >= ${pgRawDateTrunc(
+          `'${fromTimestamp.toISOString()}'::timestamp`
+        )('minute')}`
       )
       .limit(1)
   );
@@ -139,7 +150,7 @@ const insertOrUpdateCandles = (tableName, candles) => {
       .raw(
         `${pg({ t: tableName }).insert(
           candles.map(serializeCandle)
-        )} on conflict (time_start, amount_asset_uid, price_asset_uid, matcher_address_uid, interval_in_secs) do update set ${updatedFieldsExcluded}`
+        )} on conflict (time_start, amount_asset_uid, price_asset_uid, matcher_address_uid, interval) do update set ${updatedFieldsExcluded}`
       )
       .toString();
   }
@@ -159,9 +170,11 @@ const insertOrUpdateCandlesFromShortInterval = (
       `${insertIntoCandlesFromSelect(tableName, function() {
         this.from(tableName)
           .select(makeCandleCalculateColumns(longerInterval))
-          .where('interval_in_secs', shortInterval)
+          .where('interval', shortInterval)
           .whereRaw(
-            `time_start >= to_timestamp(floor(extract('epoch' from '${fromTimestamp.toISOString()}'::timestamp) / ${longerInterval}) * ${longerInterval})`
+            pg.raw(
+              `time_start >= ${makeRawTimestamp(fromTimestamp, longerInterval)}`
+            )
           )
           .groupBy(
             'candle_time',
@@ -169,7 +182,7 @@ const insertOrUpdateCandlesFromShortInterval = (
             'price_asset_uid',
             'matcher_address_uid'
           );
-      })} on conflict (time_start, amount_asset_uid, price_asset_uid, matcher_address_uid, interval_in_secs) do update set ${updatedFieldsExcluded}`
+      })} on conflict (time_start, amount_asset_uid, price_asset_uid, matcher_address_uid, interval) do update set ${updatedFieldsExcluded}`
     )
     .toString();
 
@@ -196,7 +209,7 @@ const insertAllCandles = (tableName, shortInterval, longerInterval) =>
   insertIntoCandlesFromSelect(tableName, function() {
     this.from({ t: tableName })
       .column(makeCandleCalculateColumns(longerInterval))
-      .where('t.interval_in_secs', shortInterval)
+      .where('t.interval', shortInterval)
       .groupBy([
         'candle_time',
         'amount_asset_uid',
@@ -205,12 +218,12 @@ const insertAllCandles = (tableName, shortInterval, longerInterval) =>
       ]);
   }).toString();
 
-/** selectCandlesByMinute :: Date -> String query */
-const selectCandlesByMinute = fromTimetamp =>
+/** selectCandlesAfterTimestamp :: Date -> String query */
+const selectCandlesAfterTimestamp = timetamp =>
   pg
     .columns(candleSelectColumns)
     .from(
-      selectExchangesAfterTimestamp(fromTimetamp)
+      selectExchangesAfterTimestamp(timetamp)
         .clone()
         .as('e')
     )
@@ -228,7 +241,7 @@ module.exports = {
   truncateTable,
   insertAllMinuteCandles,
   insertAllCandles,
-  selectCandlesByMinute,
+  selectCandlesAfterTimestamp,
   insertOrUpdateCandles,
   selectLastCandleHeight,
   selectLastExchangeTxHeight,
