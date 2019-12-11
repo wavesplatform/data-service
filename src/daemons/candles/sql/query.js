@@ -71,15 +71,15 @@ const insertIntoCandlesFromSelect = (tableName, selectFunction) =>
 
 /** selectExchanges :: QueryBuilder */
 const selectExchanges = pg({ t: 'txs_7' })
-  .column(
-    'o.amount_asset_uid',
-    'o.price_asset_uid',
-    't.sender_uid',
-    't.height',
-    { candle_time: pgRawDateTrunc('txs.time_stamp')('minute') },
-    `t.amount`,
-    `t.price`
-  )
+  .select({
+    amount_asset_uid: pg.raw('coalesce(o.amount_asset_uid, 0)'),
+    price_asset_uid: pg.raw('coalesce(o.price_asset_uid, 0)'),
+    sender_uid: 't.sender_uid',
+    height: 't.height',
+    candle_time: pgRawDateTrunc('txs.time_stamp')('minute'),
+    amount: 't.amount',
+    price: 't.price',
+  })
   .join({ txs: 'txs' }, 'txs.uid', 't.tx_uid')
   .join({ o: 'txs_7_orders' }, 'o.order_uid', 't.order1_uid');
 
@@ -197,8 +197,8 @@ const insertAllMinuteCandles = tableName =>
   insertIntoCandlesFromSelect(tableName, function() {
     this.select(candleSelectColumns)
       .from(selectExchanges.clone().as('e'))
-      .innerJoin({ a: 'assets' }, 'e.amount_asset_uid', 'a.uid')
-      .innerJoin({ p: 'assets' }, 'e.price_asset_uid', 'p.uid')
+      .leftJoin({ a: 'assets' }, 'e.amount_asset_uid', 'a.uid')
+      .leftJoin({ p: 'assets' }, 'e.price_asset_uid', 'p.uid')
       .groupByRaw(
         'e.candle_time, e.amount_asset_uid, e.price_asset_uid, e.sender_uid'
       );
