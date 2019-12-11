@@ -72,11 +72,12 @@ const makeRawTimestamp = (timestamp, interval) => {
 };
 
 // serializeCandle:: Object => Object
+// @todo refactor after pg updating for work with BigInt instead of BigNumber
 const serializeCandle = candle => ({
   time_start: candle.time_start,
-  amount_asset_uid: candle.amount_asset_uid,
-  price_asset_uid: candle.price_asset_uid,
-  matcher_address_uid: candle.matcher_address_uid,
+  amount_asset_uid: candle.amount_asset_uid.toNumber(), // uid is bigint (BigNumber)
+  price_asset_uid: candle.price_asset_uid.toNumber(), // uid is bigint (BigNumber)
+  matcher_address_uid: candle.matcher_address_uid.toNumber(), // uid is bigint (BigNumber)
   low: candle.low.toString(),
   high: candle.high.toString(),
   volume: candle.volume.toString(),
