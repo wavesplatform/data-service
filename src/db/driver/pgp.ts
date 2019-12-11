@@ -30,8 +30,4 @@ types.setTypeParser(1231, toBigNumberAll); // array/numeric
 // types.setTypeParser(700, toBigNumber); // real/float4
 // types.setTypeParser(1021, toBigNumberAll); // array/float
 
-// timestamp without tz
-// @todo remove when postgres will use timestamp with tz
-types.setTypeParser(1114, s => new Date(`${s}Z`));
-
 export const pgpConnect = pgp;
