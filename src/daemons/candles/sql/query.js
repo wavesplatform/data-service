@@ -14,8 +14,8 @@ const {
 const makeCandleCalculateColumns = interval => {
   return {
     candle_time: candlePresets.aggregate.candle_time(interval),
-    amount_asset_id: 'amount_asset_id',
-    price_asset_id: 'price_asset_id',
+    amount_asset_uid: 'amount_asset_uid',
+    price_asset_uid: 'price_asset_uid',
     low: candlePresets.aggregate.low,
     high: candlePresets.aggregate.high,
     volume: candlePresets.aggregate.volume,
