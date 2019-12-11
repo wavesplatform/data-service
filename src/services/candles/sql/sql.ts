@@ -123,14 +123,14 @@ export const sql = ({
       }),
     })
     .innerJoin(
-      { a_dec: 'asset_decimals' },
-      'c.amount_asset_id',
-      'a_dec.asset_id'
+      { a: 'assets' },
+      'c.amount_asset_uid',
+      'a.uid'
     )
     .innerJoin(
-      { p_dec: 'asset_decimals' },
-      'c.price_asset_id',
-      'p_dec.asset_id'
+      { p: 'assets' },
+      'c.price_asset_uid',
+      'p.uid'
     )
     .orderBy('c.time_start', 'asc')
     .toString();
