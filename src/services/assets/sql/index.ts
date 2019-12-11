@@ -11,10 +11,10 @@ const pg = knex({ client: 'pg' });
  * coalesce(addr.address, '') is used for the same reason
  */
 
-const getAssetIndex = (asset_id: string) =>
+const getAssetIndex = (asset_uid: number) =>
   pg('assets_cte')
     .column('rn')
-    .where('asset_id', asset_id);
+    .where('asset_uid', asset_uid);
 
 export const mget = (ids: string[]): string =>
   pg({ a: 'assets' })

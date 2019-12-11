@@ -8,7 +8,7 @@ const pg = knex({ client: 'pg' });
 const searchById = (q: string) =>
   pg({ a: 'assets' })
     .columns({
-      asset_id: `a.${columns.asset_id}`,
+      asset_uid: `a.${columns.uid}`,
       asset_name: `a.${columns.asset_name}`,
       ticker: `a.${columns.ticker}`,
       height: pg.raw(`coalesce(a.first_appeared_on_height, 0)`),
@@ -27,7 +27,7 @@ const searchByNameInMeta = (qb: knex.QueryBuilder, q: string) =>
   qb
     .table('assets_metadata')
     .columns([
-      'asset_id',
+      'asset_uid',
       'asset_name',
       'ticker',
       'height',
@@ -44,7 +44,7 @@ const searchByTicker = (qb: knex.QueryBuilder, q: string): knex.QueryBuilder =>
   qb
     .table({ a: 'assets' })
     .columns({
-      asset_id: `a.${columns.asset_id}`,
+      asset_uid: `a.${columns.uid}`,
       asset_name: `a.${columns.asset_name}`,
       ticker: `a.${columns.ticker}`,
       height: pg.raw(`coalesce(a.first_appeared_on_height, 0)`),
@@ -64,7 +64,7 @@ const searchByName = (qb: knex.QueryBuilder, q: string) => {
     qb
       .table({ a: 'assets' })
       .columns({
-        asset_id: `a.${columns.asset_id}`,
+        asset_uid: `a.${columns.uid}`,
         asset_name: `a.${columns.asset_name}`,
         ticker: `a.${columns.ticker}`,
         height: pg.raw(`coalesce(a.first_appeared_on_height, 0)`),
@@ -81,12 +81,12 @@ export const searchAssets = (query: string): knex.QueryBuilder =>
   pg
     .with('assets_cte', qb => {
       qb.select([
-        pg.raw('distinct on ("r"."asset_id") "r"."asset_id"'),
+        pg.raw('distinct on ("r"."asset_uid") "r"."asset_uid"'),
         'r.ticker',
         'r.asset_name',
         {
           rn: pg.raw(
-            'row_number() over (order by r.rank desc, r.height asc, r.asset_id asc)'
+            'row_number() over (order by r.rank desc, r.height asc, r.asset_uid asc)'
           ),
         },
       ])
@@ -96,10 +96,10 @@ export const searchAssets = (query: string): knex.QueryBuilder =>
             .unionAll(qb => searchByTicker(qb, query))
             .unionAll(qb => searchByName(qb, query)),
         })
-        .orderBy('r.asset_id')
+        .orderBy('r.asset_uid')
         .orderBy('r.rank', 'desc');
     })
     .from('assets_cte')
     .select(map(col => 'a.' + col, columns))
-    .innerJoin({ a: 'assets' }, 'assets_cte.asset_id', 'a.asset_id')
+    .innerJoin({ a: 'assets' }, 'assets_cte.asset_uid', 'a.uid')
     .orderBy('rn', 'asc');

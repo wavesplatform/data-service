@@ -14,6 +14,9 @@ const inputSearch = Joi.object()
   .required();
 
 const result = Joi.object().keys({
+  uid: Joi.object()
+    .bignumber()
+    .required(),
   asset_id: Joi.string()
     .assetId()
     .required(),

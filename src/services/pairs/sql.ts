@@ -73,7 +73,7 @@ const query = (pairs: AssetIdsPair[], matcher: string): string =>
       't.matcher_address_uid'
     )
     .whereIn(
-      ['aa.asset_uid', 'pa.asset_uid'],
+      ['aa.asset_id', 'pa.asset_id'],
       pairs.map(pair => [pair.amountAsset, pair.priceAsset])
     )
     .whereIn('matcher_address_uid', function() {

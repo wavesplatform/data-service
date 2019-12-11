@@ -28,6 +28,7 @@ export type AssetsService = Service<
 >;
 
 export type AssetDbResponse = {
+  uid: number;
   asset_id: string;
   asset_name: string;
   description: string;

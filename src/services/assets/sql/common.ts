@@ -1,4 +1,5 @@
 export const columns = {
+  uid: 'uid',
   asset_id: 'asset_id',
   asset_name: 'asset_name',
   description: 'description',
