@@ -92,7 +92,7 @@ const selectExchangesAfterTimestamp = fromTimestamp =>
       .select('uid')
       .from('txs')
       .whereRaw(
-        `t.time_stamp >= ${pgRawDateTrunc(
+        `time_stamp >= ${pgRawDateTrunc(
           `'${fromTimestamp.toISOString()}'::timestamp`
         )('minute')}`
       )
