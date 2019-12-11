@@ -76,7 +76,7 @@ const selectExchanges = pg({ t: 'txs_7' })
     'o.price_asset_uid',
     't.sender_uid',
     't.height',
-    { candle_time: pgRawDateTrunc('t.time_stamp')('minute') },
+    { candle_time: pgRawDateTrunc('txs.time_stamp')('minute') },
     `t.amount`,
     `t.price`
   )
