@@ -100,6 +100,6 @@ export const searchAssets = (query: string): knex.QueryBuilder =>
         .orderBy('r.rank', 'desc');
     })
     .from('assets_cte')
-    .select(map(col => 'a.' + col, columns))
+    .select(map(col => `a.${col}`, columns))
     .innerJoin({ a: 'assets' }, 'assets_cte.asset_uid', 'a.uid')
     .orderBy('rn', 'asc');

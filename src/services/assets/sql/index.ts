@@ -62,7 +62,7 @@ export const search = (request: AssetsSearchRequest): string => {
           complement(isNil),
           request =>
             compose(filter(request.ticker))(
-              pg({ a: 'assets' }).select(columns)
+              pg({ a: 'assets' }).select(map(col => `a.${col}`, columns))
             ),
         ],
       ])(request)
