@@ -24,8 +24,7 @@ export const mget = (ids: string[]): string =>
       sender: pg.raw(`coalesce(addr.address, '')`),
     })
     .whereIn('asset_id', ids)
-    .leftJoin({ t: 'txs_3' }, 't.asset_uid', 'a.uid')
-    .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid')
+    .leftJoin({ addr: 'addresses' }, 'addr.uid', 'a.issuer_address_uid')
     .toString();
 
 export const get = (id: string): string => mget([id]);
@@ -44,8 +43,7 @@ export const search = (request: AssetsSearchRequest): string => {
           issue_height: pg.raw('coalesce(a.first_appeared_on_height, 0)'),
           sender: pg.raw(`coalesce(addr.address, '')`),
         })
-        .leftJoin({ t: 'txs_3' }, 't.asset_uid', 'a.uid')
-        .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid'),
+        .leftJoin({ addr: 'addresses' }, 'addr.uid', 'a.issuer_address_uid'),
     (request: AssetsSearchRequest) =>
       cond([
         [
