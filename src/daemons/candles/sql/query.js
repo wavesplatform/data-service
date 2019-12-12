@@ -30,40 +30,30 @@ const makeCandleCalculateColumns = interval => {
   };
 };
 
-const candleSelectColumns = [
-  { time_start: 'e.candle_time' },
-  'amount_asset_uid',
-  'price_asset_uid',
-  { low: pg.raw('min(e.price * 10 ^(-8 - p.decimals + a.decimals))') },
-  { high: pg.raw('max(e.price * 10 ^(-8 - p.decimals + a.decimals))') },
-  { volume: pg.raw('sum(e.amount * 10 ^(-a.decimals))') },
-  {
-    quote_volume: pg.raw(
-      'sum(e.amount * 10 ^(-a.decimals) * e.price * 10 ^(-8 - p.decimals + a.decimals))'
-    ),
-  },
-  { max_height: pg.max('height') },
-  { txs_count: pg.raw('count(e.price)') },
-  {
-    weighted_average_price: pg.raw(
-      'sum((e.amount * 10 ^(-a.decimals))::numeric * (e.price * 10 ^(-8 - p.decimals + a.decimals))::numeric)/sum((e.amount * 10 ^(-a.decimals))::numeric)'
-    ),
-  },
-  {
-    open: pg.raw(
-      '(array_agg(e.price * 10 ^(-8 - p.decimals + a.decimals) ORDER BY e.candle_time)::numeric[])[1]'
-    ),
-  },
-  {
-    close: pg.raw(
-      '(array_agg(e.price * 10 ^(-8 - p.decimals + a.decimals) ORDER BY e.candle_time DESC)::numeric[])[1]'
-    ),
-  },
-  {
-    interval: pg.raw(`'${CandleInterval.Minute1}'`),
-  },
-  { matcher_address_uid: 'sender_uid' },
-];
+const candleSelectColumns = {
+  time_start: 'e.candle_time',
+  amount_asset_uid: 'amount_asset_uid',
+  price_asset_uid: 'price_asset_uid',
+  low: pg.raw('min(e.price * 10 ^(-8 - p.decimals + a.decimals))'),
+  high: pg.raw('max(e.price * 10 ^(-8 - p.decimals + a.decimals))'),
+  volume: pg.raw('sum(e.amount * 10 ^(-a.decimals))'),
+  quote_volume: pg.raw(
+    'sum(e.amount * 10 ^(-a.decimals) * e.price * 10 ^(-8 - p.decimals + a.decimals))'
+  ),
+  max_height: pg.max('height'),
+  txs_count: pg.raw('count(e.price)'),
+  weighted_average_price: pg.raw(
+    'sum((e.amount * 10 ^(-a.decimals))::numeric * (e.price * 10 ^(-8 - p.decimals + a.decimals))::numeric)/sum((e.amount * 10 ^(-a.decimals))::numeric)'
+  ),
+  open: pg.raw(
+    '(array_agg(e.price * 10 ^(-8 - p.decimals + a.decimals) ORDER BY e.candle_time)::numeric[])[1]'
+  ),
+  close: pg.raw(
+    '(array_agg(e.price * 10 ^(-8 - p.decimals + a.decimals) ORDER BY e.candle_time DESC)::numeric[])[1]'
+  ),
+  interval: pg.raw(`'${CandleInterval.Minute1}'`),
+  matcher_address_uid: 'e.sender_uid',
+};
 
 /** insertIntoCandlesFromSelect :: (String, Function) -> QueryBuilder */
 const insertIntoCandlesFromSelect = (tableName, selectFunction) =>
