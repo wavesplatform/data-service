@@ -37,7 +37,7 @@ module.exports = {
   filters: {
     ...commonFilters,
     matcher: commonFilters.sender,
-    orderSender: byOrderSender,
+    sender: byOrderSender,
     amountAsset: byAsset('amount'),
     priceAsset: byAsset('price'),
     orderId: byOrder,
@@ -46,7 +46,6 @@ module.exports = {
   filtersOrder: [
     ...commonFiltersOrder,
     'matcher',
-    'orderSender',
     'amountAsset',
     'priceAsset',
     'orderId',
