@@ -3,15 +3,6 @@ const { curryN } = require('ramda');
 const commonFilters = require('../../_common/sql/filters');
 const commonFiltersOrder = require('../../_common/sql/filtersOrder');
 
-const bySender = curryN(2, (sender, q) =>
-  q.where('sender_uid', function() {
-    this.select('uid')
-      .from('addresses')
-      .where('address', sender)
-      .limit(1);
-  })
-);
-
 const byOrderSender = curryN(2, (orderSender, q) =>
   q.where('order_sender_uid', function() {
     this.select('uid')
@@ -45,8 +36,7 @@ const byAsset = assetType =>
 module.exports = {
   filters: {
     ...commonFilters,
-    sender: bySender,
-    matcher: bySender,
+    matcher: commonFilters.sender,
     orderSender: byOrderSender,
     amountAsset: byAsset('amount'),
     priceAsset: byAsset('price'),
