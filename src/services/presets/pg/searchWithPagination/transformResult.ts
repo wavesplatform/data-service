@@ -1,4 +1,4 @@
-import { compose, last, take } from 'ramda';
+import { compose, init, last, take } from 'ramda';
 
 import { Serializable, List, list } from '../../../../types';
 import { WithLimit } from '../../../_common';
@@ -51,5 +51,5 @@ export const transformResults = <
     take<ResponseRaw>(request.limit - 1)
   )(responses);
 
-  return list(transformedData, createMeta(serialize)(request, responses));
+  return list(transformedData, createMeta(serialize)(request, init(responses)));
 };
