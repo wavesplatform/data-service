@@ -17,7 +17,7 @@ import * as setHeadersMiddleware from './middleware/setHeaders';
 import * as notFoundHandler from './middleware/notFoundHandler';
 
 import { loadConfig } from './loadConfig';
-import router from './endpoints';
+import router from './http';
 
 const app = unsafeKoaQs(new Koa());
 
@@ -43,7 +43,7 @@ createServices({
       .use(setHeadersMiddleware)
       .use(injectEventBus(eventBus))
       .use(accessLogMiddleware)
-      .use(serializer)
+      // .use(serializer)
       .use(
         injectConfig('defaultMatcher', options.matcher.defaultMatcherAddress)
       )

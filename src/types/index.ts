@@ -5,6 +5,9 @@ import { AppError } from '../errorHandling';
 import { toSerializable, Serializable } from './serializable';
 import { Interval, interval, Unit } from './interval';
 import { List, list } from './list';
+import { IncomingHttpHeaders } from 'http';
+import { DecimalsFormat } from '../endpoints/types';
+import { LSNFormat } from '../http/types';
 
 export { CacheSync } from './cache';
 
@@ -21,29 +24,23 @@ export const fromMaybe = <A, B>(factory: (a?: A) => B) => (mb: Maybe<A>): B =>
     Nothing: () => factory(),
   });
 
-export type ServiceGet<
-  Request,
-  ResponseTransformed extends Serializable<string, any>
-> = {
-  readonly get: (
-    request: Request
-  ) => Task<AppError, Maybe<ResponseTransformed>>;
+export const LSN_FORMAT_HEADER = 'x-lsn-format';
+export const WITH_DECIMALS_HEADER = 'x-with-decimals';
+
+export type RequestHeaders = IncomingHttpHeaders &
+  Partial<{
+    LSN_FORMAT_HEADER: LSNFormat;
+    WITH_DECIMALS_HEADER: DecimalsFormat;
+  }>;
+
+export type ServiceGet<Request, Response> = {
+  readonly get: (request: Request) => Task<AppError, Maybe<Response>>;
 };
-export type ServiceMget<
-  Request,
-  ResponseTransformed extends Serializable<string, any>
-> = {
-  readonly mget: (
-    request: Request
-  ) => Task<AppError, List<ResponseTransformed>>;
+export type ServiceMget<Request, Response> = {
+  readonly mget: (request: Request) => Task<AppError, Response>;
 };
-export type ServiceSearch<
-  Request,
-  ResponseTransformed extends Serializable<string, any>
-> = {
-  readonly search: (
-    request: Request
-  ) => Task<AppError, List<ResponseTransformed>>;
+export type ServiceSearch<Request, Response> = {
+  readonly search: (request: Request) => Task<AppError, Response>;
 };
 
 export type Service<
@@ -56,7 +53,7 @@ export type Service<
   ServiceSearch<SearchRequest, Response>;
 
 export { AssetInfo };
-export type Asset = Serializable<'asset', AssetInfo | null>;
+export type Asset = Serializable<'asset', AssetInfo>;
 export const asset = (data: AssetInfo | null = null): Asset =>
   toSerializable('asset', data);
 
@@ -64,8 +61,8 @@ export type AliasInfo = {
   alias: string;
   address: string | null;
 };
-export type Alias = Serializable<'alias', AliasInfo | null>;
-export const alias = (data: AliasInfo | null = null): Alias =>
+export type Alias = Serializable<'alias', AliasInfo>;
+export const alias = (data: AliasInfo | null): Alias =>
   toSerializable('alias', data);
 
 export type CandleInfo = {

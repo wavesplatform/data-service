@@ -58,7 +58,10 @@ export type MgetResolverDependencies<
   ResTransformed
 > & {
   getData: (r: ReqTransformed) => Task<DbError | Timeout, Maybe<ResRaw>[]>;
-  transformResult: (result: Maybe<ResRaw>[], request: ReqRaw) => ResTransformed;
+  transformResult: (
+    result: Maybe<ResRaw>[],
+    request: ReqRaw
+  ) => ResTransformed[];
 };
 
 export type SearchResolverDependencies<
@@ -76,5 +79,5 @@ export type SearchResolverDependencies<
   transformResult: (
     results: ResRaw[],
     request: ReqTransformed
-  ) => ResTransformed;
+  ) => ResTransformed[];
 };

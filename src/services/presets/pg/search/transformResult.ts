@@ -1,21 +1,7 @@
-import { FromSerializable, list, List, Serializable } from '../../../../types';
-
-export const transformResults = <
-  Request,
-  ResponseRaw,
-  ResponseTransformed extends Serializable<string, any>
->(
-  typeFactory: (
-    d?: FromSerializable<ResponseTransformed>
-  ) => ResponseTransformed
-) => (
+export const transformResults = <Request, ResponseRaw, ResponseTransformed>(
   transformDbResponse: (
     response: ResponseRaw,
     request?: Request
-  ) => FromSerializable<ResponseTransformed>
-) => (responses: ResponseRaw[], request?: Request): List<ResponseTransformed> =>
-  list(
-    responses.map(response =>
-      typeFactory(transformDbResponse(response, request))
-    )
-  );
+  ) => ResponseTransformed
+) => (responses: ResponseRaw[], request?: Request): ResponseTransformed[] =>
+  responses.map(response => transformDbResponse(response, request));

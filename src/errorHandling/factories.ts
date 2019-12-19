@@ -4,6 +4,7 @@ import {
   InitError,
   ResolverError,
   ValidationError,
+  ParseError,
   Timeout,
   ErrorType,
   ErrorMetaInfo,
@@ -42,6 +43,12 @@ export const toValidationError: CurriedFunction2<
   Error,
   ValidationError
 > = toAppError('Validation') as any;
+
+export const toParseError: CurriedFunction2<
+  ErrorMetaInfo,
+  Error,
+  ParseError
+> = toAppError('Parse') as any;
 
 export const toTimeout: CurriedFunction2<
   ErrorMetaInfo,
