@@ -47,8 +47,7 @@ export const txs = (filteringQ: knex.QueryBuilder) =>
     .select(['p.asset_uid', 'p.amount', 'p.position_in_payment'])
     .leftJoin({ a: 'txs_16_args' }, 'a.tx_uid', 't.tx_uid')
     .leftJoin({ p: 'txs_16_payment' }, 'p.tx_uid', 't.tx_uid')
-    .whereIn('t.tx_uid', filteringQ)
-    .orderBy('t.tx_uid', 'desc');
+    .whereIn('t.tx_uid', filteringQ);
 
 export const select = (s: string) =>
   pg
@@ -71,5 +70,4 @@ export const selectFromFiltered = (filtered: knex.QueryBuilder) =>
     .leftJoin({ a: 'assets' }, 'a.uid', 't.asset_uid')
     .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid')
     .leftJoin({ daddr: 'addresses' }, 'daddr.uid', 't.dapp_address_uid')
-    .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tx_uid')
-    .orderBy('t.tx_uid', 'desc');
+    .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tx_uid');

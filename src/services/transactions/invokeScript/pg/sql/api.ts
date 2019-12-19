@@ -1,4 +1,6 @@
-const { compose, defaultTo, merge, pick, pipe } = require('ramda');
+import filters from './filters';
+
+const { compose, merge, pick, pipe } = require('ramda');
 
 const { select, selectFromFiltered } = require('./query');
 const { pickBindFilters } = require('../../../../../utils/db');
@@ -32,10 +34,12 @@ export const createApi = ({ filters: F }: { filters: any }) => ({
     const withDefaults = compose(pick(fNames), merge(defaultValues))(fValues);
 
     const fs = pickBindFilters(F, fNames, withDefaults);
-    const fQuery = pipe(...fs)(
-      select(defaultTo(defaultValues.sort, fValues['sort']))
-    );
+    const fQuery = pipe(...fs)(select(withDefaults.sort));
 
-    return pipe(selectFromFiltered, String)(fQuery);
+    return pipe(
+      selectFromFiltered,
+      filters.outerSort(withDefaults.sort),
+      String
+    )(fQuery);
   },
 });
