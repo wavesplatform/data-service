@@ -70,8 +70,19 @@ const selectExchanges = pg({ t: 'txs_7' })
     amount: 't.amount',
     price: 't.price',
   })
-  .join({ txs: 'txs' }, 'txs.uid', 't.tx_uid')
-  .join({ o: 'txs_7_orders' }, 'o.order_uid', 't.order1_uid');
+  .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tx_uid')
+  .leftJoin(
+    {
+      o: pg({ t: 'txs_7_orders' }).select({
+        order_uid: 'order_uid',
+        amount_asset_uid: 'amount_asset_uid',
+        price_asset_uid: 'price_asset_uid',
+      }),
+    },
+    function() {
+      this.on('o.tx_uid', 't.tx_uid').andOn('o.order_uid', 't.order1_uid'); // not matter on which order join txs_7_orders, cause they have the same asset uids
+    }
+  );
 
 /** selectExchangesAfterTimestamp :: Date -> QueryBuilder */
 const selectExchangesAfterTimestamp = fromTimestamp =>
@@ -185,10 +196,11 @@ const truncateTable = tableName =>
 /** insertAllMinuteCandles :: String -> String query */
 const insertAllMinuteCandles = tableName =>
   insertIntoCandlesFromSelect(tableName, function() {
-    this.select(candleSelectColumns)
-      .from(selectExchanges.clone().as('e'))
-      .leftJoin({ a: 'assets' }, 'e.amount_asset_uid', 'a.uid')
-      .leftJoin({ p: 'assets' }, 'e.price_asset_uid', 'p.uid')
+    this.with('e_cte', selectExchanges)
+      .select(candleSelectColumns)
+      .from({ e: 'e_cte' })
+      .leftJoin({ a: 'assets' }, 'a.uid', 'e.amount_asset_uid')
+      .leftJoin({ p: 'assets' }, 'p.uid', 'e.price_asset_uid')
       .groupByRaw(
         'e.candle_time, e.amount_asset_uid, e.price_asset_uid, e.sender_uid'
       );
@@ -217,8 +229,8 @@ const selectCandlesAfterTimestamp = timetamp =>
         .clone()
         .as('e')
     )
-    .innerJoin({ a: 'assets' }, 'e.amount_asset_uid', 'a.uid')
-    .innerJoin({ p: 'assets' }, 'e.price_asset_uid', 'p.uid')
+    .leftJoin({ a: 'assets' }, 'a.uid', 'e.amount_asset_uid')
+    .leftJoin({ p: 'assets' }, 'p.uid', 'e.price_asset_uid')
     .groupBy([
       'e.candle_time',
       'e.amount_asset_uid',
