@@ -73,7 +73,7 @@ const selectFromFiltered = filtered =>
       .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid')
       .leftJoin({ o1: 'orders' }, 'o1.uid', 't.order1_uid')
       .leftJoin({ o2: 'orders' }, 'o2.uid', 't.order2_uid')
-      .whereIn('tx_uid', filtered),
+      .whereIn('t.tx_uid', filtered),
   })
     .columns(
       compose(
