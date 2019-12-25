@@ -143,6 +143,12 @@ export const search = (req: PairsSearchRequest): string => {
   const { matcher, limit } = req;
   const q = pg({ t: 'pairs' })
     .select(COLUMNS.map(column => `t.${column}`))
+    .select({
+      amount_asset_id: 'aa.asset_id',
+      price_asset_id: 'pa.asset_id',
+    })
+    .leftJoin({ aa: 'assets' }, 'aa.uid', 't.amount_asset_uid')
+    .leftJoin({ pa: 'assets' }, 'pa.uid', 't.price_asset_uid')
     .orderByRaw('volume_waves desc NULLS LAST')
     .whereIn('matcher_address_uid', function() {
       this.select('uid')

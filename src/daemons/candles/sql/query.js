@@ -62,27 +62,15 @@ const insertIntoCandlesFromSelect = (tableName, selectFunction) =>
 /** selectExchanges :: QueryBuilder */
 const selectExchanges = pg({ t: 'txs_7' })
   .select({
-    amount_asset_uid: pg.raw('coalesce(o.amount_asset_uid, 0)'),
-    price_asset_uid: pg.raw('coalesce(o.price_asset_uid, 0)'),
+    amount_asset_uid: pg.raw('coalesce(t.amount_asset_uid, 0)'),
+    price_asset_uid: pg.raw('coalesce(t.price_asset_uid, 0)'),
     sender_uid: 't.sender_uid',
     height: 't.height',
     candle_time: pgRawDateTrunc('txs.time_stamp')('minute'),
     amount: 't.amount',
     price: 't.price',
   })
-  .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tx_uid')
-  .leftJoin(
-    {
-      o: pg({ t: 'txs_7_orders' }).select({
-        order_uid: 'order_uid',
-        amount_asset_uid: 'amount_asset_uid',
-        price_asset_uid: 'price_asset_uid',
-      }),
-    },
-    function() {
-      this.on('o.tx_uid', 't.tx_uid').andOn('o.order_uid', 't.order1_uid'); // not matter on which order join txs_7_orders, cause they have the same asset uids
-    }
-  );
+  .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tx_uid');
 
 /** selectExchangesAfterTimestamp :: Date -> QueryBuilder */
 const selectExchangesAfterTimestamp = fromTimestamp =>
@@ -187,6 +175,13 @@ const insertOrUpdateCandlesFromShortInterval = (
     )
     .toString();
 
+/**
+ * SET statement_timeout = 0
+ * @returns string
+ */
+const withoutStatementTimeout = () =>
+  pg.raw('SET statement_timeout = 0').toString();
+
 /** truncateTable :: String -> String query */
 const truncateTable = tableName =>
   pg(tableName)
@@ -240,6 +235,7 @@ const selectCandlesAfterTimestamp = timetamp =>
     .toString();
 
 module.exports = {
+  withoutStatementTimeout,
   truncateTable,
   insertAllMinuteCandles,
   insertAllCandles,

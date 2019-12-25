@@ -8,6 +8,7 @@ const { CandleInterval } = require('../../types');
 const logTaskProgress = require('../utils/logTaskProgress');
 
 const {
+  withoutStatementTimeout,
   truncateTable,
   insertAllMinuteCandles,
   insertAllCandles,
@@ -135,6 +136,7 @@ const fillCandlesDBAll = (logTask, pg, tableName) =>
     },
     pg.tx(t =>
       t.batch([
+        t.none(withoutStatementTimeout()),
         t.any(truncateTable(tableName)),
         t.any(insertAllMinuteCandles(tableName)),
         ...intervalPairs.map(([shorter, longer]) =>
