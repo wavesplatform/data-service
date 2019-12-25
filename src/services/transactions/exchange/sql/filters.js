@@ -1,6 +1,5 @@
 const { curryN } = require('ramda');
 
-const { limit } = require('../../../../utils/db/knex');
 const commonFilters = require('../../_common/sql/filters');
 const commonFiltersOrder = require('../../_common/sql/filtersOrder');
 
@@ -43,7 +42,6 @@ module.exports = {
     priceAsset: byAsset('price'),
     orderId: byOrder,
     sortOuter: s => q => q.clone().orderBy('tx_uid', s),
-    limit: l => limit(l * 2), // txs are selecting from txs_7_ordering table, which has 2 rows for 1 tx
   },
   filtersOrder: [
     ...commonFiltersOrder,

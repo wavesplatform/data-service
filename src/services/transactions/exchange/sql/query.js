@@ -1,5 +1,4 @@
 const pg = require('knex')({ client: 'pg' });
-
 const { compose, omit, keys } = require('ramda');
 
 const columns = {
@@ -63,18 +62,37 @@ const columns = {
 };
 
 // filters would be applied on this
-const select = pg({ t: 'txs_7_orders' }).select('tx_uid');
+const select = pg({ t: 'txs_7_orders' }).select('t.tx_uid');
 
 const selectFromFiltered = filtered =>
-  pg({
-    t: pg({ t: 'txs_7' })
-      .columns(columns)
-      .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tx_uid')
-      .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid')
-      .leftJoin({ o1: 'orders' }, 'o1.uid', 't.order1_uid')
-      .leftJoin({ o2: 'orders' }, 'o2.uid', 't.order2_uid')
-      .whereIn('t.tx_uid', filtered),
-  })
+  pg
+    .with(
+      'filtered_cte',
+      filtered
+        .columns([
+          'e.height',
+          'e.price',
+          'e.amount',
+          'e.sell_matcher_fee',
+          'e.buy_matcher_fee',
+          'e.sender_uid',
+          'e.order1_uid',
+          'e.order2_uid',
+        ])
+        .join({ e: 'txs_7' }, function() {
+          this.on('e.tx_uid', 't.tx_uid').andOn('e.order1_uid', 't.order_uid');
+        })
+    )
+    .with(
+      'e_cte',
+      pg({ t: 'filtered_cte' })
+        .columns(columns)
+        .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tx_uid')
+        .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid')
+        .leftJoin({ o1: 'orders' }, 'o1.uid', 't.order1_uid')
+        .leftJoin({ o2: 'orders' }, 'o2.uid', 't.order2_uid')
+    )
+    .from({ t: 'e_cte' })
     .columns(
       compose(
         keys,
