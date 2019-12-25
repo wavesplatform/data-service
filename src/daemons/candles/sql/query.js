@@ -34,22 +34,18 @@ const candleSelectColumns = {
   time_start: 'e.candle_time',
   amount_asset_uid: 'amount_asset_uid',
   price_asset_uid: 'price_asset_uid',
-  low: pg.raw('min(e.price * 10 ^(-8 - p.decimals + a.decimals))'),
-  high: pg.raw('max(e.price * 10 ^(-8 - p.decimals + a.decimals))'),
-  volume: pg.raw('sum(e.amount * 10 ^(-a.decimals))'),
-  quote_volume: pg.raw(
-    'sum(e.amount * 10 ^(-a.decimals) * e.price * 10 ^(-8 - p.decimals + a.decimals))'
-  ),
+  low: pg.min('e.price'),
+  high: pg.max('e.price'),
+  volume: pg.sum('e.amount'),
+  quote_volume: pg.raw('sum(e.amount * e.price)'),
   max_height: pg.max('height'),
-  txs_count: pg.raw('count(e.price)'),
+  txs_count: pg.count('e.price'),
   weighted_average_price: pg.raw(
-    'sum((e.amount * 10 ^(-a.decimals))::numeric * (e.price * 10 ^(-8 - p.decimals + a.decimals))::numeric)/sum((e.amount * 10 ^(-a.decimals))::numeric)'
+    'sum((e.amount)::numeric * (e.price)::numeric)/sum((e.amount)::numeric)'
   ),
-  open: pg.raw(
-    '(array_agg(e.price * 10 ^(-8 - p.decimals + a.decimals) ORDER BY e.candle_time)::numeric[])[1]'
-  ),
+  open: pg.raw('(array_agg(e.price ORDER BY e.candle_time)::numeric[])[1]'),
   close: pg.raw(
-    '(array_agg(e.price * 10 ^(-8 - p.decimals + a.decimals) ORDER BY e.candle_time DESC)::numeric[])[1]'
+    '(array_agg(e.price ORDER BY e.candle_time DESC)::numeric[])[1]'
   ),
   interval: pg.raw(`'${CandleInterval.Minute1}'`),
   matcher_address_uid: 'e.sender_uid',
@@ -60,15 +56,20 @@ const insertIntoCandlesFromSelect = (tableName, selectFunction) =>
   pg.into(tableName).insert(selectFunction);
 
 /** selectExchanges :: QueryBuilder */
-const selectExchanges = pg({ t: 'txs_7' }).select({
-  amount_asset_uid: pg.raw('coalesce(t.amount_asset_uid, 0)'),
-  price_asset_uid: pg.raw('coalesce(t.price_asset_uid, 0)'),
-  sender_uid: 't.sender_uid',
-  height: 't.height',
-  candle_time: pgRawDateTrunc('t.time_stamp')('minute'),
-  amount: 't.amount',
-  price: 't.price',
-});
+const selectExchanges = pg({ t: 'txs_7' })
+  .select({
+    amount_asset_uid: pg.raw('coalesce(t.amount_asset_uid, 0)'),
+    price_asset_uid: pg.raw('coalesce(t.price_asset_uid, 0)'),
+    sender_uid: 't.sender_uid',
+    height: 't.height',
+    candle_time: pgRawDateTrunc('t.time_stamp')('minute'),
+    amount: pg.raw('t.amount * 10 ^(-coalesce(a.decimals, 8))'),
+    price: pg.raw(
+      't.price * 10 ^(-8 - coalesce(p.decimals, 8) + coalesce(a.decimals, 8))'
+    ),
+  })
+  .join({ a: 'assets' }, 'a.uid', 't.amount_asset_uid')
+  .join({ p: 'assets' }, 'p.uid', 't.price_asset_uid');
 
 /** selectExchangesAfterTimestamp :: Date -> QueryBuilder */
 const selectExchangesAfterTimestamp = fromTimestamp =>
@@ -191,8 +192,6 @@ const insertAllMinuteCandles = tableName =>
     this.with('e_cte', selectExchanges)
       .select(candleSelectColumns)
       .from({ e: 'e_cte' })
-      .leftJoin({ a: 'assets' }, 'a.uid', 'e.amount_asset_uid')
-      .leftJoin({ p: 'assets' }, 'p.uid', 'e.price_asset_uid')
       .groupByRaw(
         'e.candle_time, e.amount_asset_uid, e.price_asset_uid, e.sender_uid'
       );
@@ -221,8 +220,6 @@ const selectCandlesAfterTimestamp = timetamp =>
         .clone()
         .as('e')
     )
-    .leftJoin({ a: 'assets' }, 'a.uid', 'e.amount_asset_uid')
-    .leftJoin({ p: 'assets' }, 'p.uid', 'e.price_asset_uid')
     .groupBy([
       'e.candle_time',
       'e.amount_asset_uid',
