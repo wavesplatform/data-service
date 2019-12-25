@@ -76,7 +76,7 @@ const roundTo = curry(
             newDate.setUTCDate(
               newDate.getUTCDate() -
                 newDate.getUTCDay() +
-                roundFn(newDate.getUTCDay() / 7) * 7 +
+                roundFn((newDate.getUTCDay() - 1) / 7) * 7 +
                 1
             );
           }
