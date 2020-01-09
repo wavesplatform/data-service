@@ -11,9 +11,9 @@ import {
   ResolverError,
   DbError,
   Timeout,
-} from '../../../../errorHandling/';
+} from '../../../../errorHandling';
 
-import { get } from '../';
+import { get } from '..';
 import { PgDriver } from '../../../../db/driver';
 import { ValidateAsync, ValidateSync } from '../types';
 
@@ -47,7 +47,6 @@ describe('Resolver', () => {
   ) =>
     get<string, string, string, string>({
       ...commonConfig,
-      validateInput,
       validateResult,
     });
 
@@ -69,7 +68,6 @@ describe('Resolver', () => {
 
     const goodResolver = get<string, string, string, string>({
       ...commonConfig,
-      validateInput: inputOk,
       validateResult: resultOk,
     });
 
@@ -92,7 +90,6 @@ describe('Resolver', () => {
 
     const goodResolver = get<string, string, string, string>({
       ...commonConfig,
-      validateInput: inputOk,
       validateResult: resultOk,
       emitEvent: outerSpy,
     });
@@ -146,7 +143,6 @@ describe('Resolver', () => {
     const spiedDbQuery = jest.spyOn(mockPgDriver, 'one');
     const badInputResolver = get<string, string, string, string>({
       ...commonConfig,
-      validateInput: inputError,
       validateResult: resultOk,
     });
 

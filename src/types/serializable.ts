@@ -3,7 +3,7 @@ export type Serializable<T extends string, U> = {
   data: U | null;
 };
 
-export type Transform<U, S extends Serializable<string, U>> = (data: U) => S;
+export type Transform<U, S> = (data: U) => S;
 
 export type FromSerializable<
   T extends Serializable<string, any>

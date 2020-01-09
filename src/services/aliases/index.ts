@@ -1,70 +1,45 @@
-import { getByIdPreset } from '../presets/pg/getById';
-import { searchPreset } from '../presets/pg/search';
-import { AliasInfo, ServiceGet, ServiceSearch, ServiceMget } from '../../types';
+import { Maybe } from 'folktale/maybe';
 
-import { CommonServiceDependencies } from '..';
-import { transformResults as transformSearch } from '../presets/pg/search/transformResult';
-import * as sql from './data/sql';
-import { AliasDbResponse, transformDbResponse } from './data/transformResult';
-import { inputGet, inputMGet, inputSearch, output } from './schema';
-import { mgetByIdsPreset } from '../../services/presets/pg/mgetByIds';
-import { propEq } from 'ramda';
+import { AliasInfo, Repo, Service, SearchedItems } from '../../types';
 
-import { withStatementTimeout } from '../../db/driver';
+import {
+  AliasesGetRequest,
+  AliasesMgetRequest,
+  AliasesSearchRequest,
+} from './repo';
+import { WithDecimalsFormat } from 'services/types';
 
-export type AliasesGetRequest = string;
-export type AliasesMgetRequest = string[];
-export type AliasesSearchRequest = {
-  address: string;
-  showBroken: boolean;
+export type AliasesServiceGetRequest = {
+  id: AliasesGetRequest;
 };
 
-export type AliasesService = ServiceGet<AliasesGetRequest, AliasInfo> &
-  ServiceMget<AliasesMgetRequest, (AliasInfo | null)[]> &
-  ServiceSearch<AliasesSearchRequest, AliasInfo[]>;
-
-export default ({
-  drivers,
-  emitEvent,
-  timeouts,
-}: CommonServiceDependencies): AliasesService => {
-  return {
-    get: getByIdPreset<string, AliasDbResponse, AliasInfo>({
-      name: 'aliases.get',
-      sql: sql.get,
-      inputSchema: inputGet,
-      resultSchema: output,
-      transformResult: transformDbResponse,
-    })({
-      pg: withStatementTimeout(drivers.pg, timeouts.get),
-      emitEvent: emitEvent,
-    }),
-
-    mget: mgetByIdsPreset<string, AliasDbResponse, AliasInfo>({
-      name: 'aliases.mget',
-      sql: sql.mget,
-      inputSchema: inputMGet,
-      resultSchema: output,
-      transformResult: transformDbResponse,
-      matchRequestResult: propEq('alias'),
-    })({
-      pg: withStatementTimeout(drivers.pg, timeouts.mget),
-      emitEvent: emitEvent,
-    }),
-
-    search: searchPreset<AliasesSearchRequest, AliasDbResponse, AliasInfo>({
-      name: 'aliases.search',
-      sql: sql.search,
-      inputSchema: inputSearch,
-      resultSchema: output,
-      transformResult: transformSearch<
-        AliasesSearchRequest,
-        AliasDbResponse,
-        AliasInfo
-      >(transformDbResponse),
-    })({
-      pg: withStatementTimeout(drivers.pg, timeouts.search),
-      emitEvent: emitEvent,
-    }),
-  };
+export type AliasesServiceMgetRequest = {
+  ids: AliasesMgetRequest;
 };
+
+export type AliasesServiceSearchRequest = AliasesSearchRequest;
+
+export type AliasesService = {
+  get: Service<AliasesServiceGetRequest & WithDecimalsFormat, Maybe<AliasInfo>>;
+  mget: Service<
+    AliasesServiceMgetRequest & WithDecimalsFormat,
+    Maybe<AliasInfo>[]
+  >;
+  search: Service<
+    AliasesServiceSearchRequest & WithDecimalsFormat,
+    SearchedItems<AliasInfo>
+  >;
+};
+
+export default (
+  repo: Repo<
+    AliasesGetRequest,
+    AliasesMgetRequest,
+    AliasesSearchRequest,
+    AliasInfo
+  >
+): AliasesService => ({
+  get: req => repo.get(req.id),
+  mget: req => repo.mget(req.ids),
+  search: req => repo.search(req),
+});

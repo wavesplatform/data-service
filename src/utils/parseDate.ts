@@ -1,12 +1,15 @@
-import { Result, Error as error, Ok as ok } from 'folktale/result';
-import { ValidationError } from '../errorHandling';
+import { Error as error, Ok as ok } from 'folktale/result';
+import { ParseError } from '../errorHandling';
+import { Parser } from '../http/_common/filters/types';
+import { isNil } from 'ramda';
 
-export const parseDate = (str: string): Result<ValidationError, Date> => {
+export type ParseDate = Parser<Date | undefined>;
+
+export const parseDate: ParseDate = str => {
+  if (isNil(str)) return ok(undefined);
+
   const d = new Date(/^-?\d+$/.test(str) ? parseInt(str) : str);
   return isNaN(d.getTime())
-    ? error(new ValidationError('Date is not valid'))
+    ? error(new ParseError('Date is not valid'))
     : ok(d);
 };
-
-export const dateOrNull = (str: string): Date | null =>
-  parseDate(str).getOrElse(null);

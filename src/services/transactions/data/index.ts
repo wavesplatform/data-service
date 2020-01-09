@@ -1,122 +1,40 @@
-import { identity, compose } from 'ramda';
-
-import { withStatementTimeout } from '../../../db/driver';
-import { CommonServiceDependencies } from '../..';
-import { DataTxEntryType } from '../../../types';
+import { Maybe } from 'folktale/maybe';
 import {
-  transaction,
-  TransactionInfo,
-  Transaction,
-  List,
   Service,
+  SearchedItems,
+  ServiceGetRequest,
+  ServiceMgetRequest,
 } from '../../../types';
-
-import { WithLimit, WithSortOrder } from '../../_common';
-import { get, mget, search } from '../../_common/createResolver';
-import { RawTx, CommonFilters } from '../_common/types';
-
-// validation
-import { inputGet } from '../../presets/pg/getById/inputSchema';
-import { inputMget } from '../../presets/pg/mgetByIds/inputSchema';
-import { validateInput, validateResult } from '../../presets/validation';
-
-// transformation
-import { transformResults as transformResultGet } from '../../presets/pg/getById/transformResult';
-import { transformResults as transformResultMget } from '../../presets/pg/mgetByIds/transformResult';
-import { transformInput as transformInputSearch } from '../../presets/pg/searchWithPagination/transformInput';
-import { transformResults as transformResultSearch } from '../../presets/pg/searchWithPagination/transformResult';
-
-import { serialize, deserialize } from '../_common/cursor';
+import { WithDecimalsFormat } from '../../types';
 import {
-  result as resultSchema,
-  inputSearch as inputSearchSchema,
-} from './schema';
-import { pg as pgData } from './pg';
-import * as transformTxInfo from './transformTxInfo';
-
-const createServiceName = (type: string): string => `transactions.data.${type}`;
-
-type DataTxsSearchRequest = CommonFilters &
-  WithSortOrder &
-  WithLimit &
-  Partial<{
-    key: string;
-    type: DataTxEntryType;
-    value: string;
-  }>;
-
-type DataEntry = {
-  key: string;
-  type: DataTxEntryType;
-  value: string;
-};
-
-type DataTxDbResponse = RawTx & {
-  data: DataEntry[];
-};
-
-export type DataTxsService = Service<
-  string,
-  string[],
+  DataTxsRepo,
+  DataTxsGetRequest,
+  DataTxsMgetRequest,
   DataTxsSearchRequest,
-  Transaction
->;
+} from './repo/types';
+import { TransactionInfo } from '../../../types';
 
-export default ({
-  drivers: { pg },
-  emitEvent,
-  timeouts,
-}: CommonServiceDependencies): DataTxsService => {
-  return {
-    get: get<string, string, DataTxDbResponse, Transaction>({
-      transformInput: identity,
-      transformResult: transformResultGet<
-        string,
-        DataTxDbResponse,
-        TransactionInfo,
-        Transaction
-      >(transaction)(transformTxInfo),
-      validateInput: validateInput(inputGet, createServiceName('get')),
-      validateResult: validateResult(resultSchema, createServiceName('get')),
-      getData: pgData.get(withStatementTimeout(pg, timeouts.get)),
-      emitEvent,
-    }),
+export type DataTxsServiceGetRequest = ServiceGetRequest<DataTxsGetRequest>;
+export type DataTxsServiceMgetRequest = ServiceMgetRequest<DataTxsMgetRequest>;
+export type DataTxsServiceSearchRequest = DataTxsSearchRequest;
 
-    mget: mget<string[], string[], DataTxDbResponse, List<Transaction>>({
-      transformInput: identity,
-      transformResult: transformResultMget<
-        string[],
-        DataTxDbResponse,
-        TransactionInfo,
-        Transaction
-      >(transaction)(transformTxInfo),
-      validateInput: validateInput(inputMget, createServiceName('mget')),
-      validateResult: validateResult(resultSchema, createServiceName('mget')),
-      getData: pgData.mget(withStatementTimeout(pg, timeouts.mget)),
-      emitEvent,
-    }),
-
-    search: search<
-      DataTxsSearchRequest,
-      DataTxsSearchRequest,
-      DataTxDbResponse,
-      List<Transaction>
-    >({
-      transformInput: transformInputSearch(deserialize),
-      transformResult: transformResultSearch(
-        compose<DataTxDbResponse, TransactionInfo | null, Transaction>(
-          transaction,
-          transformTxInfo
-        ),
-        serialize
-      ),
-      validateInput: validateInput(
-        inputSearchSchema,
-        createServiceName('search')
-      ),
-      validateResult: validateResult(resultSchema, createServiceName('search')),
-      getData: pgData.search(withStatementTimeout(pg, timeouts.search)),
-      emitEvent,
-    }),
-  };
+export type DataTxsService = {
+  get: Service<
+    DataTxsServiceGetRequest & WithDecimalsFormat,
+    Maybe<TransactionInfo>
+  >;
+  mget: Service<
+    DataTxsServiceMgetRequest & WithDecimalsFormat,
+    Maybe<TransactionInfo>[]
+  >;
+  search: Service<
+    DataTxsServiceSearchRequest & WithDecimalsFormat,
+    SearchedItems<TransactionInfo>
+  >;
 };
+
+export default (repo: DataTxsRepo): DataTxsService => ({
+  get: req => repo.get(req.id),
+  mget: req => repo.mget(req.ids),
+  search: req => repo.search(req),
+});

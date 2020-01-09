@@ -1,66 +1,100 @@
 import { Context } from 'koa';
+import { Result, Ok as ok } from 'folktale/result';
 import { Task } from 'folktale/concurrency/task';
-import { defaultTo } from 'ramda';
-
-import { AppError, ParseError } from '../../errorHandling';
-import { Endpoint, DecimalsFormat } from '../../endpoints/types';
-import {
-  RequestHeaders,
-  WITH_DECIMALS_HEADER,
-  LSN_FORMAT_HEADER,
-} from '../../types';
-import { Transform, Serializable } from '../../types/serializable';
-
-import { LSNFormat } from '../types';
-import { Result, Ok as okOf, Error as errorOf } from 'folktale/result';
+import { ParseError, AppError, ResolverError } from '../../errorHandling';
+import { WithDecimalsFormat } from '../../services/types';
 import { resultToTask } from '../../utils/fp';
+import { handleError } from '../_common/handleError';
+import { LSNFormat } from '../types';
+import { HttpRequest, HttpResponse } from './types';
+import {
+  defaultStringify,
+  parseLSN,
+  parseDecimals,
+  setHttpResponse,
+} from './utils';
 
-const { stringify } = require('../utils/json');
+export function createHttpHandler<Params extends string[], Request>(
+  getResponse: (
+    request: WithDecimalsFormat,
+    lsnFormat: LSNFormat
+  ) => Task<AppError, HttpResponse>
+): (ctx: Context) => Promise<void>;
+export function createHttpHandler<Params extends string[], Request>(
+  getResponse: (
+    request: Request & WithDecimalsFormat,
+    lsnFormat: LSNFormat
+  ) => Task<AppError, HttpResponse>,
+  parseRequest: (
+    httpRequest: HttpRequest<Params>
+  ) => Result<ParseError, Request>
+): (ctx: Context) => Promise<void>;
+export function createHttpHandler<Params extends string[], Request>(
+  getResponse: (
+    req: WithDecimalsFormat | (Request & WithDecimalsFormat),
+    lsnFormat: LSNFormat
+  ) => Task<AppError, HttpResponse>,
+  parseRequest?: (
+    httpRequest: HttpRequest<Params>
+  ) => Result<ParseError, Request>
+): (ctx: Context) => Promise<void> {
+  return async (ctx: Context): Promise<void> => {
+    ctx.eventBus.emit('ENDPOINT_RESOLVED', {
+      value: ctx.originalUrl,
+    });
 
-export const createHttpHandler = <
-  Request,
-  EndpointResponse,
-  HttpResponse extends Serializable<string, any>
->(
-  parse: (ctx: Context) => Result<ParseError, Request>,
-  endpoint: Endpoint<Request, EndpointResponse>,
-  transform: Transform<EndpointResponse, HttpResponse>
-) => (ctx: Context): Task<AppError, string> => {
-  // const dec: ApplyDecimals = parseDec(ctx);
-  return resultToTask(parse(ctx))
-    .chain(req => endpoint(req))
-    .map(transform)
-    .map(serializeWithLSN(parseLSN(ctx)));
-};
+    const setResponse = setHttpResponse(ctx);
 
-const serializeWithLSN = (data: any) => stringify(data);
+    const safeParse: (
+      httpRequest: HttpRequest<Params>
+    ) => Result<ParseError, Request | void> = parseRequest || (() => ok());
 
-const parseLSN = (ctx: Context) => {
-  const headers: RequestHeaders = ctx.headers;
+    try {
+      await resultToTask(
+        safeParse({
+          params: ctx.params,
+          query: ctx.query,
+          headers: ctx.headers,
+        }).chain(req =>
+          parseDecimals(ctx.headers).map(dec => ({
+            ...req,
+            decimalsFormat: dec,
+          }))
+        )
+      )
+        .chain(req =>
+          resultToTask(parseLSN(ctx.headers)).chain(lsnFormat =>
+            getResponse(req, lsnFormat)
+          )
+        )
+        .mapRejected(e => {
+          const { status, body } = handleError(e);
 
-  if (
-    typeof headers[LSN_FORMAT_HEADER] === 'string' &&
-    ![LSNFormat.Number, LSNFormat.String].includes(
-      headers[LSN_FORMAT_HEADER] as LSNFormat
-    )
-  ) {
-    return errorOf(new ParseError(new Error('Invalid LongFormat')));
-  }
+          ctx.eventBus.emit('ERROR', e);
 
-  return okOf(defaultTo(LSNFormat.String, headers[LSN_FORMAT_HEADER]));
-};
+          return {
+            status,
+            body: defaultStringify(body),
+          };
+        })
+        .run()
+        .promise()
+        .then(setResponse)
+        .catch(setResponse);
+    } catch (e) {
+      const err = new ResolverError(e);
+      const { status, body } = handleError(err);
 
-export const withDecimals = (ctx: Context) => {
-  const headers: RequestHeaders = ctx.headers;
+      ctx.eventBus.emit('ERROR', err);
 
-  if (
-    headers[WITH_DECIMALS_HEADER] &&
-    ![DecimalsFormat.Float, DecimalsFormat.Long].includes(
-      headers[WITH_DECIMALS_HEADER] as DecimalsFormat
-    )
-  ) {
-    return errorOf(new ParseError(new Error('Invalid LongFormat')));
-  }
+      setResponse({
+        status,
+        body: defaultStringify(body),
+      });
+    }
 
-  return okOf(defaultTo(DecimalsFormat.Float, headers[WITH_DECIMALS_HEADER]));
-};
+    ctx.eventBus.emit('ENDPOINT_RESOLVED', {
+      value: ctx.body,
+    });
+  };
+}

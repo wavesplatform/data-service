@@ -6,7 +6,7 @@ import { Maybe } from 'folktale/maybe';
 // @todo refactor after ramda fix
 import { tap } from '../../../utils/tap';
 
-import { resultToTask } from '../../../utils/fp/';
+import { resultToTask } from '../../../utils/fp';
 
 import { applyValidation } from './applyToResult';
 export { applyTransformation } from './applyToResult';
@@ -16,7 +16,7 @@ import {
   DbError,
   AppError,
   Timeout,
-} from '../../../errorHandling/';
+} from '../../../errorHandling';
 
 import {
   EmitEvent,
@@ -24,8 +24,9 @@ import {
   MgetResolverDependencies,
   SearchResolverDependencies,
   ValidateSync,
-  ValidateAsync,
 } from './types';
+
+import { SearchedItems } from '../../../types';
 
 const createResolver = <
   RequestRaw,
@@ -33,7 +34,6 @@ const createResolver = <
   ResponseRaw,
   ResponseTransformed
 >(
-  validateInput: ValidateAsync<AppError, RequestRaw>,
   transformInput: (r: RequestRaw) => RequestTransformed,
   getData: (r: RequestTransformed) => Task<DbError | Timeout, ResponseRaw>,
   validateAllResults: ValidateSync<ResolverError, ResponseRaw>,
@@ -45,8 +45,6 @@ const createResolver = <
   request: RequestRaw
 ): Task<AppError, ResponseTransformed> =>
   taskOf<never, RequestRaw>(request)
-    .chain(validateInput)
-    .map(tap(emitEvent('INPUT_VALIDATION_OK')))
     .map(transformInput)
     .map(tap(emitEvent('TRANSFORM_INPUT_OK')))
     .chain(getData)
@@ -69,14 +67,13 @@ const getResolver = <
     ResponseRaw,
     ResponseTransformed
   >
-) => (request: RequestRaw) =>
+) => (request: RequestRaw): Task<AppError, Maybe<ResponseTransformed>> =>
   createResolver<
     RequestRaw,
     RequestTransformed,
     Maybe<ResponseRaw>,
     Maybe<ResponseTransformed>
   >(
-    dependencies.validateInput,
     dependencies.transformInput,
     dependencies.getData,
     applyValidation.get(dependencies.validateResult),
@@ -102,9 +99,8 @@ const mgetResolver = <
     RequestRaw,
     RequestTransformed,
     Maybe<ResponseRaw>[],
-    ResponseTransformed
+    Maybe<ResponseTransformed>[]
   >(
-    dependencies.validateInput,
     dependencies.transformInput,
     dependencies.getData,
     applyValidation.mget(dependencies.validateResult),
@@ -130,9 +126,8 @@ const searchResolver = <
     RequestRaw,
     RequestTransformed,
     ResponseRaw[],
-    ResponseTransformed
+    SearchedItems<ResponseTransformed>
   >(
-    dependencies.validateInput,
     dependencies.transformInput,
     dependencies.getData,
     applyValidation.search(dependencies.validateResult),

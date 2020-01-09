@@ -1,4 +1,4 @@
-import { AppError } from '../../../../errorHandling/';
+import { AppError } from '../../../../errorHandling';
 import { of as maybeOf, empty, Maybe } from 'folktale/maybe';
 import { Ok, Error /* Result */ } from 'folktale/result';
 

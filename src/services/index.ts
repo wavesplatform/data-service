@@ -1,55 +1,75 @@
 import { Task, of as taskOf } from 'folktale/concurrency/task';
 
 import { AppError } from '../errorHandling';
-import createAliasesService, { AliasService } from './aliases';
-import createAssetsService, {
-  AssetsService,
+
+import createAliasesService, { AliasesService } from './aliases';
+import createAliasesRepo from './aliases/repo';
+
+import createAssetsService, { AssetsService } from './assets';
+import createAssetsRepo, {
   createCache as createAssetsCache,
-} from './assets';
+} from './assets/repo';
+
 import createCandlesService, { CandlesService } from './candles';
-import createPairsService, {
-  createCache as createPairsCache,
-  PairsService,
-} from './pairs';
+import createCandlesRepo from './candles/repo';
+import createPairsService, { PairsService } from './pairs';
+import createPairsRepo, { createCache as createPairsCache } from './pairs/repo';
 import createAllTxsService, { AllTxsService } from './transactions/all';
+import createAllTxsRepo from './transactions/all/repo';
 import createAliasTxsService, { AliasTxsService } from './transactions/alias';
+import createAliasTxsRepo from './transactions/alias/repo';
 import createBurnTxsService, { BurnTxsService } from './transactions/burn';
+import createBurnTxsRepo from './transactions/burn/repo';
 import createDataTxsService, { DataTxsService } from './transactions/data';
+import createDataTxsRepo from './transactions/data/repo';
 import createExchangeTxsService, {
   ExchangeTxsService,
 } from './transactions/exchange';
+import createExchangeTxsRepo from './transactions/exchange/repo';
 import createGenesisTxsService, {
   GenesisTxsService,
 } from './transactions/genesis';
+import createGenesisTxsRepo from './transactions/genesis/repo';
 import createInvokeScriptTxsService, {
   InvokeScriptTxsService,
 } from './transactions/invokeScript';
+import createInvokeScriptTxsRepo from './transactions/invokeScript/repo';
 import createIssueTxsService, { IssueTxsService } from './transactions/issue';
+import createIssueTxsRepo from './transactions/issue/repo';
 import createLeaseTxsService, { LeaseTxsService } from './transactions/lease';
+import createLeaseTxsRepo from './transactions/lease/repo';
 import createLeaseCancelTxsService, {
   LeaseCancelTxsService,
 } from './transactions/leaseCancel';
+import createLeaseCancelTxsRepo from './transactions/leaseCancel/repo';
 import createMassTransferTxsService, {
   MassTransferTxsService,
 } from './transactions/massTransfer';
+import createMassTransferTxsRepo from './transactions/massTransfer/repo';
 import createPaymentTxsService, {
   PaymentTxsService,
 } from './transactions/payment';
+import createPaymentTxsRepo from './transactions/payment/repo';
 import createReissueTxsService, {
   ReissueTxsService,
 } from './transactions/reissue';
+import createReissueTxsRepo from './transactions/reissue/repo';
 import createSetAssetScriptTxsService, {
   SetAssetScriptTxsService,
 } from './transactions/setAssetScript';
+import createSetAssetScriptTxsRepo from './transactions/setAssetScript/repo';
 import createSetScriptTxsService, {
   SetScriptTxsService,
 } from './transactions/setScript';
+import createSetScriptTxsRepo from './transactions/setScript/repo';
 import createSponsorshipTxsService, {
   SponsorshipTxsService,
 } from './transactions/sponsorship';
+import createSponsorshipTxsRepo from './transactions/sponsorship/repo';
 import createTransferTxsService, {
   TransferTxsService,
 } from './transactions/transfer';
+import createTransferTxsRepo from './transactions/transfer/repo';
 import { DataServiceConfig } from '../loadConfig';
 import createRateService, { RateCacheImpl } from './rates';
 
@@ -57,12 +77,18 @@ import { PairOrderingServiceImpl } from './PairOrderingService';
 
 import { PgDriver } from '../db/driver';
 import { EmitEvent } from './_common/createResolver/types';
-import { ServiceMget, Rate, RateMgetParams, AssetIdsPair } from '../types';
+import {
+  Service,
+  RateMgetParams,
+  AssetIdsPair,
+  RateWithPairIds,
+} from '../types';
 import { RateCache } from './rates/repo';
+import { WithDecimalsFormat } from './types';
 
-import { validatePairs } from './validation/pairs';
+import { validatePairs } from './_common/validation/pairs';
 
-export type CommonServiceDependencies = {
+export type CommonRepoDependencies = {
   drivers: {
     pg: PgDriver;
   };
@@ -74,18 +100,18 @@ export type CommonServiceDependencies = {
   };
 };
 
-export type RateSerivceCreatorDependencies = CommonServiceDependencies & {
+export type RateSerivceCreatorDependencies = CommonRepoDependencies & {
   cache: RateCache;
 };
 
 export type ServiceMesh = {
-  aliases: AliasService;
+  aliases: AliasesService;
   assets: AssetsService;
   candles: CandlesService;
   matchers: {
     pairs: PairsService;
     candles: CandlesService;
-    rates: ServiceMget<RateMgetParams, Rate>;
+    rates: Service<RateMgetParams & WithDecimalsFormat, RateWithPairIds[]>;
   };
   pairs: PairsService;
   transactions: {
@@ -146,57 +172,79 @@ export default ({
       };
 
       // common init services
-      const aliases = createAliasesService(commonDeps);
-      const assets = createAssetsService({
+      const aliasesRepo = createAliasesRepo(commonDeps);
+      const aliases = createAliasesService(aliasesRepo);
+
+      const assetsRepo = createAssetsRepo({
         ...commonDeps,
         cache: assetsCache,
       });
+      const assets = createAssetsService(assetsRepo);
 
-      const aliasTxs = createAliasTxsService(commonDeps);
-      const burnTxs = createBurnTxsService(commonDeps);
-      const dataTxs = createDataTxsService(commonDeps);
-      const exchangeTxs = createExchangeTxsService(commonDeps);
-      const genesisTxs = createGenesisTxsService(commonDeps);
-      const invokeScriptTxs = createInvokeScriptTxsService(commonDeps);
-      const issueTxs = createIssueTxsService(commonDeps);
-      const leaseTxs = createLeaseTxsService(commonDeps);
-      const leaseCancelTxs = createLeaseCancelTxsService(commonDeps);
-      const massTransferTxs = createMassTransferTxsService(commonDeps);
-      const paymentTxs = createPaymentTxsService(commonDeps);
-      const reissueTxs = createReissueTxsService(commonDeps);
-      const setAssetScriptTxs = createSetAssetScriptTxsService(commonDeps);
-      const setScriptTxs = createSetScriptTxsService(commonDeps);
-      const sponsorshipTxs = createSponsorshipTxsService(commonDeps);
-      const transferTxs = createTransferTxsService(commonDeps);
+      const aliasTxsRepo = createAliasTxsRepo(commonDeps);
+      const aliasTxs = createAliasTxsService(aliasTxsRepo);
+      const burnTxsRepo = createBurnTxsRepo(commonDeps);
+      const burnTxs = createBurnTxsService(burnTxsRepo);
+      const dataTxsRepo = createDataTxsRepo(commonDeps);
+      const dataTxs = createDataTxsService(dataTxsRepo);
+      const exchangeTxsRepo = createExchangeTxsRepo(commonDeps);
+      const exchangeTxs = createExchangeTxsService(exchangeTxsRepo);
+      const genesisTxsRepo = createGenesisTxsRepo(commonDeps);
+      const genesisTxs = createGenesisTxsService(genesisTxsRepo);
+      const invokeScriptTxsRepo = createInvokeScriptTxsRepo(commonDeps);
+      const invokeScriptTxs = createInvokeScriptTxsService(invokeScriptTxsRepo);
+      const issueTxsRepo = createIssueTxsRepo(commonDeps);
+      const issueTxs = createIssueTxsService(issueTxsRepo);
+      const leaseTxsRepo = createLeaseTxsRepo(commonDeps);
+      const leaseTxs = createLeaseTxsService(leaseTxsRepo);
+      const leaseCancelTxsRepo = createLeaseCancelTxsRepo(commonDeps);
+      const leaseCancelTxs = createLeaseCancelTxsService(leaseCancelTxsRepo);
+      const massTransferTxsRepo = createMassTransferTxsRepo(commonDeps);
+      const massTransferTxs = createMassTransferTxsService(massTransferTxsRepo);
+      const paymentTxsRepo = createPaymentTxsRepo(commonDeps);
+      const paymentTxs = createPaymentTxsService(paymentTxsRepo);
+      const reissueTxsRepo = createReissueTxsRepo(commonDeps);
+      const reissueTxs = createReissueTxsService(reissueTxsRepo);
+      const setAssetScriptTxsRepo = createSetAssetScriptTxsRepo(commonDeps);
+      const setAssetScriptTxs = createSetAssetScriptTxsService(
+        setAssetScriptTxsRepo
+      );
+      const setScriptTxsRepo = createSetScriptTxsRepo(commonDeps);
+      const setScriptTxs = createSetScriptTxsService(setScriptTxsRepo);
+      const sponsorshipTxsRepo = createSponsorshipTxsRepo(commonDeps);
+      const sponsorshipTxs = createSponsorshipTxsService(sponsorshipTxsRepo);
+      const transferTxsRepo = createTransferTxsRepo(commonDeps);
+      const transferTxs = createTransferTxsService(transferTxsRepo);
+
       const rates = createRateService({
         ...commonDeps,
         cache: ratesCache,
       });
 
-      const pairsNoAsyncValidation = createPairsService({
-        ...commonDeps,
-        cache: pairsCache,
-        validatePairs: () => taskOf(undefined),
-      });
-      const pairsWithAsyncValidation = createPairsService({
-        ...commonDeps,
-        cache: pairsCache,
-        validatePairs: validatePairs(assets, pairOrderingService),
-      });
+      const pairsRepo = createPairsRepo({ ...commonDeps, cache: pairsCache });
+      const pairsNoAsyncValidation = createPairsService(pairsRepo, () =>
+        taskOf(undefined)
+      );
+      const pairsWithAsyncValidation = createPairsService(
+        pairsRepo,
+        (matcher: string, pair: AssetIdsPair) =>
+          validatePairs(assets.mget, pairOrderingService)(matcher, [pair])
+      );
 
-      const candlesNoAsyncValidation = createCandlesService({
-        ...commonDeps,
-        validatePair: () => taskOf(undefined),
-      });
-      const candlesWithAsyncValidation = createCandlesService({
-        ...commonDeps,
-        validatePair: (matcher: string, pair: AssetIdsPair) =>
-          validatePairs(assets, pairOrderingService)(matcher, [pair]),
-      });
+      const candlesRepo = createCandlesRepo(commonDeps);
+      const candlesNoAsyncValidation = createCandlesService(candlesRepo, () =>
+        taskOf(undefined)
+      );
+      const candlesWithAsyncValidation = createCandlesService(
+        candlesRepo,
+        (matcher: string, pair: AssetIdsPair) =>
+          validatePairs(assets.mget, pairOrderingService)(matcher, [pair])
+      );
 
       // specific init services
       // all txs service
-      const allTxs = createAllTxsService(commonDeps)({
+      const allTxsRepo = createAllTxsRepo(commonDeps);
+      const allTxs = createAllTxsService(allTxsRepo)({
         1: genesisTxs,
         2: paymentTxs,
         3: issueTxs,

@@ -1,67 +1,32 @@
 import { Task } from 'folktale/concurrency/task';
-import { identity } from 'ramda';
-
-import { withStatementTimeout } from '../../db/driver';
-import { Candle, List, ServiceSearch, AssetIdsPair } from '../../types';
-import { CommonServiceDependencies } from '..';
-
-import { sql } from './sql';
-import { inputSearch, output } from './schema';
-import { CandleDbResponse, transformResults } from './transformResults';
 
 import { AppError } from '../../errorHandling';
 
-import { validateInput, validateResult } from '../presets/validation';
-import { getData } from '../presets/pg/search/pg';
+import { Service, SearchedItems, CandleInfo, AssetIdsPair } from '../../types';
 
-import { search } from './../_common/createResolver/index';
+import { WithDecimalsFormat } from '../types';
 
-export type CandlesSearchRequest = {
-  amountAsset: string;
-  priceAsset: string;
-  timeStart: Date;
-  timeEnd: Date;
-  interval: string;
-  matcher: string;
+import { CandlesSearchRequest, CandlesRepo } from './repo';
+
+export type CandlesServiceSearchRequest = CandlesSearchRequest;
+
+export type CandlesService = {
+  search: Service<
+    CandlesServiceSearchRequest & WithDecimalsFormat,
+    SearchedItems<CandleInfo>
+  >;
 };
 
-export type CandlesService = ServiceSearch<CandlesSearchRequest, Candle>;
-
-export default ({
-  drivers: { pg },
-  emitEvent,
-  timeouts,
-  validatePair,
-}: CommonServiceDependencies & {
-  validatePair: (matcher: string, pair: AssetIdsPair) => Task<AppError, void>;
-}): CandlesService => {
-  const SERVICE_NAME = 'candles.search';
-  return {
-    search: search<
-      CandlesSearchRequest,
-      CandlesSearchRequest,
-      CandleDbResponse,
-      List<Candle>
-    >({
-      transformInput: identity,
-      transformResult: transformResults,
-      validateInput: req =>
-        validateInput<CandlesSearchRequest>(
-          inputSearch,
-          SERVICE_NAME
-        )(req).chain(() =>
-          validatePair(req.matcher, {
-            amountAsset: req.amountAsset,
-            priceAsset: req.priceAsset,
-          }).map(() => req)
-        ),
-      validateResult: validateResult(output, SERVICE_NAME),
-      getData: getData({
-        name: SERVICE_NAME,
-        sql,
-        pg: withStatementTimeout(pg, timeouts.search),
-      }),
-      emitEvent,
-    }),
-  };
-};
+export default (
+  repo: CandlesRepo,
+  validatePair: (matcher: string, pair: AssetIdsPair) => Task<AppError, void>
+): CandlesService => ({
+  search: req => {
+    return validatePair(req.matcher, {
+      amountAsset: req.amountAsset,
+      priceAsset: req.priceAsset,
+    }).chain(() => {
+      return repo.search(req);
+    });
+  },
+});

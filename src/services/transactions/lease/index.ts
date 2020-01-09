@@ -1,106 +1,42 @@
-import { propEq, compose } from 'ramda';
-import { BigNumber } from '@waves/data-entities';
-
-import { withStatementTimeout } from '../../../db/driver';
-import { CommonServiceDependencies } from '../..';
+import { Maybe } from 'folktale/maybe';
 import {
-  transaction,
-  TransactionInfo,
-  Transaction,
   Service,
+  SearchedItems,
+  ServiceGetRequest,
+  ServiceMgetRequest,
 } from '../../../types';
-import { WithLimit, WithSortOrder } from '../../_common';
-import { RequestWithCursor } from '../../_common/pagination';
-import { getByIdPreset } from '../../presets/pg/getById';
-import { mgetByIdsPreset } from '../../presets/pg/mgetByIds';
-import { searchWithPaginationPreset } from '../../presets/pg/searchWithPagination';
-import { inputGet } from '../../presets/pg/getById/inputSchema';
-import { inputMget } from '../../presets/pg/mgetByIds/inputSchema';
-
-import { Cursor, serialize, deserialize } from '../_common/cursor';
-import { RawTx, CommonFilters } from '../_common/types';
-import { transformTxInfo } from '../_common/transformTxInfo';
-
+import { WithDecimalsFormat } from '../../types';
 import {
-  result as resultSchema,
-  inputSearch as inputSearchSchema,
-} from './schema';
-import * as sql from './sql';
-
-type LeaseTxsSearchRequest = RequestWithCursor<
-  CommonFilters & WithSortOrder & WithLimit,
-  string
-> &
-  Partial<{
-    recipient: string;
-  }>;
-
-type LeaseTxDbResponse = RawTx & {
-  amount: BigNumber;
-  recipient: string;
-};
-
-export type LeaseTxsService = Service<
-  string,
-  string[],
+  LeaseTxsRepo,
+  LeaseTxsGetRequest,
+  LeaseTxsMgetRequest,
   LeaseTxsSearchRequest,
-  Transaction
+} from './repo/types';
+import { TransactionInfo } from '../../../types';
+
+export type LeaseTxsServiceGetRequest = ServiceGetRequest<LeaseTxsGetRequest>;
+export type LeaseTxsServiceMgetRequest = ServiceMgetRequest<
+  LeaseTxsMgetRequest
 >;
+export type LeaseTxsServiceSearchRequest = LeaseTxsSearchRequest;
 
-export default ({
-  drivers: { pg },
-  emitEvent,
-  timeouts,
-}: CommonServiceDependencies): LeaseTxsService => {
-  return {
-    get: getByIdPreset<string, LeaseTxDbResponse, TransactionInfo, Transaction>(
-      {
-        name: 'transactions.lease.get',
-        sql: sql.get,
-        inputSchema: inputGet,
-        resultSchema,
-        resultTypeFactory: transaction,
-        transformResult: transformTxInfo,
-      }
-    )({
-      pg: withStatementTimeout(pg, timeouts.get),
-      emitEvent,
-    }),
-
-    mget: mgetByIdsPreset<
-      string,
-      LeaseTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
-      name: 'transactions.lease.mget',
-      matchRequestResult: propEq('id'),
-      sql: sql.mget,
-      inputSchema: inputMget,
-      resultTypeFactory: transaction,
-      resultSchema,
-      transformResult: transformTxInfo,
-    })({
-      pg: withStatementTimeout(pg, timeouts.mget),
-      emitEvent,
-    }),
-
-    search: searchWithPaginationPreset<
-      Cursor,
-      LeaseTxsSearchRequest,
-      LeaseTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
-      name: 'transactions.lease.search',
-      sql: sql.search,
-      inputSchema: inputSearchSchema,
-      resultSchema,
-      transformResult: compose(transaction, transformTxInfo),
-      cursorSerialization: { serialize, deserialize },
-    })({
-      pg: withStatementTimeout(pg, timeouts.search),
-      emitEvent,
-    }),
-  };
+export type LeaseTxsService = {
+  get: Service<
+    LeaseTxsServiceGetRequest & WithDecimalsFormat,
+    Maybe<TransactionInfo>
+  >;
+  mget: Service<
+    LeaseTxsServiceMgetRequest & WithDecimalsFormat,
+    Maybe<TransactionInfo>[]
+  >;
+  search: Service<
+    LeaseTxsServiceSearchRequest & WithDecimalsFormat,
+    SearchedItems<TransactionInfo>
+  >;
 };
+
+export default (repo: LeaseTxsRepo): LeaseTxsService => ({
+  get: req => repo.get(req.id),
+  mget: req => repo.mget(req.ids),
+  search: req => repo.search(req),
+});

@@ -5,9 +5,8 @@ import { Task, of as taskOf } from 'folktale/concurrency/task';
 import { DbError, Timeout } from '../../../../errorHandling';
 import { PgDriver } from '../../../../db/driver';
 import { AsyncMget } from '../../repo';
-import { RateMgetParams } from '../../../../types';
+import { RateMgetParams, RateWithPairIds } from '../../../../types';
 import makeSql from './sql';
-import { RateWithPairIds } from '../../../rates';
 
 const pg = knex({ client: 'pg' });
 

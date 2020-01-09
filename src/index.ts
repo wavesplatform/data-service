@@ -12,9 +12,7 @@ import createServices from './services';
 import * as injectConfig from './middleware/injectConfig';
 import * as injectEventBus from './middleware/injectEventBus';
 import * as accessLogMiddleware from './middleware/accessLog';
-import * as serializer from './middleware/serializer';
 import * as setHeadersMiddleware from './middleware/setHeaders';
-import * as notFoundHandler from './middleware/notFoundHandler';
 
 import { loadConfig } from './loadConfig';
 import router from './http';
@@ -36,20 +34,18 @@ createServices({
   pgDriver,
   emitEvent: name => o => eventBus.emit(name, o),
 })
-  .map(services => {
-    return app
+  .map(services =>
+    app
       .use(bodyParser())
       .use(requestId)
       .use(setHeadersMiddleware)
       .use(injectEventBus(eventBus))
       .use(accessLogMiddleware)
-      // .use(serializer)
       .use(
         injectConfig('defaultMatcher', options.matcher.defaultMatcherAddress)
       )
-      .use(notFoundHandler)
-      .use(router(services).routes());
-  })
+      .use(router(services).routes())
+  )
   .run()
   .listen({
     onResolved: app => {

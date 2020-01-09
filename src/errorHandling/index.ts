@@ -7,6 +7,7 @@ export * from './factories';
 export const DEFAULT_INTERNAL_SERVER_ERROR_MESSAGE = 'Internal Server Error';
 export const DEFAULT_TIMEOUT_OCCURRED_MESSAGE = 'A Timeout Occurred';
 export const DEFAULT_NOT_FOUND_MESSAGE = 'Not Found';
+export const DEFAULT_BAD_REQUEST_MESSAGE = 'Bad Request';
 
 export function addMeta<T extends AppError>(meta: ErrorMetaInfo): (e: T) => T;
 export function addMeta(meta: ErrorMetaInfo): (e: AppError) => AppError {

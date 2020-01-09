@@ -3,14 +3,15 @@ const router = new Router();
 
 import { ServiceMesh } from '../services';
 
-import * as version from './version';
-import * as root from './root';
+import version from './version';
+import root from './root';
 
-import * as aliases from './aliases';
-import * as assets from './assets';
-import * as candles from './candles';
-import * as matchers from './matchers';
-import * as pairs from './pairs';
+import aliases from './aliases';
+import assets from './assets';
+import notFound from './notFound';
+import candles from './candles';
+import matchers from './matchers';
+import pairs from './pairs';
 import transactions from './transactions';
 
 export default (serviceMesh: ServiceMesh) =>
@@ -22,4 +23,5 @@ export default (serviceMesh: ServiceMesh) =>
     .use(pairs(serviceMesh.pairs).routes())
     .use(transactions(serviceMesh.transactions).routes())
     .get('/version', version)
-    .get('/', root);
+    .get('/', root)
+    .get('*', notFound);

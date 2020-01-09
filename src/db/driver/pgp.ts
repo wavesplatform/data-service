@@ -7,7 +7,11 @@ import { toBigNumber } from '../../utils/bigNumber';
 
 const pgp: IMain = pgPromise();
 
-const parsePgArray = compose(split(','), init, tail);
+const parsePgArray = compose<string, string, string, string[]>(
+  split(','),
+  init,
+  tail
+);
 
 const toBigNumberAll = (s: string): BigNumber[] =>
   parsePgArray(s).map(toBigNumber);

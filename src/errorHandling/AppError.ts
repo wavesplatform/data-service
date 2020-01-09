@@ -178,7 +178,7 @@ export class ParseError extends AppError implements ErrorInfo {
   }
 
   public matchWith<C>(pattern: AppErrorPattern<C>): C {
-    return pattern.Db(
+    return pattern.Parse(
       this.meta === undefined
         ? createErrorInfo(this.type, this.error)
         : createErrorInfo(this.type, this.error, this.meta)

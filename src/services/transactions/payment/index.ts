@@ -1,111 +1,44 @@
-import { propEq, compose } from 'ramda';
-
-import { withStatementTimeout } from '../../../db/driver';
+import { Maybe } from 'folktale/maybe';
 import {
-  transaction,
-  TransactionInfo,
-  Transaction,
   Service,
+  SearchedItems,
+  ServiceGetRequest,
+  ServiceMgetRequest,
 } from '../../../types';
-import { CommonServiceDependencies } from '../..';
-import { WithLimit, WithSortOrder } from '../../_common';
-import { RequestWithCursor } from '../../_common/pagination';
-import { getByIdPreset } from '../../presets/pg/getById';
-import { mgetByIdsPreset } from '../../presets/pg/mgetByIds';
-import { searchWithPaginationPreset } from '../../presets/pg/searchWithPagination';
-import { inputGet } from '../../presets/pg/getById/inputSchema';
-import { inputMget } from '../../presets/pg/mgetByIds/inputSchema';
-
-import { Cursor, serialize, deserialize } from '../_common/cursor';
-import { transformTxInfo } from '../_common/transformTxInfo';
-import { RawTx, CommonFilters } from '../_common/types';
-
+import { WithDecimalsFormat } from '../../types';
 import {
-  result as resultSchema,
-  inputSearch as inputSearchSchema,
-} from './schema';
-import * as sql from './sql';
-
-type PaymentTxsSearchRequest = RequestWithCursor<
-  CommonFilters & WithSortOrder & WithLimit,
-  string
-> &
-  Partial<{
-    recipient: string;
-  }>;
-
-type PaymentTxDbResponse = RawTx & {
-  amount: string;
-  recipient: string;
-};
-
-export type PaymentTxsService = Service<
-  string,
-  string[],
+  PaymentTxsRepo,
+  PaymentTxsGetRequest,
+  PaymentTxsMgetRequest,
   PaymentTxsSearchRequest,
-  Transaction
+} from './repo/types';
+import { TransactionInfo } from '../../../types';
+
+export type PaymentTxsServiceGetRequest = ServiceGetRequest<
+  PaymentTxsGetRequest
 >;
+export type PaymentTxsServiceMgetRequest = ServiceMgetRequest<
+  PaymentTxsMgetRequest
+>;
+export type PaymentTxsServiceSearchRequest = PaymentTxsSearchRequest;
 
-export default ({
-  drivers: { pg },
-  emitEvent,
-  timeouts,
-}: CommonServiceDependencies): PaymentTxsService => {
-  return {
-    get: getByIdPreset<
-      string,
-      PaymentTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
-      name: 'transactions.payment.get',
-      sql: sql.get,
-      inputSchema: inputGet,
-      resultSchema,
-      resultTypeFactory: transaction,
-      transformResult: transformTxInfo,
-    })({
-      pg: withStatementTimeout(pg, timeouts.get),
-      emitEvent,
-    }),
-
-    mget: mgetByIdsPreset<
-      string,
-      PaymentTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
-      name: 'transactions.payment.mget',
-      matchRequestResult: propEq('id'),
-      sql: sql.mget,
-      inputSchema: inputMget,
-      resultTypeFactory: transaction,
-      resultSchema,
-      transformResult: transformTxInfo,
-    })({
-      pg: withStatementTimeout(pg, timeouts.mget),
-      emitEvent,
-    }),
-
-    search: searchWithPaginationPreset<
-      Cursor,
-      PaymentTxsSearchRequest,
-      PaymentTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
-      name: 'transactions.payment.search',
-      sql: sql.search,
-      inputSchema: inputSearchSchema,
-      resultSchema,
-      transformResult: compose(transaction, transformTxInfo),
-      cursorSerialization: {
-        serialize,
-        deserialize,
-      },
-    })({
-      pg: withStatementTimeout(pg, timeouts.search),
-      emitEvent,
-    }),
-  };
+export type PaymentTxsService = {
+  get: Service<
+    PaymentTxsServiceGetRequest & WithDecimalsFormat,
+    Maybe<TransactionInfo>
+  >;
+  mget: Service<
+    PaymentTxsServiceMgetRequest & WithDecimalsFormat,
+    Maybe<TransactionInfo>[]
+  >;
+  search: Service<
+    PaymentTxsServiceSearchRequest & WithDecimalsFormat,
+    SearchedItems<TransactionInfo>
+  >;
 };
+
+export default (repo: PaymentTxsRepo): PaymentTxsService => ({
+  get: req => repo.get(req.id),
+  mget: req => repo.mget(req.ids),
+  search: req => repo.search(req),
+});

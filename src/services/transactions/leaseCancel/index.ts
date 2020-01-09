@@ -1,107 +1,44 @@
-import { propEq, compose } from 'ramda';
-
-import { withStatementTimeout } from '../../../db/driver';
-import { CommonServiceDependencies } from '../..';
+import { Maybe } from 'folktale/maybe';
 import {
-  transaction,
-  TransactionInfo,
-  Transaction,
   Service,
+  SearchedItems,
+  ServiceGetRequest,
+  ServiceMgetRequest,
 } from '../../../types';
-import { WithLimit, WithSortOrder } from '../../_common';
-import { RequestWithCursor } from '../../_common/pagination';
-import { getByIdPreset } from '../../presets/pg/getById';
-import { mgetByIdsPreset } from '../../presets/pg/mgetByIds';
-import { searchWithPaginationPreset } from '../../presets/pg/searchWithPagination';
-import { inputGet } from '../../presets/pg/getById/inputSchema';
-import { inputMget } from '../../presets/pg/mgetByIds/inputSchema';
-
-import { Cursor, serialize, deserialize } from '../_common/cursor';
-import { RawTx, CommonFilters } from '../_common/types';
-
+import { WithDecimalsFormat } from '../../types';
 import {
-  result as resultSchema,
-  inputSearch as inputSearchSchema,
-} from './schema';
-import * as sql from './sql';
-import * as transformTxInfo from './transformTxInfo';
-
-type LeaseCancelTxsSearchRequest = RequestWithCursor<
-  CommonFilters & WithSortOrder & WithLimit,
-  string
-> &
-  Partial<{
-    recipient: string;
-  }>;
-
-type LeaseCancelTxDbResponse = RawTx & {
-  lease_id: string;
-};
-
-export type LeaseCancelTxsService = Service<
-  string,
-  string[],
+  LeaseCancelTxsRepo,
+  LeaseCancelTxsGetRequest,
+  LeaseCancelTxsMgetRequest,
   LeaseCancelTxsSearchRequest,
-  Transaction
+} from './repo/types';
+import { TransactionInfo } from '../../../types';
+
+export type LeaseCancelTxsServiceGetRequest = ServiceGetRequest<
+  LeaseCancelTxsGetRequest
 >;
+export type LeaseCancelTxsServiceMgetRequest = ServiceMgetRequest<
+  LeaseCancelTxsMgetRequest
+>;
+export type LeaseCancelTxsServiceSearchRequest = LeaseCancelTxsSearchRequest;
 
-export default ({
-  drivers: { pg },
-  emitEvent,
-  timeouts,
-}: CommonServiceDependencies): LeaseCancelTxsService => {
-  return {
-    get: getByIdPreset<
-      string,
-      LeaseCancelTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
-      name: 'transactions.leaseCancel.get',
-      sql: sql.get,
-      inputSchema: inputGet,
-      resultSchema,
-      resultTypeFactory: transaction,
-      transformResult: transformTxInfo,
-    })({
-      pg: withStatementTimeout(pg, timeouts.get),
-      emitEvent,
-    }),
-
-    mget: mgetByIdsPreset<
-      string,
-      LeaseCancelTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
-      name: 'transactions.leaseCancel.mget',
-      matchRequestResult: propEq('id'),
-      sql: sql.mget,
-      inputSchema: inputMget,
-      resultTypeFactory: transaction,
-      resultSchema,
-      transformResult: transformTxInfo,
-    })({
-      pg: withStatementTimeout(pg, timeouts.mget),
-      emitEvent,
-    }),
-
-    search: searchWithPaginationPreset<
-      Cursor,
-      LeaseCancelTxsSearchRequest,
-      LeaseCancelTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
-      name: 'transactions.leaseCancel.search',
-      sql: sql.search,
-      inputSchema: inputSearchSchema,
-      resultSchema,
-      transformResult: compose(transaction, transformTxInfo),
-      cursorSerialization: { serialize, deserialize },
-    })({
-      pg: withStatementTimeout(pg, timeouts.search),
-      emitEvent,
-    }),
-  };
+export type LeaseCancelTxsService = {
+  get: Service<
+    LeaseCancelTxsServiceGetRequest & WithDecimalsFormat,
+    Maybe<TransactionInfo>
+  >;
+  mget: Service<
+    LeaseCancelTxsServiceMgetRequest & WithDecimalsFormat,
+    Maybe<TransactionInfo>[]
+  >;
+  search: Service<
+    LeaseCancelTxsServiceSearchRequest & WithDecimalsFormat,
+    SearchedItems<TransactionInfo>
+  >;
 };
+
+export default (repo: LeaseCancelTxsRepo): LeaseCancelTxsService => ({
+  get: req => repo.get(req.id),
+  mget: req => repo.mget(req.ids),
+  search: req => repo.search(req),
+});

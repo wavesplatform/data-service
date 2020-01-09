@@ -1,5 +1,5 @@
 import { Joi } from '../../../utils/validation';
-import commonFilterSchemas from '../../presets/pg/searchWithPagination/commonFilterSchemas';
+import commonFilterSchemas from '../../_common/presets/pg/search/commonFilterSchemas';
 
 import { deserialize } from './cursor';
 

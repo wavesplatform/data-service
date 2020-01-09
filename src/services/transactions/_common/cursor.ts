@@ -1,5 +1,6 @@
 import { Result, Error as error, Ok as ok } from 'folktale/result';
-import { Transaction } from '../../../types';
+import { isNil } from 'ramda';
+import { TransactionInfo } from '../../../types';
 import { ValidationError } from '../../../errorHandling';
 import { parseDate } from '../../../utils/parseDate';
 import { SortOrder, WithSortOrder } from '../../_common';
@@ -15,17 +16,15 @@ export type Cursor = {
 
 export const serialize = <
   Request extends WithSortOrder,
-  ResponseTransformed extends Transaction
+  ResponseTransformed extends TransactionInfo
 >(
   request: Request,
   response: ResponseTransformed
 ): string | undefined =>
-  response.data === null
+  response === null
     ? undefined
     : Buffer.from(
-        `${response.data.timestamp.toISOString()}::${response.data.id}::${
-          request.sort
-        }`
+        `${response.timestamp.toISOString()}::${response.id}::${request.sort}`
       ).toString('base64');
 
 export const deserialize = (
@@ -36,7 +35,10 @@ export const deserialize = (
     .split('::');
 
   const err = (message?: string) =>
-    new ValidationError('Cursor deserialization is failed', { cursor, message });
+    new ValidationError('Cursor deserialization is failed', {
+      cursor,
+      message,
+    });
 
   return (
     ok<ValidationError, string[]>(data)
@@ -52,7 +54,7 @@ export const deserialize = (
           // validate sort order 'asc' | 'desc'
           .chain(date => {
             const s = d[2];
-            if (isSortOrder(s)) {
+            if (!isNil(date) && isSortOrder(s)) {
               return ok<ValidationError, [Date, SortOrder]>([date, s]);
             } else {
               return error<ValidationError, [Date, SortOrder]>(

@@ -1,112 +1,44 @@
-import { propEq, compose } from 'ramda';
-
-import { withStatementTimeout } from '../../../db/driver';
+import { Maybe } from 'folktale/maybe';
 import {
-  transaction,
-  TransactionInfo,
-  Transaction,
   Service,
+  SearchedItems,
+  ServiceGetRequest,
+  ServiceMgetRequest,
 } from '../../../types';
-import { CommonServiceDependencies } from '../..';
-import { WithLimit, WithSortOrder } from '../../_common';
-import { RequestWithCursor } from '../../_common/pagination';
-import { getByIdPreset } from '../../presets/pg/getById';
-import { mgetByIdsPreset } from '../../presets/pg/mgetByIds';
-import { inputGet } from '../../presets/pg/getById/inputSchema';
-import { inputMget } from '../../presets/pg/mgetByIds/inputSchema';
-import { searchWithPaginationPreset } from '../../presets/pg/searchWithPagination';
-
-import { Cursor, serialize, deserialize } from '../_common/cursor';
-import { RawTx, CommonFilters } from '../_common/types';
-
+import { WithDecimalsFormat } from '../../types';
 import {
-  result as resultSchema,
-  inputSearch as inputSearchSchema,
-} from './schema';
-import * as sql from './sql';
-import * as transformTxInfo from './transformTxInfo';
-
-type ReissueTxsSearchRequest = RequestWithCursor<
-  CommonFilters & WithSortOrder & WithLimit,
-  string
-> &
-  Partial<{
-    assetId: string;
-  }>;
-
-type ReissueTxDbResponse = RawTx & {
-  asset_id: string;
-  quantity: string;
-  reissuable: string;
-};
-
-export type ReissueTxsService = Service<
-  string,
-  string[],
+  ReissueTxsRepo,
+  ReissueTxsGetRequest,
+  ReissueTxsMgetRequest,
   ReissueTxsSearchRequest,
-  Transaction
+} from './repo/types';
+import { TransactionInfo } from '../../../types';
+
+export type ReissueTxsServiceGetRequest = ServiceGetRequest<
+  ReissueTxsGetRequest
 >;
+export type ReissueTxsServiceMgetRequest = ServiceMgetRequest<
+  ReissueTxsMgetRequest
+>;
+export type ReissueTxsServiceSearchRequest = ReissueTxsSearchRequest;
 
-export default ({
-  drivers: { pg },
-  emitEvent,
-  timeouts,
-}: CommonServiceDependencies): ReissueTxsService => {
-  return {
-    get: getByIdPreset<
-      string,
-      ReissueTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
-      name: 'transactions.reissue.get',
-      sql: sql.get,
-      inputSchema: inputGet,
-      resultSchema,
-      resultTypeFactory: transaction,
-      transformResult: transformTxInfo,
-    })({
-      pg: withStatementTimeout(pg, timeouts.get),
-      emitEvent,
-    }),
-
-    mget: mgetByIdsPreset<
-      string,
-      ReissueTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
-      name: 'transactions.reissue.mget',
-      matchRequestResult: propEq('id'),
-      sql: sql.mget,
-      inputSchema: inputMget,
-      resultTypeFactory: transaction,
-      resultSchema,
-      transformResult: transformTxInfo,
-    })({
-      pg: withStatementTimeout(pg, timeouts.mget),
-      emitEvent,
-    }),
-
-    search: searchWithPaginationPreset<
-      Cursor,
-      ReissueTxsSearchRequest,
-      ReissueTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
-      name: 'transactions.reissue.search',
-      sql: sql.search,
-      inputSchema: inputSearchSchema,
-      resultSchema,
-      transformResult: compose(transaction, transformTxInfo),
-      cursorSerialization: {
-        serialize,
-        deserialize,
-      },
-    })({
-      pg: withStatementTimeout(pg, timeouts.search),
-      emitEvent,
-    }),
-  };
+export type ReissueTxsService = {
+  get: Service<
+    ReissueTxsServiceGetRequest & WithDecimalsFormat,
+    Maybe<TransactionInfo>
+  >;
+  mget: Service<
+    ReissueTxsServiceMgetRequest & WithDecimalsFormat,
+    Maybe<TransactionInfo>[]
+  >;
+  search: Service<
+    ReissueTxsServiceSearchRequest & WithDecimalsFormat,
+    SearchedItems<TransactionInfo>
+  >;
 };
+
+export default (repo: ReissueTxsRepo): ReissueTxsService => ({
+  get: req => repo.get(req.id),
+  mget: req => repo.mget(req.ids),
+  search: req => repo.search(req),
+});

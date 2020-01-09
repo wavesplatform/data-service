@@ -1,0 +1,70 @@
+import { compose, identity } from 'ramda';
+
+import { withStatementTimeout } from '../../../../db/driver';
+import { CommonRepoDependencies } from '../../..';
+import { TransactionInfo } from '../../../../types';
+import { get, mget, search } from '../../../_common/createResolver';
+import { validateResult } from '../../../_common/presets/validation';
+import { transformResults as transformResultGet } from '../../../_common/presets/pg/getById/transformResult';
+import { transformResults as transformResultMget } from '../../../_common/presets/pg/mgetByIds/transformResult';
+import { transformInput as transformInputSearch } from '../../../_common/presets/pg/search/transformInput';
+import { transformResults as transformResultSearch } from '../../../_common/presets/pg/search/transformResults';
+
+import { serialize, deserialize, Cursor } from '../../_common/cursor';
+
+import pgData from './pg';
+import { result as resultSchema } from './schema';
+import * as transformTxInfo from './transformTxInfo';
+import {
+  RawInvokeScriptTx,
+  InvokeScriptTxsSearchRequest,
+  InvokeScriptTxsRepo,
+} from './types';
+
+const createServiceName = (type: string) => `transactions.invokeScript.${type}`;
+
+export default ({
+  drivers: { pg },
+  emitEvent,
+  timeouts,
+}: CommonRepoDependencies): InvokeScriptTxsRepo => {
+  return {
+    get: get({
+      transformInput: identity,
+      transformResult: transformResultGet(transformTxInfo),
+      validateResult: validateResult<RawInvokeScriptTx>(
+        resultSchema,
+        createServiceName('get')
+      ),
+      getData: pgData.get(withStatementTimeout(pg, timeouts.get)),
+      emitEvent,
+    }),
+
+    mget: mget({
+      transformInput: identity,
+      transformResult: transformResultMget(transformTxInfo),
+      validateResult: validateResult(resultSchema, createServiceName('mget')),
+      getData: pgData.mget(withStatementTimeout(pg, timeouts.mget)),
+      emitEvent,
+    }),
+
+    search: search<
+      InvokeScriptTxsSearchRequest,
+      InvokeScriptTxsSearchRequest<Cursor>,
+      RawInvokeScriptTx,
+      TransactionInfo
+    >({
+      transformInput: transformInputSearch(deserialize),
+      transformResult: transformResultSearch(
+        compose(transformTxInfo),
+        serialize
+      ),
+      validateResult: validateResult<RawInvokeScriptTx>(
+        resultSchema,
+        createServiceName('search')
+      ),
+      getData: pgData.search(withStatementTimeout(pg, timeouts.search)),
+      emitEvent,
+    }),
+  };
+};
