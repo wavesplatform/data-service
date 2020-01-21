@@ -68,8 +68,11 @@ export type RawCandle = {
   p_dec: number | null;
 };
 
-/** transformCandle :: [string, RawCandle] -> Candle */
-export const transformCandle = ([time, c]: [string, RawCandle]): Candle => {
+/** transformCandle :: Interval -> [string, RawCandle] -> Candle */
+export const transformCandle = (i: string) => ([time, c]: [
+  string,
+  RawCandle
+]): Candle => {
   const isEmpty = (c: RawCandle) => c.txs_count === 0;
 
   const renameFields = renameKeys({
@@ -78,14 +81,24 @@ export const transformCandle = ([time, c]: [string, RawCandle]): Candle => {
     max_height: 'maxHeight',
     txs_count: 'txsCount',
     time_start: 'time',
+    time_end: 'timeEnd',
+  });
+
+  const timeEnd = interval(i).matchWith({
+    Ok: ({ value }) => new Date(new Date(time).valueOf() + value.length - 1),
+    Error: () =>
+      new Date(
+        new Date(time).valueOf() + defaultInterval.unsafeGet().length - 1
+      ),
   });
 
   return compose(
     (c: any): Candle => candle(c),
-    omit(['a_dec', 'p_dec']),
     renameFields,
+    assoc('time_end', timeEnd),
     assoc('time_start', time),
-    assoc('txs_count', c.txs_count),
+    assoc('txs_count', c.txs_count) as any,
+    omit(['a_dec', 'p_dec']),
     ifElse(isEmpty, map(always(null)), identity)
   )(c);
 };
@@ -155,7 +168,7 @@ export const transformResults = (
     List<Candle>
   >(
     list,
-    map(transformCandle),
+    map(transformCandle(request.interval)),
     sort((a, b): number => new Date(a[0]).valueOf() - new Date(b[0]).valueOf()),
     toPairs,
     map<{ [date: string]: RawCandle }, { [date: string]: RawCandle }>(
