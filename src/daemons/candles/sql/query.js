@@ -56,8 +56,8 @@ const insertIntoCandlesFromSelect = (tableName, selectFunction) =>
   pg.into(tableName).insert(selectFunction);
 
 /** selectExchanges :: QueryBuilder */
-const selectExchanges = pg({ t: 'txs_7' })
-  .select({
+const selectExchanges = pg({
+  t: pg({ t: 'txs_7' }).select({
     amount_asset_uid: pg.raw('coalesce(t.amount_asset_uid, 0)'),
     price_asset_uid: pg.raw('coalesce(t.price_asset_uid, 0)'),
     sender_uid: 't.sender_uid',
@@ -67,7 +67,9 @@ const selectExchanges = pg({ t: 'txs_7' })
     price: pg.raw(
       't.price * 10 ^(-8 - coalesce(p.decimals, 8) + coalesce(a.decimals, 8))'
     ),
-  })
+  }),
+})
+  .select('t.*')
   .join({ a: 'assets' }, 'a.uid', 't.amount_asset_uid')
   .join({ p: 'assets' }, 'p.uid', 't.price_asset_uid');
 
