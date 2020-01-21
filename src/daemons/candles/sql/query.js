@@ -63,13 +63,19 @@ const selectExchanges = pg({
     sender_uid: 't.sender_uid',
     height: 't.height',
     candle_time: pgRawDateTrunc('t.time_stamp')('minute'),
-    amount: pg.raw('t.amount * 10 ^(-coalesce(a.decimals, 8))'),
-    price: pg.raw(
-      't.price * 10 ^(-8 - coalesce(p.decimals, 8) + coalesce(a.decimals, 8))'
-    ),
+    amount: 't.amount',
+    price: 't.price',
   }),
 })
-  .select('t.*')
+  .select({
+    amount_asset_uid: 't.amount_asset_uid',
+    price_asset_uid: 't.price_asset_uid',
+    sender_uid: 't.sender_uid',
+    height: 't.height',
+    candle_time: 't.candle_time',
+    amount: pg.raw('t.amount * 10 ^(-a.decimals)'),
+    price: pg.raw('t.price * 10 ^(-8 - p.decimals + a.decimals)'),
+  })
   .join({ a: 'assets' }, 'a.uid', 't.amount_asset_uid')
   .join({ p: 'assets' }, 'p.uid', 't.price_asset_uid');
 
