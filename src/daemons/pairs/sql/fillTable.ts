@@ -4,15 +4,13 @@ const pg = knex({ client: 'pg' });
 const selectExchanges = pg({ t: 'txs_7' })
   .select({
     tx_uid: 't.tx_uid',
-    amount_asset_uid: pg.raw('coalesce(o.amount_asset_uid, 0)'),
-    price_asset_uid: pg.raw('coalesce(o.price_asset_uid, 0)'),
+    amount_asset_uid: pg.raw('coalesce(t.amount_asset_uid, 0)'),
+    price_asset_uid: pg.raw('coalesce(t.price_asset_uid, 0)'),
     amount: 't.amount',
     price: 't.price',
-    time_stamp: 'txs.time_stamp',
+    time_stamp: 't.time_stamp',
     sender_uid: 't.sender_uid',
   })
-  .join({ txs: 'txs' }, 'txs.uid', 't.tx_uid')
-  .join({ o: 'txs_7_orders' }, 'o.order_uid', 't.order1_uid')
   .where(
     't.tx_uid',
     '>=',
