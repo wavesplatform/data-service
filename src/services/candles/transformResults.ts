@@ -68,8 +68,7 @@ export type RawCandle = {
   p_dec: number | null;
 };
 
-/** transformCandle :: Interval -> [string, RawCandle] -> Candle */
-export const transformCandle = (i: string) => ([time, c]: [
+export const transformCandle = (candleInterval: string) => ([time, c]: [
   string,
   RawCandle
 ]): Candle => {
@@ -83,7 +82,7 @@ export const transformCandle = (i: string) => ([time, c]: [
     time_start: 'time',
   });
 
-  const timeEnd = interval(i).matchWith({
+  const timeClose = interval(candleInterval).matchWith({
     Ok: ({ value }) => new Date(new Date(time).valueOf() + value.length - 1),
     Error: () =>
       new Date(
@@ -93,7 +92,7 @@ export const transformCandle = (i: string) => ([time, c]: [
 
   return compose(
     (c: any): Candle => candle(c),
-    assoc('time_end', timeEnd),
+    assoc('timeClose', timeClose),
     renameFields,
     assoc('time_start', time),
     assoc('txs_count', c.txs_count) as any,
