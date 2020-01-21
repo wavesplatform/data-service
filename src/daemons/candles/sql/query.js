@@ -58,6 +58,7 @@ const insertIntoCandlesFromSelect = (tableName, selectFunction) =>
 /** selectExchanges :: QueryBuilder */
 const selectExchanges = pg({
   t: pg({ t: 'txs_7' }).select({
+    tx_uid: 't.tx_uid',
     amount_asset_uid: pg.raw('coalesce(t.amount_asset_uid, 0)'),
     price_asset_uid: pg.raw('coalesce(t.price_asset_uid, 0)'),
     sender_uid: 't.sender_uid',
@@ -68,6 +69,7 @@ const selectExchanges = pg({
   }),
 })
   .select({
+    tx_uid: 't.tx_uid',
     amount_asset_uid: 't.amount_asset_uid',
     price_asset_uid: 't.price_asset_uid',
     sender_uid: 't.sender_uid',
