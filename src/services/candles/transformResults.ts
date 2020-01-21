@@ -81,7 +81,6 @@ export const transformCandle = (i: string) => ([time, c]: [
     max_height: 'maxHeight',
     txs_count: 'txsCount',
     time_start: 'time',
-    time_end: 'timeEnd',
   });
 
   const timeEnd = interval(i).matchWith({
@@ -94,8 +93,8 @@ export const transformCandle = (i: string) => ([time, c]: [
 
   return compose(
     (c: any): Candle => candle(c),
-    renameFields,
     assoc('time_end', timeEnd),
+    renameFields,
     assoc('time_start', time),
     assoc('txs_count', c.txs_count) as any,
     omit(['a_dec', 'p_dec']),
