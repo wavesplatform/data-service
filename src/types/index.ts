@@ -69,7 +69,8 @@ export const alias = (data: AliasInfo | null = null): Alias =>
   toSerializable('alias', data);
 
 export type CandleInfo = {
-  timeStart: Date | null;
+  time: Date;
+  timeEnd: Date;
   maxHeight: number;
   open: BigNumber | null;
   high: BigNumber;
