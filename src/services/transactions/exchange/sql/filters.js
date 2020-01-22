@@ -4,7 +4,7 @@ const commonFilters = require('../../_common/sql/filters');
 const commonFiltersOrder = require('../../_common/sql/filtersOrder');
 
 const byOrderSender = curryN(2, (orderSender, q) =>
-  q.where('order_sender_uid', function() {
+  q.where('t.order_sender_uid', function() {
     this.select('uid')
       .from('addresses')
       .where('address', orderSender)
@@ -14,7 +14,7 @@ const byOrderSender = curryN(2, (orderSender, q) =>
 
 const byOrder = curryN(2, (orderId, q) =>
   q
-    .where('order_uid', function() {
+    .where('t.order_uid', function() {
       this.select('uid')
         .from('orders')
         .where('id', orderId)
@@ -25,7 +25,7 @@ const byOrder = curryN(2, (orderId, q) =>
 
 const byAsset = assetType =>
   curryN(2, (assetId, q) =>
-    q.where(`${assetType}_asset_uid`, function() {
+    q.where(`t.${assetType}_asset_uid`, function() {
       this.select('uid')
         .from('assets')
         .where('asset_id', assetId)
