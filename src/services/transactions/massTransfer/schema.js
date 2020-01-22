@@ -18,12 +18,11 @@ const result = Joi.object().keys({
   sender_public_key: Joi.string()
     .base58()
     .required(),
-  recipients: Joi.array().items(Joi.string()),
-  amounts: Joi.array().items(
-    Joi.object()
-      .bignumber()
-      .required()
+  recipients: Joi.alternatives().try(
+    Joi.array().items(Joi.string()),
+    Joi.array().items(Joi.allow(null).required())
   ),
+  amounts: Joi.array().items(Joi.object().bignumber()),
 });
 
 const inputSearch = Joi.object()
