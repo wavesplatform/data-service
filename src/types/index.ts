@@ -70,7 +70,7 @@ export const alias = (data: AliasInfo | null = null): Alias =>
 
 export type CandleInfo = {
   time: Date;
-  timeEnd: Date;
+  timeClose: Date;
   maxHeight: number;
   open: BigNumber | null;
   high: BigNumber;

@@ -3354,7 +3354,7 @@
               "txsCount": {
                 "type": "number"
               },
-              "timeEnd": {
+              "timeClose": {
                 "type": "string",
                 "format": "date-time"
               }
