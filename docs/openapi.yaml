@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 0.27.1
+  version: 0.28.0
   title: Waves Data Service
   description: This is a a public Waves Data Services API documentation. The goal of the API is to provide a simple and convenient way to get data from Waves blockchain.
 servers:
@@ -2062,6 +2062,9 @@ components:
               type: number
             txsCount:
               type: number
+            timeClose:
+              type: string
+              format: date-time
     Pair:
       type: object
       properties:
