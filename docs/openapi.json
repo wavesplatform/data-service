@@ -184,7 +184,7 @@
           {
             "in": "query",
             "name": "timeStart",
-            "description": "Time range filter, start.",
+            "description": "Time range filter, start (ISO-8601 or timestamp in milliseconds).",
             "required": true,
             "schema": {
               "oneOf": [
@@ -201,7 +201,7 @@
           {
             "in": "query",
             "name": "timeEnd",
-            "description": "Time range filter, end. Defaults to now.",
+            "description": "Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -234,7 +234,7 @@
         ],
         "responses": {
           "200": {
-            "description": "List of Candles",
+            "description": "List of Candles.</br>time - candle open time</br>timeClose - candle close time",
             "content": {
               "application/json": {
                 "schema": {
@@ -469,7 +469,7 @@
           {
             "in": "query",
             "name": "timeStart",
-            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db.",
+            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -485,7 +485,7 @@
           {
             "in": "query",
             "name": "timeEnd",
-            "description": "Time range filter, end. Defaults to now.",
+            "description": "Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -591,7 +591,7 @@
           {
             "in": "query",
             "name": "timeStart",
-            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db.",
+            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -607,7 +607,7 @@
           {
             "in": "query",
             "name": "timeEnd",
-            "description": "Time range filter, end. Defaults to now.",
+            "description": "Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -729,7 +729,7 @@
           {
             "in": "query",
             "name": "timeStart",
-            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db.",
+            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -745,7 +745,7 @@
           {
             "in": "query",
             "name": "timeEnd",
-            "description": "Time range filter, end. Defaults to now.",
+            "description": "Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -867,7 +867,7 @@
           {
             "in": "query",
             "name": "timeStart",
-            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db.",
+            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -883,7 +883,7 @@
           {
             "in": "query",
             "name": "timeEnd",
-            "description": "Time range filter, end. Defaults to now.",
+            "description": "Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -1013,7 +1013,7 @@
           {
             "in": "query",
             "name": "timeStart",
-            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db.",
+            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -1029,7 +1029,7 @@
           {
             "in": "query",
             "name": "timeEnd",
-            "description": "Time range filter, end. Defaults to now.",
+            "description": "Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -1159,7 +1159,7 @@
           {
             "in": "query",
             "name": "timeStart",
-            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db.",
+            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -1175,7 +1175,7 @@
           {
             "in": "query",
             "name": "timeEnd",
-            "description": "Time range filter, end. Defaults to now.",
+            "description": "Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -1297,7 +1297,7 @@
           {
             "in": "query",
             "name": "timeStart",
-            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db.",
+            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -1313,7 +1313,7 @@
           {
             "in": "query",
             "name": "timeEnd",
-            "description": "Time range filter, end. Defaults to now.",
+            "description": "Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -1451,7 +1451,7 @@
           {
             "in": "query",
             "name": "timeStart",
-            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db.",
+            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -1467,7 +1467,7 @@
           {
             "in": "query",
             "name": "timeEnd",
-            "description": "Time range filter, end. Defaults to now.",
+            "description": "Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -1597,7 +1597,7 @@
           {
             "in": "query",
             "name": "timeStart",
-            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db.",
+            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -1613,7 +1613,7 @@
           {
             "in": "query",
             "name": "timeEnd",
-            "description": "Time range filter, end. Defaults to now.",
+            "description": "Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -1735,7 +1735,7 @@
           {
             "in": "query",
             "name": "timeStart",
-            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db.",
+            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -1751,7 +1751,7 @@
           {
             "in": "query",
             "name": "timeEnd",
-            "description": "Time range filter, end. Defaults to now.",
+            "description": "Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -1873,7 +1873,7 @@
           {
             "in": "query",
             "name": "timeStart",
-            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db.",
+            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -1889,7 +1889,7 @@
           {
             "in": "query",
             "name": "timeEnd",
-            "description": "Time range filter, end. Defaults to now.",
+            "description": "Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -2003,7 +2003,7 @@
           {
             "in": "query",
             "name": "timeStart",
-            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db.",
+            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -2019,7 +2019,7 @@
           {
             "in": "query",
             "name": "timeEnd",
-            "description": "Time range filter, end. Defaults to now.",
+            "description": "Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -2149,7 +2149,7 @@
           {
             "in": "query",
             "name": "timeStart",
-            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db.",
+            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -2165,7 +2165,7 @@
           {
             "in": "query",
             "name": "timeEnd",
-            "description": "Time range filter, end. Defaults to now.",
+            "description": "Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -2319,7 +2319,7 @@
           {
             "in": "query",
             "name": "timeStart",
-            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db.",
+            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -2335,7 +2335,7 @@
           {
             "in": "query",
             "name": "timeEnd",
-            "description": "Time range filter, end. Defaults to now.",
+            "description": "Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -2457,7 +2457,7 @@
           {
             "in": "query",
             "name": "timeStart",
-            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db.",
+            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -2473,7 +2473,7 @@
           {
             "in": "query",
             "name": "timeEnd",
-            "description": "Time range filter, end. Defaults to now.",
+            "description": "Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -2595,7 +2595,7 @@
           {
             "in": "query",
             "name": "timeStart",
-            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db.",
+            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -2611,7 +2611,7 @@
           {
             "in": "query",
             "name": "timeEnd",
-            "description": "Time range filter, end. Defaults to now.",
+            "description": "Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -2741,7 +2741,7 @@
           {
             "in": "query",
             "name": "timeStart",
-            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db.",
+            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -2757,7 +2757,7 @@
           {
             "in": "query",
             "name": "timeEnd",
-            "description": "Time range filter, end. Defaults to now.",
+            "description": "Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -3119,7 +3119,7 @@
           {
             "in": "query",
             "name": "timeStart",
-            "description": "Time range filter, start.",
+            "description": "Time range filter, start (ISO-8601 or timestamp in milliseconds).",
             "required": true,
             "schema": {
               "oneOf": [
@@ -3136,7 +3136,7 @@
           {
             "in": "query",
             "name": "timeEnd",
-            "description": "Time range filter, end. Defaults to now.",
+            "description": "Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).",
             "schema": {
               "oneOf": [
                 {
@@ -3169,7 +3169,7 @@
         ],
         "responses": {
           "200": {
-            "description": "List of Candles",
+            "description": "List of Candles</br>time - candle open time</br>timeClose - candle close time",
             "content": {
               "application/json": {
                 "schema": {
@@ -3318,7 +3318,8 @@
             "properties": {
               "time": {
                 "type": "string",
-                "format": "date-time"
+                "format": "date-time",
+                "description": "candle open time"
               },
               "open": {
                 "type": "number",
@@ -3356,7 +3357,8 @@
               },
               "timeClose": {
                 "type": "string",
-                "format": "date-time"
+                "format": "date-time",
+                "description": "candle close time"
               }
             }
           }
