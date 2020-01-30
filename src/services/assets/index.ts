@@ -1,12 +1,13 @@
 import { Maybe } from 'folktale/maybe';
 import { Asset } from '@waves/data-entities';
 
-import { Repo, Service, SearchedItems } from '../../types';
+import { Service, SearchedItems } from '../../types';
 
 import {
   AssetsGetRequest,
   AssetsMgetRequest,
   AssetsSearchRequest,
+  AssetsRepo,
 } from './repo/types';
 
 export type AssetsServiceGetRequest = {
@@ -25,9 +26,7 @@ export type AssetsService = {
   search: Service<AssetsServiceSearchRequest, SearchedItems<Asset>>;
 };
 
-export default (
-  repo: Repo<AssetsGetRequest, AssetsMgetRequest, AssetsSearchRequest, Asset>
-): AssetsService => ({
+export default (repo: AssetsRepo): AssetsService => ({
   get: req => repo.get(req.id),
   mget: req => repo.mget(req.ids),
   search: req => repo.search(req),

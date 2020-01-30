@@ -1,11 +1,12 @@
 import { Maybe } from 'folktale/maybe';
 
-import { AliasInfo, Repo, Service, SearchedItems } from '../../types';
+import { AliasInfo, Service, SearchedItems } from '../../types';
 
 import {
   AliasesGetRequest,
   AliasesMgetRequest,
   AliasesSearchRequest,
+  AliasesRepo,
 } from './repo';
 import { WithDecimalsFormat } from '../types';
 
@@ -31,14 +32,7 @@ export type AliasesService = {
   >;
 };
 
-export default (
-  repo: Repo<
-    AliasesGetRequest,
-    AliasesMgetRequest,
-    AliasesSearchRequest,
-    AliasInfo
-  >
-): AliasesService => ({
+export default (repo: AliasesRepo): AliasesService => ({
   get: req => repo.get(req.id),
   mget: req => repo.mget(req.ids),
   search: req => repo.search(req),
