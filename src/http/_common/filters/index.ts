@@ -1,36 +1,36 @@
 import { Result, Ok as ok, Error as error } from 'folktale/result';
 import { compose, reject, isNil, mapObjIndexed } from 'ramda';
 import { ParseError } from '../../../errorHandling';
-import commonParsers from './parsers';
-import { CommonParsers, Parser } from './types';
+import commonFilters from './filters';
+import { CommonFilters, Parser } from './types';
 
 export const parseFilterValues = <
-  Parsers extends {
+  Filters extends {
     [K: string]: Parser<any, any>;
   }
 >(
-  parsers: Parsers
+  filters: Filters
 ) => <
   AllParsedFilterValues extends {
-    [K in keyof Parsers]: ReturnType<Parsers[K]>;
+    [K in keyof Filters]: ReturnType<Filters[K]>;
   } &
-    { [K in keyof CommonParsers]: ReturnType<CommonParsers[K]> },
+    { [K in keyof CommonFilters]: ReturnType<CommonFilters[K]> },
   ParsedFilterValues extends {
-    [K in keyof Parsers]: Parsers[K] extends Parser<infer R> ? R : never;
+    [K in keyof Filters]: Filters[K] extends Parser<infer R> ? R : never;
   } &
     {
-      [K in keyof CommonParsers]: CommonParsers[K] extends Parser<infer R>
+      [K in keyof CommonFilters]: CommonFilters[K] extends Parser<infer R>
         ? R
         : never;
     }
 >(
   values: Partial<
-    { [K in keyof Parsers]: Parameters<Parsers[K]>[0] } &
-      { [K in keyof CommonParsers]: Parameters<CommonParsers[K]>[0] }
+    { [K in keyof Filters]: Parameters<Filters[K]>[0] } &
+      { [K in keyof CommonFilters]: Parameters<CommonFilters[K]>[0] }
   >
 ) =>
   compose<
-    Parsers | CommonParsers,
+    Filters | CommonFilters,
     AllParsedFilterValues,
     Result<ParseError, ParsedFilterValues>,
     Result<ParseError, ParsedFilterValues>
@@ -52,4 +52,4 @@ export const parseFilterValues = <
       ReturnType<Parser<ParsedFilterValues[keyof ParsedFilterValues]>>,
       AllParsedFilterValues
     >((val, key) => val(values[key]))
-  )({ ...parsers, ...commonParsers });
+  )({ ...filters, ...commonFilters });

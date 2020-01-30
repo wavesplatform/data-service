@@ -6,11 +6,11 @@ import { DataTxsServiceSearchRequest } from '../../services/transactions/data';
 import { DataEntryValue } from '../../services/transactions/data/repo/types';
 import { DataEntryType, ServiceMgetRequest } from '../../types';
 import { parseFilterValues } from '../_common/filters';
-import commonParsers from '../_common/filters/parsers';
+import commonFilters from '../_common/filters/filters';
+import { Parser } from '../_common/filters/types';
 import { HttpRequest } from '../_common/types';
-import { parseBool } from '../utils/parseBool';
+import { parseBool } from '../../utils/parsers/parseBool';
 import { isMgetRequest } from './_common';
-import { Parser } from 'http/_common/filters/types';
 
 function parseValue(
   type: DataEntryType.Boolean,
@@ -76,9 +76,9 @@ export const parseDataMgetOrSearch = ({
   }
 
   return parseFilterValues({
-    key: commonParsers.query,
+    key: commonFilters.query,
     type: parseDataEntryType,
-    value: commonParsers.query,
+    value: commonFilters.query,
   })(query).chain(fValues => {
     if (isMgetRequest(fValues)) {
       return ok(fValues);

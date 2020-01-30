@@ -18,7 +18,7 @@ import { HttpRequest } from '../_common/types';
 import { parseFilterValues } from '../_common/filters';
 import { Parser } from '../_common/filters/types';
 import { defaultStringify } from '../_common/utils';
-import * as postToGet from '../utils/postToGet';
+import { postToGet } from '../_common/postToGet';
 
 export const isMgetRequest = <SearchRequest>(
   req: ServiceMgetRequest | SearchRequest
@@ -37,7 +37,7 @@ export const parseGet = ({
 };
 
 export const parseMgetOrSearch = <SearchRequest>(
-  customParsers: Record<string, Parser<any>>
+  customFilters: Record<string, Parser<any>>
 ) => ({
   query,
 }: HttpRequest): Result<ParseError, ServiceMgetRequest | SearchRequest> => {
@@ -45,7 +45,7 @@ export const parseMgetOrSearch = <SearchRequest>(
     return error(new ParseError(new Error('Query is empty')));
   }
 
-  return parseFilterValues(customParsers)(query).map(fValues => {
+  return parseFilterValues(customFilters)(query).map(fValues => {
     if (isMgetRequest(fValues)) {
       return { ids: fValues.ids };
     } else {

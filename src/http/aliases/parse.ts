@@ -6,11 +6,11 @@ import {
   AliasesServiceMgetRequest,
   AliasesServiceSearchRequest,
 } from '../../services/aliases';
-import commonParsers from '../_common/filters/parsers';
+import commonFilters from '../_common/filters/filters';
 import { parseFilterValues } from '../_common/filters';
 import { HttpRequest } from '../_common/types';
-import { parseArrayQuery } from '../utils/parseArrayQuery';
-import { parseBool } from '../utils/parseBool';
+import { parseArrayQuery } from '../../utils/parsers/parseArrayQuery';
+import { parseBool } from '../../utils/parsers/parseBool';
 
 export const get = ({
   params,
@@ -34,7 +34,7 @@ export const mgetOrSearch = ({
 
   return parseFilterValues({
     aliases: parseArrayQuery,
-    address: commonParsers.query,
+    address: commonFilters.query,
     showBroken: parseBool,
   })(query).map(fValues => {
     if (Array.isArray(fValues.aliases)) {

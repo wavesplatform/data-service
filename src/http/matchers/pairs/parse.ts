@@ -2,15 +2,14 @@ import { Result, Ok as ok, Error as error } from 'folktale/result';
 import { isNil } from 'ramda';
 import { ParseError } from '../../../errorHandling';
 import { parseFilterValues } from '../../_common/filters';
-import commonParsers from '../../_common/filters/parsers';
+import commonFilters from '../../_common/filters/filters';
 import { HttpRequest } from '../../_common/types';
 import {
   PairsGetRequest,
   PairsMgetRequest,
   PairsSearchRequest,
 } from '../../../services/pairs/repo/types';
-import { parseArrayQuery } from '../../utils/parseArrayQuery';
-import { parsePairs } from '../../utils/parsePairs';
+import { parseArrayQuery, parsePairs } from '../../../utils/parsers';
 
 export const get = ({
   params,
@@ -58,7 +57,7 @@ export const mgetOrSearch = ({
   return parseFilterValues({
     pairs: parsePairs,
     match_exactly: parseArrayQuery,
-    search_by_asset: commonParsers.query,
+    search_by_asset: commonFilters.query,
     search_by_assets: parseArrayQuery,
   })(query).map(fValues => {
     if (Array.isArray(fValues.pairs)) {

@@ -3,7 +3,7 @@ import { isNil } from 'ramda';
 import { ParseError } from '../../../errorHandling';
 import { CandlesSearchRequest } from '../../../services/candles/repo';
 import { parseFilterValues } from '../../_common/filters';
-import commonParsers from '../../_common/filters/parsers';
+import commonFilters from '../../_common/filters/filters';
 import { HttpRequest } from '../../_common/types';
 
 export const parse = ({
@@ -22,7 +22,7 @@ export const parse = ({
   }
 
   return parseFilterValues({
-    interval: commonParsers.query,
+    interval: commonFilters.query,
   })(query).map(fValues => {
     if (isNil(fValues.timeStart)) {
       throw new ParseError(new Error('timeStart is undefined'));

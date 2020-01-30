@@ -6,7 +6,7 @@ import {
   AssetsServiceSearchRequest,
 } from '../../services/assets';
 import { parseFilterValues } from '../_common/filters';
-import commonParsers from '../_common/filters/parsers';
+import commonFilters from '../_common/filters/filters';
 import { HttpRequest } from '../_common/types';
 export const get = ({
   params,
@@ -29,8 +29,8 @@ export const mgetOrSearch = ({
   }
 
   return parseFilterValues({
-    ticker: commonParsers.query,
-    search: commonParsers.query,
+    ticker: commonFilters.query,
+    search: commonFilters.query,
   })(query).map(fValues => {
     if (Array.isArray(fValues.ids)) {
       return { ids: fValues.ids };

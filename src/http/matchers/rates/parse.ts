@@ -3,10 +3,9 @@ import * as maybe from 'folktale/maybe';
 import { Result, Error as error } from 'folktale/result';
 import { ParseError } from '../../../errorHandling';
 import { RateMgetParams } from '../../../types';
-import { parseDate } from '../../../utils/parseDate';
+import { parseDate, parsePairs } from '../../../utils/parsers';
 import { parseFilterValues } from '../../_common/filters';
 import { HttpRequest } from '../../_common/types';
-import { parsePairs } from '../../utils/parsePairs';
 
 export const parse = ({
   params,

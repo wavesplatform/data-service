@@ -2,7 +2,7 @@ import * as Router from 'koa-router';
 
 import { ServiceMesh } from '../../services';
 
-import commonParsers from '../_common/filters/parsers';
+import commonFilters from '../_common/filters/filters';
 import { Parser } from '../_common/filters/types';
 
 import {
@@ -10,14 +10,13 @@ import {
   parseGet,
   parseMgetOrSearch,
 } from './_common';
-
 import { parseDataMgetOrSearch } from './parseDataMgetOrSearch';
 
 const createParseRequest = <SearchRequest>(
-  customParsers: Record<string, Parser<any>> = {}
+  customFilters: Record<string, Parser<any>> = {}
 ) => ({
   get: parseGet,
-  mgetOrSearch: parseMgetOrSearch<SearchRequest>(customParsers),
+  mgetOrSearch: parseMgetOrSearch<SearchRequest>(customFilters),
 });
 
 const subrouter = new Router();
@@ -42,7 +41,7 @@ export default (txsServices: ServiceMesh['transactions']) => {
     '/transactions/burn',
     txsServices['burn'],
     createParseRequest({
-      assetId: commonParsers.query,
+      assetId: commonFilters.query,
     })
   );
 
@@ -61,10 +60,10 @@ export default (txsServices: ServiceMesh['transactions']) => {
     '/transactions/exchange',
     txsServices['exchange'],
     createParseRequest({
-      matcher: commonParsers.query,
-      amountAsset: commonParsers.query,
-      priceAsset: commonParsers.query,
-      orderId: commonParsers.query,
+      matcher: commonFilters.query,
+      amountAsset: commonFilters.query,
+      priceAsset: commonFilters.query,
+      orderId: commonFilters.query,
     })
   );
 
@@ -73,7 +72,7 @@ export default (txsServices: ServiceMesh['transactions']) => {
     '/transactions/genesis',
     txsServices['genesis'],
     createParseRequest({
-      recipient: commonParsers.query,
+      recipient: commonFilters.query,
     })
   );
 
@@ -82,8 +81,8 @@ export default (txsServices: ServiceMesh['transactions']) => {
     '/transactions/invoke-script',
     txsServices['invokeScript'],
     createParseRequest({
-      dapp: commonParsers.query,
-      function: commonParsers.query,
+      dapp: commonFilters.query,
+      function: commonFilters.query,
     })
   );
 
@@ -92,8 +91,8 @@ export default (txsServices: ServiceMesh['transactions']) => {
     '/transactions/issue',
     txsServices['issue'],
     createParseRequest({
-      assetId: commonParsers.query,
-      script: commonParsers.query,
+      assetId: commonFilters.query,
+      script: commonFilters.query,
     })
   );
 
@@ -102,7 +101,7 @@ export default (txsServices: ServiceMesh['transactions']) => {
     '/transactions/lease',
     txsServices['lease'],
     createParseRequest({
-      recipient: commonParsers.query,
+      recipient: commonFilters.query,
     })
   );
 
@@ -111,7 +110,7 @@ export default (txsServices: ServiceMesh['transactions']) => {
     '/transactions/lease-cancel',
     txsServices['leaseCancel'],
     createParseRequest({
-      recipient: commonParsers.query,
+      recipient: commonFilters.query,
     })
   );
 
@@ -120,8 +119,8 @@ export default (txsServices: ServiceMesh['transactions']) => {
     '/transactions/mass-transfer',
     txsServices['massTransfer'],
     createParseRequest({
-      assetId: commonParsers.query,
-      recipient: commonParsers.query,
+      assetId: commonFilters.query,
+      recipient: commonFilters.query,
     })
   );
 
@@ -130,7 +129,7 @@ export default (txsServices: ServiceMesh['transactions']) => {
     '/transactions/payment',
     txsServices['payment'],
     createParseRequest({
-      recipient: commonParsers.query,
+      recipient: commonFilters.query,
     })
   );
 
@@ -139,7 +138,7 @@ export default (txsServices: ServiceMesh['transactions']) => {
     '/transactions/reissue',
     txsServices['reissue'],
     createParseRequest({
-      assetId: commonParsers.query,
+      assetId: commonFilters.query,
     })
   );
 
@@ -148,8 +147,8 @@ export default (txsServices: ServiceMesh['transactions']) => {
     '/transactions/set-asset-script',
     txsServices['setAssetScript'],
     createParseRequest({
-      assetId: commonParsers.query,
-      script: commonParsers.query,
+      assetId: commonFilters.query,
+      script: commonFilters.query,
     })
   );
 
@@ -158,7 +157,7 @@ export default (txsServices: ServiceMesh['transactions']) => {
     '/transactions/set-script',
     txsServices['setScript'],
     createParseRequest({
-      script: commonParsers.query,
+      script: commonFilters.query,
     })
   );
 
@@ -167,7 +166,7 @@ export default (txsServices: ServiceMesh['transactions']) => {
     '/transactions/sponsorship',
     txsServices['sponsorship'],
     createParseRequest({
-      assetId: commonParsers.query,
+      assetId: commonFilters.query,
     })
   );
 
@@ -176,8 +175,8 @@ export default (txsServices: ServiceMesh['transactions']) => {
     '/transactions/transfer',
     txsServices['transfer'],
     createParseRequest({
-      assetId: commonParsers.query,
-      recipient: commonParsers.query,
+      assetId: commonFilters.query,
+      recipient: commonFilters.query,
     })
   );
 

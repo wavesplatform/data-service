@@ -2,7 +2,7 @@ import { Result, Error as error, Ok as ok } from 'folktale/result';
 import { isNil } from 'ramda';
 import { TransactionInfo } from '../../../types';
 import { ValidationError } from '../../../errorHandling';
-import { parseDate } from '../../../utils/parseDate';
+import { parseDate } from '../../../utils/parsers/parseDate';
 import { SortOrder, WithSortOrder } from '../../_common';
 
 const isSortOrder = (s: string): s is SortOrder =>

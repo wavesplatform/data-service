@@ -7,7 +7,7 @@ import {
   PairsMgetRequest,
 } from '../../services/pairs/repo/types';
 import { createHttpHandler } from '../_common';
-import * as postToGet from '../utils/postToGet';
+import { postToGet } from '../_common/postToGet';
 import { get as parseGet, mgetOrSearch as parseMgetOrSearch } from './parse';
 import * as serialize from './serialize';
 

@@ -7,7 +7,7 @@ import {
   AliasesMgetRequest,
   AliasesSearchRequest,
 } from './repo';
-import { WithDecimalsFormat } from 'services/types';
+import { WithDecimalsFormat } from '../types';
 
 export type AliasesServiceGetRequest = {
   id: AliasesGetRequest;

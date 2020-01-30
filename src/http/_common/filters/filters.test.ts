@@ -1,9 +1,9 @@
 import { parseFilterValues } from '.';
-import commonParsers from './parsers';
+import commonFilters from './filters';
 import { SortOrder } from '../../../services/_common';
 
 describe('Filter values parsing', () => {
-  const parseQuery = parseFilterValues(commonParsers);
+  const parseQuery = parseFilterValues(commonFilters);
 
   const query = {
     ids: ['id1', 'id2'],

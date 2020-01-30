@@ -12,7 +12,7 @@ import {
   mgetOrSearch as parseMgetOrSearch,
 } from '../../pairs/parse';
 import * as serialize from '../../pairs/serialize';
-import * as postToGet from '../../utils/postToGet';
+import { postToGet } from '../../_common/postToGet';
 
 const subrouter = new Router();
 

@@ -1,11 +1,11 @@
 import { Result } from 'folktale/result';
 import { ParseError } from '../../../errorHandling';
 import { SortOrder } from '../../../services/_common';
-import { ParseDate } from '../../../utils/parseDate';
-import { ParseArrayQuery } from '../../utils/parseArrayQuery';
-import { ParseTrimmedStringIfDefined } from '../../utils/parseString';
+import { ParseDate } from '../../../utils/parsers/parseDate';
+import { ParseArrayQuery } from '../../../utils/parsers/parseArrayQuery';
+import { ParseTrimmedStringIfDefined } from '../../../utils/parsers/parseString';
 
-export type CommonParsers = {
+export type CommonFilters = {
   timeStart: ParseDate;
   timeEnd: ParseDate;
   limit: Parser<number>;
