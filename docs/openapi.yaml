@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 0.28.0
+  version: 0.28.1
   title: Waves Data Service
   description: This is a a public Waves Data Services API documentation. The goal of the API is to provide a simple and convenient way to get data from Waves blockchain.
 servers:
