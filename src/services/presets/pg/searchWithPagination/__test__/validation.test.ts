@@ -12,8 +12,8 @@ import { WithLimit } from '../../../../_common';
 import { searchWithPaginationPreset } from '..';
 import commonFilterSchemas from '../commonFilterSchemas';
 import { AppError, ValidationError } from './../../../../../errorHandling';
-import { RawTxWithUid } from 'services/transactions/_common/types';
-import { RequestWithCursor } from 'services/_common/pagination';
+import { RawTxWithUid } from '../../../../transactions/_common/types';
+import { RequestWithCursor } from '../../../../_common/pagination';
 
 const mockTxs: ResponseRaw[] = [
   { tx_uid: 1, id: 'q', timestamp: new Date() },
@@ -30,10 +30,8 @@ type Cursor = {
   tx_uid: number;
 };
 
-type Request = RequestWithCursor<WithLimit, Cursor>;
-
 const serialize = <ResponseRaw extends RawTxWithUid>(
-  request: Request,
+  request: RequestWithCursor<WithLimit, Cursor>,
   response: ResponseRaw
 ): string | undefined =>
   response === null
@@ -69,7 +67,7 @@ const deserialize = (cursor: string): Result<ValidationError, Cursor> => {
 
 const service = searchWithPaginationPreset<
   Cursor,
-  Request,
+  RequestWithCursor<WithLimit, string>,
   ResponseRaw,
   ResponseRaw,
   Serializable<string, ResponseRaw | null>
@@ -89,7 +87,10 @@ const service = searchWithPaginationPreset<
   emitEvent: always(T),
 });
 
-const assertValidationError = (done: jest.DoneCallback, v: Request) =>
+const assertValidationError = (
+  done: jest.DoneCallback,
+  v: RequestWithCursor<WithLimit, string>
+) =>
   service(v)
     .run()
     .promise()
@@ -105,13 +106,6 @@ describe('searchWithPagination preset validation', () => {
       assertValidationError(done, {
         limit: 0,
       }));
-    it('fails if after is incorrect', done =>
-      assertValidationError(done, {
-        limit: 10,
-        after: {
-          tx_uid: 1,
-        },
-      }));
     it('passes if correct object is provided', done =>
       service({
         limit: 1,
@@ -119,7 +113,6 @@ describe('searchWithPagination preset validation', () => {
         .run()
         .listen({
           onResolved: (x: Serializable<string, any>) => {
-            console.log('here ', x);
             expect(x.__type).toBe('list');
             done();
           },

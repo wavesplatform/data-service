@@ -27,7 +27,7 @@ type AliasesSearchRequest = {
 
 type AliasMGetParams = string[];
 
-export type AliasService = ServiceGet<string, Alias> &
+export type AliasesService = ServiceGet<string, Alias> &
   ServiceSearch<AliasesSearchRequest, Alias> &
   ServiceMget<AliasMGetParams, Alias>;
 
@@ -35,7 +35,7 @@ export default ({
   drivers,
   emitEvent,
   timeouts,
-}: CommonServiceDependencies): AliasService => {
+}: CommonServiceDependencies): AliasesService => {
   return {
     get: getByIdPreset<string, AliasDbResponse, AliasInfo, Alias>({
       name: 'aliases.get',
