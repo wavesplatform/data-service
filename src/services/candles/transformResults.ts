@@ -95,7 +95,7 @@ export const transformCandle = (candleInterval: string) => ([time, c]: [
     assoc('timeClose', timeClose),
     renameFields,
     assoc('time_start', time),
-    assoc('txs_count', c.txs_count),
+    assoc('txs_count', c.txs_count) as any,
     omit(['a_dec', 'p_dec']),
     ifElse(isEmpty, map(always(null)), identity)
   )(c);

@@ -1,6 +1,6 @@
 {
   "name": "data-service",
-  "version": "0.27.0",
+  "version": "0.28.0",
   "description": "Waves data service",
   "main": "src/index.js",
   "repository": "git@github.com:wavesplatform/data-service.git",
