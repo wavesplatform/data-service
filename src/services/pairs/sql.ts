@@ -13,8 +13,6 @@ import { AssetIdsPair } from '../../types';
 const pg = knex({ client: 'pg' });
 
 const COLUMNS = [
-  'amount_asset_id',
-  'price_asset_id',
   'first_price',
   'last_price',
   'volume',
@@ -63,11 +61,27 @@ const getMatchExactly = (matchExactly: boolean[] | undefined): boolean[] => {
 const query = (pairs: AssetIdsPair[], matcher: string): string =>
   pg({ t: 'pairs' })
     .select(COLUMNS)
+    .select({
+      amount_asset_id: 'aa.asset_id',
+      price_asset_id: 'pa.asset_id',
+    })
+    .join({ aa: 'assets' }, 'aa.uid', 't.amount_asset_uid')
+    .join({ pa: 'assets' }, 'pa.uid', 't.price_asset_uid')
+    .leftJoin(
+      { matcher_addr: 'addresses' },
+      'matcher_addr.uid',
+      't.matcher_address_uid'
+    )
     .whereIn(
-      ['t.amount_asset_id', 't.price_asset_id'],
+      ['aa.asset_id', 'pa.asset_id'],
       pairs.map(pair => [pair.amountAsset, pair.priceAsset])
     )
-    .where('matcher', matcher)
+    .whereIn('matcher_address_uid', function() {
+      this.select('uid')
+        .from('addresses')
+        .where('address', matcher)
+        .limit(1);
+    })
     .toString();
 
 const searchAssets = (
@@ -78,44 +92,46 @@ const searchAssets = (
 ) => {
   // will be used on searchable_asset_name search
   const cleanedQuery = escapeForTsQuery(query);
-  return qb
-    .table({ [tableAlias]: 'assets' })
-    .column({ asset_id: `${tableAlias}.asset_id` })
-    .where(`${tableAlias}.asset_id`, query)
-    .orWhere(
-      `${tableAlias}.ticker`,
-      'ilike',
-      prepareForLike(query, { matchExactly })
-    )
-    .unionAll(q =>
-      q
-        .from({ [`${tableAlias}2`]: 'assets_metadata' })
-        .column({ asset_id: `${tableAlias}2.asset_id` })
-        .where(
-          `${tableAlias}2.asset_name`,
-          'ilike',
-          prepareForLike(query, { matchExactly })
-        )
-    )
-    .unionAll(q =>
-      compose((q: knex.QueryBuilder) =>
-        cleanedQuery.length
-          ? q.orWhereRaw(
-              `${tableAlias}3.searchable_asset_name @@ to_tsquery(?)`,
-              [`${cleanedQuery}:*`]
-            )
-          : q
-      )(
+  return qb.distinct('asset_uid').from(function(this: knex.QueryBuilder) {
+    this.table({ [tableAlias]: 'assets' })
+      .column({ asset_uid: `${tableAlias}.uid` })
+      .where(`${tableAlias}.asset_id`, query)
+      .orWhere(
+        `${tableAlias}.ticker`,
+        'ilike',
+        prepareForLike(query, { matchExactly })
+      )
+      .unionAll(q =>
         q
-          .from({ [`${tableAlias}3`]: 'assets_names_map' })
-          .column({ asset_id: `${tableAlias}3.asset_id` })
+          .from({ [`${tableAlias}2`]: 'assets_metadata' })
+          .column({ asset_uid: `${tableAlias}2.asset_uid` })
           .where(
-            `${tableAlias}3.asset_name`,
+            `${tableAlias}2.asset_name`,
             'ilike',
             prepareForLike(query, { matchExactly })
           )
       )
-    );
+      .unionAll(q =>
+        compose((q: knex.QueryBuilder) =>
+          cleanedQuery.length
+            ? q.orWhereRaw(
+                `${tableAlias}3.searchable_asset_name @@ to_tsquery(?)`,
+                [`${cleanedQuery}:*`]
+              )
+            : q
+        )(
+          q
+            .from({ [`${tableAlias}3`]: 'assets' })
+            .column({ asset_uid: `${tableAlias}3.uid` })
+            .where(
+              `${tableAlias}3.asset_name`,
+              'ilike',
+              prepareForLike(query, { matchExactly })
+            )
+        )
+      )
+      .as('a');
+  });
 };
 
 export const get = (r: PairsGetRequest): string => query([r.pair], r.matcher);
@@ -129,8 +145,19 @@ export const search = (req: PairsSearchRequest): string => {
   const { matcher, limit } = req;
   const q = pg({ t: 'pairs' })
     .select(COLUMNS.map(column => `t.${column}`))
+    .select({
+      amount_asset_id: 'aa.asset_id',
+      price_asset_id: 'pa.asset_id',
+    })
+    .join({ aa: 'assets' }, 'aa.uid', 't.amount_asset_uid')
+    .join({ pa: 'assets' }, 'pa.uid', 't.price_asset_uid')
     .orderByRaw('volume_waves desc NULLS LAST')
-    .where('matcher', matcher)
+    .whereIn('matcher_address_uid', function() {
+      this.select('uid')
+        .from('addresses')
+        .where('address', matcher)
+        .limit(1);
+    })
     .limit(limit);
 
   if (isSearchByAssetRequest(req)) {
@@ -139,15 +166,15 @@ export const search = (req: PairsSearchRequest): string => {
       .with('assets_cte', (qb: knex.QueryBuilder) =>
         searchAssets(qb, amountAsset, getMatchExactly(matchExactly)[0])
       )
-      .innerJoin(
+      .join(
         { amountCte: 'assets_cte' },
-        'amountCte.asset_id',
-        't.amount_asset_id'
+        'amountCte.asset_uid',
+        't.amount_asset_uid'
       )
-      .innerJoin(
+      .join(
         { priceCte: 'assets_cte' },
-        'priceCte.asset_id',
-        't.amount_asset_id'
+        'priceCte.asset_uid',
+        't.amount_asset_uid'
       )
       .toString();
   } else if (isSearchByAssetsRequest(req)) {
@@ -161,8 +188,8 @@ export const search = (req: PairsSearchRequest): string => {
       .with('assets_cte', (qb: knex.QueryBuilder) =>
         qb
           .select({
-            amount_asset_id: 't1.asset_id',
-            price_asset_id: 't2.asset_id',
+            amount_asset_uid: 't1.asset_uid',
+            price_asset_uid: 't2.asset_uid',
           })
           .from({
             t1: searchAssets(
@@ -176,25 +203,36 @@ export const search = (req: PairsSearchRequest): string => {
             searchAssets(qb, priceAsset, priceAssetExaclty, 'p').as('t2')
           )
       )
-      .innerJoin(
+      .join(
         { direct_cte: 'assets_cte' },
         {
-          'direct_cte.amount_asset_id': 't.amount_asset_id',
-          'direct_cte.price_asset_id': 't.price_asset_id',
+          'direct_cte.amount_asset_uid': 't.amount_asset_uid',
+          'direct_cte.price_asset_uid': 't.price_asset_uid',
         }
       )
       .unionAll((qb: knex.QueryBuilder) =>
         qb
           .select(COLUMNS.map(column => `t1.${column}`))
+          .select({
+            amount_asset_id: 'aa.asset_id',
+            price_asset_id: 'pa.asset_id',
+          })
           .from({ t1: 'pairs' })
-          .innerJoin(
+          .join(
             { reverse_cte: 'assets_cte' },
             {
-              'reverse_cte.amount_asset_id': 't1.price_asset_id',
-              'reverse_cte.price_asset_id': 't1.amount_asset_id',
+              'reverse_cte.amount_asset_uid': 't1.price_asset_uid',
+              'reverse_cte.price_asset_uid': 't1.amount_asset_uid',
             }
           )
-          .where('matcher', matcher)
+          .join({ aa: 'assets' }, 'aa.uid', 't1.amount_asset_uid')
+          .join({ pa: 'assets' }, 'pa.uid', 't1.price_asset_uid')
+          .whereIn('matcher_address_uid', function() {
+            this.select('uid')
+              .from('addresses')
+              .where('address', matcher)
+              .limit(1);
+          })
       )
       .toString();
   } else {

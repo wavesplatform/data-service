@@ -1,6 +1,9 @@
 const { Joi } = require('../../../utils/validation');
 
 module.exports = {
+  tx_uid: Joi.object()
+    .bignumber()
+    .required(),
   id: Joi.string()
     .base58()
     .required(),
@@ -22,6 +25,10 @@ module.exports = {
     .allow(null),
   proofs: Joi.array().required(),
 
-  sender: Joi.string().base58().required(),
-  sender_public_key: Joi.string().base58().required(),
+  sender: Joi.string()
+    .base58()
+    .required(),
+  sender_public_key: Joi.string()
+    .base58()
+    .required(),
 };

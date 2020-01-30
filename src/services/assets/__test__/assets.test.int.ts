@@ -8,6 +8,7 @@ import createService, { createCache } from '../index';
 import { createPgDriver } from '../../../db';
 import { loadConfig } from '../../../loadConfig';
 import { EventEmitter } from 'events';
+import { SortOrder } from '../../_common';
 
 const options = loadConfig();
 const drivers = {
@@ -71,7 +72,7 @@ describe('Assets service', () => {
   describe('search', () => {
     it('fetches WAVES by ticker', async done => {
       service
-        .search({ ticker: 'WAVES', limit: 100 })
+        .search({ ticker: 'WAVES', limit: 1, sort: SortOrder.Descending })
         .run()
         .promise()
         .then(xs => {
@@ -90,7 +91,7 @@ describe('Assets service', () => {
           res.on('end', () => {
             const assetInfoFromNode: any = parse(data);
             service
-              .search({ ticker: 'BTC', limit: 100 })
+              .search({ ticker: 'BTC', limit: 1, sort: SortOrder.Descending })
               .run()
               .promise()
               .then(xs => {
@@ -127,7 +128,7 @@ describe('Assets service', () => {
 
     it('fetches all assets with tickers by ticker=*', () =>
       service
-        .search({ ticker: '*', limit: 100 })
+        .search({ ticker: '*', limit: 101, sort: SortOrder.Descending })
         .run()
         .promise()
         .then(as => {

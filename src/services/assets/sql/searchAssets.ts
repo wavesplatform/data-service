@@ -1,29 +1,33 @@
 import * as knex from 'knex';
-import { compose } from 'ramda';
+import { compose, map } from 'ramda';
 import { escapeForTsQuery, prepareForLike } from '../../../utils/db';
 import { columns } from './common';
 
 const pg = knex({ client: 'pg' });
 
 const searchById = (q: string) =>
-  pg({ t: 'assets' })
+  pg({ a: 'assets' })
     .columns({
-      asset_id: 't.asset_id',
-      asset_name: 't.asset_name',
-      ticker: 't.ticker',
-      height: 't.issue_height',
+      asset_uid: `a.${columns.uid}`,
+      asset_name: `a.${columns.asset_name}`,
+      ticker: `a.${columns.ticker}`,
+      height: pg.raw(`coalesce(a.first_appeared_on_height, 0)`),
       rank: pg.raw(
-        "ts_rank(to_tsvector('simple', t.asset_id), plainto_tsquery(?), 3) * case when t.ticker is null then 128 else 256 end",
+        `ts_rank(to_tsvector('simple', a.${columns.asset_id}), plainto_tsquery(?), 3) * case when a.${columns.ticker} is null then 128 else 256 end`,
         [q]
       ),
     })
-    .where('t.asset_id', 'ilike', prepareForLike(q, { matchExactly: true })); // ilike - hack for searching for waves in different cases
+    .where(
+      `a.${columns.asset_id}`,
+      'ilike',
+      prepareForLike(q, { matchExactly: true })
+    ); // ilike - hack for searching for waves in different cases
 
 const searchByNameInMeta = (qb: knex.QueryBuilder, q: string) =>
   qb
     .table('assets_metadata')
     .columns([
-      'asset_id',
+      'asset_uid',
       'asset_name',
       'ticker',
       'height',
@@ -40,38 +44,36 @@ const searchByTicker = (qb: knex.QueryBuilder, q: string): knex.QueryBuilder =>
   qb
     .table({ a: 'assets' })
     .columns({
-      asset_id: 'a.asset_id',
-      asset_name: 'a.asset_name',
-      ticker: 'a.ticker',
-      height: 'a.issue_height',
+      asset_uid: `a.${columns.uid}`,
+      asset_name: `a.${columns.asset_name}`,
+      ticker: `a.${columns.ticker}`,
+      height: pg.raw(`coalesce(a.first_appeared_on_height, 0)`),
       rank: pg.raw('32'),
     })
-    .where('a.ticker', 'ilike', prepareForLike(q));
+    .where(`a.${columns.ticker}`, 'ilike', prepareForLike(q));
 
 const searchByName = (qb: knex.QueryBuilder, q: string) => {
   const cleanedQuery = escapeForTsQuery(q);
   return compose((q: knex.QueryBuilder) =>
     cleanedQuery.length
-      ? q.orWhereRaw('am.searchable_asset_name @@ to_tsquery(?)', [
+      ? q.orWhereRaw('a.searchable_asset_name @@ to_tsquery(?)', [
           `${cleanedQuery}:*`,
         ])
       : q
   )(
     qb
-      .table({ am: 'assets_names_map' })
+      .table({ a: 'assets' })
       .columns({
-        asset_id: 'am.asset_id',
-        asset_name: 'am.asset_name',
-        ticker: 'ti.ticker',
-        height: 't.height',
+        asset_uid: `a.${columns.uid}`,
+        asset_name: `a.${columns.asset_name}`,
+        ticker: `a.${columns.ticker}`,
+        height: pg.raw(`coalesce(a.first_appeared_on_height, 0)`),
         rank: pg.raw(
-          "ts_rank(to_tsvector('simple', am.asset_name), plainto_tsquery(?), 3) * case when ti.ticker is null then 16 else 32 end",
+          `ts_rank(to_tsvector('simple', a.${columns.asset_name}), plainto_tsquery(?), 3) * case when a.${columns.ticker} is null then 16 else 32 end`,
           [q]
         ),
       })
-      .leftJoin({ t: 'txs_3' }, 'am.asset_id', 't.asset_id')
-      .leftJoin({ ti: 'tickers' }, 'am.asset_id', 'ti.asset_id')
-      .where('am.asset_name', 'ilike', prepareForLike(q))
+      .where(`a.${columns.asset_name}`, 'ilike', prepareForLike(q))
   );
 };
 
@@ -79,12 +81,12 @@ export const searchAssets = (query: string): knex.QueryBuilder =>
   pg
     .with('assets_cte', qb => {
       qb.select([
-        pg.raw('distinct on ("r"."asset_id") "r"."asset_id"'),
+        pg.raw('distinct on ("r"."asset_uid") "r"."asset_uid"'),
         'r.ticker',
         'r.asset_name',
         {
           rn: pg.raw(
-            'row_number() over (order by r.rank desc, r.height asc, r.asset_id asc)'
+            'row_number() over (order by r.rank desc, r.height asc, r.asset_uid asc)'
           ),
         },
       ])
@@ -94,10 +96,10 @@ export const searchAssets = (query: string): knex.QueryBuilder =>
             .unionAll(qb => searchByTicker(qb, query))
             .unionAll(qb => searchByName(qb, query)),
         })
-        .orderBy('r.asset_id')
+        .orderBy('r.asset_uid')
         .orderBy('r.rank', 'desc');
     })
     .from('assets_cte')
-    .select(columns.map(col => 'a.' + col))
-    .innerJoin({ a: 'assets' }, 'assets_cte.asset_id', 'a.asset_id')
+    .select(map(col => `a.${col}`, columns))
+    .innerJoin({ a: 'assets' }, 'assets_cte.asset_uid', 'a.uid')
     .orderBy('rn', 'asc');

@@ -1,6 +1,20 @@
-const createSql = require('../../_common/sql/index');
+const { compose } = require('ramda');
 
-const { select } = require('./query');
+const createSql = require('../../_common/sql/index');
+const { outerSort } = require('../../_common/sql/filters');
+
+const { select, selectFromFiltered } = require('./query');
 const { filters, filtersOrder } = require('./filters');
 
-module.exports = createSql({ query: select, filters, filtersOrder });
+const queryAfterFilters = {
+  get: selectFromFiltered,
+  mget: selectFromFiltered,
+  search: (q, fValues) => compose(outerSort(fValues.sort), selectFromFiltered)(q),
+};
+
+module.exports = createSql({
+  query: select,
+  filters,
+  filtersOrder,
+  queryAfterFilters,
+});

@@ -1,7 +1,7 @@
 import { Task, of as taskOf } from 'folktale/concurrency/task';
 
 import { AppError } from '../errorHandling';
-import createAliasesService, { AliasService } from './aliases';
+import createAliasesService, { AliasesService } from './aliases';
 import createAssetsService, {
   AssetsService,
   createCache as createAssetsCache,
@@ -79,7 +79,7 @@ export type RateSerivceCreatorDependencies = CommonServiceDependencies & {
 };
 
 export type ServiceMesh = {
-  aliases: AliasService;
+  aliases: AliasesService;
   assets: AssetsService;
   candles: CandlesService;
   matchers: {

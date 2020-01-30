@@ -48,7 +48,7 @@ const pairsOneEndpoint = service => async ctx => {
     });
   } catch (e) {
     e.matchWith({
-      DB: () => {
+      Db: () => {
         throw e;
       },
       Resolver: () => {

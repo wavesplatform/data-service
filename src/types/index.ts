@@ -125,7 +125,6 @@ export type DataTxEntryType = 'binary' | 'boolean' | 'integer' | 'string';
 export type TransactionInfo = {
   id: string;
   type: number;
-  timestamp: Date;
 };
 export type NotNullTransaction = Serializable<'transaction', TransactionInfo>;
 export type Transaction = Serializable<'transaction', TransactionInfo | null>;

@@ -4,13 +4,15 @@ const LIMIT = 1000;
 
 const selectFromSet = aliasSet =>
   pg.select('alias', 'address', 'duplicates').from({
-    counted_aliases: pg('txs_10')
-      .select({ alias: 'alias' })
-      .min({ address: 'sender' }) // first sender
-      .min({ time_stamp: 'time_stamp' }) // first tx timestamp
-      .count({ duplicates: 'sender' }) // count senders grouped by alias
-      .whereIn('alias', aliasSet)
-      .groupBy('alias'),
+    counted_aliases: pg({ t: 'txs_10' })
+      .select({ alias: 't.alias' })
+      .min({ address: 'addr.address' }) // first sender
+      .min({ time_stamp: 'txs.time_stamp' }) // first tx timestamp
+      .count({ duplicates: 't.sender_uid' }) // count senders grouped by alias
+      .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tx_uid')
+      .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid')
+      .whereIn('t.alias', aliasSet)
+      .groupBy('t.alias'),
   });
 
 module.exports = {
@@ -26,7 +28,12 @@ module.exports = {
     const q = selectFromSet(
       pg('txs_10')
         .select('alias')
-        .where('sender', address)
+        .where('sender_uid', function() {
+          this.select('uid')
+            .from('addresses')
+            .where('address', address)
+            .limit(1);
+        })
     )
       .clone()
       .orderBy('time_stamp', 'asc')

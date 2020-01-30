@@ -2,48 +2,41 @@ import { of as task } from 'folktale/concurrency/task';
 import { Result, Error as error, Ok as ok } from 'folktale/result';
 import { always, T } from 'ramda';
 
-import { parseDate } from '../../../../../utils/parseDate';
 import { Joi } from '../../../../../utils/validation';
 import {
   Serializable,
   toSerializable,
 } from '../../../../../types/serializable';
 import { PgDriver } from '../../../../../db/driver';
-import { SortOrder, WithLimit } from '../../../../_common';
+import { WithLimit } from '../../../../_common';
 import { searchWithPaginationPreset } from '..';
 import commonFilterSchemas from '../commonFilterSchemas';
 import { AppError, ValidationError } from './../../../../../errorHandling';
+import { RawTxWithUid } from '../../../../transactions/_common/types';
+import { RequestWithCursor } from '../../../../_common/pagination';
 
 const mockTxs: ResponseRaw[] = [
-  { id: 'q', timestamp: new Date() },
-  { id: 'w', timestamp: new Date() },
+  { tx_uid: 1, id: 'q', timestamp: new Date() },
+  { tx_uid: 2, id: 'w', timestamp: new Date() },
 ];
 
-type Request = WithLimit & {
-  timeEnd?: Date;
-  timeStart?: Date;
-  sort: SortOrder;
-};
-
 type ResponseRaw = {
+  tx_uid: number;
   id: string;
   timestamp: Date;
 };
 
 type Cursor = {
-  timestamp: Date;
-  id: string;
+  tx_uid: number;
 };
 
-const serialize = <ResponseRaw extends Serializable<string, any>>(
-  request: Request,
+const serialize = <ResponseRaw extends RawTxWithUid>(
+  request: RequestWithCursor<WithLimit, Cursor>,
   response: ResponseRaw
 ): string | undefined =>
   response === null
     ? undefined
-    : Buffer.from(
-        `${response.data.timestamp.toISOString()}::${response.data.id}`
-      ).toString('base64');
+    : Buffer.from(response.tx_uid.toString()).toString('base64');
 
 const deserialize = (cursor: string): Result<ValidationError, Cursor> => {
   const data = Buffer.from(cursor, 'base64')
@@ -51,28 +44,30 @@ const deserialize = (cursor: string): Result<ValidationError, Cursor> => {
     .split('::');
 
   const err = (message?: string) =>
-    new ValidationError('Cursor deserialization is failed', { cursor, message });
+    new ValidationError('Cursor deserialization is failed', {
+      cursor,
+      message,
+    });
 
   return (
     ok<ValidationError, string[]>(data)
       // validate length
       .chain(d =>
-        d.length > 1
-          ? ok<ValidationError, string[]>(d)
-          : error<ValidationError, string[]>(err('Cursor length <2'))
+        d.length === 1
+          ? ok<ValidationError, number>(parseInt(d[0]))
+          : error<ValidationError, number>(
+              err('Cursor length is not equals to 1')
+            )
       )
-      .chain(d =>
-        parseDate(d[0]).map(date => ({
-          timestamp: date,
-          id: d[1],
-        }))
-      )
+      .map(tx_uid => ({
+        tx_uid,
+      }))
   );
 };
 
 const service = searchWithPaginationPreset<
   Cursor,
-  Request,
+  RequestWithCursor<WithLimit, string>,
   ResponseRaw,
   ResponseRaw,
   Serializable<string, ResponseRaw | null>
@@ -92,7 +87,10 @@ const service = searchWithPaginationPreset<
   emitEvent: always(T),
 });
 
-const assertValidationError = (done: jest.DoneCallback, v: Request) =>
+const assertValidationError = (
+  done: jest.DoneCallback,
+  v: RequestWithCursor<WithLimit, string>
+) =>
   service(v)
     .run()
     .promise()
@@ -104,42 +102,22 @@ const assertValidationError = (done: jest.DoneCallback, v: Request) =>
 
 describe('searchWithPagination preset validation', () => {
   describe('common filters', () => {
-    it('fails if timeEnd < 0', done =>
+    it('fails if limit <= 0', done =>
       assertValidationError(done, {
-        timeEnd: parseDate('-1525132900000').unsafeGet(),
-        limit: 10,
-        sort: SortOrder.Ascending,
+        limit: 0,
       }));
-    it('fails if timeStart < 0', done =>
-      assertValidationError(done, {
-        timeEnd: parseDate('1525132900000').unsafeGet(),
-        timeStart: parseDate('-1525132800000').unsafeGet(),
-        limit: 10,
-        sort: SortOrder.Ascending,
-      }));
-    it('fails if timeEnd < timeStart', done =>
-      assertValidationError(done, {
-        timeEnd: parseDate('1525132700000').unsafeGet(),
-        timeStart: parseDate('1525132800000').unsafeGet(),
-        limit: 10,
-        sort: SortOrder.Ascending,
-      }));
-    it('fails if timeStart->invalid Date', done => {
-      expect(parseDate('').unsafeGet).toThrowError();
-      done();
-    });
     it('passes if correct object is provided', done =>
       service({
-        timeStart: new Date(0),
-        timeEnd: new Date(),
         limit: 1,
-        sort: SortOrder.Ascending,
       })
         .run()
         .listen({
           onResolved: (x: Serializable<string, any>) => {
             expect(x.__type).toBe('list');
             done();
+          },
+          onRejected: (e: AppError) => {
+            done(e.error.message);
           },
         }));
   });

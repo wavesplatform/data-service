@@ -1,30 +1,21 @@
-const { compose, merge, pick, pipe, assoc } = require('ramda');
+const { assoc, compose, merge, pick, pipe } = require('ramda');
 
-const { select, fSelect, composeQuery } = require('./query');
+const { select, selectFromFiltered } = require('./query');
 const { pickBindFilters } = require('../../../../../utils/db');
 
 // one — get by id
 // many — apply filters
 module.exports = ({ filters: F }) => ({
-  get: id =>
-    pipe(
-      F.id(id),
-      String
-    )(select),
+  get: id => pipe(F.id(id), selectFromFiltered, String)(select),
 
-  mget: ids =>
-    pipe(
-      F.ids(ids),
-      String
-    )(select),
+  mget: ids => pipe(F.ids(ids), selectFromFiltered, String)(select),
 
   search: (fValues = {}) => {
     const defaultValues = { limit: 100, sort: 'desc' };
 
-    // no `limit` here, will apply it separately
     const fNames = [
-      // tx attributes
       'after',
+      // tx attributes
       'timeStart',
       'timeEnd',
       'sender',
@@ -38,10 +29,7 @@ module.exports = ({ filters: F }) => ({
     ];
 
     // { [fName]: fValue }
-    const withDefaults = compose(
-      pick(fNames),
-      merge(defaultValues)
-    )(fValues);
+    const withDefaults = compose(pick(fNames), merge(defaultValues))(fValues);
 
     const withValueF =
       withDefaults.value !== undefined
@@ -49,12 +37,8 @@ module.exports = ({ filters: F }) => ({
         : F;
 
     const fs = pickBindFilters(withValueF, fNames, withDefaults);
-    const fQuery = pipe(...fs)(fSelect);
+    const fQuery = pipe(...fs)(select);
 
-    return pipe(
-      composeQuery,
-      F.sort(withDefaults.sort),
-      String
-    )(fQuery);
+    return pipe(selectFromFiltered, F.sort(withDefaults.sort), String)(fQuery);
   },
 });

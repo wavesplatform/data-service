@@ -1,4 +1,4 @@
-import { compose, last, take } from 'ramda';
+import { compose, init, last, take } from 'ramda';
 
 import { Serializable, List, list } from '../../../../types';
 import { WithLimit } from '../../../_common';
@@ -12,32 +12,23 @@ type ResponseMeta = {
   lastCursor?: string;
 };
 
-const createMeta = <
-  Cursor extends Partial<Request> & Partial<ResponseTransformed>,
-  Request extends WithLimit,
-  ResponseRaw,
-  ResponseTransformed
->(
-  serialize: CursorSerialization<
-    Cursor,
-    Request,
-    ResponseTransformed
-  >['serialize']
+const createMeta = <Cursor, Request extends WithLimit, ResponseRaw>(
+  serialize: CursorSerialization<Cursor, Request, ResponseRaw>['serialize']
 ) => (
   request: RequestWithCursor<Request, Cursor>,
-  responsesRaw: ResponseRaw[],
-  lastTransformedResponse: ResponseTransformed | undefined
+  responsesRaw: ResponseRaw[]
 ): ResponseMeta => {
   const metaBuilder: ResponseMeta = {};
-  if (typeof lastTransformedResponse !== 'undefined') {
+  const lastResponse = last(init(responsesRaw));
+  if (typeof lastResponse !== 'undefined') {
     metaBuilder.isLastPage = responsesRaw.length < request.limit;
-    metaBuilder.lastCursor = serialize(request, lastTransformedResponse);
+    metaBuilder.lastCursor = serialize(request, lastResponse);
   }
   return metaBuilder;
 };
 
 export const transformResults = <
-  Cursor extends Record<string, any>,
+  Cursor,
   Request extends WithLimit,
   ResponseRaw,
   ResponseTransformed extends Serializable<string, any>
@@ -46,11 +37,7 @@ export const transformResults = <
     results: ResponseRaw,
     request?: RequestWithCursor<Request, Cursor>
   ) => ResponseTransformed,
-  serialize: CursorSerialization<
-    Cursor,
-    Request,
-    ResponseTransformed
-  >['serialize']
+  serialize: CursorSerialization<Cursor, Request, ResponseRaw>['serialize']
 ) => (
   responses: ResponseRaw[],
   request: RequestWithCursor<Request, Cursor>
@@ -60,8 +47,5 @@ export const transformResults = <
     take<ResponseRaw>(request.limit - 1)
   )(responses);
 
-  return list(
-    transformedData,
-    createMeta(serialize)(request, responses, last(transformedData))
-  );
+  return list(transformedData, createMeta(serialize)(request, responses));
 };

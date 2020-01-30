@@ -2,17 +2,14 @@ const { compose } = require('ramda');
 
 const createSql = require('../../_common/sql/index');
 
-const { select, withDecimals } = require('./query');
+const { select, selectFromFiltered } = require('./query');
 const { filters, filtersOrder } = require('./filters');
 
 const queryAfterFilters = {
-  get: withDecimals,
-  mget: withDecimals,
+  get: selectFromFiltered,
+  mget: selectFromFiltered,
   search: (q, fValues) =>
-    compose(
-      filters.sortOuter(fValues.sort),
-      withDecimals
-    )(q),
+    compose(filters.sortOuter(fValues.sort), selectFromFiltered)(q),
 };
 
 module.exports = createSql({

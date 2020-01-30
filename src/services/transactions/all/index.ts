@@ -194,7 +194,7 @@ export default (deps: CommonServiceDependencies) => (
         ),
 
     search: filters =>
-      commonTxData.search(filters).chain((txsList: List<NotNullTransaction>) =>
+      commonTxData.search(filters).chain<AppError, List<Transaction>>(txsList =>
         pipe<
           List<NotNullTransaction>,
           { id: string; type: number }[],

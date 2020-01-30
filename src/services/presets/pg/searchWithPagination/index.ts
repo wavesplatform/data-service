@@ -15,7 +15,7 @@ import { getData } from './pg';
 
 export const searchWithPaginationPreset = <
   Cursor,
-  Request extends WithLimit,
+  Request extends RequestWithCursor<WithLimit, any>,
   ResponseRaw,
   ResponseTransformed,
   Res extends Serializable<string, ResponseTransformed | null>
@@ -28,14 +28,15 @@ export const searchWithPaginationPreset = <
   cursorSerialization,
 }: {
   name: string;
-  sql: (r: RequestWithCursor<Request, Cursor>) => string;
+  sql: (r: Request) => string;
   inputSchema: SchemaLike;
   resultSchema: SchemaLike;
-  transformResult: (
-    response: ResponseRaw,
-    request?: RequestWithCursor<Request, Cursor>
-  ) => Res;
-  cursorSerialization: CursorSerialization<Cursor, Request, Res>;
+  transformResult: (response: ResponseRaw, request?: Request) => Res;
+  cursorSerialization: CursorSerialization<
+    Cursor,
+    RequestWithCursor<Request, Cursor>,
+    ResponseRaw
+  >;
 }) => ({ pg, emitEvent }: ServicePresetInitOptions) =>
   search<
     RequestWithCursor<Request, string>,
@@ -44,15 +45,13 @@ export const searchWithPaginationPreset = <
     List<Res>
   >({
     transformInput: transformInput(cursorSerialization.deserialize),
-    transformResult: transformResults<
-      Cursor,
-      RequestWithCursor<Request, Cursor>,
-      ResponseRaw,
-      Res
-    >(transformResult, cursorSerialization.serialize),
+    transformResult: transformResults<Cursor, Request, ResponseRaw, Res>(
+      transformResult,
+      cursorSerialization.serialize
+    ),
     validateInput: validateInput(inputSchema, name),
     validateResult: validateResult(resultSchema, name),
-    getData: getData<RequestWithCursor<Request, Cursor>, ResponseRaw>({
+    getData: getData<Request, ResponseRaw>({
       name,
       sql,
       pg,
