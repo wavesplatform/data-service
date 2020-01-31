@@ -2,6 +2,7 @@ import {
   DEFAULT_INTERNAL_SERVER_ERROR_MESSAGE,
   DEFAULT_TIMEOUT_OCCURRED_MESSAGE,
   DEFAULT_NOT_FOUND_MESSAGE,
+  DEFAULT_BAD_REQUEST_MESSAGE,
 } from '../../errorHandling';
 import { RequestHeaders } from '../../types';
 import { ValuesOf } from '../../types/generic';
@@ -32,8 +33,18 @@ export class HttpResponse {
     return new HttpResponse(200, body, headers);
   }
 
-  public static BadRequest(body?: string, headers?: Record<string, string>) {
-    return new HttpResponse(400, body, headers);
+  public static BadRequest(
+    meta?: { message: string }[],
+    headers?: Record<string, string>
+  ) {
+    return new HttpResponse(
+      400,
+      defaultStringify({
+        message: DEFAULT_BAD_REQUEST_MESSAGE,
+        meta,
+      }),
+      headers
+    );
   }
 
   public static NotFound(headers?: Record<string, string>) {
