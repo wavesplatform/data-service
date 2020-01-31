@@ -1,14 +1,15 @@
+import { Result, Ok as ok } from 'folktale/result';
 import { omit, compose, evolve, inc } from 'ramda';
 
+import { ValidationError } from '../../../../../errorHandling';
 import { WithLimit } from '../../../../_common';
 import { RequestWithCursor, CursorSerialization } from '../../../pagination';
 
-// @todo: should return Result<ValidationError, RequestWithCursor<Request, Cursor>> cause cursor deserialization
 export const transformInput = <Cursor, Request extends WithLimit>(
   deserialize: CursorSerialization<Cursor, Request, Response>['deserialize']
 ) => (
   request: RequestWithCursor<Request, string>
-): RequestWithCursor<Request, Cursor> => {
+): Result<ValidationError, RequestWithCursor<Request, Cursor>> => {
   const requestWithoutAfter = compose<
     RequestWithCursor<Request, string>,
     any, // hack for evolve output -> omit input type
@@ -19,11 +20,11 @@ export const transformInput = <Cursor, Request extends WithLimit>(
   )(request);
 
   if (!request.after) {
-    return requestWithoutAfter;
+    return ok(requestWithoutAfter);
   } else {
-    return {
+    return deserialize(request.after).map(cursor => ({
       ...requestWithoutAfter,
-      after: deserialize(request.after).unsafeGet(),
-    };
+      after: cursor,
+    }));
   }
 };

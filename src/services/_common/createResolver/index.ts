@@ -1,5 +1,6 @@
 import { of as taskOf, Task } from 'folktale/concurrency/task';
 import { Maybe } from 'folktale/maybe';
+import { Result } from 'folktale/result';
 
 // @hack because of ramda 'tap' not working with null values
 // https://github.com/ramda/ramda/issues/2421
@@ -16,6 +17,7 @@ import {
   DbError,
   AppError,
   Timeout,
+  ValidationError,
 } from '../../../errorHandling';
 
 import {
@@ -34,7 +36,9 @@ const createResolver = <
   ResponseRaw,
   ResponseTransformed
 >(
-  transformInput: (r: RequestRaw) => RequestTransformed,
+  transformInput: (
+    r: RequestRaw
+  ) => Result<ValidationError, RequestTransformed>,
   getData: (r: RequestTransformed) => Task<DbError | Timeout, ResponseRaw>,
   validateAllResults: ValidateSync<ResolverError, ResponseRaw>,
   transformAllResults: (
@@ -46,6 +50,7 @@ const createResolver = <
 ): Task<AppError, ResponseTransformed> =>
   taskOf<never, RequestRaw>(request)
     .map(transformInput)
+    .chain(resultToTask)
     .map(tap(emitEvent('TRANSFORM_INPUT_OK')))
     .chain(getData)
     .map(tap(emitEvent('DB_QUERY_OK')))

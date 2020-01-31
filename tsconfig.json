@@ -13,5 +13,5 @@
     "noUnusedLocals": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules","src/services","src/services/candles/*","src/http/transactions","src/http/candles"]
+  "exclude": ["node_modules"]
 }

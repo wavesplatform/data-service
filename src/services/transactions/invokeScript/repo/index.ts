@@ -1,4 +1,5 @@
-import { compose, identity } from 'ramda';
+import { Ok as ok } from 'folktale/result';
+import { compose } from 'ramda';
 
 import { withStatementTimeout } from '../../../../db/driver';
 import { CommonRepoDependencies } from '../../..';
@@ -30,7 +31,7 @@ export default ({
 }: CommonRepoDependencies): InvokeScriptTxsRepo => {
   return {
     get: get({
-      transformInput: identity,
+      transformInput: ok,
       transformResult: transformResultGet(transformTxInfo),
       validateResult: validateResult<RawInvokeScriptTx>(
         resultSchema,
@@ -41,7 +42,7 @@ export default ({
     }),
 
     mget: mget({
-      transformInput: identity,
+      transformInput: ok,
       transformResult: transformResultMget(transformTxInfo),
       validateResult: validateResult(resultSchema, createServiceName('mget')),
       getData: pgData.mget(withStatementTimeout(pg, timeouts.mget)),

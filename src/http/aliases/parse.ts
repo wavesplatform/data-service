@@ -36,20 +36,22 @@ export const mgetOrSearch = ({
     aliases: parseArrayQuery,
     address: commonFilters.query,
     showBroken: parseBool,
-  })(query).map(fValues => {
+  })(query).chain(fValues => {
     if (Array.isArray(fValues.aliases)) {
-      return { ids: fValues.aliases };
+      return ok({ ids: fValues.aliases });
     } else {
       if (isNil(fValues.address)) {
-        throw new ParseError(new Error('Address is incorrect or undefined'));
+        return error(
+          new ParseError(new Error('Address is incorrect or undefined'))
+        );
       }
 
-      return {
+      return ok({
         address: fValues.address,
         showBroken: fValues.showBroken,
         sort: fValues.sort,
         limit: fValues.limit,
-      };
+      });
     }
   });
 };

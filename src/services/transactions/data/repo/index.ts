@@ -1,4 +1,4 @@
-import { identity } from 'ramda';
+import { Ok as ok } from 'folktale/result';
 
 import { withStatementTimeout } from '../../../../db/driver';
 import { CommonRepoDependencies } from '../../..';
@@ -30,7 +30,7 @@ export default ({
 }: CommonRepoDependencies): DataTxsRepo => {
   return {
     get: get({
-      transformInput: identity,
+      transformInput: ok,
       transformResult: transformResultGet<
         string,
         DataTxDbResponse,
@@ -42,7 +42,7 @@ export default ({
     }),
 
     mget: mget({
-      transformInput: identity,
+      transformInput: ok,
       transformResult: transformResultMget<
         string[],
         DataTxDbResponse,

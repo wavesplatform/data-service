@@ -1,6 +1,6 @@
-import { identity } from 'ramda';
 import { of as taskOf } from 'folktale/concurrency/task';
 import { of as just, Maybe } from 'folktale/maybe';
+import { Ok as ok } from 'folktale/result';
 
 import { forEach, isEmpty } from '../../../utils/fp/maybeOps';
 import { tap } from '../../../utils/tap';
@@ -58,7 +58,7 @@ export default ({
     PairDbResponse,
     PairInfo
   >({
-    transformInput: identity,
+    transformInput: ok,
 
     // cache first
     getData: req =>
@@ -85,7 +85,7 @@ export default ({
     PairDbResponse,
     PairInfo
   >({
-    transformInput: identity,
+    transformInput: ok,
     getData: request => {
       let results: Array<Maybe<PairDbResponse>> = request.pairs.map(p =>
         cache.get({

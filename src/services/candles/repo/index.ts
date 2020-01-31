@@ -1,4 +1,4 @@
-import { identity } from 'ramda';
+import { Ok as ok } from 'folktale/result';
 
 import { withStatementTimeout } from '../../../db/driver';
 import { CandleInfo, RepoSearch } from '../../../types';
@@ -32,7 +32,7 @@ export default ({
   const SERVICE_NAME = 'candles.search';
   return {
     search: search({
-      transformInput: identity,
+      transformInput: ok,
       transformResult: transformResults,
       validateResult: validateResult(output, SERVICE_NAME),
       getData: getData({

@@ -23,7 +23,7 @@ type CommonResolverDependencies<
   ResRaw,
   ResTransformed
 > = {
-  transformInput: (r: ReqRaw) => ReqTransformed;
+  transformInput: (r: ReqRaw) => Result<ValidationError, ReqTransformed>;
   validateResult: ValidateSync<ResolverError, ResRaw>;
   emitEvent: EmitEvent;
 };

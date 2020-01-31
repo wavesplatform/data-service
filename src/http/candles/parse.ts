@@ -1,4 +1,4 @@
-import { Result, Error as error } from 'folktale/result';
+import { Result, Error as error, Ok as ok } from 'folktale/result';
 import { isNil } from 'ramda';
 import { ParseError } from '../../errorHandling';
 import { CandlesSearchRequest } from '../../services/candles/repo';
@@ -24,26 +24,26 @@ export const parse = ({
   return parseFilterValues({
     matcher: commonFilters.query,
     interval: commonFilters.query,
-  })(query).map(fValues => {
+  })(query).chain(fValues => {
     if (isNil(fValues.matcher)) {
-      throw new ParseError(new Error('matcher is undefined'));
+      return error(new ParseError(new Error('matcher is undefined')));
     }
 
     if (isNil(fValues.timeStart)) {
-      throw new ParseError(new Error('timeStart is undefined'));
+      return error(new ParseError(new Error('timeStart is undefined')));
     }
 
     if (isNil(fValues.interval)) {
-      throw new ParseError(new Error('interval is undefined'));
+      return error(new ParseError(new Error('interval is undefined')));
     }
 
-    return {
+    return ok({
       amountAsset: params.amountAsset,
       priceAsset: params.priceAsset,
       matcher: fValues.matcher,
       timeStart: fValues.timeStart,
       timeEnd: fValues.timeEnd || new Date(),
       interval: fValues.interval,
-    };
+    });
   });
 };

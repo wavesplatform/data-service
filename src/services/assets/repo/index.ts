@@ -1,6 +1,7 @@
-import { propEq, identity } from 'ramda';
+import { propEq } from 'ramda';
 import { of as taskOf } from 'folktale/concurrency/task';
 import { of as just, Maybe } from 'folktale/maybe';
+import { Ok as ok } from 'folktale/result';
 import { Asset } from '@waves/data-entities';
 
 import { withStatementTimeout } from '../../../db/driver/utils';
@@ -58,7 +59,7 @@ export default ({
       AssetDbResponse,
       Asset
     >({
-      transformInput: identity,
+      transformInput: ok,
       getData: req =>
         cache.get(req).matchWith({
           Just: ({ value }) => taskOf(just(value)),
@@ -82,7 +83,7 @@ export default ({
       AssetDbResponse,
       Asset
     >({
-      transformInput: identity,
+      transformInput: ok,
       getData: request => {
         let results: Array<Maybe<AssetDbResponse>> = request.map(x =>
           cache.get(x)

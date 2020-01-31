@@ -3,7 +3,7 @@ import { Result, Error as error, Ok as ok } from 'folktale/result';
 import { has } from 'ramda';
 import * as Router from 'koa-router';
 
-import { ParseError, DEFAULT_NOT_FOUND_MESSAGE } from '../../errorHandling';
+import { ParseError } from '../../errorHandling';
 import { ServiceMesh } from '../../services';
 import { WithSortOrder, WithLimit } from '../../services/_common';
 import {
@@ -17,57 +17,49 @@ import {
 import { stringify } from '../../utils/json';
 
 import { createHttpHandler } from '../_common';
-import { HttpRequest } from '../_common/types';
+import { HttpRequest, HttpResponse } from '../_common/types';
 import { parseFilterValues } from '../_common/filters';
 import { Parser } from '../_common/filters/types';
-import { defaultStringify } from '../_common/utils';
 import { postToGet } from '../_common/postToGet';
 import { LSNFormat } from '../types';
 
 const serializeGet = (lsnFormat: LSNFormat) => (m: Maybe<TransactionInfo>) =>
   m.matchWith({
-    Just: ({ value }) => ({
-      status: 200,
-      body: stringify(lsnFormat)(transaction(value)),
-    }),
-    Nothing: () => ({
-      status: 404,
-      body: defaultStringify({
-        message: DEFAULT_NOT_FOUND_MESSAGE,
-      }),
-    }),
+    Just: ({ value }) =>
+      HttpResponse.Ok(stringify(lsnFormat)(transaction(value))),
+    Nothing: () => HttpResponse.NotFound(),
   });
 
 const serializeMget = (lsnFormat: LSNFormat) => (
   ms: Maybe<TransactionInfo>[]
-) => ({
-  status: 200,
-  body: stringify(lsnFormat)(
-    list(
-      ms.map(maybe =>
-        maybe.matchWith({
-          Just: ({ value }) => transaction(value),
-          Nothing: () => transaction(null),
-        })
+) =>
+  HttpResponse.Ok(
+    stringify(lsnFormat)(
+      list(
+        ms.map(maybe =>
+          maybe.matchWith({
+            Just: ({ value }) => transaction(value),
+            Nothing: () => transaction(null),
+          })
+        )
       )
     )
-  ),
-});
+  );
 
 const serializeSearch = (lsnFormat: LSNFormat) => (
   data: SearchedItems<TransactionInfo>
-) => ({
-  status: 200,
-  body: stringify(lsnFormat)(
-    list(
-      data.items.map(a => transaction(a)),
-      {
-        isLastPage: data.isLastPage,
-        lastCursor: data.lastCursor,
-      }
+) =>
+  HttpResponse.Ok(
+    stringify(lsnFormat)(
+      list(
+        data.items.map(a => transaction(a)),
+        {
+          isLastPage: data.isLastPage,
+          lastCursor: data.lastCursor,
+        }
+      )
     )
-  ),
-});
+  );
 
 export const isMgetRequest = <SearchRequest>(
   req: ServiceMgetRequest | SearchRequest

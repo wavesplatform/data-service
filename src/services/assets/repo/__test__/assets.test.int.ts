@@ -2,13 +2,13 @@ const http = require('http');
 
 import { parse } from '../../../../utils/json';
 
-import createService, { createCache } from '../index';
+import createRepo, { createCache } from '../';
 
 // dependencies
 import { createPgDriver } from '../../../../db';
 import { loadConfig } from '../../../../loadConfig';
 import { EventEmitter } from 'events';
-import { SortOrder } from '../../_common';
+import { SortOrder } from '../../../_common';
 
 const options = loadConfig();
 const drivers = {
@@ -18,7 +18,7 @@ const cache = createCache(10, 10000);
 
 const DEFAULT_TIMEOUT_IN_MS = 30000;
 
-const service = createService({
+const repo = createRepo({
   drivers,
   emitEvent: () => () => null,
   cache,
@@ -31,10 +31,10 @@ const service = createService({
 
 const assetId = 'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH';
 
-describe('Assets service', () => {
+describe('Assets repo', () => {
   describe('get', () => {
     it('fetches a real asset', async done => {
-      service
+      repo
         .get(assetId)
         .run()
         .promise()
@@ -46,7 +46,7 @@ describe('Assets service', () => {
     });
 
     it('returns null for unreal tx', async () => {
-      const tx = await service
+      const tx = await repo
         .get('UNREAL')
         .run()
         .promise();
@@ -57,7 +57,7 @@ describe('Assets service', () => {
 
   describe('mget', () => {
     it('fetches real assets with nulls for unreal', async done => {
-      service
+      repo
         .mget([assetId, 'UNREAL'])
         .run()
         .promise()
@@ -71,7 +71,7 @@ describe('Assets service', () => {
 
   describe('search', () => {
     it('fetches WAVES by ticker', async done => {
-      service
+      repo
         .search({ ticker: 'WAVES', limit: 1, sort: SortOrder.Descending })
         .run()
         .promise()
@@ -90,7 +90,7 @@ describe('Assets service', () => {
           res.on('data', (chunk: string) => (data += chunk));
           res.on('end', () => {
             const assetInfoFromNode: any = parse(data);
-            service
+            repo
               .search({ ticker: 'BTC', limit: 1, sort: SortOrder.Descending })
               .run()
               .promise()
@@ -127,7 +127,7 @@ describe('Assets service', () => {
     });
 
     it('fetches all assets with tickers by ticker=*', () =>
-      service
+      repo
         .search({ ticker: '*', limit: 101, sort: SortOrder.Descending })
         .run()
         .promise()

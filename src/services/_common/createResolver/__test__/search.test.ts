@@ -1,6 +1,5 @@
 import { of as taskOf } from 'folktale/concurrency/task';
-import { Ok, Error as error } from 'folktale/result';
-import { identity } from 'ramda';
+import { Ok as ok, Error as error } from 'folktale/result';
 import {
   AppError,
   ResolverError,
@@ -19,7 +18,7 @@ const ids = [
 const errorMessage = 'Bad value';
 
 // mock validation
-const resultOk = (s: string) => Ok<ResolverError, string>(s);
+const resultOk = (s: string) => ok<ResolverError, string>(s);
 const resultError = (s: string) =>
   error<ResolverError, string>(AppError.Resolver(errorMessage));
 
@@ -29,7 +28,7 @@ const mockPgDriver: PgDriver = {
 } as PgDriver;
 
 const commonConfig = {
-  transformInput: identity,
+  transformInput: ok,
   transformResult: (items: any) => ({
     isLastPage: false,
     items,

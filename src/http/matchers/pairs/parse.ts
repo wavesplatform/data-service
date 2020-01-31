@@ -59,21 +59,23 @@ export const mgetOrSearch = ({
     match_exactly: parseArrayQuery,
     search_by_asset: commonFilters.query,
     search_by_assets: parseArrayQuery,
-  })(query).map(fValues => {
+  })(query).chain(fValues => {
     if (Array.isArray(fValues.pairs)) {
-      return { pairs: fValues.pairs, matcher: params.matcher };
+      return ok({ pairs: fValues.pairs, matcher: params.matcher });
     } else {
       if (fValues.search_by_asset || fValues.search_by_assets) {
-        return {
+        return ok({
           matcher: params.matcher,
           sort: fValues.sort,
           limit: fValues.limit,
           match_exactly: fValues.match_exactly,
           search_by_asset: fValues.search_by_asset,
           search_by_assets: fValues.search_by_assets,
-        };
+        });
       } else {
-        throw new ParseError(new Error('There are not any search params'));
+        return error(
+          new ParseError(new Error('There are not any search params'))
+        );
       }
     }
   });

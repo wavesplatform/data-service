@@ -1,6 +1,9 @@
 import * as Joi from '../../../utils/validation/joi';
 
 export const result = Joi.object().keys({
+  uid: Joi.object()
+    .bignumber()
+    .required(),
   asset_id: Joi.string()
     .assetId()
     .required(),

@@ -1,4 +1,4 @@
-import { Result, Error as error } from 'folktale/result';
+import { Result, Error as error, Ok as ok } from 'folktale/result';
 import { compose, defaultTo, isNil } from 'ramda';
 import { ParseError } from '../../errorHandling';
 import { parseFilterValues } from '../_common/filters';
@@ -37,18 +37,18 @@ export const get = ({
 
   return parseFilterValues({
     matcher: matcherParser,
-  })(query).map(fValues => {
+  })(query).chain(fValues => {
     if (isNil(fValues.matcher)) {
-      throw new ParseError(new Error('matcher is not set'));
+      return error(new ParseError(new Error('matcher is not set')));
     }
 
-    return {
+    return ok({
       matcher: fValues.matcher,
       pair: {
         amountAsset: params.amountAsset,
         priceAsset: params.priceAsset,
       },
-    };
+    });
   });
 };
 
@@ -65,25 +65,27 @@ export const mgetOrSearch = ({
     match_exactly: parseBool,
     search_by_asset: commonFilters.query,
     search_by_assets: parseArrayQuery,
-  })(query).map(fValues => {
+  })(query).chain(fValues => {
     if (isNil(fValues.matcher)) {
-      throw new ParseError(new Error('matcher is not set'));
+      return error(new ParseError(new Error('matcher is not set')));
     }
 
     if (Array.isArray(fValues.pairs)) {
-      return { pairs: fValues.pairs, matcher: fValues.matcher };
+      return ok({ pairs: fValues.pairs, matcher: fValues.matcher });
     } else {
       if (fValues.search_by_asset || fValues.search_by_assets) {
-        return {
+        return ok({
           matcher: fValues.matcher,
           sort: fValues.sort,
           limit: fValues.limit,
           match_exactly: fValues.match_exactly,
           search_by_asset: fValues.search_by_asset,
           search_by_assets: fValues.search_by_assets,
-        };
+        });
       } else {
-        throw new ParseError(new Error('There are not any search params'));
+        return error(
+          new ParseError(new Error('There are not any search params'))
+        );
       }
     }
   });

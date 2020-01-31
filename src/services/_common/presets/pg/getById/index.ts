@@ -1,4 +1,4 @@
-import { identity } from 'ramda';
+import { Ok as ok } from 'folktale/result';
 import { SchemaLike } from 'joi';
 
 import { get as getResolver } from '../../../createResolver';
@@ -19,7 +19,7 @@ export const getByIdPreset = <Id, ResponseRaw, ResponseTransformed>({
   sql: (r: Id) => string;
 }) => ({ pg, emitEvent }: RepoPresetInitOptions) =>
   getResolver<Id, Id, ResponseRaw, ResponseTransformed>({
-    transformInput: identity,
+    transformInput: ok,
     transformResult: transformResultFn<Id, ResponseRaw, ResponseTransformed>(
       transformResult
     ),

@@ -1,6 +1,6 @@
 import { of as taskOf } from 'folktale/concurrency/task';
 import { of as maybeOf } from 'folktale/maybe';
-import { Ok, Error as error } from 'folktale/result';
+import { Ok as ok, Error as error } from 'folktale/result';
 import { identity } from 'ramda';
 import {
   AppError,
@@ -18,7 +18,7 @@ const assetId = 'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH';
 
 // mock validation
 const inputOk = (s: string) => taskOf<ValidationError, string>(s);
-const resultOk = (s: string) => Ok<ResolverError, string>(s);
+const resultOk = (s: string) => ok<ResolverError, string>(s);
 const resultError = (s: string) =>
   error<ResolverError, string>(AppError.Resolver(s));
 
@@ -30,7 +30,7 @@ describe('Resolver', () => {
   } as PgDriver;
 
   const commonConfig = {
-    transformInput: identity,
+    transformInput: ok,
     transformResult: identity,
     getData: (id: string) => mockPgDriver.one<string>(id).map(maybeOf),
     emitEvent: () => () => undefined,

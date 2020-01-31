@@ -1,6 +1,4 @@
 import { BigNumber } from '@waves/data-entities';
-import { Interval, CandleInfo, SearchedItems } from '../../../types';
-
 import {
   compose,
   curry,
@@ -8,15 +6,10 @@ import {
   map,
   sort,
   toPairs,
-  assoc,
-  always,
-  identity,
-  ifElse,
   merge,
   evolve,
-  omit,
 } from 'ramda';
-import { renameKeys } from 'ramda-adjunct';
+import { Interval, CandleInfo, SearchedItems } from '../../../types';
 import { interval, Unit, CandleInterval } from '../../../types';
 import { concatAll } from '../../../utils/fp/concatAll';
 import { floor, ceil, add, trunc } from '../../../utils/date';
@@ -64,16 +57,6 @@ export const transformCandle = (candleInterval: string) => ([time, c]: [
   string,
   RawCandle
 ]): CandleInfo => {
-  const isEmpty = (c: RawCandle) => c.txs_count === 0;
-
-  const renameFields = renameKeys({
-    quote_volume: 'quoteVolume',
-    weighted_average_price: 'weightedAveragePrice',
-    max_height: 'maxHeight',
-    txs_count: 'txsCount',
-    time_start: 'time',
-  });
-
   const timeClose = interval(candleInterval).matchWith({
     Ok: ({ value }) => new Date(new Date(time).valueOf() + value.length - 1),
     Error: () =>
@@ -82,26 +65,29 @@ export const transformCandle = (candleInterval: string) => ([time, c]: [
       ),
   });
 
-  return compose(
-    assoc('timeClose', timeClose),
-    renameFields,
-    assoc('time_start', time),
-    assoc('txs_count', c.txs_count) as any,
-    omit(['a_dec', 'p_dec']),
-    ifElse(isEmpty, map(always(null)), identity)
-  )(c) as CandleInfo;
+  return {
+    time: new Date(time),
+    timeClose,
+    txsCount: c.txs_count,
+    ...map(v => (c.txs_count === 0 ? null : v), {
+      maxHeight: c.max_height,
+      open: c.open,
+      high: c.high,
+      low: c.low,
+      close: c.close,
+      volume: c.volume,
+      quoteVolume: c.quote_volume,
+      weightedAveragePrice: c.weighted_average_price,
+    }),
+  };
 };
 
 /** addMissingCandles :: Interval -> Date -> Date
  * -> Map String CandleDbResponse[]-> Map String CandleDbResponse[] */
 export const addMissingCandles = curry(
-  (
-    interval: Interval,
-    timeStart: Date,
-    timeEnd: Date
-  ) => (candlesGroupedByTime: {
-    [date: string]: CandleDbResponse[];
-  }): { [date: string]: CandleDbResponse[] } => {
+  (interval: Interval, timeStart: Date, timeEnd: Date) => (
+    candlesGroupedByTime: Record<string, CandleDbResponse[]>
+  ): Record<string, CandleDbResponse[]> => {
     const end = timeEnd;
     const res = merge({}, candlesGroupedByTime);
     for (
@@ -147,10 +133,10 @@ export const transformResults = (
 ): SearchedItems<CandleInfo> =>
   compose<
     CandleDbResponse[],
-    { [date: string]: CandleDbResponse[] },
-    { [date: string]: RawCandle[] },
-    { [date: string]: RawCandle },
-    { [date: string]: RawCandle },
+    Record<string, CandleDbResponse[]>,
+    Record<string, RawCandle[]>,
+    Record<string, RawCandle>,
+    Record<string, RawCandle>,
     [string, RawCandle][],
     [string, RawCandle][],
     CandleInfo[],
@@ -163,13 +149,13 @@ export const transformResults = (
     map(transformCandle(request.interval)),
     sort((a, b): number => new Date(a[0]).valueOf() - new Date(b[0]).valueOf()),
     toPairs,
-    map<{ [date: string]: RawCandle }, { [date: string]: RawCandle }>(
+    map<Record<string, RawCandle>, Record<string, RawCandle>>(
       (candle: RawCandle) =>
         candle.a_dec && candle.p_dec
           ? candleFixedDecimals(candle, candle.a_dec, candle.p_dec)
           : candle
     ),
-    map<{ [date: string]: RawCandle[] }, { [date: string]: RawCandle }>(
+    map<Record<string, RawCandle[]>, Record<string, RawCandle>>(
       concatAll(candleMonoid)
     ),
     addMissingCandles(

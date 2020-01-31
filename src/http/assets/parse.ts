@@ -31,27 +31,27 @@ export const mgetOrSearch = ({
   return parseFilterValues({
     ticker: commonFilters.query,
     search: commonFilters.query,
-  })(query).map(fValues => {
+  })(query).chain(fValues => {
     if (Array.isArray(fValues.ids)) {
-      return { ids: fValues.ids };
+      return ok({ ids: fValues.ids });
     } else {
       if (fValues.ticker) {
-        return {
+        return ok({
           ticker: fValues.ticker,
           sort: fValues.sort,
           limit: fValues.limit,
           after: fValues.after,
-        };
+        });
       } else if (fValues.search) {
-        return {
+        return ok({
           search: fValues.search,
           sort: fValues.sort,
           limit: fValues.limit,
           after: fValues.after,
-        };
+        });
       } else {
-        throw new ParseError(
-          new Error('There is neither ticker nor search query')
+        return error(
+          new ParseError(new Error('There is neither ticker nor search query'))
         );
       }
     }

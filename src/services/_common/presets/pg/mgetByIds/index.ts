@@ -1,4 +1,4 @@
-import { identity } from 'ramda';
+import { Ok as ok } from 'folktale/result';
 import { SchemaLike } from 'joi';
 
 import { RepoPresetInitOptions } from '../../types';
@@ -24,7 +24,7 @@ export const mgetByIdsPreset = <Id, ResponseRaw, ResponseTransformed>({
   matchRequestResult: (req: Id[], res: ResponseRaw) => boolean;
 }) => ({ pg, emitEvent }: RepoPresetInitOptions) =>
   mget<Id[], Id[], ResponseRaw, ResponseTransformed>({
-    transformInput: identity,
+    transformInput: ok,
     transformResult: transformResultsFn<Id[], ResponseRaw, ResponseTransformed>(
       transformResult
     ),

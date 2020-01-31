@@ -1,6 +1,6 @@
 import { isNil } from 'ramda';
-import * as maybe from 'folktale/maybe';
-import { Result, Error as error } from 'folktale/result';
+import { fromNullable } from 'folktale/maybe';
+import { Result, Error as error, Ok as ok } from 'folktale/result';
 import { ParseError } from '../../../errorHandling';
 import { RateMgetParams } from '../../../types';
 import { parseDate, parsePairs } from '../../../utils/parsers';
@@ -21,15 +21,17 @@ export const parse = ({
   return parseFilterValues({
     pairs: parsePairs,
     timestamp: parseDate,
-  })(query).map(fValues => {
+  })(query).chain(fValues => {
     if (isNil(fValues.pairs)) {
-      throw new ParseError(new Error('Pairs are incorrect or are not set'));
+      return error(
+        new ParseError(new Error('Pairs are incorrect or are not set'))
+      );
     }
 
-    return {
+    return ok({
       matcher: params.matcher,
       pairs: fValues.pairs,
-      timestamp: maybe.fromNullable(fValues.timestamp),
-    };
+      timestamp: fromNullable(fValues.timestamp),
+    });
   });
 };
