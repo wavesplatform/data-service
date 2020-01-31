@@ -11,13 +11,11 @@ const parser = createParser<BigNumber>({
 });
 
 export const parse = parser.parse;
-export const stringify = (
-  lsnFormat: LSNFormat
-): ((data: any) => string | undefined) =>
+export const stringify = (lsnFormat: LSNFormat) =>
   createParser<BigNumber>({
     strict: false,
     isInstance: (bn: any): bn is BigNumber => BigNumber.isBigNumber(bn),
     stringify: (bn: BigNumber) =>
       lsnFormat === LSNFormat.Number ? bn.toFixed() : `"${bn.toString()}"`,
     parse: toBigNumber,
-  }).stringify;
+  }).stringify as (data: any) => string | undefined;
