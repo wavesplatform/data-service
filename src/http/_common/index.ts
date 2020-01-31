@@ -7,12 +7,7 @@ import { resultToTask } from '../../utils/fp';
 import { handleError } from '../_common/handleError';
 import { LSNFormat } from '../types';
 import { HttpRequest, HttpResponse } from './types';
-import {
-  defaultStringify,
-  parseLSN,
-  parseDecimals,
-  setHttpResponse,
-} from './utils';
+import { parseLSN, parseDecimals, setHttpResponse } from './utils';
 
 export function createHttpHandler<Params extends string[], Request>(
   getResponse: (
@@ -68,14 +63,9 @@ export function createHttpHandler<Params extends string[], Request>(
           )
         )
         .mapRejected(e => {
-          const { status, body } = handleError(e);
-
           ctx.eventBus.emit('ERROR', e);
 
-          return {
-            status,
-            body: defaultStringify(body),
-          };
+          return handleError(e);
         })
         .run()
         .promise()
@@ -83,14 +73,10 @@ export function createHttpHandler<Params extends string[], Request>(
         .catch(setResponse);
     } catch (e) {
       const err = new ResolverError(e);
-      const { status, body } = handleError(err);
 
       ctx.eventBus.emit('ERROR', err);
 
-      setResponse({
-        status,
-        body: defaultStringify(body),
-      });
+      setResponse(handleError(err));
     }
 
     ctx.eventBus.emit('ENDPOINT_RESOLVED', {

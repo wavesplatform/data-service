@@ -1,16 +1,10 @@
 import { RequestHeaders } from '../../types';
 import { ValuesOf } from 'types/generic';
 
-export type HttpRequest<Params extends string[] = any> = {
+export type HttpRequest<Params extends string[] = string[]> = {
   params?: { [K in ValuesOf<Params>]: string };
   query?: Record<string, string>;
   headers: RequestHeaders;
-};
-
-export type HttpResponseDto<T = any> = {
-  status: number;
-  body?: T;
-  headers?: { [key: string]: string };
 };
 
 export type HttpResponse = {

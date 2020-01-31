@@ -11,14 +11,9 @@ import {
 } from '../../types';
 import { DecimalsFormat } from '../../services/types';
 import { LSNFormat } from '../types';
-import { HttpResponse, HttpResponseDto } from './types';
+import { HttpResponse } from './types';
 
 export const defaultStringify = stringify(LSNFormat.String);
-
-export const toHttpResponse = (res: HttpResponseDto): HttpResponse => ({
-  status: res.status,
-  body: defaultStringify(res.body),
-});
 
 export const setHttpResponse = (ctx: Context) => (
   httpResponse: HttpResponse

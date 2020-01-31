@@ -67,7 +67,7 @@ const parseDataEntryType: Parser<DataEntryType | undefined> = raw => {
 
 export const parseDataMgetOrSearch = ({
   query,
-}: HttpRequest): Result<
+}: HttpRequest<string[]>): Result<
   ParseError,
   ServiceMgetRequest | DataTxsServiceSearchRequest
 > => {

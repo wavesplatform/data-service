@@ -4,42 +4,43 @@ import {
   DEFAULT_TIMEOUT_OCCURRED_MESSAGE,
   DEFAULT_BAD_REQUEST_MESSAGE,
 } from '../../errorHandling';
-import { HttpResponseDto } from './types';
+import { HttpResponse } from './types';
+import { defaultStringify } from './utils';
 
-export const handleError = (error: AppError): HttpResponseDto => {
+export const handleError = (error: AppError): HttpResponse => {
   return error.matchWith({
     Init: () => ({
       status: 500,
-      body: {
+      body: defaultStringify({
         message: DEFAULT_INTERNAL_SERVER_ERROR_MESSAGE,
-      },
+      }),
     }),
     Db: () => ({
       status: 500,
-      body: {
+      body: defaultStringify({
         message: DEFAULT_INTERNAL_SERVER_ERROR_MESSAGE,
-      },
+      }),
     }),
     Resolver: () => ({
       status: 500,
-      body: {
+      body: defaultStringify({
         message: DEFAULT_INTERNAL_SERVER_ERROR_MESSAGE,
-      },
+      }),
     }),
     Parse: errorInfo => ({
       status: 400,
-      body: {
+      body: defaultStringify({
         message: DEFAULT_BAD_REQUEST_MESSAGE,
         meta: [
           {
             message: errorInfo.error.message,
           },
         ],
-      },
+      }),
     }),
     Validation: errorInfo => ({
       status: 400,
-      body: {
+      body: defaultStringify({
         message: 'Validation Error',
         meta:
           errorInfo.meta !== undefined
@@ -49,13 +50,13 @@ export const handleError = (error: AppError): HttpResponseDto => {
                 }))
               : errorInfo.meta
             : undefined,
-      },
+      }),
     }),
     Timeout: () => ({
       status: 504,
-      body: {
+      body: defaultStringify({
         message: DEFAULT_TIMEOUT_OCCURRED_MESSAGE,
-      },
+      }),
     }),
   });
 };

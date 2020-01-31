@@ -1,3 +1,4 @@
+import { Maybe } from 'folktale/maybe';
 import { Result, Error as error, Ok as ok } from 'folktale/result';
 import { has } from 'ramda';
 import * as Router from 'koa-router';
@@ -10,6 +11,8 @@ import {
   list,
   ServiceMgetRequest,
   ServiceGetRequest,
+  TransactionInfo,
+  SearchedItems,
 } from '../../types';
 import { stringify } from '../../utils/json';
 
@@ -19,6 +22,52 @@ import { parseFilterValues } from '../_common/filters';
 import { Parser } from '../_common/filters/types';
 import { defaultStringify } from '../_common/utils';
 import { postToGet } from '../_common/postToGet';
+import { LSNFormat } from '../types';
+
+const serializeGet = (lsnFormat: LSNFormat) => (m: Maybe<TransactionInfo>) =>
+  m.matchWith({
+    Just: ({ value }) => ({
+      status: 200,
+      body: stringify(lsnFormat)(transaction(value)),
+    }),
+    Nothing: () => ({
+      status: 404,
+      body: defaultStringify({
+        message: DEFAULT_NOT_FOUND_MESSAGE,
+      }),
+    }),
+  });
+
+const serializeMget = (lsnFormat: LSNFormat) => (
+  ms: Maybe<TransactionInfo>[]
+) => ({
+  status: 200,
+  body: stringify(lsnFormat)(
+    list(
+      ms.map(maybe =>
+        maybe.matchWith({
+          Just: ({ value }) => transaction(value),
+          Nothing: () => transaction(null),
+        })
+      )
+    )
+  ),
+});
+
+const serializeSearch = (lsnFormat: LSNFormat) => (
+  data: SearchedItems<TransactionInfo>
+) => ({
+  status: 200,
+  body: stringify(lsnFormat)(
+    list(
+      data.items.map(a => transaction(a)),
+      {
+        isLastPage: data.isLastPage,
+        lastCursor: data.lastCursor,
+      }
+    )
+  ),
+});
 
 export const isMgetRequest = <SearchRequest>(
   req: ServiceMgetRequest | SearchRequest
@@ -61,40 +110,17 @@ export const createTransactionHttpHandlers = <
   prefix: string,
   service: ServiceMesh['transactions'][keyof ServiceMesh['transactions']],
   parseRequest: {
-    get: (req: HttpRequest) => Result<ParseError, ServiceGetRequest>;
+    get: (req: HttpRequest<['id']>) => Result<ParseError, ServiceGetRequest>;
     mgetOrSearch: (
-      req: HttpRequest
+      req: HttpRequest<string[]>
     ) => Result<ParseError, ServiceMgetRequest | SearchRequest>;
   }
 ) => {
   const mgetOrSearchHandler = createHttpHandler(
     (req, lsnFormat) =>
       isMgetRequest(req)
-        ? service.mget(req).map(ms => ({
-            status: 200,
-            body: stringify(lsnFormat)(
-              list(
-                ms.map(maybe =>
-                  maybe.matchWith({
-                    Just: ({ value }) => transaction(value),
-                    Nothing: () => transaction(null),
-                  })
-                )
-              )
-            ),
-          }))
-        : service.search(req).map(data => ({
-            status: 200,
-            body: stringify(lsnFormat)(
-              list(
-                data.items.map(a => transaction(a)),
-                {
-                  isLastPage: data.isLastPage,
-                  lastCursor: data.lastCursor,
-                }
-              )
-            ),
-          })),
+        ? service.mget(req).map(serializeMget(lsnFormat))
+        : service.search(req).map(serializeSearch(lsnFormat)),
     parseRequest.mgetOrSearch
   );
 
@@ -102,21 +128,7 @@ export const createTransactionHttpHandlers = <
     .get(
       `${prefix}/:id`,
       createHttpHandler(
-        (req, lsnFormat) =>
-          service.get(req).map(m =>
-            m.matchWith({
-              Just: ({ value }) => ({
-                status: 200,
-                body: stringify(lsnFormat)(transaction(value)),
-              }),
-              Nothing: () => ({
-                status: 404,
-                body: defaultStringify({
-                  message: DEFAULT_NOT_FOUND_MESSAGE,
-                }),
-              }),
-            })
-          ),
+        (req, lsnFormat) => service.get(req).map(serializeGet(lsnFormat)),
         parseRequest.get
       )
     )
