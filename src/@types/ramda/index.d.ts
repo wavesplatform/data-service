@@ -1,4 +1,4 @@
-import { Static, Dictionary } from 'ramda';
+import { Static } from 'ramda';
 import { Task } from 'folktale/concurrency/task';
 import { Maybe } from 'folktale/maybe';
 import { Result } from 'folktale/result';
