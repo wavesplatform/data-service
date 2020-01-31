@@ -24,9 +24,8 @@ describe('Sql builder', () => {
         sql.search({
           ...filterValues,
           after: {
-            timestamp: 'timestamp',
-            id: 'id',
-            sortDirection: 'sortDirection',
+            tx_uid: 20000000,
+            sort: 'sortDirection',
           },
         })
       ).toMatchSnapshot();

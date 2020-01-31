@@ -444,36 +444,32 @@ Object {
 
 exports[`transform candle fn take empty candle and returns correctly transformed for result candle 1`] = `
 Object {
-  "__type": "candle",
-  "data": Object {
-    "close": null,
-    "high": null,
-    "low": null,
-    "maxHeight": null,
-    "open": null,
-    "quoteVolume": null,
-    "time": 2018-11-01T00:00:00.000Z,
-    "txsCount": 0,
-    "volume": null,
-    "weightedAveragePrice": null,
-  },
+  "close": null,
+  "high": null,
+  "low": null,
+  "maxHeight": null,
+  "open": null,
+  "quoteVolume": null,
+  "time": 2018-11-01T00:00:00.000Z,
+  "timeClose": 2018-11-01T00:00:59.999Z,
+  "txsCount": 0,
+  "volume": null,
+  "weightedAveragePrice": null,
 }
 `;
 
 exports[`transform candle fn take valid candle and returns correctly transformed for result candle 1`] = `
 Object {
-  "__type": "candle",
-  "data": Object {
-    "close": "0.0001",
-    "high": "0.01",
-    "low": "1e-8",
-    "maxHeight": 377979,
-    "open": "0.01",
-    "quoteVolume": "3.3000442",
-    "time": 2018-11-01T00:00:00.000Z,
-    "txsCount": 20,
-    "volume": "2842",
-    "weightedAveragePrice": "0.0011",
-  },
+  "close": "0.0001",
+  "high": "0.01",
+  "low": "1e-8",
+  "maxHeight": 377979,
+  "open": "0.01",
+  "quoteVolume": "3.3000442",
+  "time": 2018-11-01T00:00:00.000Z,
+  "timeClose": 2018-11-01T00:00:59.999Z,
+  "txsCount": 20,
+  "volume": "2842",
+  "weightedAveragePrice": "0.0011",
 }
 `;

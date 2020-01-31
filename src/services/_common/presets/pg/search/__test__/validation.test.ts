@@ -2,44 +2,36 @@ import { of as task } from 'folktale/concurrency/task';
 import { Result, Error as error, Ok as ok } from 'folktale/result';
 import { always, identity, T } from 'ramda';
 
-import { parseDate } from '../../../../../../utils/parseDate';
-import { Joi } from '../../../../../../utils/validation';
 import { PgDriver } from '../../../../../../db/driver';
-import { SortOrder, WithLimit } from '../../../..';
+import { AppError, ValidationError } from './../../../../../../errorHandling';
+import { SearchedItems } from '../../../../../../types';
+import { Joi } from '../../../../../../utils/validation';
+import { RequestWithCursor } from '../../../../../_common/pagination';
+import { WithLimit, WithSortOrder, SortOrder } from '../../../..';
 import { searchPreset } from '../../search';
-import { AppError, ValidationError } from '../../../../../../errorHandling';
-import { SearchedItems } from 'types';
 
 const mockTxs: ResponseRaw[] = [
-  { id: 'q', timestamp: new Date() },
-  { id: 'w', timestamp: new Date() },
+  { tx_uid: 1, id: 'q', timestamp: new Date() },
+  { tx_uid: 2, id: 'w', timestamp: new Date() },
 ];
 
-type Request = WithLimit & {
-  timeEnd?: Date;
-  timeStart?: Date;
-  sort: SortOrder;
-};
-
 type ResponseRaw = {
+  tx_uid: number;
   id: string;
   timestamp: Date;
 };
 
 type Cursor = {
-  timestamp: Date;
-  id: string;
+  tx_uid: number;
 };
 
 const serialize = (
-  request: Request,
+  request: RequestWithCursor<WithLimit, string>,
   response: ResponseRaw
 ): string | undefined =>
   response === null
     ? undefined
-    : Buffer.from(
-        `${response.timestamp.toISOString()}::${response.id}`
-      ).toString('base64');
+    : Buffer.from(response.tx_uid.toString()).toString('base64');
 
 const deserialize = (cursor: string): Result<ValidationError, Cursor> => {
   const data = Buffer.from(cursor, 'base64')
@@ -56,20 +48,24 @@ const deserialize = (cursor: string): Result<ValidationError, Cursor> => {
     ok<ValidationError, string[]>(data)
       // validate length
       .chain(d =>
-        d.length > 1
-          ? ok<ValidationError, string[]>(d)
-          : error<ValidationError, string[]>(err('Cursor length <2'))
+        d.length === 1
+          ? ok<ValidationError, number>(parseInt(d[0]))
+          : error<ValidationError, number>(
+              err('Cursor length is not equals to 1')
+            )
       )
-      .chain(d =>
-        parseDate(d[0]).map(date => ({
-          timestamp: date,
-          id: d[1],
-        }))
-      )
+      .map(tx_uid => ({
+        tx_uid,
+      }))
   );
 };
 
-const service = searchPreset<Cursor, Request, ResponseRaw, ResponseRaw>({
+const service = searchPreset<
+  Cursor,
+  RequestWithCursor<WithLimit & WithSortOrder, string>,
+  ResponseRaw,
+  ResponseRaw
+>({
   name: 'some_name',
   sql: () => '',
   resultSchema: Joi.any(),
@@ -83,54 +79,21 @@ const service = searchPreset<Cursor, Request, ResponseRaw, ResponseRaw>({
   emitEvent: always(T),
 });
 
-const assertValidationError = (done: jest.DoneCallback, v: Request) =>
-  service(v)
-    .run()
-    .promise()
-    .then(() => done('Wrong branch, error'))
-    .catch((e: AppError) => {
-      expect(e.type).toBe('Validation');
-      done();
-    });
-
 describe('search preset validation', () => {
   describe('common filters', () => {
-    it('fails if timeEnd < 0', done =>
-      assertValidationError(done, {
-        timeEnd: parseDate('-1525132900000').unsafeGet(),
-        limit: 10,
-        sort: SortOrder.Ascending,
-      }));
-    it('fails if timeStart < 0', done =>
-      assertValidationError(done, {
-        timeEnd: parseDate('1525132900000').unsafeGet(),
-        timeStart: parseDate('-1525132800000').unsafeGet(),
-        limit: 10,
-        sort: SortOrder.Ascending,
-      }));
-    it('fails if timeEnd < timeStart', done =>
-      assertValidationError(done, {
-        timeEnd: parseDate('1525132700000').unsafeGet(),
-        timeStart: parseDate('1525132800000').unsafeGet(),
-        limit: 10,
-        sort: SortOrder.Ascending,
-      }));
-    it('fails if timeStart->invalid Date', done => {
-      expect(parseDate('').unsafeGet).toThrowError();
-      done();
-    });
     it('passes if correct object is provided', done =>
       service({
-        timeStart: new Date(0),
-        timeEnd: new Date(),
         limit: 1,
-        sort: SortOrder.Ascending,
+        sort: SortOrder.Descending,
       })
         .run()
         .listen({
           onResolved: (x: SearchedItems<any>) => {
             expect(x.items).toBeInstanceOf(Array);
             done();
+          },
+          onRejected: (e: AppError) => {
+            done(e.error.message);
           },
         }));
   });

@@ -1,7 +1,7 @@
 import { Asset } from '@waves/data-entities';
 import { CacheSync, Repo, XOR } from '../../../types';
+import { WithSortOrder, WithLimit } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
-import { Cursor } from './cursor';
 
 export type AssetsCache = CacheSync<string, AssetDbResponse>;
 
@@ -10,17 +10,15 @@ export type AssetsMgetRequest = string[];
 
 export type SearchByTicker = {
   ticker: string;
-  limit: number;
 };
 
 export type SearchFullText = {
   search: string;
-  limit: number;
 };
 
 export type AssetsSearchRequest = RequestWithCursor<
-  XOR<SearchByTicker, SearchFullText>,
-  Cursor
+  XOR<SearchByTicker, SearchFullText> & WithSortOrder & WithLimit,
+  string
 >;
 
 export type AssetsRepo = Repo<
@@ -31,6 +29,7 @@ export type AssetsRepo = Repo<
 >;
 
 export type AssetDbResponse = {
+  uid: number;
   asset_id: string;
   asset_name: string;
   description: string;

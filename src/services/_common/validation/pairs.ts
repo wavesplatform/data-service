@@ -3,7 +3,7 @@ import {
   rejected as taskRejected,
   of as taskOf,
 } from 'folktale/concurrency/task';
-import { isNil, zip } from 'ramda';
+import { F, T, zip } from 'ramda';
 
 import { ValidationError, AppError } from '../../../errorHandling';
 import { AssetIdsPair } from '../../../types';
@@ -41,7 +41,12 @@ export const validatePairs = (
 
   return assetsMget({ ids: assetIds }).chain(assets => {
     const nonExistingIds = zip(assetIds, assets)
-      .filter(x => x[1].filter(isNil))
+      .filter(x =>
+        x[1].matchWith({
+          Just: F,
+          Nothing: T,
+        })
+      )
       .map(x => x[0]);
 
     if (!nonExistingIds.length) {

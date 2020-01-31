@@ -78,6 +78,6 @@ export type SearchResolverDependencies<
   getData: (r: ReqTransformed) => Task<DbError | Timeout, ResRaw[]>;
   transformResult: (
     results: ResRaw[],
-    request: ReqTransformed
+    request: ReqRaw
   ) => SearchedItems<ResTransformed>;
 };

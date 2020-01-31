@@ -1,23 +1,30 @@
 const pg = require('knex')({ client: 'pg' });
 
-const select = pg({ t: 'txs_14' })
-  .select({
-    height: 't.height',
-    tx_type: 't.tx_type',
-    id: 't.id',
-    time_stamp: 't.time_stamp',
-    signature: 't.signature',
-    proofs: 't.proofs',
-    tx_version: 't.tx_version',
-    fee: pg.raw('t.fee * 10^(-8)'),
-    sender: 't.sender',
-    sender_public_key: 't.sender_public_key',
+const select = pg({ t: 'txs_14' }).select('*');
 
-    asset_id: 't.asset_id',
-    min_sponsored_asset_fee: pg.raw(
-      't.min_sponsored_asset_fee * 10^(-asset_decimals.decimals)'
-    ),
-  })
-  .join('asset_decimals', 'asset_decimals.asset_id', '=', 't.asset_id');
+const selectFromFiltered = filtered =>
+  pg({ t: filtered })
+    .column({
+      tx_uid: 't.tx_uid',
+      height: 't.height',
+      tx_type: 'txs.tx_type',
+      id: 'txs.id',
+      time_stamp: 'txs.time_stamp',
+      signature: 'txs.signature',
+      proofs: 'txs.proofs',
+      tx_version: 'txs.tx_version',
+      fee: pg.raw('txs.fee * 10^(-8)'),
+      sender: 'addr.address',
+      sender_public_key: 'addr.public_key',
 
-module.exports = { select };
+      asset_id: 'a.asset_id',
+      min_sponsored_asset_fee: pg.raw(
+        't.min_sponsored_asset_fee * 10^(-dec.decimals)'
+      ),
+    })
+    .leftJoin('txs', 'txs.uid', 't.tx_uid')
+    .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid')
+    .leftJoin({ a: 'assets' }, 'a.uid', 't.asset_uid')
+    .leftJoin({ dec: 'txs_3' }, 'dec.asset_uid', '=', 't.asset_uid');
+
+module.exports = { select, selectFromFiltered };

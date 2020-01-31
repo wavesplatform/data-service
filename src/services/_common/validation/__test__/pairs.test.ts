@@ -15,7 +15,7 @@ describe('Pairs validation', () => {
     [MATCHER]: [BTC, WAVES],
   });
 
-  const assetsMget: AssetsService['mget'] = ({ ids }: { ids: string[] }) =>
+  const assetsMget: AssetsService['mget'] = ({ ids }) =>
     taskOf(
       ids.map(aid => {
         switch (aid) {

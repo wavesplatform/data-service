@@ -32,8 +32,9 @@ import {
   AssetsRepo,
   AssetsGetRequest,
   AssetsMgetRequest,
+  AssetsSearchRequest,
 } from './types';
-import { serialize, deserialize } from './cursor';
+import { serialize, deserialize, Cursor } from './cursor';
 export { create as createCache } from './cache';
 
 export default ({
@@ -118,7 +119,12 @@ export default ({
       emitEvent,
     }),
 
-    search: searchPreset({
+    search: searchPreset<
+      Cursor,
+      AssetsSearchRequest,
+      AssetDbResponse,
+      AssetInfo
+    >({
       name: SERVICE_NAME.SEARCH,
       sql: sql.search,
       resultSchema,

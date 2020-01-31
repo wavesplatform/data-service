@@ -25,15 +25,6 @@ describe('mgetByIds', () => {
     // passing result validation
     const service = createService(Joi.any());
 
-    it('fails if ids params is not a base58 string array', done =>
-      service(['10'])
-        .run()
-        .promise()
-        .then(() => done('Wrong branch, error'))
-        .catch(e => {
-          expect(e.type).toBe('Validation');
-          done();
-        }));
     it('passes if ids param is an empty array', done =>
       service([])
         .run()

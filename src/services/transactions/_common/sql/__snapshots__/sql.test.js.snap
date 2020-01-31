@@ -1,9 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Sql builder  get works 1`] = `"select * from \\"some_table\\" where \\"id\\" = 'id'"`;
+exports[`Sql builder  get works 1`] = `"select * from \\"some_table\\" where \\"t\\".\\"tx_uid\\" = (select \\"uid\\" from \\"txs\\" where \\"id\\" = 'id' limit 1)"`;
 
-exports[`Sql builder mget works 1`] = `"select * from \\"some_table\\" where \\"id\\" in ('id1', 'id2')"`;
+exports[`Sql builder mget works 1`] = `"select * from \\"some_table\\" where \\"t\\".\\"tx_uid\\" in (select \\"uid\\" from \\"txs\\" where \\"id\\" in ('id1', 'id2'))"`;
 
-exports[`Sql builder search covers case with all filters (without after) 1`] = `"select * from \\"some_table\\" where \\"sender\\" = 'sender' and \\"time_stamp\\" >= 'timeStart' and \\"time_stamp\\" <= 'timeEnd' order by \\"time_stamp\\" desc, \\"id\\" desc limit 1"`;
+exports[`Sql builder search covers case with all filters (without after) 1`] = `"select * from \\"some_table\\" where \\"t\\".\\"sender_uid\\" = (select \\"uid\\" from \\"addresses\\" where \\"address\\" = 'sender') and \\"t\\".\\"tx_uid\\" >= (select \\"uid\\" from \\"txs\\" where \\"time_stamp\\" >= 'timeStart' order by \\"uid\\" asc limit 1) and \\"t\\".\\"tx_uid\\" <= (select \\"uid\\" from \\"txs\\" where \\"time_stamp\\" <= 'timeEnd' order by \\"uid\\" desc limit 1) order by \\"t\\".\\"tx_uid\\" desc limit 1"`;
 
-exports[`Sql builder search covers case with all filters with after 1`] = `"select * from \\"some_table\\" where \\"sender\\" = 'sender' and \\"time_stamp\\" >= 'timeStart' and \\"time_stamp\\" <= 'timeEnd' and (time_stamp, id) > ('timestamp', 'id') order by \\"time_stamp\\" desc, \\"id\\" desc limit 1"`;
+exports[`Sql builder search covers case with all filters with after 1`] = `"select * from \\"some_table\\" where \\"t\\".\\"sender_uid\\" = (select \\"uid\\" from \\"addresses\\" where \\"address\\" = 'sender') and \\"t\\".\\"tx_uid\\" >= (select \\"uid\\" from \\"txs\\" where \\"time_stamp\\" >= 'timeStart' order by \\"uid\\" asc limit 1) and \\"t\\".\\"tx_uid\\" <= (select \\"uid\\" from \\"txs\\" where \\"time_stamp\\" <= 'timeEnd' order by \\"uid\\" desc limit 1) and \\"t\\".\\"tx_uid\\" > 20000000 order by \\"t\\".\\"tx_uid\\" desc limit 1"`;

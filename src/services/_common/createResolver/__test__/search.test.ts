@@ -56,7 +56,10 @@ describe('Resolver', () => {
       .run()
       .listen({
         onResolved: data => {
-          expect(data).toEqual(ids);
+          expect(data).toEqual({
+            isLastPage: false,
+            items: ids,
+          });
           done();
         },
       });
@@ -74,36 +77,6 @@ describe('Resolver', () => {
       .listen({
         onResolved: () => {
           expect(spiedDbQuery).toBeCalled();
-          done();
-        },
-      });
-  });
-
-  it('should take left branch if input validation fails', done => {
-    const badInputResolver = createMockResolver(resultOk);
-
-    badInputResolver(ids)
-      .run()
-      .listen({
-        onRejected: e => {
-          expect(e).toEqual(AppError.Validation(errorMessage));
-          done();
-        },
-      });
-  });
-
-  it('should NOT call db query if input validation fails', done => {
-    const spiedDbQuery = jest.spyOn(mockPgDriver, 'many');
-    const badInputResolver = search<string[], string[], string, string>({
-      ...commonConfig,
-      validateResult: resultOk,
-    });
-
-    badInputResolver(ids)
-      .run()
-      .listen({
-        onRejected: () => {
-          expect(spiedDbQuery).not.toBeCalled();
           done();
         },
       });

@@ -1,6 +1,7 @@
 import * as knex from 'knex';
 import { chain, map } from 'ramda';
 import { Task, of as taskOf } from 'folktale/concurrency/task';
+import { BigNumber } from '@waves/data-entities';
 
 import { DbError, Timeout } from '../../../../errorHandling';
 import { PgDriver } from '../../../../db/driver';
@@ -9,6 +10,13 @@ import { RateMgetParams, RateWithPairIds } from '../../../../types';
 import makeSql from './sql';
 
 const pg = knex({ client: 'pg' });
+
+type CandleRate = {
+  amount_asset_id: string;
+  price_asset_id: string;
+  matcher: string;
+  weighted_average_price: BigNumber;
+};
 
 export default class RemoteRateRepo
   implements AsyncMget<RateMgetParams, RateWithPairIds, DbError | Timeout> {
@@ -28,14 +36,14 @@ export default class RemoteRateRepo
       ...pairsSqlParams,
     ]);
 
-    const dbTask: Task<DbError | Timeout, any[]> =
+    const dbTask: Task<DbError | Timeout, CandleRate[]> =
       request.pairs.length === 0
         ? taskOf([])
         : this.dbDriver.any(sql.toString());
 
     return dbTask.map(
-      (result: any[]): Array<RateWithPairIds> =>
-        map((it: any): RateWithPairIds => {
+      (result): Array<RateWithPairIds> =>
+        map((it): RateWithPairIds => {
           return {
             amountAsset: it.amount_asset_id,
             priceAsset: it.price_asset_id,

@@ -60,8 +60,10 @@ export type RawCandle = {
   p_dec: number | null;
 };
 
-/** transformCandle :: [string, RawCandle] -> Candle */
-export const transformCandle = ([time, c]: [string, RawCandle]): CandleInfo => {
+export const transformCandle = (candleInterval: string) => ([time, c]: [
+  string,
+  RawCandle
+]): CandleInfo => {
   const isEmpty = (c: RawCandle) => c.txs_count === 0;
 
   const renameFields = renameKeys({
@@ -72,13 +74,22 @@ export const transformCandle = ([time, c]: [string, RawCandle]): CandleInfo => {
     time_start: 'time',
   });
 
+  const timeClose = interval(candleInterval).matchWith({
+    Ok: ({ value }) => new Date(new Date(time).valueOf() + value.length - 1),
+    Error: () =>
+      new Date(
+        new Date(time).valueOf() + defaultInterval.unsafeGet().length - 1
+      ),
+  });
+
   return compose(
-    omit(['a_dec', 'p_dec']),
+    assoc('timeClose', timeClose),
     renameFields,
     assoc('time_start', time),
-    assoc('txs_count', c.txs_count),
+    assoc('txs_count', c.txs_count) as any,
+    omit(['a_dec', 'p_dec']),
     ifElse(isEmpty, map(always(null)), identity)
-  )(c) as any;
+  )(c) as CandleInfo;
 };
 
 /** addMissingCandles :: Interval -> Date -> Date
@@ -149,7 +160,7 @@ export const transformResults = (
       items: items,
       isLastPage: false,
     }),
-    map(transformCandle),
+    map(transformCandle(request.interval)),
     sort((a, b): number => new Date(a[0]).valueOf() - new Date(b[0]).valueOf()),
     toPairs,
     map<{ [date: string]: RawCandle }, { [date: string]: RawCandle }>(

@@ -5,7 +5,7 @@ const { addMeta } = require('../../../../../errorHandling');
 const { matchRequestsResults } = require('../../../../../utils/db/index');
 
 const transformResult = require('./transformResult');
-const sql = require('./sql');
+const sql = require('./sql').default;
 
 const pg = {
   get: pg => id =>

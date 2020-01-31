@@ -66,6 +66,7 @@ export const mgetOrSearch = ({
       if (fValues.search_by_asset || fValues.search_by_assets) {
         return {
           matcher: params.matcher,
+          sort: fValues.sort,
           limit: fValues.limit,
           match_exactly: fValues.match_exactly,
           search_by_asset: fValues.search_by_asset,

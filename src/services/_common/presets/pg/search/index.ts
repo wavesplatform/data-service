@@ -3,7 +3,7 @@ import { SchemaLike } from 'joi';
 import { search } from '../../../createResolver';
 import { validateResult } from '../../validation';
 import { RepoPresetInitOptions } from '../../types';
-import { WithLimit } from '../../../../_common';
+import { WithLimit, WithSortOrder } from '../../../../_common';
 import { RequestWithCursor, CursorSerialization } from '../../../pagination';
 import { transformInput } from './transformInput';
 import { transformResults } from './transformResults';
@@ -12,7 +12,7 @@ import { RepoSearch } from 'types';
 
 export const searchPreset = <
   Cursor,
-  Request extends WithLimit,
+  Request extends RequestWithCursor<WithLimit & WithSortOrder, any>,
   ResponseRaw,
   ResponseTransformed
 >({
@@ -27,12 +27,12 @@ export const searchPreset = <
   resultSchema: SchemaLike;
   transformResult: (
     response: ResponseRaw,
-    request?: RequestWithCursor<Request, Cursor>
+    request?: Request
   ) => ResponseTransformed;
   cursorSerialization: CursorSerialization<
     Cursor,
-    Request,
-    ResponseTransformed
+    RequestWithCursor<Request, string>,
+    ResponseRaw
   >;
 }) => ({
   pg,
@@ -50,12 +50,12 @@ export const searchPreset = <
     transformInput: transformInput(cursorSerialization.deserialize),
     transformResult: transformResults<
       Cursor,
-      RequestWithCursor<Request, Cursor>,
+      RequestWithCursor<Request, string>,
       ResponseRaw,
       ResponseTransformed
     >(transformResult, cursorSerialization.serialize),
     validateResult: validateResult(resultSchema, name),
-    getData: getData<RequestWithCursor<Request, Cursor>, ResponseRaw>({
+    getData: getData<Request, ResponseRaw>({
       name,
       sql,
       pg,

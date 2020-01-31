@@ -20,5 +20,6 @@ export const transformTxInfo = compose(
     tx_version: 'version',
     sender_public_key: 'senderPublicKey',
     time_stamp: 'timestamp',
-  })
+  }),
+  omit(['tx_uid'])
 );

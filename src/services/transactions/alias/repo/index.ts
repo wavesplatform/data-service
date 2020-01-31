@@ -11,7 +11,7 @@ import { Cursor, serialize, deserialize } from '../../_common/cursor';
 import { transformTxInfo } from '../../_common/transformTxInfo';
 
 import { result as resultSchema } from './schema';
-import sql from './sql';
+import * as sql from './sql';
 import {
   AliasTxsRepo,
   AliasTxsSearchRequest,

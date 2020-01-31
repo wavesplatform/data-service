@@ -1,4 +1,4 @@
-const sql = require('../sql');
+const sql = require('../sql').default;
 
 describe('transactions.data api method', () => {
   it('get matches snapshot', () => {
@@ -45,9 +45,8 @@ describe('transactions.data api method', () => {
       expect(
         sql.search({
           after: {
-            timestamp: new Date('2018-04-07T08:36:52.149Z'),
-            id: '23sjEq5zNctBTGqrsapLrPxDkHFM8rJCKF1ti55NRpbF',
-            sortDirection: 'asc',
+            tx_uid: 20000000,
+            sort: 'asc',
           },
         })
       ).toMatchSnapshot();

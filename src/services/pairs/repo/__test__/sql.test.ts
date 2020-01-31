@@ -1,4 +1,5 @@
 import { get, mget, search } from '../sql';
+import { SortOrder } from '../../../_common';
 
 describe('sql query from pairs', () => {
   it('should get one pair', () => {
@@ -37,6 +38,7 @@ describe('sql query from pairs', () => {
         search_by_asset: '7FJhS4wyEKqsp77VCMfCZWKLSMuy1TWskYAyZ28amWFj',
         matcher: '',
         limit: 10,
+        sort: SortOrder.Descending,
       })
     ).toMatchSnapshot();
   });
@@ -48,6 +50,7 @@ describe('sql query from pairs', () => {
         match_exactly: [true],
         matcher: '',
         limit: 10,
+        sort: SortOrder.Descending,
       })
     ).toMatchSnapshot();
   });
@@ -59,13 +62,19 @@ describe('sql query from pairs', () => {
         match_exactly: [true],
         matcher: '',
         limit: 10,
+        sort: SortOrder.Descending,
       })
     ).toMatchSnapshot();
   });
 
   it('should search pairs for two assets (amount and price)', () => {
     expect(
-      search({ search_by_assets: ['BTC', 'WAVES'], matcher: '', limit: 10 })
+      search({
+        search_by_assets: ['BTC', 'WAVES'],
+        matcher: '',
+        limit: 10,
+        sort: SortOrder.Descending,
+      })
     ).toMatchSnapshot();
   });
 
@@ -75,6 +84,7 @@ describe('sql query from pairs', () => {
         search_by_assets: ['¯\\_(ツ)_/¯', 'WAVES'],
         matcher: '',
         limit: 10,
+        sort: SortOrder.Descending,
       })
     ).toMatchSnapshot();
   });
@@ -86,6 +96,7 @@ describe('sql query from pairs', () => {
         match_exactly: [true, false],
         matcher: '',
         limit: 10,
+        sort: SortOrder.Descending,
       })
     ).toMatchSnapshot();
   });

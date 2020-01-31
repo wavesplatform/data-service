@@ -1,43 +1,51 @@
 const pg = require('knex')({ client: 'pg' });
 
-const columnsWithoutSatoshi = [
-  // common
-  'height',
-  'tx_type',
-  'id',
-  'time_stamp',
-  'signature',
-  'proofs',
-  'tx_version',
-  // 'fee',
-  'sender',
-  'sender_public_key',
+const select = pg({ t: 'txs_2' }).select('*');
 
-  // type-specific
-  'recipient',
-  // satoshi
-];
-
-const select = pg({ t: 'txs_2' })
-  .select(columnsWithoutSatoshi)
-  .select({
-    fee: pg.raw('fee * 10^(-8)'),
-    amount: pg.raw('amount * 10^(-8)'),
-  });
-
-const withFirstOnly = q =>
+const selectFromFiltered = filtered =>
   pg
-    .select([...columnsWithoutSatoshi, 'fee', 'amount'])
+    .select({
+      // common
+      tx_uid: 't.tx_uid',
+      height: 't.height',
+      tx_type: 'txs.tx_type',
+      id: 'txs.id',
+      time_stamp: 'txs.time_stamp',
+      signature: 'txs.signature',
+      proofs: 'txs.proofs',
+      tx_version: 'txs.tx_version',
+      fee: pg.raw('txs.fee * 10^(-8)'),
+      sender: 'addr.address',
+      sender_public_key: 'addr.public_key',
+
+      // type-specific
+      amount: pg.raw('t.amount * 10^(-8)'),
+      recipient: pg.raw(
+        'coalesce(recipient_alias.alias, recipient_addr.address)'
+      ),
+    })
     .from({
-      counted: pg
+      t: pg
         .select('*')
         .select({
           rn: pg.raw(
-            'row_number() over (partition by id order by time_stamp asc)'
+            'row_number() over (partition by tx_uid order by tx_uid asc)'
           ),
         })
-        .from({ t: q.clone() }),
+        .from({ t: filtered }),
     })
-    .where('rn', '=', 1);
+    .where('rn', '=', 1)
+    .leftJoin('txs', 'txs.uid', 't.tx_uid')
+    .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid')
+    .leftJoin(
+      { recipient_addr: 'addresses' },
+      'recipient_addr.uid',
+      't.recipient_address_uid'
+    )
+    .leftJoin(
+      { recipient_alias: 'txs_10' },
+      'recipient_alias.tx_uid',
+      't.recipient_alias_uid'
+    );
 
-module.exports = { select, withFirstOnly };
+module.exports = { select, selectFromFiltered };

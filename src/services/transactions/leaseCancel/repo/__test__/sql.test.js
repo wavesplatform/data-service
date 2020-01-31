@@ -1,5 +1,9 @@
 const sql = require('../sql');
 const filterValues = {
+  // default values
+  sort: 'desc',
+  limit: 100,
+  // for test
   recipient: 'recipient',
 };
 

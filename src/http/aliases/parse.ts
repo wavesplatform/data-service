@@ -47,6 +47,7 @@ export const mgetOrSearch = ({
       return {
         address: fValues.address,
         showBroken: fValues.showBroken,
+        sort: fValues.sort,
         limit: fValues.limit,
       };
     }

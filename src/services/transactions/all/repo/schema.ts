@@ -1,6 +1,9 @@
 import { Joi } from '../../../../utils/validation';
 
 export const result = Joi.object().keys({
+  tx_uid: Joi.object()
+    .bignumber()
+    .required(),
   tx_type: Joi.number()
     .min(1)
     .max(16)

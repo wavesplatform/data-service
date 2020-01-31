@@ -1,9 +1,9 @@
+import { Ok as ok } from 'folktale/result';
 import { parseFilterValues } from '.';
-import commonFilters from './filters';
 import { SortOrder } from '../../../services/_common';
 
 describe('Filter values parsing', () => {
-  const parseQuery = parseFilterValues(commonFilters);
+  const parseQuery = parseFilterValues({});
 
   const query = {
     ids: ['id1', 'id2'],
@@ -21,36 +21,44 @@ describe('Filter values parsing', () => {
 
   describe('all common filter', () => {
     it('values are parsed correctly provided correct values are given', () => {
-      expect(parseQuery(query)).toEqual({
-        ...query,
-        timeStart: new Date(query.timeStart),
-        timeEnd: new Date(query.timeEnd),
-        limit: 10,
-      });
+      expect(parseQuery(query)).toEqual(
+        ok({
+          ...query,
+          timeStart: new Date(query.timeStart),
+          timeEnd: new Date(query.timeEnd),
+          limit: 10,
+        })
+      );
     });
     it('correct default values are given ', () => {
-      expect(parseQuery({})).toEqual(defaults);
+      expect(parseQuery({})).toEqual(ok(defaults));
     });
 
     it('ids are parsed correctly in any form', () => {
-      expect(parseQuery({ ids: 'someValue' })).toEqual({
-        ...defaults,
-        ids: ['someValue'],
-      });
+      expect(parseQuery({ ids: 'someValue' })).toEqual(
+        ok({
+          ...defaults,
+          ids: ['someValue'],
+        })
+      );
 
-      expect(parseQuery({ ids: '' })).toEqual({
-        ...defaults,
-        ids: [],
-      });
+      expect(parseQuery({ ids: '' })).toEqual(
+        ok({
+          ...defaults,
+          ids: [],
+        })
+      );
 
-      expect(parseQuery({ ids: 'qwe,asd' })).toEqual({
-        ...defaults,
-        ids: ['qwe', 'asd'],
-      });
+      expect(parseQuery({ ids: 'qwe,asd' })).toEqual(
+        ok({
+          ...defaults,
+          ids: ['qwe', 'asd'],
+        })
+      );
     });
   });
 
   it('extra input values are ignored', () => {
-    expect(parseQuery({ badKey: 'badValue' } as any)).toEqual(defaults);
+    expect(parseQuery({ badKey: 'badValue' } as any)).toEqual(ok(defaults));
   });
 });

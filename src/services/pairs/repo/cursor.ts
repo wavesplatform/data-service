@@ -1,17 +1,17 @@
 import { Result, Ok as ok, Error as error } from 'folktale/result';
 import { ValidationError } from '../../../errorHandling';
 import { PairsSearchRequest } from './types';
-import { PairResponse } from './transformResult';
+import { PairDbResponse } from './transformResult';
 
 export type Cursor = [string, string];
 
-export const serialize = <ResponseTransformed extends PairResponse>(
+export const serialize = <ResponseTransformed extends PairDbResponse>(
   request: PairsSearchRequest,
   response: ResponseTransformed
 ): string =>
-  Buffer.from(`${response.amountAssetId}:${response.priceAssetId}`).toString(
-    'base64'
-  );
+  Buffer.from(
+    `${response.amount_asset_id}:${response.price_asset_id}`
+  ).toString('base64');
 
 export const deserialize = (
   cursor: string

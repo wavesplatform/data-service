@@ -1,4 +1,5 @@
 import { PairInfo, AssetIdsPair, Repo } from '../../../types';
+import { WithLimit, WithSortOrder } from '../../_common';
 
 export type PairsGetRequest = {
   pair: AssetIdsPair;
@@ -7,10 +8,10 @@ export type PairsGetRequest = {
 
 export type PairsMgetRequest = { pairs: AssetIdsPair[]; matcher: string };
 
-export type SearchCommonRequest = {
-  matcher: string;
-  limit: number;
-};
+export type SearchCommonRequest = WithSortOrder &
+  WithLimit & {
+    matcher: string;
+  };
 
 export type SearchWithMatchExactly = SearchCommonRequest & {
   match_exactly?: boolean[];

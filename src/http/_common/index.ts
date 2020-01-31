@@ -39,7 +39,7 @@ export function createHttpHandler<Params extends string[], Request>(
   ) => Result<ParseError, Request>
 ): (ctx: Context) => Promise<void> {
   return async (ctx: Context): Promise<void> => {
-    ctx.eventBus.emit('ENDPOINT_RESOLVED', {
+    ctx.eventBus.emit('ENDPOINT_HIT', {
       value: ctx.originalUrl,
     });
 

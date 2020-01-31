@@ -1,7 +1,7 @@
 const { groupBy, map, pipe, toPairs } = require('ramda');
 const { addMissingCandles, transformCandle } = require('../transformResults');
 const { candleMonoid } = require('../candleMonoid');
-const { interval, Unit } = require('../../../../types');
+const { interval, Unit, CandleInterval } = require('../../../../types');
 const { floor, trunc } = require('../../../../utils/date');
 const { concatAll } = require('../../../../utils/fp/concatAll');
 
@@ -12,11 +12,11 @@ const monthCandles = require('./mocks/monthCandles');
 const yearCandles = require('./mocks/yearCandles');
 
 const date1 = new Date('2018-11-01T00:00:00.000Z'),
-  date2 = new Date('2018-12-01T00:00:00.000Z');
+  date2 = new Date(new Date('2018-12-01T00:00:00.000Z').valueOf() - 1);
 
-const day = interval('1d').unsafeGet(),
-  minute = interval('1m').unsafeGet(),
-  month = interval('1M').unsafeGet();
+const day = interval(CandleInterval.Day1).unsafeGet(),
+  minute = interval(CandleInterval.Minute1).unsafeGet(),
+  month = interval(CandleInterval.Month1).unsafeGet();
 
 const addMissing1mCandles = addMissingCandles(minute),
   addMissing1dCandles = addMissingCandles(day),
@@ -33,7 +33,7 @@ describe('add missing candles', () => {
           addMissing1mCandles(date1, date2),
           toPairs
         )(oneDayCandles).length
-      ).toBe(43201);
+      ).toBe(43200);
     });
     it('should add empty candles to list of thirty candles for 1M period including the 1st day of next M', () => {
       expect(
@@ -44,7 +44,7 @@ describe('add missing candles', () => {
           addMissing1mCandles(date1, date2),
           toPairs
         )(monthCandles).length
-      ).toBe(43201);
+      ).toBe(43200);
     });
   });
 
@@ -58,7 +58,7 @@ describe('add missing candles', () => {
           addMissing1dCandles(date1, date2),
           toPairs
         )(oneDayCandles).length
-      ).toBe(31);
+      ).toBe(30);
     });
 
     it('should not add any candles to list of thirty candles for 1M period including the 1st day of next M', () => {
@@ -70,7 +70,7 @@ describe('add missing candles', () => {
           addMissing1dCandles(date1, date2),
           toPairs
         )(monthCandles).length
-      ).toBe(31);
+      ).toBe(30);
     });
 
     it('should not add candles to list of twenty candles for 1Y period including the last day of month', () => {
@@ -109,10 +109,12 @@ describe('candle monoid', () => {
 
 describe('transform candle fn', () => {
   it('take empty candle and returns correctly transformed for result candle', () => {
-    expect(transformCandle([date1, candleMonoid.empty])).toMatchSnapshot();
+    expect(
+      transformCandle(minute)([date1, candleMonoid.empty])
+    ).toMatchSnapshot();
   });
 
   it('take valid candle and returns correctly transformed for result candle', () => {
-    expect(transformCandle([date1, oneDayCandles[0]])).toMatchSnapshot();
+    expect(transformCandle(day)([date1, oneDayCandles[0]])).toMatchSnapshot();
   });
 });

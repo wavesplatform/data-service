@@ -7,19 +7,20 @@ import { CommonRepoDependencies } from '../..';
 import { getByIdPreset } from '../../_common/presets/pg/getById';
 import { mgetByIdsPreset } from '../../_common/presets/pg/mgetByIds';
 import { searchPreset } from '../../_common/presets/pg/search';
-import { WithLimit } from '../../_common';
+import { WithLimit, WithSortOrder } from '../../_common';
 
-import { serialize, deserialize } from './cursor';
+import { serialize, deserialize, Cursor } from './cursor';
 import sql from './data/sql';
-import { transformDbResponse } from './data/transformResult';
+import { transformDbResponse, AliasDbResponse } from './data/transformResult';
 import { output } from './schema';
 
 export type AliasesGetRequest = string;
 export type AliasesMgetRequest = string[];
-export type AliasesSearchRequest = WithLimit & {
-  address: string;
-  showBroken: boolean;
-};
+export type AliasesSearchRequest = WithSortOrder &
+  WithLimit & {
+    address: string;
+    showBroken: boolean;
+  };
 
 export type AliasesRepo = Repo<
   AliasesGetRequest,
@@ -55,7 +56,12 @@ export default ({
       emitEvent: emitEvent,
     }),
 
-    search: searchPreset({
+    search: searchPreset<
+      Cursor,
+      AliasesSearchRequest,
+      AliasDbResponse,
+      AliasInfo
+    >({
       name: 'aliases.search',
       sql: sql.search,
       resultSchema: output,

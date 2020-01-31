@@ -1,3 +1,4 @@
+import { BigNumber } from '@waves/data-entities';
 import { RawTx, Tx, CommonFilters } from '../../_common/types';
 import { RequestWithCursor } from '../../../_common/pagination';
 import { WithSortOrder, WithLimit } from '../../../_common';
@@ -6,7 +7,7 @@ import { Repo, TransactionInfo } from '../../../../types';
 export type InvokeScriptTxArgType = 'integer' | 'boolean' | 'binary' | 'string';
 
 export type RawInvokeScriptTxArgValue = {
-  arg_value_integer: bigint | null;
+  arg_value_integer: BigNumber | null;
   arg_value_boolean: boolean | null;
   arg_value_binary: Buffer | null;
   arg_value_string: string | null;
@@ -18,7 +19,7 @@ export type RawInvokeScriptTxArg = RawInvokeScriptTxArgValue & {
 };
 
 export type RawInvokeScriptTxPayment = {
-  amount: bigint | null;
+  amount: BigNumber | null;
   asset_id: string | null;
   position_in_payment: number | null;
 };

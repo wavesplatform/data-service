@@ -20,7 +20,7 @@ import { searchPreset } from '../../_common/presets/pg/search';
 
 // service logic
 export { create as createCache } from './cache';
-import { serialize, deserialize } from './cursor';
+import { serialize, deserialize, Cursor } from './cursor';
 import { matchRequestResult } from './matchRequestResult';
 import { mgetPairsPg } from './mgetPairsPg';
 import { result as resultSchema } from './schema';
@@ -31,7 +31,12 @@ import {
   PairResponse,
 } from './transformResult';
 import * as sql from './sql';
-import { PairsGetRequest, PairsMgetRequest, PairsRepo } from './types';
+import {
+  PairsGetRequest,
+  PairsMgetRequest,
+  PairsRepo,
+  PairsSearchRequest,
+} from './types';
 
 export default ({
   drivers,
@@ -128,7 +133,12 @@ export default ({
     emitEvent,
   });
 
-  const search = searchPreset({
+  const search = searchPreset<
+    Cursor,
+    PairsSearchRequest,
+    PairDbResponse,
+    PairInfo
+  >({
     name: SERVICE_NAME.SEARCH,
     sql: sql.search,
     resultSchema,

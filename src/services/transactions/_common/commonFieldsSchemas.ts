@@ -1,6 +1,9 @@
 import { Joi } from '../../../utils/validation';
 
 export default {
+  tx_uid: Joi.object()
+    .bignumber()
+    .required(),
   id: Joi.string()
     .base58()
     .required(),

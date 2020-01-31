@@ -38,12 +38,14 @@ export const mgetOrSearch = ({
       if (fValues.ticker) {
         return {
           ticker: fValues.ticker,
+          sort: fValues.sort,
           limit: fValues.limit,
           after: fValues.after,
         };
       } else if (fValues.search) {
         return {
           search: fValues.search,
+          sort: fValues.sort,
           limit: fValues.limit,
           after: fValues.after,
         };

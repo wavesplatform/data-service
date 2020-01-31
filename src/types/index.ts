@@ -94,7 +94,8 @@ export const alias = (data: AliasInfo | null): Alias =>
   toSerializable('alias', data);
 
 export type CandleInfo = {
-  timeStart: Date | null;
+  time: Date;
+  timeClose: Date;
   maxHeight: number;
   open: BigNumber | null;
   high: BigNumber;
@@ -154,7 +155,6 @@ export enum DataEntryType {
 export type TransactionInfo = {
   id: string;
   type: number;
-  timestamp: Date;
 };
 export type NotNullTransaction = Serializable<'transaction', TransactionInfo>;
 export type Transaction = Serializable<'transaction', TransactionInfo | null>;

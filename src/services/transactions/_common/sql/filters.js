@@ -1,33 +1,84 @@
-const { where, whereIn, limit } = require('../../../../utils/db/knex/index');
+const { equals, ifElse } = require('ramda');
+const {
+  where,
+  whereIn,
+  whereRaw,
+  limit,
+} = require('../../../../utils/db/knex/index');
+const { md5 } = require('../../../../utils/hash');
 
-const id = where('id');
-const ids = whereIn('id');
+const id = id =>
+  where('t.tx_uid', function() {
+    this.select('uid')
+      .from('txs')
+      .where('id', id)
+      .limit(1);
+  });
 
-const sender = where('sender');
+const ids = ids =>
+  whereIn('t.tx_uid', function() {
+    this.select('uid')
+      .from('txs')
+      .whereIn('id', ids);
+  });
 
-const timeStart = where('time_stamp', '>=');
-const timeEnd = where('time_stamp', '<=');
+const sender = addr =>
+  where('t.sender_uid', function() {
+    this.select('uid')
+      .from('addresses')
+      .where('address', addr);
+  });
 
-const sort = s => q =>
-  q
-    .clone()
-    .orderBy('time_stamp', s)
-    .orderBy('id', s);
+const byTimeStamp = comparator => ts =>
+  where('t.tx_uid', comparator, function() {
+    this.select('uid')
+      .from('txs')
+      .where('time_stamp', comparator, ts)
+      .orderBy('uid', comparator === '>=' ? 'asc' : 'desc')
+      .limit(1);
+  });
 
-const after = ({ timestamp, id, sort }) => q => {
+const byAssetId = ifElse(
+  equals('WAVES'),
+  () => where('asset_uid', null),
+  assetId =>
+    where('asset_uid', function() {
+      this.select('uid')
+        .from('assets')
+        .where('asset_id', assetId)
+        .limit(1);
+    })
+);
+
+const byRecipient = r =>
+  where('recipient_address_uid', function() {
+    this.select('uid')
+      .from('addresses')
+      .where('address', r)
+      .limit(1);
+  });
+
+const byScript = s => whereRaw('md5(script) = ?', md5(s));
+
+const sort = s => q => q.clone().orderBy('t.tx_uid', s);
+const outerSort = s => q => q.clone().orderBy('txs.uid', s);
+
+const after = ({ tx_uid, sort }) => {
   const comparator = sort === 'desc' ? '<' : '>';
-  return q
-    .clone()
-    .whereRaw(`(time_stamp, id) ${comparator} (?, ?)`, [timestamp, id]);
+  return where('t.tx_uid', comparator, tx_uid);
 };
 
 module.exports = {
   id,
   ids,
   sender,
-  timeStart,
-  timeEnd,
+  timeStart: byTimeStamp('>='),
+  timeEnd: byTimeStamp('<='),
   sort,
   after,
   limit,
+  outerSort,
+  assetId: byAssetId,
+  recipient: byRecipient,
+  script: byScript,
 };

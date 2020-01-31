@@ -1,19 +1,21 @@
 import { Result, Ok as ok } from 'folktale/result';
-import { Asset } from '@waves/data-entities';
 import { ValidationError } from '../../../errorHandling';
-import { AssetsSearchRequest } from './types';
+import { AssetsSearchRequest, AssetDbResponse } from './types';
 
-export type Cursor = string;
+export type Cursor = number;
 
-export const serialize = <ResponseTransformed extends Asset>(
+export const serialize = <Response extends AssetDbResponse>(
   request: AssetsSearchRequest,
-  response: ResponseTransformed
-): string => Buffer.from(response.id).toString('base64');
+  response: Response
+): string | undefined =>
+  response === null
+    ? undefined
+    : Buffer.from(response.uid.toString()).toString('base64');
 
 export const deserialize = (
   cursor: string
 ): Result<ValidationError, Cursor> => {
   return ok<ValidationError, Cursor>(
-    Buffer.from(cursor, 'base64').toString('utf8')
+    parseInt(Buffer.from(cursor, 'base64').toString('utf-8'))
   );
 };

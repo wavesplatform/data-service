@@ -1,4 +1,4 @@
-import { compose, last, take } from 'ramda';
+import { compose, init, last, take } from 'ramda';
 
 import { SearchedItems } from '../../../../../types';
 import { WithLimit } from '../../../../_common';
@@ -10,49 +10,37 @@ type ResponseMeta = {
 };
 
 const createMeta = <
-  Cursor extends Partial<Request> & Partial<ResponseTransformed>,
-  Request extends WithLimit,
-  ResponseRaw,
-  ResponseTransformed
+  Cursor,
+  Request extends RequestWithCursor<WithLimit, string>,
+  ResponseRaw
 >(
-  serialize: CursorSerialization<
-    Cursor,
-    Request,
-    ResponseTransformed
-  >['serialize']
-) => (
-  request: RequestWithCursor<Request, Cursor>,
-  responsesRaw: ResponseRaw[],
-  lastTransformedResponse: ResponseTransformed | undefined
-): ResponseMeta => {
+  serialize: CursorSerialization<Cursor, Request, ResponseRaw>['serialize']
+) => (request: Request, responsesRaw: ResponseRaw[]): ResponseMeta => {
   const metaBuilder: ResponseMeta = {
     isLastPage: true,
   };
-  if (typeof lastTransformedResponse !== 'undefined') {
+  const lastResponse = last(init(responsesRaw));
+  if (typeof lastResponse !== 'undefined') {
     metaBuilder.isLastPage = responsesRaw.length < request.limit;
-    metaBuilder.lastCursor = serialize(request, lastTransformedResponse);
+    metaBuilder.lastCursor = serialize(request, lastResponse);
   }
   return metaBuilder;
 };
 
 export const transformResults = <
-  Cursor extends any,
-  Request extends WithLimit,
+  Cursor,
+  Request extends RequestWithCursor<WithLimit, string>,
   ResponseRaw,
   ResponseTransformed
 >(
   transformDbResponse: (
     results: ResponseRaw,
-    request?: RequestWithCursor<Request, Cursor>
+    request?: Request
   ) => ResponseTransformed,
-  serialize: CursorSerialization<
-    Cursor,
-    Request,
-    ResponseTransformed
-  >['serialize']
+  serialize: CursorSerialization<Cursor, Request, ResponseRaw>['serialize']
 ) => (
   responses: ResponseRaw[],
-  request: RequestWithCursor<Request, Cursor>
+  request: Request
 ): SearchedItems<ResponseTransformed> => {
   const transformedData = compose(
     rs => rs.map(r => transformDbResponse(r, request)),
@@ -61,6 +49,6 @@ export const transformResults = <
 
   return {
     items: transformedData,
-    ...createMeta(serialize)(request, responses, last(transformedData)),
+    ...createMeta(serialize)(request, responses),
   };
 };

@@ -92,6 +92,7 @@ export default (repo: AllTxsRepo) => (
           Nothing: () => taskOf(emptyOf()),
         })
       ),
+
   mget: req =>
     repo
       .mget(req.ids) // Task tx[]. tx can have data: null
