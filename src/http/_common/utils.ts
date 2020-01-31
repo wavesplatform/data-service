@@ -22,7 +22,7 @@ export const setHttpResponse = (ctx: Context) => (
   }
 };
 
-const LSN_FORMAT_KEY = 'large-significand-format=';
+const LSN_FORMAT_KEY = 'large-significand-format';
 
 export const parseLSN = (
   httpHeaders: RequestHeaders
@@ -34,7 +34,7 @@ export const parseLSN = (
     acceptHeader.includes(LSN_FORMAT_KEY)
   ) {
     const lsnFormat = acceptHeader.substr(
-      acceptHeader.indexOf(LSN_FORMAT_KEY) + LSN_FORMAT_KEY.length
+      acceptHeader.indexOf(LSN_FORMAT_KEY) + LSN_FORMAT_KEY.length + 1  // + 1 cause the equal sign 
     ) as LSNFormat;
 
     if (![LSNFormat.Number, LSNFormat.String].includes(lsnFormat)) {
@@ -55,7 +55,7 @@ export const contentTypeWithLSN = (
 ) =>
   `${contentType}${
     lsnFormat === LSNFormat.String
-      ? `; ${LSN_FORMAT_KEY}${LSNFormat.String}`
+      ? `; ${LSN_FORMAT_KEY}=${LSNFormat.String}`
       : ''
   }`;
 
