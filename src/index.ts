@@ -12,7 +12,8 @@ import createServices from './services';
 import * as injectConfig from './middleware/injectConfig';
 import * as injectEventBus from './middleware/injectEventBus';
 import * as accessLogMiddleware from './middleware/accessLog';
-import * as setHeadersMiddleware from './middleware/setHeaders';
+
+const cors = require('@koa/cors');
 
 import { loadConfig } from './loadConfig';
 import router from './http';
@@ -38,7 +39,7 @@ createServices({
     app
       .use(bodyParser())
       .use(requestId)
-      .use(setHeadersMiddleware)
+      .use(cors())
       .use(injectEventBus(eventBus))
       .use(accessLogMiddleware)
       .use(

@@ -4,11 +4,7 @@ import { defaultTo } from 'ramda';
 
 import { ParseError } from '../../errorHandling';
 import { stringify } from '../../utils/json';
-import {
-  RequestHeaders,
-  LSN_FORMAT_HEADER,
-  WITH_DECIMALS_HEADER,
-} from '../../types';
+import { RequestHeaders, WITH_DECIMALS_HEADER } from '../../types';
 import { DecimalsFormat } from '../../services/types';
 import { LSNFormat } from '../types';
 import { HttpResponse } from './types';
@@ -26,22 +22,42 @@ export const setHttpResponse = (ctx: Context) => (
   }
 };
 
+const LSN_FORMAT_KEY = 'large-significand-format=';
+
 export const parseLSN = (
   httpHeaders: RequestHeaders
 ): Result<ParseError, LSNFormat> => {
-  if (
-    typeof httpHeaders[LSN_FORMAT_HEADER] === 'string' &&
-    ![LSNFormat.Number, LSNFormat.String].includes(
-      httpHeaders[LSN_FORMAT_HEADER] as LSNFormat
-    )
-  ) {
-    return error(new ParseError(new Error('Invalid LongFormat')));
-  }
+  const acceptHeader = httpHeaders['accept'];
 
-  return ok(
-    defaultTo(LSNFormat.String, httpHeaders[LSN_FORMAT_HEADER] as LSNFormat)
-  );
+  if (
+    typeof acceptHeader === 'string' &&
+    acceptHeader.includes(LSN_FORMAT_KEY)
+  ) {
+    const lsnFormat = acceptHeader.substr(
+      acceptHeader.indexOf(LSN_FORMAT_KEY) + LSN_FORMAT_KEY.length
+    ) as LSNFormat;
+
+    if (![LSNFormat.Number, LSNFormat.String].includes(lsnFormat)) {
+      return error(
+        new ParseError(new Error('Invalid Large significand format'))
+      );
+    } else {
+      return ok(lsnFormat);
+    }
+  } else {
+    return ok(LSNFormat.Number);
+  }
 };
+
+export const contentTypeWithLSN = (
+  lsnFormat: LSNFormat,
+  contentType: string = 'application/json; charset=utf-8'
+) =>
+  `${contentType}${
+    lsnFormat === LSNFormat.String
+      ? `; ${LSN_FORMAT_KEY}${LSNFormat.String}`
+      : ''
+  }`;
 
 export const parseDecimals = (
   httpHeaders: RequestHeaders

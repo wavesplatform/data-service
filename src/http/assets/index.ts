@@ -24,15 +24,18 @@ export default ({ get, mget, search }: AssetsService): Router => {
   return subrouter
     .get(
       '/assets/:id',
-      createHttpHandler(req => get(req).map(serializeGet(asset)), parseGet)
+      createHttpHandler(
+        (req, lsnFormat) => get(req).map(serializeGet(asset, lsnFormat)),
+        parseGet
+      )
     )
     .get(
       '/assets',
       createHttpHandler(
-        req =>
+        (req, lsnFormat) =>
           isMgetRequest(req)
-            ? mget(req).map(serializeMget(asset))
-            : search(req).map(serializeSearch(asset)),
+            ? mget(req).map(serializeMget(asset, lsnFormat))
+            : search(req).map(serializeSearch(asset, lsnFormat)),
         parseMgetOrSearch
       )
     );

@@ -18,6 +18,6 @@ export const stringify = (
     strict: false,
     isInstance: (bn: any): bn is BigNumber => BigNumber.isBigNumber(bn),
     stringify: (bn: BigNumber) =>
-      lsnFormat === LSNFormat.Number ? bn.toFixed() : bn.toString(),
+      lsnFormat === LSNFormat.Number ? bn.toFixed() : `"${bn.valueOf()}"`,
     parse: toBigNumber,
   }).stringify;

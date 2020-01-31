@@ -7,7 +7,6 @@ import { Interval, interval, Unit } from './interval';
 import { List, list } from './list';
 import { IncomingHttpHeaders } from 'http';
 import { DecimalsFormat } from '../services/types';
-import { LSNFormat } from '../http/types';
 
 export { CacheSync } from './cache';
 
@@ -24,12 +23,10 @@ export const fromMaybe = <A, B>(factory: (a?: A) => B) => (mb: Maybe<A>): B =>
     Nothing: () => factory(),
   });
 
-export const LSN_FORMAT_HEADER = 'x-lsn-format';
 export const WITH_DECIMALS_HEADER = 'x-with-decimals';
 
 export type RequestHeaders = IncomingHttpHeaders &
   Partial<{
-    LSN_FORMAT_HEADER: LSNFormat;
     WITH_DECIMALS_HEADER: DecimalsFormat;
   }>;
 

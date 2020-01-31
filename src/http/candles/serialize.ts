@@ -1,5 +1,5 @@
-import { SearchedItems, CandleInfo, candle, list } from '../../types';
-import { stringify } from '../../utils/json';
+import { SearchedItems, CandleInfo, candle, Candle } from '../../types';
+import { search as searchSerializer } from '../_common/serialize';
 import { HttpResponse } from '../_common/types';
 import { LSNFormat } from '../types';
 
@@ -8,17 +8,7 @@ export const serialize = (
   lsnFormat: LSNFormat
 ): HttpResponse => {
   if (data.items.length) {
-    return HttpResponse.Ok(
-      stringify(lsnFormat)(
-        list(
-          data.items.map(a => candle(a)),
-          {
-            isLastPage: data.isLastPage,
-            lastCursor: data.lastCursor,
-          }
-        )
-      )
-    );
+    return searchSerializer<CandleInfo | null, Candle>(candle, lsnFormat)(data);
   } else {
     return HttpResponse.NotFound();
   }

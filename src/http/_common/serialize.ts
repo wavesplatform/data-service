@@ -1,21 +1,28 @@
 import { Maybe } from 'folktale/maybe';
 import { Serializable, SearchedItems, list } from '../../types';
+import { stringify } from '../../utils/json';
+import { LSNFormat } from '../types';
 import { HttpResponse } from './types';
-import { defaultStringify } from './utils';
+import { contentTypeWithLSN } from './utils';
 
 export const get = <T, Res extends Serializable<string, T>>(
-  transform: (t: T | null) => Res
+  transform: (t: T | null) => Res,
+  lsnFormat: LSNFormat = LSNFormat.String
 ) => (m: Maybe<T>): HttpResponse =>
   m.matchWith({
-    Just: ({ value }) => HttpResponse.Ok(defaultStringify(transform(value))),
+    Just: ({ value }) =>
+      HttpResponse.Ok(stringify(lsnFormat)(transform(value))).withHeaders({
+        'Content-Type': contentTypeWithLSN(lsnFormat),
+      }),
     Nothing: () => HttpResponse.NotFound(),
   });
 
 export const mget = <T, Res extends Serializable<string, T>>(
-  transform: (t: T | null) => Res
+  transform: (t: T | null) => Res,
+  lsnFormat: LSNFormat = LSNFormat.String
 ) => (ms: Maybe<T>[]): HttpResponse =>
   HttpResponse.Ok(
-    defaultStringify(
+    stringify(lsnFormat)(
       ms.map(maybe =>
         maybe.matchWith({
           Just: ({ value }) => transform(value),
@@ -23,13 +30,16 @@ export const mget = <T, Res extends Serializable<string, T>>(
         })
       )
     )
-  );
+  ).withHeaders({
+    'Content-Type': contentTypeWithLSN(lsnFormat),
+  });
 
 export const search = <T, Res extends Serializable<string, T>>(
-  transform: (t: T | null) => Res
+  transform: (t: T | null) => Res,
+  lsnFormat: LSNFormat = LSNFormat.String
 ) => (data: SearchedItems<T>): HttpResponse =>
   HttpResponse.Ok(
-    defaultStringify(
+    stringify(lsnFormat)(
       list(
         data.items.map(a => transform(a)),
         {
@@ -38,4 +48,6 @@ export const search = <T, Res extends Serializable<string, T>>(
         }
       )
     )
-  );
+  ).withHeaders({
+    'Content-Type': contentTypeWithLSN(lsnFormat),
+  });

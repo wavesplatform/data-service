@@ -8,10 +8,15 @@ import {
 } from '../../../services/pairs/repo/types';
 import { createHttpHandler } from '../../_common';
 import {
+  get as getSerializer,
+  mget as mgetSerializer,
+  search as searchSerializer,
+} from '../../_common/serialize';
+import { pairWithoutData } from '../../pairs';
+import {
   get as parseGet,
   mgetOrSearch as parseMgetOrSearch,
 } from '../../pairs/parse';
-import * as serialize from '../../pairs/serialize';
 import { postToGet } from '../../_common/postToGet';
 
 const subrouter = new Router();
@@ -24,8 +29,10 @@ const mgetOrSearchHttpHandler = (pairsService: PairsService) =>
   createHttpHandler(
     (req, lsnFormat) =>
       isMgetRequest(req)
-        ? pairsService.mget(req).map(res => serialize.mget(res, lsnFormat))
-        : pairsService.search(req).map(res => serialize.search(res, lsnFormat)),
+        ? pairsService.mget(req).map(mgetSerializer(pairWithoutData, lsnFormat))
+        : pairsService
+            .search(req)
+            .map(searchSerializer(pairWithoutData, lsnFormat)),
     parseMgetOrSearch
   );
 
@@ -35,7 +42,7 @@ export default (pairsService: PairsService) =>
       '/pairs/:amountAsset/:priceAsset',
       createHttpHandler(
         (req, lsnFormat) =>
-          pairsService.get(req).map(res => serialize.get(res, lsnFormat)),
+          pairsService.get(req).map(getSerializer(pairWithoutData, lsnFormat)),
         parseGet
       )
     )

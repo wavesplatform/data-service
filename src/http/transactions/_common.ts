@@ -1,4 +1,3 @@
-import { Maybe } from 'folktale/maybe';
 import { Result, Error as error, Ok as ok } from 'folktale/result';
 import { has } from 'ramda';
 import * as Router from 'koa-router';
@@ -8,58 +7,22 @@ import { ServiceMesh } from '../../services';
 import { WithSortOrder, WithLimit } from '../../services/_common';
 import {
   transaction,
-  list,
   ServiceMgetRequest,
   ServiceGetRequest,
   TransactionInfo,
-  SearchedItems,
+  Transaction,
 } from '../../types';
-import { stringify } from '../../utils/json';
 
 import { createHttpHandler } from '../_common';
-import { HttpRequest, HttpResponse } from '../_common/types';
+import { HttpRequest } from '../_common/types';
 import { parseFilterValues } from '../_common/filters';
 import { Parser } from '../_common/filters/types';
+import {
+  get as getSerializer,
+  mget as mgetSerializer,
+  search as searchSerializer,
+} from '../_common/serialize';
 import { postToGet } from '../_common/postToGet';
-import { LSNFormat } from '../types';
-
-const serializeGet = (lsnFormat: LSNFormat) => (m: Maybe<TransactionInfo>) =>
-  m.matchWith({
-    Just: ({ value }) =>
-      HttpResponse.Ok(stringify(lsnFormat)(transaction(value))),
-    Nothing: () => HttpResponse.NotFound(),
-  });
-
-const serializeMget = (lsnFormat: LSNFormat) => (
-  ms: Maybe<TransactionInfo>[]
-) =>
-  HttpResponse.Ok(
-    stringify(lsnFormat)(
-      list(
-        ms.map(maybe =>
-          maybe.matchWith({
-            Just: ({ value }) => transaction(value),
-            Nothing: () => transaction(null),
-          })
-        )
-      )
-    )
-  );
-
-const serializeSearch = (lsnFormat: LSNFormat) => (
-  data: SearchedItems<TransactionInfo>
-) =>
-  HttpResponse.Ok(
-    stringify(lsnFormat)(
-      list(
-        data.items.map(a => transaction(a)),
-        {
-          isLastPage: data.isLastPage,
-          lastCursor: data.lastCursor,
-        }
-      )
-    )
-  );
 
 export const isMgetRequest = <SearchRequest>(
   req: ServiceMgetRequest | SearchRequest
@@ -111,8 +74,22 @@ export const createTransactionHttpHandlers = <
   const mgetOrSearchHandler = createHttpHandler(
     (req, lsnFormat) =>
       isMgetRequest(req)
-        ? service.mget(req).map(serializeMget(lsnFormat))
-        : service.search(req).map(serializeSearch(lsnFormat)),
+        ? service
+            .mget(req)
+            .map(
+              mgetSerializer<TransactionInfo | null, Transaction>(
+                transaction,
+                lsnFormat
+              )
+            )
+        : service
+            .search(req)
+            .map(
+              searchSerializer<TransactionInfo | null, Transaction>(
+                transaction,
+                lsnFormat
+              )
+            ),
     parseRequest.mgetOrSearch
   );
 
@@ -120,7 +97,15 @@ export const createTransactionHttpHandlers = <
     .get(
       `${prefix}/:id`,
       createHttpHandler(
-        (req, lsnFormat) => service.get(req).map(serializeGet(lsnFormat)),
+        (req, lsnFormat) =>
+          service
+            .get(req)
+            .map(
+              getSerializer<TransactionInfo | null, Transaction>(
+                transaction,
+                lsnFormat
+              )
+            ),
         parseRequest.get
       )
     )
