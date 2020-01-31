@@ -1,4 +1,4 @@
-import { Static, traverse, Dictionary } from 'ramda';
+import { Static, Dictionary } from 'ramda';
 import { Task } from 'folktale/concurrency/task';
 import { Maybe } from 'folktale/maybe';
 import { Result } from 'folktale/result';
@@ -128,11 +128,6 @@ declare module 'ramda' {
     mapObjIndexed<T, TResult, TDictionary>(
       fn: (value: T, key: string, obj?: any) => TResult
     ): (obj: any) => TDictionary;
-
-    sequence<A, T>(of: (a: any) => T, list: ReadonlyArray<A>): T;
-    sequence<A, T>(of: (a: any) => T): (list: ReadonlyArray<A>) => T;
-    sequence<T>(of: (a: any) => T, dict: Record<string, any>): T;
-    sequence<T>(of: (a: any) => T): (dict: Record<string, any>) => T;
   }
 
   interface Filter {
