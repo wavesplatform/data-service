@@ -34,7 +34,7 @@ export const transformResults = <
   ResponseTransformed
 >(
   transformDbResponse: (
-    resul: ResponseRaw,
+    result: ResponseRaw,
     request?: Request
   ) => ResponseTransformed,
   serialize: CursorSerialization<Cursor, Request, ResponseRaw>['serialize']
