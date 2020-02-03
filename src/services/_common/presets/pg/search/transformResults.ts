@@ -34,7 +34,7 @@ export const transformResults = <
   ResponseTransformed
 >(
   transformDbResponse: (
-    results: ResponseRaw,
+    resul: ResponseRaw,
     request?: Request
   ) => ResponseTransformed,
   serialize: CursorSerialization<Cursor, Request, ResponseRaw>['serialize']
@@ -44,7 +44,7 @@ export const transformResults = <
 ): SearchedItems<ResponseTransformed> => {
   const transformedData = compose(
     rs => rs.map(r => transformDbResponse(r, request)),
-    take<ResponseRaw>(request.limit - 1)
+    take<ResponseRaw>(request.limit)
   )(responses);
 
   return {
