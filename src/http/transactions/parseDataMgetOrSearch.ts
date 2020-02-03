@@ -12,6 +12,14 @@ import { HttpRequest } from '../_common/types';
 import { parseBool } from '../../utils/parsers/parseBool';
 import { isMgetRequest } from './_common';
 
+const isDataEntryType = (raw: unknown): raw is DataEntryType =>
+  [
+    DataEntryType.Binary,
+    DataEntryType.Boolean,
+    DataEntryType.Integer,
+    DataEntryType.String,
+  ].includes(raw as DataEntryType);
+
 function parseValue(
   type: DataEntryType.Boolean,
   vs: string
@@ -51,15 +59,8 @@ function parseValue(
 const parseDataEntryType: Parser<DataEntryType | undefined> = raw => {
   if (isNil(raw)) return ok(undefined);
 
-  if (
-    [
-      DataEntryType.Binary,
-      DataEntryType.Boolean,
-      DataEntryType.Integer,
-      DataEntryType.String,
-    ].includes(raw as DataEntryType)
-  ) {
-    return ok(raw as DataEntryType);
+  if (isDataEntryType(raw)) {
+    return ok(raw);
   } else {
     return error(new ParseError(new Error('Invalid type param value')));
   }

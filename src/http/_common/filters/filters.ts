@@ -1,7 +1,7 @@
 import { Result, Error as error, Ok as ok } from 'folktale/result';
 import { compose, defaultTo } from 'ramda';
 import { ParseError } from '../../../errorHandling';
-import { SortOrder } from '../../../services/_common';
+import { SortOrder, isSortOrder } from '../../../services/_common';
 import {
   parseDate,
   parseArrayQuery,
@@ -11,7 +11,10 @@ import {
 import { CommonFilters } from './types';
 
 const limitFilter: CommonFilters['limit'] = compose(
-  n => (isNaN(n) ? error(new ParseError('limit has to be a number')) : ok(n)),
+  n =>
+    isNaN(n)
+      ? error(new ParseError(new Error('limit has to be a number')))
+      : ok(n),
   parseInt,
   String,
   defaultTo(100)
@@ -23,8 +26,8 @@ const sortFilter: CommonFilters['sort'] = compose<
   Result<ParseError, SortOrder>
 >(
   s =>
-    [SortOrder.Ascending, SortOrder.Descending].includes(s as SortOrder)
-      ? ok(s as SortOrder)
+    isSortOrder(s)
+      ? ok(s)
       : error(new ParseError(new Error('Invalid sort value'))),
   defaultTo<SortOrder>(SortOrder.Descending)
 );

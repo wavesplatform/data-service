@@ -13,10 +13,7 @@ import {
   search as searchSerializer,
 } from '../../_common/serialize';
 import { pairWithoutData } from '../../pairs';
-import {
-  get as parseGet,
-  mgetOrSearch as parseMgetOrSearch,
-} from '../../pairs/parse';
+import { get as parseGet, mgetOrSearch as parseMgetOrSearch } from './parse';
 import { postToGet } from '../../_common/postToGet';
 
 const subrouter = new Router();

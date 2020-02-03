@@ -40,8 +40,8 @@ describe('parseBool should correctly parse', () => {
   });
 
   it('non-string falsy values', () => {
-    expect(parseBool(null)).toEqual(invalidValueError);
-    expect(parseBool()).toEqual(invalidValueError);
+    expect(parseBool(null)).toEqual(ok(undefined));
+    expect(parseBool()).toEqual(ok(undefined));
     expect(parseBool(NaN)).toEqual(invalidValueError);
   });
 });

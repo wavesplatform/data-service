@@ -8,8 +8,8 @@ import { HttpRequest } from '../_common/types';
 import {
   PairsGetRequest,
   PairsMgetRequest,
-  PairsSearchRequest,
 } from '../../services/pairs/repo/types';
+import { PairsServiceSearchRequest } from '../../services/pairs';
 import { parseArrayQuery, parseBool, parsePairs } from '../../utils/parsers';
 
 import { loadConfig } from '../../loadConfig';
@@ -54,7 +54,10 @@ export const get = ({
 
 export const mgetOrSearch = ({
   query,
-}: HttpRequest): Result<ParseError, PairsMgetRequest | PairsSearchRequest> => {
+}: HttpRequest): Result<
+  ParseError,
+  PairsMgetRequest | PairsServiceSearchRequest
+> => {
   if (!query) {
     return error(new ParseError(new Error('Query is empty')));
   }
@@ -73,19 +76,28 @@ export const mgetOrSearch = ({
     if (Array.isArray(fValues.pairs)) {
       return ok({ pairs: fValues.pairs, matcher: fValues.matcher });
     } else {
-      if (fValues.search_by_asset || fValues.search_by_assets) {
+      if (fValues.search_by_asset) {
         return ok({
           matcher: fValues.matcher,
           sort: fValues.sort,
           limit: fValues.limit,
           match_exactly: fValues.match_exactly,
           search_by_asset: fValues.search_by_asset,
+        });
+      } else if (fValues.search_by_assets) {
+        return ok({
+          matcher: fValues.matcher,
+          sort: fValues.sort,
+          limit: fValues.limit,
+          match_exactly: fValues.match_exactly,
           search_by_assets: fValues.search_by_assets,
         });
       } else {
-        return error(
-          new ParseError(new Error('There are not any search params'))
-        );
+        return ok({
+          matcher: fValues.matcher,
+          sort: fValues.sort,
+          limit: fValues.limit,
+        });
       }
     }
   });

@@ -159,7 +159,6 @@ export const search = (req: PairsSearchRequest): string => {
         .limit(1);
     })
     .limit(limit);
-
   if (isSearchByAssetRequest(req)) {
     const { search_by_asset: amountAsset, match_exactly: matchExactly } = req;
     return q

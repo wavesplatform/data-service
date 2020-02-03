@@ -53,9 +53,12 @@ export const validatePairs = (
       return taskOf(undefined);
     } else {
       return taskRejected(
-        new ValidationError('Assets do not exist in the blockchain', {
-          assets: nonExistingIds,
-        })
+        new ValidationError(
+          new Error('Assets do not exist in the blockchain'),
+          {
+            assets: nonExistingIds,
+          }
+        )
       );
     }
   });

@@ -1,5 +1,5 @@
 import { Result, Ok as ok, Error as error } from 'folktale/result';
-import { isNil } from 'ramda';
+import { isNil, has } from 'ramda';
 import { ParseError } from '../../../errorHandling';
 import { parseFilterValues } from '../../_common/filters';
 import commonFilters from '../../_common/filters/filters';
@@ -7,8 +7,8 @@ import { HttpRequest } from '../../_common/types';
 import {
   PairsGetRequest,
   PairsMgetRequest,
-  PairsSearchRequest,
 } from '../../../services/pairs/repo/types';
+import { PairsServiceSearchRequest } from '../../../services/pairs';
 import { parseArrayQuery, parsePairs } from '../../../utils/parsers';
 
 export const get = ({
@@ -39,12 +39,15 @@ export const get = ({
   }
 };
 
+const isMgetRequest = (req: unknown): req is PairsMgetRequest =>
+  has('pairs', req) && has('matcher', req);
+
 export const mgetOrSearch = ({
   params,
   query,
 }: HttpRequest<['matcher']>): Result<
   ParseError,
-  PairsMgetRequest | PairsSearchRequest
+  PairsMgetRequest | PairsServiceSearchRequest
 > => {
   if (isNil(params)) {
     return error(new ParseError(new Error('Params is empty')));
@@ -59,23 +62,35 @@ export const mgetOrSearch = ({
     match_exactly: parseArrayQuery,
     search_by_asset: commonFilters.query,
     search_by_assets: parseArrayQuery,
-  })(query).chain(fValues => {
-    if (Array.isArray(fValues.pairs)) {
-      return ok({ pairs: fValues.pairs, matcher: params.matcher });
+  })(query).map(fValues => {
+    if (isMgetRequest(fValues)) {
+      return {
+        pairs: fValues.pairs,
+        matcher: params.matcher,
+      };
     } else {
-      if (fValues.search_by_asset || fValues.search_by_assets) {
-        return ok({
+      if (fValues.search_by_asset) {
+        return {
           matcher: params.matcher,
           sort: fValues.sort,
           limit: fValues.limit,
           match_exactly: fValues.match_exactly,
           search_by_asset: fValues.search_by_asset,
+        };
+      } else if (fValues.search_by_assets) {
+        return {
+          matcher: params.matcher,
+          sort: fValues.sort,
+          limit: fValues.limit,
+          match_exactly: fValues.match_exactly,
           search_by_assets: fValues.search_by_assets,
-        });
+        };
       } else {
-        return error(
-          new ParseError(new Error('There are not any search params'))
-        );
+        return {
+          matcher: params.matcher,
+          sort: fValues.sort,
+          limit: fValues.limit,
+        };
       }
     }
   });
