@@ -34,7 +34,8 @@ const byTimeStamp = comparator => ts =>
     this.select('uid')
       .from('txs')
       .where('time_stamp', comparator, ts)
-      .orderBy('uid', comparator === '>=' ? 'asc' : 'desc')
+      .orderBy('id', comparator === '>=' ? 'asc' : 'desc')
+      .orderBy('time_stamp', comparator === '>=' ? 'asc' : 'desc')
       .limit(1);
   });
 
