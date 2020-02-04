@@ -1,12 +1,12 @@
 import * as Router from 'koa-router';
-import { has } from 'ramda';
+import { has, omit } from 'ramda';
 
 import { PairsService } from '../../services/pairs';
 import {
   PairsSearchRequest,
   PairsMgetRequest,
 } from '../../services/pairs/repo/types';
-import { pair, PairInfo } from '../../types';
+import { pair, PairInfo, AssetIdsPair, Pair } from '../../types';
 import { createHttpHandler } from '../_common';
 import {
   get as getSerializer,
@@ -22,16 +22,29 @@ const isMgetRequest = (
   req: PairsMgetRequest | PairsSearchRequest
 ): req is PairsMgetRequest => has('pairs', req);
 
-export const pairWithoutData = (p: PairInfo | null) => pair(p, null);
+export const pairWithData = (p: (PairInfo & AssetIdsPair) | null): Pair =>
+  p
+    ? pair(omit(['amountAsset', 'priceAsset'], p), {
+        amountAsset: p.amountAsset,
+        priceAsset: p.priceAsset,
+      })
+    : pair(null, null);
 
 const mgetOrSearchHttpHandler = (pairsService: PairsService) =>
   createHttpHandler(
     (req, lsnFormat) =>
       isMgetRequest(req)
-        ? pairsService.mget(req).map(mgetSerializer(pairWithoutData, lsnFormat))
+        ? pairsService
+            .mget(req)
+            .map(
+              mgetSerializer<PairInfo & AssetIdsPair, Pair>(
+                pairWithData,
+                lsnFormat
+              )
+            )
         : pairsService
             .search(req)
-            .map(serachSerializer(pairWithoutData, lsnFormat)),
+            .map(serachSerializer(pairWithData, lsnFormat)),
     parseMgetOrSearch
   );
 
@@ -41,7 +54,7 @@ export default (pairsService: PairsService) =>
       '/pairs/:amountAsset/:priceAsset',
       createHttpHandler(
         (req, lsnFormat) =>
-          pairsService.get(req).map(getSerializer(pairWithoutData, lsnFormat)),
+          pairsService.get(req).map(getSerializer(pairWithData, lsnFormat)),
         parseGet
       )
     )

@@ -12,7 +12,7 @@ import {
   mget as mgetSerializer,
   search as searchSerializer,
 } from '../../_common/serialize';
-import { pairWithoutData } from '../../pairs';
+import { pairWithData } from '../../pairs';
 import { get as parseGet, mgetOrSearch as parseMgetOrSearch } from './parse';
 import { postToGet } from '../../_common/postToGet';
 
@@ -26,10 +26,10 @@ const mgetOrSearchHttpHandler = (pairsService: PairsService) =>
   createHttpHandler(
     (req, lsnFormat) =>
       isMgetRequest(req)
-        ? pairsService.mget(req).map(mgetSerializer(pairWithoutData, lsnFormat))
+        ? pairsService.mget(req).map(mgetSerializer(pairWithData, lsnFormat))
         : pairsService
             .search(req)
-            .map(searchSerializer(pairWithoutData, lsnFormat)),
+            .map(searchSerializer(pairWithData, lsnFormat)),
     parseMgetOrSearch
   );
 
@@ -39,7 +39,7 @@ export default (pairsService: PairsService) =>
       '/pairs/:amountAsset/:priceAsset',
       createHttpHandler(
         (req, lsnFormat) =>
-          pairsService.get(req).map(getSerializer(pairWithoutData, lsnFormat)),
+          pairsService.get(req).map(getSerializer(pairWithData, lsnFormat)),
         parseGet
       )
     )

@@ -1,12 +1,12 @@
 import { renameKeys } from 'ramda-adjunct';
 import { compose, omit } from 'ramda';
-import { Asset } from '@waves/data-entities';
+import { Asset, IAssetJSON } from '@waves/data-entities';
 import { AssetDbResponse } from './types';
 
 export const transformDbResponse = (raw: AssetDbResponse): Asset =>
   compose(
-    (obj: any) => new Asset(obj),
-    renameKeys({
+    obj => new Asset(obj),
+    renameKeys<IAssetJSON>({
       asset_id: 'id',
       asset_name: 'name',
       issue_height: 'height',

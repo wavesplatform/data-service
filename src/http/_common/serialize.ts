@@ -5,7 +5,7 @@ import { LSNFormat } from '../types';
 import { HttpResponse } from './types';
 import { contentTypeWithLSN } from './utils';
 
-export const get = <T, Res extends Serializable<string, T>>(
+export const get = <T, Res extends Serializable<string, any>>(
   transform: (t: T | null) => Res,
   lsnFormat: LSNFormat = LSNFormat.String
 ) => (m: Maybe<T>): HttpResponse =>
@@ -17,7 +17,7 @@ export const get = <T, Res extends Serializable<string, T>>(
     Nothing: () => HttpResponse.NotFound(),
   });
 
-export const mget = <T, Res extends Serializable<string, T>>(
+export const mget = <T, Res extends Serializable<string, any>>(
   transform: (t: T | null) => Res,
   lsnFormat: LSNFormat = LSNFormat.String
 ) => (ms: Maybe<T>[]): HttpResponse =>
@@ -34,7 +34,7 @@ export const mget = <T, Res extends Serializable<string, T>>(
     'Content-Type': contentTypeWithLSN(lsnFormat),
   });
 
-export const search = <T, Res extends Serializable<string, T>>(
+export const search = <T, Res extends Serializable<string, any>>(
   transform: (t: T | null) => Res,
   lsnFormat: LSNFormat = LSNFormat.String
 ) => (data: SearchedItems<T>): HttpResponse =>

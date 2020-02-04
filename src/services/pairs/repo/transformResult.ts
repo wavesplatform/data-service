@@ -1,6 +1,6 @@
-import { pick } from 'ramda';
 import { renameKeys } from 'ramda-adjunct';
 import { BigNumber } from '@waves/data-entities';
+import { PairInfo, AssetIdsPair } from '../../../types';
 
 export type PairDbResponse = {
   amount_asset_id: string;
@@ -16,24 +16,10 @@ export type PairDbResponse = {
   volume_waves: BigNumber;
 };
 
-export type PairResponse = {
-  amountAssetId: string;
-  priceAssetId: string;
-  firstPrice: BigNumber;
-  lastPrice: BigNumber;
-  volume: BigNumber;
-  quoteVolume: BigNumber;
-  high: BigNumber;
-  low: BigNumber;
-  weightedAveragePrice: BigNumber;
-  txsCount: number;
-  volumeWaves: BigNumber;
-};
-
 /** renamePairFields :: Object -> Object */
-const renamePairFields = renameKeys({
-  amount_asset_id: 'amountAssetId',
-  price_asset_id: 'priceAssetId',
+const renamePairFields = renameKeys<PairInfo & AssetIdsPair>({
+  amount_asset_id: 'amountAsset',
+  price_asset_id: 'priceAsset',
   first_price: 'firstPrice',
   last_price: 'lastPrice',
   volume_waves: 'volumeWaves',
@@ -41,21 +27,6 @@ const renamePairFields = renameKeys({
   quote_volume: 'quoteVolume',
   txs_count: 'txsCount',
 });
-
-const pairDataFields = [
-  'firstPrice',
-  'lastPrice',
-  'low',
-  'high',
-  'weightedAveragePrice',
-  'volume',
-  'quoteVolume',
-  'volumeWaves',
-  'txsCount',
-];
-
-/** pickPairFields :: Object -> Object */
-export const toPairInfo = pick(pairDataFields);
 
 /** transformResult :: Object -> Object */
 export const transformResult = renamePairFields;

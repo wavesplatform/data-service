@@ -1,12 +1,12 @@
 import { of as taskOf } from 'folktale/concurrency/task';
-import { of as just, Maybe } from 'folktale/maybe';
+import { of as justOf } from 'folktale/maybe';
 import { Ok as ok } from 'folktale/result';
 
 import { forEach, isEmpty } from '../../../utils/fp/maybeOps';
 import { tap } from '../../../utils/tap';
 
 import { withStatementTimeout } from '../../../db/driver';
-import { PairInfo, CacheSync } from '../../../types';
+import { PairInfo, CacheSync, AssetIdsPair } from '../../../types';
 import { CommonRepoDependencies } from '../..';
 
 // resolver creation and presets
@@ -24,12 +24,7 @@ import { serialize, deserialize, Cursor } from './cursor';
 import { matchRequestResult } from './matchRequestResult';
 import { mgetPairsPg } from './mgetPairsPg';
 import { result as resultSchema } from './schema';
-import {
-  PairDbResponse,
-  transformResult,
-  toPairInfo,
-  PairResponse,
-} from './transformResult';
+import { PairDbResponse, transformResult } from './transformResult';
 import * as sql from './sql';
 import {
   PairsGetRequest,
@@ -56,14 +51,14 @@ export default ({
     PairsGetRequest,
     PairsGetRequest,
     PairDbResponse,
-    PairInfo
+    PairInfo & AssetIdsPair
   >({
     transformInput: ok,
 
     // cache first
     getData: req =>
       cache.get(req).matchWith({
-        Just: ({ value }) => taskOf(just(value)),
+        Just: ({ value }) => taskOf(justOf(value)),
         Nothing: () =>
           getByIdPg<PairDbResponse, PairsGetRequest>({
             name: SERVICE_NAME.GET,
@@ -74,8 +69,7 @@ export default ({
           ),
       }),
     validateResult: validateResult(resultSchema, SERVICE_NAME.GET),
-    transformResult: res =>
-      res.map(res => transformResult(res) as PairResponse).map(toPairInfo),
+    transformResult: res => res.map(transformResult),
     emitEvent,
   });
 
@@ -83,11 +77,11 @@ export default ({
     PairsMgetRequest,
     PairsMgetRequest,
     PairDbResponse,
-    PairInfo
+    PairInfo & AssetIdsPair
   >({
     transformInput: ok,
     getData: request => {
-      let results: Array<Maybe<PairDbResponse>> = request.pairs.map(p =>
+      let results = request.pairs.map(p =>
         cache.get({
           pair: p,
           matcher: request.matcher,
@@ -126,10 +120,7 @@ export default ({
       });
     },
     validateResult: validateResult(resultSchema, SERVICE_NAME.MGET),
-    transformResult: res =>
-      res
-        .map(m => m.map(p => transformResult(p) as PairResponse))
-        .map(toPairInfo),
+    transformResult: res => res.map((m, i) => m.map(transformResult)),
     emitEvent,
   });
 
@@ -137,12 +128,12 @@ export default ({
     Cursor,
     PairsSearchRequest,
     PairDbResponse,
-    PairInfo
+    PairInfo & AssetIdsPair
   >({
     name: SERVICE_NAME.SEARCH,
     sql: sql.search,
     resultSchema,
-    transformResult: (p: PairDbResponse) => transformResult(p) as PairResponse,
+    transformResult,
     cursorSerialization: {
       serialize,
       deserialize,

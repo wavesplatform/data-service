@@ -1,6 +1,8 @@
 import { waitAll, of as taskOf } from 'folktale/concurrency/task';
 import { Maybe, empty as emptyOf } from 'folktale/maybe';
 import { pipe, groupBy, prop, toPairs, flatten } from 'ramda';
+
+import { AppError } from '../../../errorHandling';
 import {
   TransactionInfo,
   Service,
@@ -114,7 +116,7 @@ export default (repo: AllTxsRepo) => (
 
   search: req =>
     repo.search(req).chain((txsList: SearchedItems<TransactionInfo>) =>
-      waitAll(
+      waitAll<AppError, Maybe<TransactionInfo>[]>(
         pipe(groupBy(prop('type') as any), toPairs, tuples =>
           tuples.map(([type, txs]) => {
             return txsServices[

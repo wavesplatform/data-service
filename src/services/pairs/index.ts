@@ -15,11 +15,17 @@ import {
 export type PairsServiceSearchRequest = PairsSearchRequest;
 
 export type PairsService = {
-  get: Service<PairsGetRequest & WithDecimalsFormat, Maybe<PairInfo>>;
-  mget: Service<PairsMgetRequest & WithDecimalsFormat, Maybe<PairInfo>[]>;
+  get: Service<
+    PairsGetRequest & WithDecimalsFormat,
+    Maybe<PairInfo & AssetIdsPair>
+  >;
+  mget: Service<
+    PairsMgetRequest & WithDecimalsFormat,
+    Maybe<PairInfo & AssetIdsPair>[]
+  >;
   search: Service<
     PairsSearchRequest & WithDecimalsFormat,
-    SearchedItems<PairInfo>
+    SearchedItems<PairInfo & AssetIdsPair>
   >;
 };
 

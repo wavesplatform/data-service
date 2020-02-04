@@ -34,5 +34,5 @@ export type PairsRepo = Repo<
   PairsGetRequest,
   PairsMgetRequest,
   PairsSearchRequest,
-  PairInfo
+  PairInfo & AssetIdsPair
 >;

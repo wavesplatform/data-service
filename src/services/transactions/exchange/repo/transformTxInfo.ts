@@ -1,5 +1,6 @@
 import { pick, compose } from 'ramda';
 import { renameKeys } from 'ramda-adjunct';
+import { BigNumber } from '@waves/data-entities';
 
 import { transformTxInfo } from '../../_common/transformTxInfo';
 
@@ -42,6 +43,13 @@ const createOrder = (prefix: string) => <T extends Record<string, any>>({
   return version === '3' ? { ...tx, matcherFeeAssetId } : tx;
 };
 
+type ExchangeTxFields = {
+  buyMatcherFee: BigNumber;
+  sellMatcherFee: BigNumber;
+  amount: BigNumber;
+  price: BigNumber;
+};
+
 /** transformTx:: RawTxInfo -> TxInfo */
 export default (tx: ExchangeTxDbResponse) => {
   const commonFields = compose(
@@ -61,7 +69,7 @@ export default (tx: ExchangeTxDbResponse) => {
   )(tx);
 
   const exchangeTxFields = compose(
-    renameKeys({
+    renameKeys<ExchangeTxFields>({
       buy_matcher_fee: 'buyMatcherFee',
       sell_matcher_fee: 'sellMatcherFee',
     }),
