@@ -1,8 +1,7 @@
-import { Task, waitAll } from 'folktale/concurrency/task';
+import { Task } from 'folktale/concurrency/task';
 import { Maybe } from 'folktale/maybe';
 
 import { AppError } from '../../errorHandling';
-
 import { Service, SearchedItems, AssetIdsPair, PairInfo } from '../../types';
 import { WithDecimalsFormat } from '../types';
 import {
@@ -13,7 +12,6 @@ import {
 } from './repo/types';
 
 export type PairsServiceSearchRequest = PairsSearchRequest;
-
 export type PairsService = {
   get: Service<
     PairsGetRequest & WithDecimalsFormat,
@@ -31,21 +29,13 @@ export type PairsService = {
 
 export default (
   repo: PairsRepo,
-  validatePair: (matcher: string, pair: AssetIdsPair) => Task<AppError, void>
+  validatePairs: (
+    matcher: string,
+    pairs: AssetIdsPair[]
+  ) => Task<AppError, void>
 ): PairsService => ({
-  get: req => {
-    return validatePair(req.matcher, req.pair).chain(() => {
-      return repo.get(req);
-    });
-  },
-  mget: req => {
-    return waitAll(
-      req.pairs.map(pair => validatePair(req.matcher, pair))
-    ).chain(() => {
-      return repo.mget(req);
-    });
-  },
-  search: req => {
-    return repo.search(req);
-  },
+  get: req => validatePairs(req.matcher, [req.pair]).chain(() => repo.get(req)),
+  mget: req =>
+    validatePairs(req.matcher, req.pairs).chain(() => repo.mget(req)),
+  search: req => repo.search(req),
 });

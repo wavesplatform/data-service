@@ -13,7 +13,7 @@ describe('Candles', () => {
   const service = create({
     drivers: { pg: createPgDriver(options) },
     emitEvent: () => () => null,
-    validatePair: () => taskOf(undefined),
+    validatePairs: () => taskOf(undefined),
   });
 
   describe('search all candles between 2017-05-26 00:00:00 and 2017-05-26 23:59:59', () => {

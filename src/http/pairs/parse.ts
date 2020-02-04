@@ -20,6 +20,11 @@ const matcherParser: Parser<string | undefined> = compose(
   defaultTo(options.matcher.defaultMatcherAddress)
 );
 
+export const isMgetRequest = (
+  req: PairsMgetRequest | PairsServiceSearchRequest
+): req is PairsMgetRequest =>
+  typeof req === 'object' && req !== null && req.hasOwnProperty('pairs');
+
 export const get = ({
   params,
   query,

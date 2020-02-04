@@ -1,9 +1,5 @@
 import * as Router from 'koa-router';
-import { has } from 'ramda';
-import {
-  AssetsServiceMgetRequest,
-  AssetsServiceSearchRequest,
-} from '../../services/assets';
+import { AssetsServiceMgetRequest } from '../../services/assets';
 import { AssetsService } from '../../services/assets';
 import { asset } from '../../types';
 import { createHttpHandler } from '../_common';
@@ -16,9 +12,8 @@ import { get as parseGet, mgetOrSearch as parseMgetOrSearch } from './parse';
 
 const subrouter: Router = new Router();
 
-const isMgetRequest = (
-  req: AssetsServiceMgetRequest | AssetsServiceSearchRequest
-): req is AssetsServiceMgetRequest => has('ids', req);
+const isMgetRequest = (req: unknown): req is AssetsServiceMgetRequest =>
+  typeof req === 'object' && req !== null && req.hasOwnProperty('ids');
 
 export default ({ get, mget, search }: AssetsService): Router => {
   return subrouter

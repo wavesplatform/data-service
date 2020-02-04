@@ -227,8 +227,8 @@ export default ({
       );
       const pairsWithAsyncValidation = createPairsService(
         pairsRepo,
-        (matcher: string, pair: AssetIdsPair) =>
-          validatePairs(assets.mget, pairOrderingService)(matcher, [pair])
+        (matcher: string, pairs: AssetIdsPair[]) =>
+          validatePairs(assets.mget, pairOrderingService)(matcher, pairs)
       );
 
       const candlesRepo = createCandlesRepo(commonDeps);
@@ -237,8 +237,8 @@ export default ({
       );
       const candlesWithAsyncValidation = createCandlesService(
         candlesRepo,
-        (matcher: string, pair: AssetIdsPair) =>
-          validatePairs(assets.mget, pairOrderingService)(matcher, [pair])
+        (matcher: string, pairs: AssetIdsPair[]) =>
+          validatePairs(assets.mget, pairOrderingService)(matcher, pairs)
       );
 
       // specific init services

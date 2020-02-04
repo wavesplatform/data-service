@@ -1,5 +1,5 @@
 import { Result, Ok as ok, Error as error } from 'folktale/result';
-import { isNil, has } from 'ramda';
+import { isNil } from 'ramda';
 import { ParseError } from '../../../errorHandling';
 import { parseFilterValues } from '../../_common/filters';
 import commonFilters from '../../_common/filters/filters';
@@ -39,8 +39,8 @@ export const get = ({
   }
 };
 
-const isMgetRequest = (req: unknown): req is PairsMgetRequest =>
-  has('pairs', req) && has('matcher', req);
+export const isMgetRequest = (req: unknown): req is PairsMgetRequest =>
+  typeof req === 'object' && req !== null && req.hasOwnProperty('pairs');
 
 export const mgetOrSearch = ({
   params,

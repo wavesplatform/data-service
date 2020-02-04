@@ -1,5 +1,4 @@
 import { Result, Error as error, Ok as ok } from 'folktale/result';
-import { has } from 'ramda';
 import * as Router from 'koa-router';
 
 import { ParseError } from '../../errorHandling';
@@ -24,9 +23,8 @@ import {
 } from '../_common/serialize';
 import { postToGet } from '../_common/postToGet';
 
-export const isMgetRequest = <SearchRequest>(
-  req: ServiceMgetRequest | SearchRequest
-): req is ServiceMgetRequest => has('ids', req);
+export const isMgetRequest = (req: unknown): req is ServiceMgetRequest =>
+  typeof req === 'object' && req !== null && req.hasOwnProperty('ids');
 
 export const parseGet = ({
   params,

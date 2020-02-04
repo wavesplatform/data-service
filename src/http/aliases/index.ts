@@ -1,10 +1,6 @@
 import * as Router from 'koa-router';
-import { has } from 'ramda';
 import { AliasesService } from '../../services/aliases';
-import {
-  AliasesServiceMgetRequest,
-  AliasesServiceSearchRequest,
-} from '../../services/aliases';
+import { AliasesServiceMgetRequest } from '../../services/aliases';
 import { alias } from '../../types';
 import { createHttpHandler } from '../_common';
 import {
@@ -16,9 +12,8 @@ import { get as parseGet, mgetOrSearch as parseMgetOrSearch } from './parse';
 
 const subrouter: Router = new Router();
 
-const isMgetRequest = (
-  req: AliasesServiceMgetRequest | AliasesServiceSearchRequest
-): req is AliasesServiceMgetRequest => has('ids', req);
+const isMgetRequest = (req: unknown): req is AliasesServiceMgetRequest =>
+  typeof req === 'object' && req !== null && req.hasOwnProperty('ids');
 
 export default ({ get, mget, search }: AliasesService): Router => {
   return subrouter
