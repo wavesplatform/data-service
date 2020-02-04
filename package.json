@@ -49,7 +49,7 @@
     "@koa/cors": "^2.2.3",
     "@waves/assets-pairs-order": "^4.0.0",
     "@waves/data-entities": "^1.8.0",
-    "@waves/parse-json-bignumber": "^1.0.1",
+    "@waves/parse-json-bignumber": "^1.0.3",
     "chalk": "^2.3.2",
     "check-env": "^1.3.0",
     "folktale": "^2.1.0",

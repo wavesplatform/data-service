@@ -18,4 +18,4 @@ export const stringify = (lsnFormat: LSNFormat) =>
     stringify: (bn: BigNumber) =>
       lsnFormat === LSNFormat.Number ? bn.toFixed() : `"${bn.toString()}"`,
     parse: toBigNumber,
-  }).stringify as (data: any) => string | undefined;
+  }).stringify;
