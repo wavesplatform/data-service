@@ -19,12 +19,11 @@ const selectFromFiltered = filtered =>
 
       asset_id: 'a.asset_id',
       min_sponsored_asset_fee: pg.raw(
-        't.min_sponsored_asset_fee * 10^(-dec.decimals)'
+        't.min_sponsored_asset_fee * 10^(-a.decimals)'
       ),
     })
     .leftJoin('txs', 'txs.uid', 't.tx_uid')
     .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid')
-    .leftJoin({ a: 'assets' }, 'a.uid', 't.asset_uid')
-    .leftJoin({ dec: 'txs_3' }, 'dec.asset_uid', '=', 't.asset_uid');
+    .leftJoin({ a: 'assets' }, 'a.uid', 't.asset_uid');
 
 module.exports = { select, selectFromFiltered };
