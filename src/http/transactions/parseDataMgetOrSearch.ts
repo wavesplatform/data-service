@@ -49,7 +49,12 @@ function parseValue(
   if (type === DataEntryType.Boolean) return parseBool(value);
   else if (type === DataEntryType.Integer) {
     try {
-      return ok(new BigNumber(value));
+      const v = new BigNumber(value);
+      if (v.isNaN()) {
+        throw new Error('Provided value is not a number');
+      } else {
+        return ok(v);
+      }
     } catch (e) {
       return error(new ParseError(e));
     }
