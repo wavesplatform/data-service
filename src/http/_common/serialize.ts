@@ -23,11 +23,13 @@ export const mget = <T, Res extends Serializable<string, any>>(
 ) => (ms: Maybe<T>[]): HttpResponse =>
   HttpResponse.Ok(
     stringify(lsnFormat)(
-      ms.map(maybe =>
-        maybe.matchWith({
-          Just: ({ value }) => transform(value),
-          Nothing: () => transform(null),
-        })
+      list(
+        ms.map(maybe =>
+          maybe.matchWith({
+            Just: ({ value }) => transform(value),
+            Nothing: () => transform(null),
+          })
+        )
       )
     )
   ).withHeaders({
