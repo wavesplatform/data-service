@@ -12,10 +12,10 @@ describe('sql query results transformation', () => {
         volume_waves: 10.2,
       })
     ).toEqual({
-      amountAssetId: '111',
+      amountAsset: '111',
       firstPrice: 1.2,
       lastPrice: 2.1,
-      priceAssetId: '222',
+      priceAsset: '222',
       volume: 100.1,
       volumeWaves: 10.2,
     });
