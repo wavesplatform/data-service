@@ -1,6 +1,6 @@
 import { Ok as ok } from 'folktale/result';
-import { parseFilterValues } from '.';
-import { SortOrder } from '../../../services/_common';
+import { parseFilterValues } from '..';
+import { SortOrder } from '../../../../services/_common';
 
 describe('Filter values parsing', () => {
   const parseQuery = parseFilterValues({});
