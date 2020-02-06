@@ -39,7 +39,8 @@ const withGrouping = q =>
       'addr.public_key',
       't.asset_id',
       't.attachment',
-      't.tx_uid'
+      't.tx_uid',
+      'txs.uid'
     );
 
 const selectFromFiltered = pipe(

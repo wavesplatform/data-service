@@ -87,6 +87,7 @@ const selectFromFiltered = filtered =>
             );
           });
         })
+        .limit(1)
     )
     .with(
       'e_cte',
