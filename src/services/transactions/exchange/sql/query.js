@@ -80,8 +80,14 @@ const selectFromFiltered = filtered =>
           'e.order2_uid',
         ])
         .join({ e: 'txs_7' }, function() {
-          this.on('e.tx_uid', 't.tx_uid').andOn('e.order1_uid', 't.order_uid');
+          this.on('e.tx_uid', 't.tx_uid').andOn(function() {
+            this.on('e.order1_uid', 't.order_uid').orOn(
+              'e.order2_uid',
+              't.order_uid'
+            );
+          });
         })
+        .limit(1)
     )
     .with(
       'e_cte',
