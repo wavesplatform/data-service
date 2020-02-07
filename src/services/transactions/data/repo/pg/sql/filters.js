@@ -1,17 +1,36 @@
+const { curryN } = require('ramda');
 const { BigNumber } = require('@waves/data-entities');
-
-const { where } = require('../../../../../../utils/db/knex');
 
 const commonFilters = require('../../../../_common/sql/filters');
 
-const value = type => val => {
-  const v = val instanceof BigNumber ? val.toString() : val;
-  return where(`data_value_${type}`, v);
-};
+const byKey = curryN(2, (key, q) =>
+  q.clone().whereIn('t.tx_uid', function() {
+    this.select('tx_uid')
+      .from('txs_12_data')
+      .where('data_key', key);
+  })
+);
+
+const byType = curryN(2, (type, q) =>
+  q.clone().whereIn('t.tx_uid', function() {
+    this.select('tx_uid')
+      .from('txs_12_data')
+      .where('data_type', type);
+  })
+);
+
+const byValue = curryN(2, (value, q) => {
+  const v = value instanceof BigNumber ? value.toString() : value;
+  return q.clone().whereIn('t.tx_uid', function() {
+    this.select('tx_uid')
+      .from('txs_12_data')
+      .where('data_value', v);
+  });
+});
 
 module.exports = {
   ...commonFilters,
-  key: where('data_key'),
-  type: where('data_type'),
-  value,
+  key: byKey,
+  type: byType,
+  value: byValue,
 };
