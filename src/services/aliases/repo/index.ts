@@ -4,10 +4,11 @@ import { withStatementTimeout } from '../../../db/driver';
 import { AliasInfo, Repo } from '../../../types';
 
 import { CommonRepoDependencies } from '../..';
+import { WithLimit, WithSortOrder } from '../../_common';
+import { RequestWithCursor } from '../../_common/pagination';
 import { getByIdPreset } from '../../_common/presets/pg/getById';
 import { mgetByIdsPreset } from '../../_common/presets/pg/mgetByIds';
 import { searchPreset } from '../../_common/presets/pg/search';
-import { WithLimit, WithSortOrder } from '../../_common';
 
 import { serialize, deserialize, Cursor } from './cursor';
 import sql from './data/sql';
@@ -16,11 +17,14 @@ import { output } from './schema';
 
 export type AliasesGetRequest = string;
 export type AliasesMgetRequest = string[];
-export type AliasesSearchRequest = WithSortOrder &
-  WithLimit & {
-    address: string;
-    showBroken: boolean;
-  };
+export type AliasesSearchRequest = RequestWithCursor<
+  WithSortOrder &
+    WithLimit & {
+      address: string;
+      showBroken: boolean;
+    },
+  string
+>;
 
 export type AliasesRepo = Repo<
   AliasesGetRequest,

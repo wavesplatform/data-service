@@ -1,10 +1,8 @@
 import * as knex from 'knex';
-import { defaultTo } from 'ramda';
+import { compose } from 'ramda';
 import { AliasesSearchRequest } from '../../repo';
 
 const pg = knex({ client: 'pg' });
-
-const LIMIT = 1000;
 
 const selectFromSet = (aliasSet: string[] | knex.QueryBuilder) =>
   pg.select('alias', 'address', 'duplicates').from({
@@ -28,7 +26,7 @@ export default {
     selectFromSet(aliases)
       .clone()
       .toString(),
-  search: ({ address, showBroken, limit }: AliasesSearchRequest) => {
+  search: ({ address, showBroken, after, limit }: AliasesSearchRequest) => {
     const q = selectFromSet(
       pg('txs_10')
         .select('alias')
@@ -43,16 +41,18 @@ export default {
     )
       .clone()
       .orderBy('time_stamp', 'asc')
-      .limit(defaultTo(LIMIT, limit));
+      .limit(limit);
 
-    // aliases are considered broken if 'duplicates' not equal to 1
-    if (showBroken) {
-      return q.toString();
-    } else {
-      return q
-        .clone()
-        .where('duplicates', 1)
-        .toString();
-    }
+    return compose<knex.QueryBuilder, knex.QueryBuilder, string>(
+      // aliases are considered broken if 'duplicates' not equal to 1
+      q =>
+        showBroken
+          ? q.toString()
+          : q
+              .clone()
+              .where('duplicates', 1)
+              .toString(),
+      q => (after ? q.where('alias', '<', after) : q)
+    )(q);
   },
 };

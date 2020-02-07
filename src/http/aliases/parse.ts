@@ -36,6 +36,7 @@ export const mgetOrSearch = ({
     aliases: parseArrayQuery,
     address: commonFilters.query,
     showBroken: parseBool,
+    after: commonFilters.query,
   })(query).chain(fValues => {
     if (Array.isArray(fValues.aliases)) {
       return ok({ ids: fValues.aliases });
@@ -49,8 +50,9 @@ export const mgetOrSearch = ({
       return ok({
         address: fValues.address,
         showBroken: fValues.showBroken || false,
+        after: fValues.after,
         sort: fValues.sort,
-        limit: fValues.limit,
+        limit: 1000,
       });
     }
   });
