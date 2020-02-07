@@ -151,7 +151,11 @@ export enum DataEntryType {
 }
 export type TransactionInfo = {
   id: string;
+  timestamp: Date;
   type: number;
+};
+export type CommonTransactionInfo = TransactionInfo & {
+  tx_uid: BigNumber;
 };
 export type NotNullTransaction = Serializable<'transaction', TransactionInfo>;
 export type Transaction = Serializable<'transaction', TransactionInfo | null>;

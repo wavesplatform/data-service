@@ -1,7 +1,7 @@
 import { propEq } from 'ramda';
 
 import { withStatementTimeout } from '../../../../db/driver';
-import { TransactionInfo } from '../../../../types';
+import { CommonTransactionInfo } from '../../../../types';
 import { CommonRepoDependencies } from '../../..';
 import { getByIdPreset } from '../../../_common/presets/pg/getById';
 import { mgetByIdsPreset } from '../../../_common/presets/pg/mgetByIds';
@@ -24,7 +24,7 @@ export default ({
   timeouts,
 }: CommonRepoDependencies): AllTxsRepo => {
   return {
-    get: getByIdPreset<AllTxsGetRequest, TxDbResponse, TransactionInfo>({
+    get: getByIdPreset<AllTxsGetRequest, TxDbResponse, CommonTransactionInfo>({
       name: 'transactions.all.commonData.get',
       sql: sql.get,
       resultSchema: result,
@@ -34,7 +34,7 @@ export default ({
       emitEvent,
     }),
 
-    mget: mgetByIdsPreset<string, TxDbResponse, TransactionInfo>({
+    mget: mgetByIdsPreset<string, TxDbResponse, CommonTransactionInfo>({
       name: 'transactions.all.commonData.mget',
       matchRequestResult: propEq('id'),
       sql: sql.mget,
@@ -49,7 +49,7 @@ export default ({
       Cursor,
       AllTxsSearchRequest,
       TxDbResponse,
-      TransactionInfo
+      CommonTransactionInfo
     >({
       name: 'transactions.all.commonData.search',
       sql: sql.search,

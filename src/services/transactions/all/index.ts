@@ -1,6 +1,6 @@
-import { waitAll, of as taskOf } from 'folktale/concurrency/task';
+import { waitAll, of as taskOf, Task } from 'folktale/concurrency/task';
 import { Maybe, empty as emptyOf } from 'folktale/maybe';
-import { pipe, groupBy, prop, toPairs, flatten } from 'ramda';
+import { pipe, groupBy, toPairs, flatten, sort, indexBy } from 'ramda';
 
 import { AppError } from '../../../errorHandling';
 import {
@@ -9,8 +9,9 @@ import {
   SearchedItems,
   ServiceMgetRequest,
   ServiceGetRequest,
+  CommonTransactionInfo,
 } from '../../../types';
-
+import { SortOrder } from '../../_common';
 import { GenesisTxsService } from '../genesis';
 import { PaymentTxsService } from '../payment';
 import { IssueTxsService } from '../issue';
@@ -115,23 +116,54 @@ export default (repo: AllTxsRepo) => (
       ),
 
   search: req =>
-    repo.search(req).chain((txsList: SearchedItems<TransactionInfo>) =>
+    repo.search(req).chain((txsList: SearchedItems<CommonTransactionInfo>) =>
       waitAll<AppError, Maybe<TransactionInfo>[]>(
-        pipe(groupBy(prop('type') as any), toPairs, tuples =>
-          tuples.map(([type, txs]) => {
-            return txsServices[
-              (type as unknown) as keyof AllTxsServiceDep
-            ].mget({
-              ids: ((txs as unknown) as TransactionInfo[]).map(prop('id')),
-              decimalsFormat: req.decimalsFormat,
-            });
-          })
+        pipe<
+          CommonTransactionInfo[],
+          Record<string, CommonTransactionInfo[]>,
+          [string, CommonTransactionInfo[]][],
+          Task<AppError, Maybe<TransactionInfo>[]>[]
+        >(
+          groupBy(t => String(t.type)),
+          toPairs,
+          tuples =>
+            tuples.map(([type, txs]) => {
+              return txsServices[
+                (type as unknown) as keyof AllTxsServiceDep
+              ].mget({
+                ids: txs.map(t => t.id),
+                decimalsFormat: req.decimalsFormat,
+              });
+            })
         )(txsList.items)
-      ).map(txs => ({
-        ...txsList,
-        items: (flatten(
-          txs.map(ts => ts.map(m => m.unsafeGet()))
-        ) as unknown) as TransactionInfo[],
-      }))
+      )
+        .map(mss => flatten<Maybe<TransactionInfo>>(mss))
+        .map(ms =>
+          ms
+            .filter(m =>
+              m.matchWith({
+                Just: () => true,
+                Nothing: () => false,
+              })
+            )
+            .map(m => m.unsafeGet())
+        )
+        .map(txs => {
+          const s = indexBy(
+            tx => `${tx.id}:${tx.timestamp.valueOf()}`,
+            txsList.items
+          );
+          return sort((a, b) => {
+            const aTxUid = s[`${a.id}:${a.timestamp.valueOf()}`]['tx_uid'];
+            const bTxUid = s[`${b.id}:${b.timestamp.valueOf()}`]['tx_uid'];
+            return req.sort === SortOrder.Ascending
+              ? aTxUid.minus(bTxUid).toNumber()
+              : bTxUid.minus(aTxUid).toNumber();
+          }, txs);
+        })
+        .map(txs => ({
+          ...txsList,
+          items: txs,
+        }))
     ),
 });
