@@ -32,11 +32,7 @@ const selectFromFiltered = filtered =>
     .leftJoin({ td: 'txs_12_data' }, 'td.tx_uid', 't.tx_uid')
     .whereIn('t.tx_uid', filtered);
 
-const select = pg
-  .select('t.tx_uid')
-  .from({ t: 'txs_12' })
-  .leftJoin({ td: 'txs_12_data' }, 't.tx_uid', 'td.tx_uid')
-  .groupBy('t.tx_uid');
+const select = pg.select('t.tx_uid').from({ t: 'txs_12' });
 
 module.exports = {
   selectFromFiltered,

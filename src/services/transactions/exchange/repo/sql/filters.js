@@ -41,7 +41,7 @@ module.exports = {
     amountAsset: byAsset('amount'),
     priceAsset: byAsset('price'),
     orderId: byOrder,
-    sortOuter: s => q => q.clone().orderBy('tx_uid', s),
+    outerSort: s => q => q.clone().orderBy('tx_uid', s),
   },
   filtersOrder: [
     ...commonFiltersOrder,
@@ -49,6 +49,6 @@ module.exports = {
     'amountAsset',
     'priceAsset',
     'orderId',
-    'sortOuter',
+    'outerSort',
   ],
 };

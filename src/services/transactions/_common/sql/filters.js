@@ -19,14 +19,16 @@ const ids = ids =>
   whereIn('t.tx_uid', function() {
     this.select('uid')
       .from('txs')
-      .whereIn('id', ids);
+      .whereIn('id', ids)
+      .limit(ids.length);
   });
 
 const sender = addr =>
   where('t.sender_uid', function() {
     this.select('uid')
       .from('addresses')
-      .where('address', addr);
+      .where('address', addr)
+      .limit(1);
   });
 
 const byTimeStamp = comparator => ts =>

@@ -51,9 +51,8 @@ const txs = (qb: knex.QueryBuilder, filteringQ: knex.QueryBuilder) =>
     .whereIn('t.tx_uid', filteringQ);
 
 export const select = (s: string) =>
-  pg
+  pg({ t: 'txs_16 ' })
     .select('t.tx_uid')
-    .from({ t: 'txs_16' })
     .orderBy('t.tx_uid', s);
 
 export const selectFromFiltered = (filtered: knex.QueryBuilder) =>

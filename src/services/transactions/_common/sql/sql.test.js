@@ -1,6 +1,6 @@
 const pg = require('knex')({ client: 'pg' });
 
-const createSql = require('../sql');
+const { createSql } = require('../sql');
 
 // sample query
 const query = pg('some_table').select('*');

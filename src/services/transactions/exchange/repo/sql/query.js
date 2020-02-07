@@ -61,34 +61,34 @@ const columns = {
   o2_matcher_fee_asset_id: pg.raw("o2.order->>'matcherFeeAssetId'"),
 };
 
-// filters would be applied on this
-const select = pg({ t: 'txs_7_orders' }).select('t.tx_uid');
+const columnsFromFiltered = filtered =>
+  filtered.columns([
+    'tx_uid',
+    'height',
+    'price',
+    'amount',
+    'sell_matcher_fee',
+    'buy_matcher_fee',
+    'sender_uid',
+    'order1_uid',
+    'order2_uid',
+  ]);
+
+const getOrMget = s => pg({ t: 'txs_7' }).orderBy('t.tx_uid', s);
+
+const getOrMgetPrepareForSelectFromFiltered = columnsFromFiltered;
+
+const search = s =>
+  pg({ t: 'txs_7_orders' })
+    .select('t.tx_uid')
+    .orderBy('t.tx_uid', s);
+
+const searchPrepareForSelectFromFiltered = filtered =>
+  columnsFromFiltered(pg({ t: 'txs_7' }).whereIn('t.tx_uid', filtered));
 
 const selectFromFiltered = filtered =>
   pg
-    .with(
-      'filtered_cte',
-      filtered
-        .columns([
-          'e.height',
-          'e.price',
-          'e.amount',
-          'e.sell_matcher_fee',
-          'e.buy_matcher_fee',
-          'e.sender_uid',
-          'e.order1_uid',
-          'e.order2_uid',
-        ])
-        .join({ e: 'txs_7' }, function() {
-          this.on('e.tx_uid', 't.tx_uid').andOn(function() {
-            this.on('e.order1_uid', 't.order_uid').orOn(
-              'e.order2_uid',
-              't.order_uid'
-            );
-          });
-        })
-        .limit(1)
-    )
+    .with('filtered_cte', filtered)
     .with(
       'e_cte',
       pg({ t: 'filtered_cte' })
@@ -130,6 +130,9 @@ const selectFromFiltered = filtered =>
     .leftJoin({ p_dec: 'assets' }, 't.price_asset', 'p_dec.asset_id');
 
 module.exports = {
-  select,
+  getOrMget,
+  getOrMgetPrepareForSelectFromFiltered,
+  search,
+  searchPrepareForSelectFromFiltered,
   selectFromFiltered,
 };

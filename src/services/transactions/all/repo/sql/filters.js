@@ -13,7 +13,8 @@ const ids = ids =>
   whereIn('t.uid', function() {
     this.select('uid')
       .from('txs')
-      .whereIn('id', ids);
+      .whereIn('id', ids)
+      .limit(ids.length);
   });
 
 const byTimeStamp = comparator => ts =>
