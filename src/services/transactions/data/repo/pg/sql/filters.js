@@ -19,12 +19,12 @@ const byType = curryN(2, (type, q) =>
   })
 );
 
-const byValue = curryN(2, (value, q) => {
+const byValue = curryN(3, (type, value, q) => {
   const v = value instanceof BigNumber ? value.toString() : value;
   return q.clone().whereIn('t.tx_uid', function() {
     this.select('tx_uid')
       .from('txs_12_data')
-      .where('data_value', v);
+      .where(`data_value_${type}`, v);
   });
 });
 
