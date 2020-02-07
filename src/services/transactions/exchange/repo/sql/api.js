@@ -49,7 +49,13 @@ const createApi = ({ filters: F }) => ({
     ];
 
     // { [fName]: fValue }
-    const withDefaults = compose(pick(fNames), merge(defaultValues))(fValues);
+    const withDefaults = compose(
+      pick(fNames),
+      merge({
+        ...defaultValues,
+        limit: fValues.limit * 2, // hack for filtering in txs_7_orders - there are 2 rows on each tx
+      })
+    )(fValues);
 
     const sort = defaultTo(defaultValues.sort, fValues.sort);
 
