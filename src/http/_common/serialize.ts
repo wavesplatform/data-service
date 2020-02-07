@@ -5,20 +5,20 @@ import { LSNFormat } from '../types';
 import { HttpResponse } from './types';
 import { contentTypeWithLSN } from './utils';
 
-export const get = <T, Res extends Serializable<string, any>>(
-  transform: (t: T | null) => Res,
+export const get = <T extends R, Res extends Serializable<string, R>, R = T>(
+  toSerializable: (t: T | null) => Res,
   lsnFormat: LSNFormat = LSNFormat.String
 ) => (m: Maybe<T>): HttpResponse =>
   m.matchWith({
     Just: ({ value }) =>
-      HttpResponse.Ok(stringify(lsnFormat)(transform(value))).withHeaders({
+      HttpResponse.Ok(stringify(lsnFormat)(toSerializable(value))).withHeaders({
         'Content-Type': contentTypeWithLSN(lsnFormat),
       }),
     Nothing: () => HttpResponse.NotFound(),
   });
 
-export const mget = <T, Res extends Serializable<string, any>>(
-  transform: (t: T | null) => Res,
+export const mget = <T extends R, Res extends Serializable<string, R>, R = T>(
+  toSerializable: (t: T | null) => Res,
   lsnFormat: LSNFormat = LSNFormat.String
 ) => (ms: Maybe<T>[]): HttpResponse =>
   HttpResponse.Ok(
@@ -26,8 +26,8 @@ export const mget = <T, Res extends Serializable<string, any>>(
       list(
         ms.map(maybe =>
           maybe.matchWith({
-            Just: ({ value }) => transform(value),
-            Nothing: () => transform(null),
+            Just: ({ value }) => toSerializable(value),
+            Nothing: () => toSerializable(null),
           })
         )
       )
@@ -36,14 +36,14 @@ export const mget = <T, Res extends Serializable<string, any>>(
     'Content-Type': contentTypeWithLSN(lsnFormat),
   });
 
-export const search = <T, Res extends Serializable<string, any>>(
-  transform: (t: T | null) => Res,
+export const search = <T extends R, Res extends Serializable<string, R>, R = T>(
+  toSerializable: (t: T | null) => Res,
   lsnFormat: LSNFormat = LSNFormat.String
 ) => (data: SearchedItems<T>): HttpResponse =>
   HttpResponse.Ok(
     stringify(lsnFormat)(
       list(
-        data.items.map(a => transform(a)),
+        data.items.map(a => toSerializable(a)),
         {
           isLastPage: data.isLastPage,
           lastCursor: data.lastCursor,

@@ -33,14 +33,19 @@ const mgetOrSearchHttpHandler = (pairsService: PairsService) =>
         ? pairsService
             .mget(req)
             .map(
-              mgetSerializer<PairInfo & AssetIdsPair, Pair>(
+              mgetSerializer<PairInfo & AssetIdsPair, Pair, PairInfo>(
                 pairWithData,
                 lsnFormat
               )
             )
         : pairsService
             .search(req)
-            .map(serachSerializer(pairWithData, lsnFormat)),
+            .map(
+              serachSerializer<PairInfo & AssetIdsPair, Pair, PairInfo>(
+                pairWithData,
+                lsnFormat
+              )
+            ),
     parseMgetOrSearch
   );
 
@@ -50,7 +55,14 @@ export default (pairsService: PairsService) =>
       '/pairs/:amountAsset/:priceAsset',
       createHttpHandler(
         (req, lsnFormat) =>
-          pairsService.get(req).map(getSerializer(pairWithData, lsnFormat)),
+          pairsService
+            .get(req)
+            .map(
+              getSerializer<PairInfo & AssetIdsPair, Pair, PairInfo>(
+                pairWithData,
+                lsnFormat
+              )
+            ),
         parseGet
       )
     )

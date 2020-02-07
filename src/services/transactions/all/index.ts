@@ -35,6 +35,7 @@ import {
   AllTxsSearchRequest,
 } from './repo/types';
 import { WithDecimalsFormat, DecimalsFormat } from '../../types';
+import { collect } from '../../../utils/collection';
 
 type AllTxsServiceDep = {
   1: GenesisTxsService;
@@ -138,24 +139,15 @@ export default (repo: AllTxsRepo) => (
         )(txsList.items)
       )
         .map(mss => flatten<Maybe<TransactionInfo>>(mss))
-        .map(ms =>
-          ms
-            .filter(m =>
-              m.matchWith({
-                Just: () => true,
-                Nothing: () => false,
-              })
-            )
-            .map(m => m.unsafeGet())
-        )
+        .map(ms => collect(m => m.getOrElse(undefined), ms))
         .map(txs => {
           const s = indexBy(
             tx => `${tx.id}:${tx.timestamp.valueOf()}`,
             txsList.items
           );
           return sort((a, b) => {
-            const aTxUid = s[`${a.id}:${a.timestamp.valueOf()}`]['tx_uid'];
-            const bTxUid = s[`${b.id}:${b.timestamp.valueOf()}`]['tx_uid'];
+            const aTxUid = s[`${a.id}:${a.timestamp.valueOf()}`]['txUid'];
+            const bTxUid = s[`${b.id}:${b.timestamp.valueOf()}`]['txUid'];
             return req.sort === SortOrder.Ascending
               ? aTxUid.minus(bTxUid).toNumber()
               : bTxUid.minus(aTxUid).toNumber();

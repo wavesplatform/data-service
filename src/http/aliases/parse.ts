@@ -12,6 +12,8 @@ import { HttpRequest } from '../_common/types';
 import { parseArrayQuery } from '../../utils/parsers/parseArrayQuery';
 import { parseBool } from '../../utils/parsers/parseBool';
 
+const LIMIT = 1000;
+
 export const get = ({
   params,
 }: HttpRequest<['id']>): Result<ParseError, AliasesServiceGetRequest> => {
@@ -52,7 +54,7 @@ export const mgetOrSearch = ({
         showBroken: fValues.showBroken || false,
         after: fValues.after,
         sort: fValues.sort,
-        limit: 1000,
+        limit: LIMIT,
       });
     }
   });

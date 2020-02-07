@@ -1,7 +1,7 @@
 const { compose, defaultTo, merge, pick, pipe } = require('ramda');
 
 const { pickBindFilters } = require('../../../../../utils/db');
-const { defaultValues } = require('../../../_common/sql');
+const defaultValues = require('../../../_common/sql/defaults');
 const { filters } = require('./filters');
 const {
   getOrMget,
@@ -21,7 +21,7 @@ const createApi = ({ filters: F }) => ({
       getOrMgetPrepareForSelectFromFiltered,
       selectFromFiltered,
       String
-    )(getOrMget(defaultValues.sort)),
+    )(getOrMget(defaultValues.SORT)),
 
   mget: ids =>
     pipe(
@@ -30,7 +30,7 @@ const createApi = ({ filters: F }) => ({
       getOrMgetPrepareForSelectFromFiltered,
       selectFromFiltered,
       String
-    )(getOrMget(defaultValues.sort)),
+    )(getOrMget(defaultValues.SORT)),
 
   search: fValues => {
     const fNames = [
@@ -53,11 +53,11 @@ const createApi = ({ filters: F }) => ({
       pick(fNames),
       merge({
         ...defaultValues,
-        limit: defaultValues.limit * 2, // hack for filtering in txs_7_orders - there are 2 rows on each tx
+        limit: defaultValues.LIMIT * 2, // hack for filtering in txs_7_orders - there are 2 rows on each tx
       })
     )({ ...fValues, limit: fValues.limit * 2 });
 
-    const sort = defaultTo(defaultValues.sort, fValues.sort);
+    const sort = defaultTo(defaultValues.SORT, fValues.sort);
 
     const fs = pickBindFilters(F, fNames, withDefaults);
     const fQuery = pipe(...fs)(search(sort));

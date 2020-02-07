@@ -1,6 +1,7 @@
 import * as Router from 'koa-router';
 
 import { PairsService } from '../../../services/pairs';
+import { PairInfo, AssetIdsPair, Pair } from '../../../types';
 import { createHttpHandler } from '../../_common';
 import {
   get as getSerializer,
@@ -21,10 +22,22 @@ const mgetOrSearchHttpHandler = (pairsService: PairsService) =>
   createHttpHandler(
     (req, lsnFormat) =>
       isMgetRequest(req)
-        ? pairsService.mget(req).map(mgetSerializer(pairWithData, lsnFormat))
+        ? pairsService
+            .mget(req)
+            .map(
+              mgetSerializer<PairInfo & AssetIdsPair, Pair, PairInfo>(
+                pairWithData,
+                lsnFormat
+              )
+            )
         : pairsService
             .search(req)
-            .map(searchSerializer(pairWithData, lsnFormat)),
+            .map(
+              searchSerializer<PairInfo & AssetIdsPair, Pair, PairInfo>(
+                pairWithData,
+                lsnFormat
+              )
+            ),
     parseMgetOrSearch
   );
 
@@ -34,7 +47,14 @@ export default (pairsService: PairsService) =>
       '/pairs/:amountAsset/:priceAsset',
       createHttpHandler(
         (req, lsnFormat) =>
-          pairsService.get(req).map(getSerializer(pairWithData, lsnFormat)),
+          pairsService
+            .get(req)
+            .map(
+              getSerializer<PairInfo & AssetIdsPair, Pair, PairInfo>(
+                pairWithData,
+                lsnFormat
+              )
+            ),
         parseGet
       )
     )

@@ -12,8 +12,7 @@ const {
 
 const commonFiltersOrder = require('./filtersOrder');
 const commonFilters = require('./filters');
-
-const defaultValues = { limit: 100, sort: 'desc' };
+const defaultValues = require('./defaults');
 
 const createSql = ({
   query,
@@ -37,7 +36,7 @@ const createSql = ({
         q => queryAfterFiltersWithDefaults.get(q, id),
         filters.limit(1),
         filters.id(id),
-        filters.sort(defaultValues.sort)
+        filters.sort(defaultValues.SORT)
       )(query),
 
     mget: ids =>
@@ -46,7 +45,7 @@ const createSql = ({
         q => queryAfterFiltersWithDefaults.mget(q, ids),
         filters.limit(ids.length),
         filters.ids(ids),
-        filters.sort(defaultValues.sort)
+        filters.sort(defaultValues.SORT)
       )(query),
 
     search: fValues => {

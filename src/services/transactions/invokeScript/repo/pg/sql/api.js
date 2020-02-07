@@ -1,7 +1,7 @@
 const { compose, defaultTo, merge, pick, pipe } = require('ramda');
 
 const { pickBindFilters } = require('../../../../../../utils/db');
-const { defaultValues } = require('../../../../_common/sql');
+const defaultValues = require('../../../../_common/sql/defaults');
 const filters = require('./filters').default;
 const { select, selectFromFiltered } = require('./query');
 
@@ -14,7 +14,7 @@ const createApi = ({ filters: F }) => ({
       F.limit(1),
       selectFromFiltered,
       String
-    )(select(defaultValues.sort)),
+    )(select(defaultValues.SORT)),
 
   mget: ids =>
     pipe(
@@ -22,7 +22,7 @@ const createApi = ({ filters: F }) => ({
       F.limit(ids.length),
       selectFromFiltered,
       String
-    )(select(defaultValues.sort)),
+    )(select(defaultValues.SORT)),
 
   search: fValues => {
     const fNames = [
@@ -41,7 +41,7 @@ const createApi = ({ filters: F }) => ({
     // { [fName]: fValue }
     const withDefaults = compose(pick(fNames), merge(defaultValues))(fValues);
 
-    const sort = defaultTo(defaultValues.sort, fValues.sort);
+    const sort = defaultTo(defaultValues.SORT, fValues.sort);
 
     const fs = pickBindFilters(F, fNames, withDefaults);
     const fQuery = pipe(...fs)(select(sort));

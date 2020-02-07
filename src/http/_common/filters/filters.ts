@@ -38,6 +38,7 @@ export default {
   timeStart: parseDate,
   timeEnd: parseDate,
   limit: limitFilter,
+  sender: parseTrimmedStringIfDefined,
   sort: sortFilter,
   after: afterFilter,
   ids: parseArrayQuery,

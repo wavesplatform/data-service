@@ -155,7 +155,7 @@ export type TransactionInfo = {
   type: number;
 };
 export type CommonTransactionInfo = TransactionInfo & {
-  tx_uid: BigNumber;
+  txUid: BigNumber;
 };
 export type NotNullTransaction = Serializable<'transaction', TransactionInfo>;
 export type Transaction = Serializable<'transaction', TransactionInfo | null>;

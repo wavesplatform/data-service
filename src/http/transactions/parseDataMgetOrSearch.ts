@@ -82,7 +82,6 @@ export const parseDataMgetOrSearch = ({
   }
 
   return parseFilterValues({
-    sender: commonFilters.query,
     key: commonFilters.query,
     type: parseDataEntryType,
     value: commonFilters.query,
