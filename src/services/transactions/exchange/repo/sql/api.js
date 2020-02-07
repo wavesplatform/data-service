@@ -40,9 +40,11 @@ const createApi = ({ filters: F }) => ({
       'timeEnd',
       'sender',
       // specific attributes
-      'dapp',
-      'function',
-      // limit
+      'matcher',
+      'orderId',
+      'amountAsset',
+      'priceAsset',
+      // common
       'limit',
     ];
 
