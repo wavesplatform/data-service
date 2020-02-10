@@ -11,7 +11,6 @@ import {
   parseMgetOrSearch,
 } from './_common';
 import { parseDataMgetOrSearch } from './parseDataMgetOrSearch';
-import { parseGenesisMgetOrSearch } from './parseGenesisMgetOrSearch';
 
 const createParseRequest = <SearchRequest>(
   customFilters: Record<string, Parser<any>> = {}
@@ -72,10 +71,9 @@ export default (txsServices: ServiceMesh['transactions']) => {
     new Router(),
     '/transactions/genesis',
     txsServices['genesis'],
-    {
-      get: parseGet,
-      mgetOrSearch: parseGenesisMgetOrSearch,
-    }
+    createParseRequest({
+      recipient: commonFilters.query,
+    })
   );
 
   const invokeScript = createTransactionHttpHandlers(

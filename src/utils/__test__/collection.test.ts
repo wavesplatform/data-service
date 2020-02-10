@@ -6,9 +6,10 @@ describe('collect function', () => {
     expect(collect(identity, [])).toEqual([]);
   });
 
-  it('should return arr as partial input arr, when fn does not return undefined', () => {
+  it('should return full copy of input arr, when fn does not any changes and does not return undefined', () => {
     const arr = [1, 2, 3];
     expect(collect(identity, arr)).toEqual(arr);
+    expect(collect(identity, arr)).not.toBe(arr);
   });
 
   it('should not mutate input array', () => {
