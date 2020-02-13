@@ -31,7 +31,7 @@ export const mgetByIdsPreset = <
     request?: Id[]
   ) => ResponseTransformed;
   sql: (r: Id[]) => string;
-  matchRequestResult: (req: Id[], res: ResponseRaw) => boolean;
+  matchRequestResult: (req: Id, res: ResponseRaw) => boolean;
 }) => ({ pg, emitEvent }: ServicePresetInitOptions) =>
   mget<Id[], Id[], ResponseRaw, List<Result>>({
     transformInput: identity,

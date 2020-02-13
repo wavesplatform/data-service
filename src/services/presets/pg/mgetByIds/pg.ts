@@ -1,8 +1,10 @@
-import { Task } from 'folktale/concurrency/task';
+import { Task, of as task } from 'folktale/concurrency/task';
 import { Maybe } from 'folktale/maybe';
 import { PgDriver } from '../../../../db/driver';
 import { matchRequestsResults } from '../../../../utils/db';
 import { DbError, Timeout, addMeta } from '../../../../errorHandling';
+
+import { isEmpty } from 'ramda';
 
 export const getData = <ResponseRaw, Id = string>({
   matchRequestResult,
@@ -12,10 +14,12 @@ export const getData = <ResponseRaw, Id = string>({
 }: {
   name: string;
   sql: (req: Id[]) => string;
-  matchRequestResult: (req: Id[], res: ResponseRaw) => boolean;
+  matchRequestResult: (req: Id, res: ResponseRaw) => boolean;
   pg: PgDriver;
 }) => (req: Id[]): Task<DbError | Timeout, Maybe<ResponseRaw>[]> =>
-  pg
-    .any<ResponseRaw>(sql(req))
-    .map(responses => matchRequestsResults(matchRequestResult, req, responses))
-    .mapRejected(addMeta({ request: name, params: req }));
+  isEmpty(req)
+    ? task([])
+    : pg
+        .any<ResponseRaw>(sql(req))
+        .map(responses => matchRequestsResults(matchRequestResult, req, responses))
+        .mapRejected(addMeta({ request: name, params: req }));
