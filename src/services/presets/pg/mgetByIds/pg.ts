@@ -14,7 +14,7 @@ export const getData = <ResponseRaw, Id = string>({
 }: {
   name: string;
   sql: (req: Id[]) => string;
-  matchRequestResult: (req: Id[], res: ResponseRaw) => boolean;
+  matchRequestResult: (req: Id, res: ResponseRaw) => boolean;
   pg: PgDriver;
 }) => (req: Id[]): Task<DbError | Timeout, Maybe<ResponseRaw>[]> =>
   isEmpty(req)
