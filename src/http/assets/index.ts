@@ -3,6 +3,7 @@ import { AssetsServiceMgetRequest } from '../../services/assets';
 import { AssetsService } from '../../services/assets';
 import { asset } from '../../types';
 import { createHttpHandler } from '../_common';
+import { postToGet } from '../_common/postToGet';
 import {
   get as serializeGet,
   mget as serializeMget,
@@ -15,23 +16,25 @@ const subrouter: Router = new Router();
 const isMgetRequest = (req: unknown): req is AssetsServiceMgetRequest =>
   typeof req === 'object' && req !== null && req.hasOwnProperty('ids');
 
-export default ({ get, mget, search }: AssetsService): Router => {
+const mgetOrSearchHandler = (assetsService: AssetsService) =>
+  createHttpHandler(
+    (req, lsnFormat) =>
+      isMgetRequest(req)
+        ? assetsService.mget(req).map(serializeMget(asset, lsnFormat))
+        : assetsService.search(req).map(serializeSearch(asset, lsnFormat)),
+    parseMgetOrSearch
+  );
+
+export default (assetsService: AssetsService): Router => {
   return subrouter
     .get(
       '/assets/:id',
       createHttpHandler(
-        (req, lsnFormat) => get(req).map(serializeGet(asset, lsnFormat)),
+        (req, lsnFormat) =>
+          assetsService.get(req).map(serializeGet(asset, lsnFormat)),
         parseGet
       )
     )
-    .get(
-      '/assets',
-      createHttpHandler(
-        (req, lsnFormat) =>
-          isMgetRequest(req)
-            ? mget(req).map(serializeMget(asset, lsnFormat))
-            : search(req).map(serializeSearch(asset, lsnFormat)),
-        parseMgetOrSearch
-      )
-    );
+    .get('/assets', mgetOrSearchHandler(assetsService))
+    .post('/assets', postToGet(mgetOrSearchHandler(assetsService)));
 };
