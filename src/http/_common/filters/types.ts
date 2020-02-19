@@ -15,4 +15,4 @@ export type CommonFilters = {
   query: Parser<string | undefined>;
 };
 
-export type Parser<T, R = string> = (raw?: R) => Result<ParseError, T>;
+export type Parser<Res, Raw = string> = (raw?: Raw) => Result<ParseError, Res>;

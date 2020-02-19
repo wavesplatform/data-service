@@ -5,25 +5,63 @@ import { parseFilterValues } from '../_common/filters';
 import { Parser } from '../_common/filters/types';
 import commonFilters from '../_common/filters/filters';
 import { HttpRequest } from '../_common/types';
+import { WithMatcher } from '../../services/_common';
 import {
   PairsGetRequest,
   PairsMgetRequest,
+  SearchByAssetRequest,
+  SearchCommonRequest,
+  SearchByAssetsRequest,
 } from '../../services/pairs/repo/types';
 import { PairsServiceSearchRequest } from '../../services/pairs';
 import { parseArrayQuery, parseBool, parsePairs } from '../../utils/parsers';
 
 import { loadConfig } from '../../loadConfig';
+
 const options = loadConfig();
 
-const matcherParser: Parser<string | undefined> = compose(
-  commonFilters.query,
+const matcherParser: Parser<string> = compose<
+  string | undefined,
+  string,
+  Result<ParseError, string>
+>(
+  commonFilters.query as Parser<string>,
   defaultTo(options.matcher.defaultMatcherAddress)
 );
 
-export const isMgetRequest = (
-  req: PairsMgetRequest | PairsServiceSearchRequest
-): req is PairsMgetRequest =>
-  typeof req === 'object' && req !== null && req.hasOwnProperty('pairs');
+const withMatcher = (req: any): req is WithMatcher =>
+  'matcher' in req && typeof req.matcher !== 'undefined';
+
+export const isMgetRequest = (req: any): req is PairsMgetRequest =>
+  'pairs' in req && Array.isArray(req.pairs) && withMatcher(req);
+
+const isSearchCommonRequest = (req: any): req is SearchCommonRequest =>
+  'matcher' in req && typeof req.matcher === 'string';
+
+const isSearchByAssetRequest = (req: any): req is SearchByAssetRequest =>
+  'search_by_asset' in req && typeof req.search_by_asset === 'string';
+
+const isSearchByAssetsRequest = (req: any): req is SearchByAssetsRequest =>
+  'search_by_assets' in req && typeof req.search_by_assets === 'string';
+
+type ParseMatchExactly = Parser<boolean[] | undefined>;
+
+const parseMatchExactly: ParseMatchExactly = (matchExactlyRaw?: string) =>
+  isNil(matchExactlyRaw)
+    ? ok(undefined)
+    : parseArrayQuery(matchExactlyRaw).chain(ss =>
+        typeof ss === 'undefined'
+          ? ok(undefined)
+          : ss.map(parseBool).reduceRight((acc, cur) => {
+              return acc.chain(a =>
+                cur.matchWith({
+                  Ok: ({ value }) =>
+                    typeof value === 'undefined' ? ok(a) : ok([...a, value]),
+                  Error: ({ value }) => error(value),
+                })
+              );
+            }, ok([] as boolean[]))
+      );
 
 export const get = ({
   params,
@@ -43,10 +81,6 @@ export const get = ({
   return parseFilterValues({
     matcher: matcherParser,
   })(query).chain(fValues => {
-    if (isNil(fValues.matcher)) {
-      return error(new ParseError(new Error('matcher is not set')));
-    }
-
     return ok({
       matcher: fValues.matcher,
       pair: {
@@ -70,39 +104,23 @@ export const mgetOrSearch = ({
   return parseFilterValues({
     matcher: matcherParser,
     pairs: parsePairs,
-    match_exactly: parseBool,
+    match_exactly: parseMatchExactly,
     search_by_asset: commonFilters.query,
     search_by_assets: parseArrayQuery,
   })(query).chain(fValues => {
-    if (isNil(fValues.matcher)) {
-      return error(new ParseError(new Error('matcher is not set')));
-    }
-
-    if (Array.isArray(fValues.pairs)) {
-      return ok({ pairs: fValues.pairs, matcher: fValues.matcher });
+    if (isMgetRequest(fValues)) {
+      return ok(fValues);
     } else {
-      if (fValues.search_by_asset) {
-        return ok({
-          matcher: fValues.matcher,
-          sort: fValues.sort,
-          limit: fValues.limit,
-          match_exactly: fValues.match_exactly,
-          search_by_asset: fValues.search_by_asset,
-        });
-      } else if (fValues.search_by_assets) {
-        return ok({
-          matcher: fValues.matcher,
-          sort: fValues.sort,
-          limit: fValues.limit,
-          match_exactly: fValues.match_exactly,
-          search_by_assets: fValues.search_by_assets,
-        });
+      if (isSearchCommonRequest(fValues)) {
+        if (isSearchByAssetRequest(fValues)) {
+          return ok(fValues);
+        } else if (isSearchByAssetsRequest(fValues)) {
+          return ok(fValues);
+        } else {
+          return ok(fValues);
+        }
       } else {
-        return ok({
-          matcher: fValues.matcher,
-          sort: fValues.sort,
-          limit: fValues.limit,
-        });
+        return error(new ParseError(new Error('Invalid request data')));
       }
     }
   });

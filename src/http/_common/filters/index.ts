@@ -5,9 +5,7 @@ import commonFilters from './filters';
 import { CommonFilters, Parser } from './types';
 
 export const parseFilterValues = <
-  Filters extends {
-    [K: string]: Parser<any, any>;
-  }
+  Filters extends Record<string, Parser<any, any>>
 >(
   filters: Filters
 ) => <
@@ -25,10 +23,11 @@ export const parseFilterValues = <
     }
 >(
   values: Partial<
+    // Parameters<Filters[K]>[0] is the 1st arg of Parser - raw value
     { [K in keyof Filters]: Parameters<Filters[K]>[0] } &
       { [K in keyof CommonFilters]: Parameters<CommonFilters[K]>[0] }
   >
-) =>
+): Result<ParseError, ParsedFilterValues> =>
   compose<
     Filters | CommonFilters,
     AllParsedFilterValues,
@@ -41,7 +40,11 @@ export const parseFilterValues = <
         (acc, cur) =>
           acc.chain(a =>
             d[cur].matchWith({
-              Ok: ({ value }) => ok({ ...a, [cur]: value }),
+              Ok: ({ value }) =>
+                ok({
+                  ...a,
+                  [cur]: value,
+                }),
               Error: ({ value }) => error(value),
             })
           ),

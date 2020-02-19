@@ -25,23 +25,15 @@ const COLUMNS = [
 ];
 
 const isSearchByAssetRequest = (
-  searchByAssetRequest: PairsSearchRequest
-): searchByAssetRequest is SearchByAssetRequest => {
-  return (
-    typeof searchByAssetRequest === 'object' &&
-    searchByAssetRequest !== null &&
-    searchByAssetRequest.hasOwnProperty('search_by_asset')
-  );
+  req: PairsSearchRequest
+): req is SearchByAssetRequest => {
+  return 'search_by_asset' in req;
 };
 
 const isSearchByAssetsRequest = (
-  searchByAssetRequest: PairsSearchRequest
-): searchByAssetRequest is SearchByAssetsRequest => {
-  return (
-    typeof searchByAssetRequest === 'object' &&
-    searchByAssetRequest !== null &&
-    searchByAssetRequest.hasOwnProperty('search_by_assets')
-  );
+  req: PairsSearchRequest
+): req is SearchByAssetsRequest => {
+  return 'search_by_assets' in req && Array.isArray(req.search_by_assets);
 };
 
 const getMatchExactly = (matchExactly: boolean[] | undefined): boolean[] => {

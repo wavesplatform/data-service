@@ -1,34 +1,27 @@
-import { PairInfo, AssetIdsPair, Repo } from '../../../types';
-import { WithLimit, WithSortOrder } from '../../_common';
+import { PairInfo, AssetIdsPair, Repo, XOR } from '../../../types';
+import { WithLimit, WithSortOrder, WithMatcher } from '../../_common';
 
 export type PairsGetRequest = {
   pair: AssetIdsPair;
-  matcher: string;
-};
+} & WithMatcher;
 
-export type PairsMgetRequest = { pairs: AssetIdsPair[]; matcher: string };
+export type PairsMgetRequest = { pairs: AssetIdsPair[] } & WithMatcher;
 
-export type SearchCommonRequest = WithSortOrder &
-  WithLimit & {
-    matcher: string;
-  };
+export type SearchCommonRequest = WithSortOrder & WithLimit & WithMatcher;
 
-export type SearchWithMatchExactly = SearchCommonRequest & {
-  match_exactly?: boolean[];
-};
-
-export type SearchByAssetRequest = SearchWithMatchExactly & {
+export type SearchByAssetRequest = SearchCommonRequest & {
   search_by_asset: string;
+  match_exactly: [boolean];
 };
 
-export type SearchByAssetsRequest = SearchWithMatchExactly & {
+export type SearchByAssetsRequest = SearchCommonRequest & {
   search_by_assets: [string, string];
+  match_exactly: [boolean] | [boolean, boolean];
 };
 
 export type PairsSearchRequest =
   | SearchCommonRequest
-  | SearchByAssetRequest
-  | SearchByAssetsRequest;
+  | XOR<SearchByAssetRequest, SearchByAssetsRequest>;
 
 export type PairsRepo = Repo<
   PairsGetRequest,

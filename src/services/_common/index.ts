@@ -13,3 +13,7 @@ export type WithSortOrder = {
 export type WithLimit = {
   limit: number;
 };
+
+export type WithMatcher = {
+  matcher: string;
+};

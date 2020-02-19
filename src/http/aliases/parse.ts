@@ -1,4 +1,3 @@
-import { isNil } from 'ramda';
 import { Result, Ok as ok, Error as error } from 'folktale/result';
 import { ParseError } from '../../errorHandling';
 import {
@@ -13,6 +12,9 @@ import { parseArrayQuery } from '../../utils/parsers/parseArrayQuery';
 import { parseBool } from '../../utils/parsers/parseBool';
 
 const LIMIT = 1000;
+
+export const isMgetRequest = (req: any): req is AliasesServiceMgetRequest =>
+  'aliases' in req && Array.isArray(req.aliases);
 
 export const get = ({
   params,
@@ -38,12 +40,11 @@ export const mgetOrSearch = ({
     aliases: parseArrayQuery,
     address: commonFilters.query,
     showBroken: parseBool,
-    after: commonFilters.query,
   })(query).chain(fValues => {
-    if (Array.isArray(fValues.aliases)) {
-      return ok({ ids: fValues.aliases });
+    if (isMgetRequest(fValues)) {
+      return ok(fValues);
     } else {
-      if (isNil(fValues.address)) {
+      if (!('address' in fValues) || typeof fValues.address === 'undefined') {
         return error(
           new ParseError(new Error('Address is incorrect or undefined'))
         );
