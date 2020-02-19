@@ -10,7 +10,7 @@ import commonFilters from '../_common/filters/filters';
 import { HttpRequest } from '../_common/types';
 
 const isMgetRequest = (req: any): req is AssetsServiceMgetRequest =>
-  'ids' in req && typeof req.ids !== 'undefined' && Array.isArray(req);
+  'ids' in req && typeof req.ids !== 'undefined' && Array.isArray(req.ids);
 
 export const get = ({
   params,
