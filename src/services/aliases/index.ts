@@ -15,7 +15,7 @@ export type AliasesServiceGetRequest = {
 };
 
 export type AliasesServiceMgetRequest = {
-  ids: AliasesMgetRequest;
+  aliases: AliasesMgetRequest;
 };
 
 export type AliasesServiceSearchRequest = AliasesSearchRequest;
@@ -34,6 +34,6 @@ export type AliasesService = {
 
 export default (repo: AliasesRepo): AliasesService => ({
   get: req => repo.get(req.id),
-  mget: req => repo.mget(req.ids),
+  mget: req => repo.mget(req.aliases),
   search: req => repo.search(req),
 });

@@ -8,7 +8,10 @@ import {
 import commonFilters from '../_common/filters/filters';
 import { parseFilterValues } from '../_common/filters';
 import { HttpRequest } from '../_common/types';
-import { parseArrayQuery } from '../../utils/parsers/parseArrayQuery';
+import {
+  parseArrayQuery,
+  ParseArrayQuery,
+} from '../../utils/parsers/parseArrayQuery';
 import { parseBool } from '../../utils/parsers/parseBool';
 
 const LIMIT = 1000;
@@ -37,7 +40,7 @@ export const mgetOrSearch = ({
   }
 
   return parseFilterValues({
-    aliases: parseArrayQuery,
+    aliases: parseArrayQuery as ParseArrayQuery, // merge function type and overloads 
     address: commonFilters.query,
     showBroken: parseBool,
   })(query).chain(fValues => {

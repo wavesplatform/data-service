@@ -36,7 +36,7 @@ describe('sql query from pairs', () => {
     expect(
       search({
         search_by_asset: '7FJhS4wyEKqsp77VCMfCZWKLSMuy1TWskYAyZ28amWFj',
-        match_exactly: [true],
+        match_exactly: [false],
         matcher: '',
         limit: 10,
         sort: SortOrder.Descending,
@@ -72,7 +72,7 @@ describe('sql query from pairs', () => {
     expect(
       search({
         search_by_assets: ['BTC', 'WAVES'],
-        match_exactly: [true, true],
+        match_exactly: [false, false],
         matcher: '',
         limit: 10,
         sort: SortOrder.Descending,
@@ -84,7 +84,7 @@ describe('sql query from pairs', () => {
     expect(
       search({
         search_by_assets: ['¯\\_(ツ)_/¯', 'WAVES'],
-        match_exactly: [true],
+        match_exactly: [false],
         matcher: '',
         limit: 10,
         sort: SortOrder.Descending,

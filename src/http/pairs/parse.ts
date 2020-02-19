@@ -15,6 +15,7 @@ import {
 } from '../../services/pairs/repo/types';
 import { PairsServiceSearchRequest } from '../../services/pairs';
 import { parseArrayQuery, parseBool, parsePairs } from '../../utils/parsers';
+import { ParseArrayQuery } from '../../utils/parsers/parseArrayQuery';
 
 import { loadConfig } from '../../loadConfig';
 
@@ -106,7 +107,7 @@ export const mgetOrSearch = ({
     pairs: parsePairs,
     match_exactly: parseMatchExactly,
     search_by_asset: commonFilters.query,
-    search_by_assets: parseArrayQuery,
+    search_by_assets: parseArrayQuery as ParseArrayQuery, // merge function type and overloads 
   })(query).chain(fValues => {
     if (isMgetRequest(fValues)) {
       return ok(fValues);
