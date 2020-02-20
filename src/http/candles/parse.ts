@@ -1,10 +1,24 @@
 import { Result, Error as error, Ok as ok } from 'folktale/result';
-import { isNil } from 'ramda';
+import { compose, defaultTo, isNil } from 'ramda';
 import { ParseError } from '../../errorHandling';
 import { CandlesSearchRequest } from '../../services/candles/repo';
 import { parseFilterValues } from '../_common/filters';
 import commonFilters from '../_common/filters/filters';
+import { Parser } from '../_common/filters/types';
 import { HttpRequest } from '../_common/types';
+
+import { loadConfig } from '../../loadConfig';
+
+const options = loadConfig();
+
+const matcherParser: Parser<string> = compose<
+  string | undefined,
+  string,
+  Result<ParseError, string>
+>(
+  commonFilters.query as Parser<string>, // raw always will be defined
+  defaultTo(options.matcher.defaultMatcherAddress)
+);
 
 export const parse = ({
   params,
@@ -22,19 +36,15 @@ export const parse = ({
   }
 
   return parseFilterValues({
-    matcher: commonFilters.query,
+    matcher: matcherParser,
     interval: commonFilters.query,
   })(query).chain(fValues => {
-    if (isNil(fValues.matcher)) {
-      return error(new ParseError(new Error('matcher is undefined')));
-    }
-
     if (isNil(fValues.timeStart)) {
-      return error(new ParseError(new Error('timeStart is undefined')));
+      return error(new ParseError(new Error('timeStart is required')));
     }
 
     if (isNil(fValues.interval)) {
-      return error(new ParseError(new Error('interval is undefined')));
+      return error(new ParseError(new Error('interval is required')));
     }
 
     return ok({

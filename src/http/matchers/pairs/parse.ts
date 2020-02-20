@@ -21,9 +21,6 @@ export const get = ({
     return error(new ParseError(new Error('Params is empty')));
   }
 
-  if (isNil(params.matcher)) {
-    return error(new ParseError(new Error('Matcher is not set')));
-  }
   if (params.amountAsset && params.priceAsset) {
     return ok({
       matcher: params.matcher,

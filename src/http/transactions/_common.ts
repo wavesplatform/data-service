@@ -34,7 +34,7 @@ export const parseGet = ({
       id: params.id,
     });
   } else {
-    return error(new ParseError(new Error('Transaction id is not set')));
+    return error(new ParseError(new Error('TransactionId is required')));
   }
 };
 

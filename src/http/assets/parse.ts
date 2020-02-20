@@ -18,7 +18,7 @@ export const get = ({
   if (params) {
     return ok({ id: params.id });
   } else {
-    return error(new ParseError(new Error('AssetId is not set')));
+    return error(new ParseError(new Error('AssetId is required')));
   }
 };
 

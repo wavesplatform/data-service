@@ -26,7 +26,7 @@ const matcherParser: Parser<string> = compose<
   string,
   Result<ParseError, string>
 >(
-  commonFilters.query as Parser<string>,
+  commonFilters.query as Parser<string>, // raw always will be defined
   defaultTo(options.matcher.defaultMatcherAddress)
 );
 

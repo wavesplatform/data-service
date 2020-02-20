@@ -25,7 +25,7 @@ export const get = ({
   if (params) {
     return ok({ id: params.id });
   } else {
-    return error(new ParseError(new Error('AliasId is not set')));
+    return error(new ParseError(new Error('AliasId is required')));
   }
 };
 
