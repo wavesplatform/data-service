@@ -82,7 +82,7 @@ const searchAssets = (
   matchExactly: boolean,
   tableAlias: string = 't'
 ) => {
-  // will be used on searchable_asset_name search
+  // will be used on to_tsvector('simple', asset_name) search
   const cleanedQuery = escapeForTsQuery(query);
   return qb.distinct('asset_uid').from(function(this: knex.QueryBuilder) {
     this.table({ [tableAlias]: 'assets' })
@@ -107,7 +107,7 @@ const searchAssets = (
         compose((q: knex.QueryBuilder) =>
           cleanedQuery.length
             ? q.orWhereRaw(
-                `${tableAlias}3.searchable_asset_name @@ to_tsquery(?)`,
+                `to_tsvector('simple', ${tableAlias}3.asset_name) @@ to_tsquery(?)`,
                 [`${cleanedQuery}:*`]
               )
             : q
