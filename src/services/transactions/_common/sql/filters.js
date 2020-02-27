@@ -44,7 +44,7 @@ const byAssetId = ifElse(
   assetId =>
     where('asset_uid', function() {
       this.select('uid')
-        .from('assets')
+        .from('assets_data')
         .where('asset_id', assetId)
         .limit(1);
     })

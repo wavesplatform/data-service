@@ -49,8 +49,8 @@ const selectPairsCTE = pg
       matcher_address_uid: 'sender_uid',
     })
       .from(selectExchanges.clone().as('e'))
-      .leftJoin({ a: 'assets' }, 'e.amount_asset_uid', 'a.uid')
-      .leftJoin({ p: 'assets' }, 'e.price_asset_uid', 'p.uid')
+      .leftJoin({ a: 'assets_data' }, 'e.amount_asset_uid', 'a.uid')
+      .leftJoin({ p: 'assets_data' }, 'e.price_asset_uid', 'p.uid')
       .groupBy(['amount_asset_uid', 'price_asset_uid', 'sender_uid']);
   })
   .from({ p: 'pairs_cte' })

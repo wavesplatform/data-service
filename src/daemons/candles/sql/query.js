@@ -78,8 +78,8 @@ const selectExchanges = pg({
     amount: pg.raw('t.amount * 10 ^(-a.decimals)'),
     price: pg.raw('t.price * 10 ^(-8 - p.decimals + a.decimals)'),
   })
-  .join({ a: 'assets' }, 'a.uid', 't.amount_asset_uid')
-  .join({ p: 'assets' }, 'p.uid', 't.price_asset_uid');
+  .join({ a: 'assets_data' }, 'a.uid', 't.amount_asset_uid')
+  .join({ p: 'assets_data' }, 'p.uid', 't.price_asset_uid');
 
 /** selectExchangesAfterTimestamp :: Date -> QueryBuilder */
 const selectExchangesAfterTimestamp = fromTimestamp =>

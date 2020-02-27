@@ -126,8 +126,8 @@ const selectFromFiltered = filtered =>
       ),
       o2_amount: pg.raw('t.o2_amount * 10^(-coalesce(a_dec.decimals, 8))'),
     })
-    .leftJoin({ a_dec: 'assets' }, 't.amount_asset', 'a_dec.asset_id')
-    .leftJoin({ p_dec: 'assets' }, 't.price_asset', 'p_dec.asset_id');
+    .leftJoin({ a_dec: 'assets_data' }, 't.amount_asset', 'a_dec.asset_id')
+    .leftJoin({ p_dec: 'assets_data' }, 't.price_asset', 'p_dec.asset_id');
 
 module.exports = {
   getOrMget,

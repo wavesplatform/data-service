@@ -27,7 +27,7 @@ const byAsset = assetType =>
   curryN(2, (assetId, q) =>
     q.where(`t.${assetType}_asset_uid`, function() {
       this.select('uid')
-        .from('assets')
+        .from('assets_data')
         .where('asset_id', assetId)
         .limit(1);
     })

@@ -24,7 +24,8 @@ const byValue = curryN(3, (type, value, q) => {
   return q.clone().whereIn('t.tx_uid', function() {
     this.select('tx_uid')
       .from('txs_12_data')
-      .where(`data_value_${type}`, v);
+      .where('data_type', type)
+      .andWhere(`data_value_${type}`, v);
   });
 });
 

@@ -66,7 +66,7 @@ export const selectFromFiltered = (filtered: knex.QueryBuilder) =>
       pg.raw('fee * 10^(-8) as fee'),
     ])
     .from({ t: 't_cte' })
-    .leftJoin('assets as a', 'a.uid', 't.asset_uid')
+    .leftJoin('assets_data as a', 'a.uid', 't.asset_uid')
     .leftJoin('addresses as addr', 'addr.uid', 't.sender_uid')
     .leftJoin('addresses as daddr', 'daddr.uid', 't.dapp_address_uid')
     .leftJoin('txs', 'txs.uid', 't.tx_uid');

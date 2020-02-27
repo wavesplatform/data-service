@@ -73,13 +73,13 @@ export const selectCandles = ({
     .select(FIELDS)
     .whereIn('amount_asset_uid', function() {
       this.select('uid')
-        .from('assets')
+        .from('assets_data')
         .where('asset_id', amountAsset)
         .limit(1);
     })
     .whereIn('price_asset_uid', function() {
       this.select('uid')
-        .from('assets')
+        .from('assets_data')
         .where('asset_id', priceAsset)
         .limit(1);
     })
@@ -123,8 +123,8 @@ export const sql = ({
         matcher,
       }),
     })
-    .innerJoin({ a: 'assets' }, 'c.amount_asset_uid', 'a.uid')
-    .innerJoin({ p: 'assets' }, 'c.price_asset_uid', 'p.uid')
+    .innerJoin({ a: 'assets_data' }, 'c.amount_asset_uid', 'a.uid')
+    .innerJoin({ p: 'assets_data' }, 'c.price_asset_uid', 'p.uid')
     .innerJoin({ addr: 'addresses' }, 'c.matcher_address_uid', 'addr.uid')
     .orderBy('c.time_start', 'asc')
     .toString();

@@ -1,4 +1,4 @@
-const { assoc, compose, merge, pick, pipe } = require('ramda');
+const { assoc, compose, merge, omit, pick, pipe } = require('ramda');
 
 const { pickBindFilters } = require('../../../../../../utils/db');
 const defaultValues = require('../../../../_common/sql/defaults');
@@ -49,7 +49,15 @@ module.exports = ({ filters: F }) => ({
         ? assoc('value', F.value(withDefaults.type), F)
         : F;
 
-    const fs = pickBindFilters(withValueF, fNames, withDefaults);
+    const fs = pickBindFilters(
+      withValueF,
+      // filter by type+value or type
+      withDefaults.value !== undefined
+        ? fNames.filter(name => name !== 'type')
+        : fNames,
+      withDefaults
+    );
+
     const fQuery = fs.length ? pipe(...fs)(select) : select;
 
     return pipe(selectFromFiltered, F.sort(withDefaults.sort), String)(fQuery);

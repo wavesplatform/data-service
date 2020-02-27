@@ -62,7 +62,7 @@ const selectFromFiltered = pipe(
             recipient_alias_uid: 'tfs.recipient_alias_uid',
             address: 'recipient_addr.address',
           })
-          .leftJoin({ a: 'assets' }, 'a.uid', 't.asset_uid')
+          .leftJoin({ a: 'assets_data' }, 'a.uid', 't.asset_uid')
       )
       .select({
         tx_uid: 't.tx_uid',

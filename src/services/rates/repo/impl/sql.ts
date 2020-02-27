@@ -30,8 +30,8 @@ from (
     a.address as matcher
   from candles c
   left join addresses a on a.uid = c.matcher_address_uid
-  left join assets aa on aa.uid = c.amount_asset_uid
-  left join assets pa on pa.uid = c.price_asset_uid
+  left join assets_data aa on aa.uid = c.amount_asset_uid
+  left join assets_data pa on pa.uid = c.price_asset_uid
   where
     c.interval = '${CandleInterval.Day1}'
     and a.address = ?

@@ -23,7 +23,7 @@ const selectFromFiltered = filtered =>
     })
     .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tx_uid')
     .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid')
-    .leftJoin({ a: 'assets' }, 'a.uid', 't.asset_uid')
+    .leftJoin({ a: 'assets_data' }, 'a.uid', 't.asset_uid')
     .join({ dec: 'txs_3' }, 'dec.asset_uid', '=', 't.asset_uid');
 
 module.exports = { select, selectFromFiltered };

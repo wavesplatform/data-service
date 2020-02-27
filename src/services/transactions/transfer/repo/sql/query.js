@@ -22,12 +22,12 @@ const selectFromFiltered = filtered =>
           fee_asset_uid: 't.fee_asset_uid',
         })
         .leftJoin(
-          { a: pg('assets').select('uid', 'asset_id', 'decimals') },
+          { a: 'assets_data' },
           'a.uid',
           't.asset_uid'
         )
         .leftJoin(
-          { addr: pg('addresses').select('uid', 'address', 'public_key') },
+          { addr: 'addresses' },
           'addr.uid',
           't.sender_uid'
         )
@@ -58,17 +58,17 @@ const selectFromFiltered = filtered =>
     .from({ t: 'ts' })
     .leftJoin('txs', 'txs.uid', 't.tx_uid')
     .leftJoin(
-      { fa: pg('assets').select('uid', 'asset_id', 'decimals') },
+      { fa: 'assets_data' },
       'fa.uid',
       't.fee_asset_uid'
     )
     .leftJoin(
-      { recipient_addr: pg('addresses').select('uid', 'address') },
+      { recipient_addr: 'addresses' },
       'recipient_addr.uid',
       't.recipient_address_uid'
     )
     .leftJoin(
-      { recipient_alias: pg('txs_10').select('tx_uid', 'alias') },
+      { recipient_alias: 'txs_10' },
       'recipient_alias.tx_uid',
       't.recipient_alias_uid'
     );
