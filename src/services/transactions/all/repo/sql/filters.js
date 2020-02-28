@@ -1,30 +1,11 @@
 const { where, whereIn } = require('../../../../../utils/db/knex');
 const commonFilters = require('../../../_common/sql/filters');
 
-const id = id =>
-  where('t.uid', function() {
-    this.select('uid')
-      .from('txs')
-      .where('id', id)
-      .limit(1);
-  });
+const id = id => where('id', id);
 
-const ids = ids =>
-  whereIn('t.uid', function() {
-    this.select('uid')
-      .from('txs')
-      .whereIn('id', ids)
-      .limit(ids.length);
-  });
+const ids = ids => whereIn('id', ids);
 
-const byTimeStamp = comparator => ts =>
-  where('t.uid', comparator, function() {
-    this.select('uid')
-      .from('txs')
-      .where('time_stamp', comparator, ts)
-      .orderBy('uid', comparator === '>=' ? 'asc' : 'desc')
-      .limit(1);
-  });
+const byTimeStamp = comparator => ts => where('time_stamp', comparator, ts);
 
 const after = ({ tx_uid, sort }) => {
   const comparator = sort === 'desc' ? '<' : '>';

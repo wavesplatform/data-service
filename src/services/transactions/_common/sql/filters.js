@@ -7,21 +7,9 @@ const {
 } = require('../../../../utils/db/knex/index');
 const { md5 } = require('../../../../utils/hash');
 
-const id = id =>
-  where('t.tx_uid', function() {
-    this.select('uid')
-      .from('txs')
-      .where('id', id)
-      .limit(1);
-  });
+const id = id => where('t.id', id);
 
-const ids = ids =>
-  whereIn('t.tx_uid', function() {
-    this.select('uid')
-      .from('txs')
-      .whereIn('id', ids)
-      .limit(ids.length);
-  });
+const ids = ids => whereIn('t.id', ids);
 
 const sender = addr =>
   where('t.sender_uid', function() {
@@ -37,6 +25,8 @@ const byTimeStamp = comparator => ts =>
       .from('txs')
       .where('time_stamp', comparator, ts)
       .orderBy('uid', comparator === '>=' ? 'asc' : 'desc')
+      // tip for postgresql to use index only scan
+      .orderBy('time_stamp', comparator === '>=' ? 'desc' : 'asc')
       .limit(1);
   });
 
