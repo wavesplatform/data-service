@@ -17,20 +17,18 @@ const createApi = ({ filters: F }) => ({
   get: id =>
     pipe(
       F.id(id),
-      F.limit(1),
       getOrMgetPrepareForSelectFromFiltered,
       selectFromFiltered,
       String
-    )(getOrMget(defaultValues.SORT)),
+    )(getOrMget),
 
   mget: ids =>
     pipe(
       F.ids(ids),
-      F.limit(ids.length),
       getOrMgetPrepareForSelectFromFiltered,
       selectFromFiltered,
       String
-    )(getOrMget(defaultValues.SORT)),
+    )(getOrMget),
 
   search: fValues => {
     const fNames = [
@@ -60,7 +58,7 @@ const createApi = ({ filters: F }) => ({
     const sort = defaultTo(defaultValues.SORT, fValues.sort);
 
     const fs = pickBindFilters(F, fNames, withDefaults);
-    const fQuery = pipe(...fs)(search(sort));
+    const fQuery = pipe(F.sort(sort), ...fs)(search);
 
     return pipe(
       searchPrepareForSelectFromFiltered,

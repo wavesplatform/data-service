@@ -6,7 +6,7 @@ import { columns } from './common';
 const pg = knex({ client: 'pg' });
 
 const searchById = (q: string) =>
-  pg({ a: 'assets' })
+  pg({ a: 'assets_data' })
     .columns({
       asset_uid: `a.${columns.uid}`,
       asset_name: `a.${columns.asset_name}`,
@@ -42,7 +42,7 @@ const searchByNameInMeta = (qb: knex.QueryBuilder, q: string) =>
 
 const searchByTicker = (qb: knex.QueryBuilder, q: string): knex.QueryBuilder =>
   qb
-    .table({ a: 'assets' })
+    .table({ a: 'assets_data' })
     .columns({
       asset_uid: `a.${columns.uid}`,
       asset_name: `a.${columns.asset_name}`,
@@ -62,7 +62,7 @@ const searchByName = (qb: knex.QueryBuilder, q: string) => {
       : q
   )(
     qb
-      .table({ a: 'assets' })
+      .table({ a: 'assets_data' })
       .columns({
         asset_uid: `a.${columns.uid}`,
         asset_name: `a.${columns.asset_name}`,

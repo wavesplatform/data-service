@@ -34,18 +34,14 @@ const createSql = ({
       compose(
         String,
         q => queryAfterFiltersWithDefaults.get(q, id),
-        filters.limit(1),
-        filters.id(id),
-        filters.sort(defaultValues.SORT)
+        filters.id(id)
       )(query),
 
     mget: ids =>
       compose(
         String,
         q => queryAfterFiltersWithDefaults.mget(q, ids),
-        filters.limit(ids.length),
-        filters.ids(ids),
-        filters.sort(defaultValues.SORT)
+        filters.ids(ids)
       )(query),
 
     search: fValues => {

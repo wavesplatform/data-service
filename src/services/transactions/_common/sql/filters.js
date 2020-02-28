@@ -33,9 +33,11 @@ const sender = addr =>
 
 const byTimeStamp = comparator => ts =>
   where('t.tx_uid', comparator, function() {
-    (comparator === '>=' ? this.min('uid') : this.max('uid'))
+    this.select('uid')
       .from('txs')
-      .where('time_stamp', comparator, ts);
+      .where('time_stamp', comparator, ts)
+      .orderBy('uid', comparator === '>=' ? 'asc' : 'desc')
+      .limit(1);
   });
 
 const byAssetId = ifElse(

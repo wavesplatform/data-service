@@ -50,7 +50,9 @@ const txs = (qb: knex.QueryBuilder, filteringQ: knex.QueryBuilder) =>
     .leftJoin('txs_16_payment as p', 'p.tx_uid', 't.tx_uid')
     .whereIn('t.tx_uid', filteringQ);
 
-export const select = (s: string) =>
+export const getOrMgetSelect = pg({ t: 'txs_16 ' }).select('t.tx_uid');
+
+export const search = (s: string) =>
   pg({ t: 'txs_16 ' })
     .select('t.tx_uid')
     .orderBy('t.tx_uid', s);

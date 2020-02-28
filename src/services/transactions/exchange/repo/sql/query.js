@@ -73,15 +73,11 @@ const columnsFromFiltered = filtered =>
     'order1_uid',
     'order2_uid',
   ]);
-
-const getOrMget = s => pg({ t: 'txs_7' }).orderBy('t.tx_uid', s);
+const getOrMget = pg({ t: 'txs_7' });
 
 const getOrMgetPrepareForSelectFromFiltered = columnsFromFiltered;
 
-const search = s =>
-  pg({ t: 'txs_7_orders' })
-    .select('t.tx_uid')
-    .orderBy('t.tx_uid', s);
+const search = pg({ t: 'txs_7_orders' }).select('t.tx_uid');
 
 const searchPrepareForSelectFromFiltered = filtered =>
   columnsFromFiltered(pg({ t: 'txs_7' }).whereIn('t.tx_uid', filtered));
