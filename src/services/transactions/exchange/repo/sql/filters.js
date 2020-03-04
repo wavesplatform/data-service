@@ -25,12 +25,14 @@ const byOrder = curryN(2, (orderId, q) =>
 
 const byAsset = assetType =>
   curryN(2, (assetId, q) =>
-    q.where(`t.${assetType}_asset_uid`, function() {
-      this.select('uid')
-        .from('assets_data')
-        .where('asset_id', assetId)
-        .limit(1);
-    })
+    assetId === 'WAVES'
+      ? q.whereNull(`t.${assetType}_asset_uid`)
+      : q.where(`t.${assetType}_asset_uid`, function() {
+          this.select('uid')
+            .from('assets_data')
+            .where('asset_id', assetId)
+            .limit(1);
+        })
   );
 
 module.exports = {
