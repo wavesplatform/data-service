@@ -5,7 +5,14 @@ const id = id => where('id', id);
 
 const ids = ids => whereIn('id', ids);
 
-const byTimeStamp = comparator => ts => where('time_stamp', comparator, ts);
+const byTimeStamp = comparator => ts =>
+  where('t.uid', comparator, function() {
+    this.select('uid')
+      .from('txs')
+      .where('time_stamp', comparator, ts)
+      .orderBy('uid', comparator === '>=' ? 'asc' : 'desc')
+      .limit(1);
+  });
 
 const after = ({ tx_uid, sort }) => {
   const comparator = sort === 'desc' ? '<' : '>';
