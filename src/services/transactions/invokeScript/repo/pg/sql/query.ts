@@ -34,7 +34,8 @@ const columnsWithoutFeeAndPaymentAssetId = [
   'p.position_in_payment',
 ];
 
-export const getOrMgetSelect = pg({ t: 'txs_16 ' });
+// orderBy is tip for index usage
+export const getOrMgetSelect = pg({ t: 'txs_16 ' }).orderBy('tx_uid');
 
 export const search = (s: string) =>
   pg({ t: 'txs_16 ' }).orderBy('t.tx_uid', s);
