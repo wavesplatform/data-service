@@ -33,7 +33,6 @@ const createApi = ({ filters: F }) => ({
   search: fValues => {
     const fNames = [
       // tx attributes
-      'after',
       'timeStart',
       'timeEnd',
       'sender',
@@ -43,6 +42,7 @@ const createApi = ({ filters: F }) => ({
       'amountAsset',
       'priceAsset',
       // common
+      'after',
       'limit',
     ];
 
