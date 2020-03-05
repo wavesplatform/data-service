@@ -53,7 +53,6 @@ const byRecipient = r =>
 const byScript = s => whereRaw('md5(script) = ?', md5(s));
 
 const sort = s => q => q.clone().orderBy('t.tx_uid', s);
-const outerSort = s => q => q.clone().orderBy('txs.uid', s);
 
 const after = ({ tx_uid, sort }) => {
   const comparator = sort === 'desc' ? '<' : '>';
@@ -69,7 +68,6 @@ module.exports = {
   sort,
   after,
   limit,
-  outerSort,
   assetId: byAssetId,
   recipient: byRecipient,
   script: byScript,

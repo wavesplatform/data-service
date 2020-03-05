@@ -1,22 +1,15 @@
 const { compose } = require('ramda');
 
 const { createSql } = require('../../../_common/sql');
-const { outerSort } = require('../../../_common/sql/filters');
+const { sort } = require('../../../_common/sql/filters');
 
 const { select, selectFromFiltered } = require('./query');
 const { filters, filtersOrder } = require('./filters');
 
-const outerLimit = l => q => q.clone().limit(l);
-
 const queryAfterFilters = {
   get: selectFromFiltered,
   mget: selectFromFiltered,
-  search: (q, fValues) =>
-    compose(
-      outerLimit(fValues.limit),
-      outerSort(fValues.sort),
-      selectFromFiltered
-    )(q),
+  search: (q, fValues) => compose(sort(fValues.sort), selectFromFiltered)(q),
 };
 
 module.exports = createSql({

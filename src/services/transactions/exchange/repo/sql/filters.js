@@ -28,11 +28,11 @@ const byAsset = assetType =>
     assetId === 'WAVES'
       ? q.whereNull(`t.${assetType}_asset_uid`)
       : q.where(`t.${assetType}_asset_uid`, function() {
-          this.select('uid')
-            .from('assets_data')
-            .where('asset_id', assetId)
-            .limit(1);
-        })
+        this.select('uid')
+          .from('assets_data')
+          .where('asset_id', assetId)
+          .limit(1);
+      })
   );
 
 module.exports = {
@@ -43,7 +43,6 @@ module.exports = {
     amountAsset: byAsset('amount'),
     priceAsset: byAsset('price'),
     orderId: byOrder,
-    outerSort: s => q => q.clone().orderBy('tx_uid', s),
   },
   filtersOrder: [
     ...commonFiltersOrder,
@@ -51,6 +50,5 @@ module.exports = {
     'amountAsset',
     'priceAsset',
     'orderId',
-    'outerSort',
   ],
 };

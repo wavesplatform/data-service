@@ -2,7 +2,6 @@ const { compose, defaultTo, merge, pick, pipe } = require('ramda');
 
 const { pickBindFilters } = require('../../../../../utils/db');
 const defaultValues = require('../../../_common/sql/defaults');
-const { filters } = require('./filters');
 const {
   getOrMget,
   getOrMgetPrepareForSelectFromFiltered,
@@ -63,7 +62,7 @@ const createApi = ({ filters: F }) => ({
     return pipe(
       searchPrepareForSelectFromFiltered,
       selectFromFiltered,
-      filters.outerSort(sort),
+      F.sort(sort),
       String
     )(fQuery);
   },

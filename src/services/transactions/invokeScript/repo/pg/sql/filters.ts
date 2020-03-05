@@ -13,7 +13,6 @@ const byDapp = (dappAddress: string) =>
 
 export default {
   ...commonFilters,
-  sort: (s: string) => (q: knex.QueryBuilder) => q.clone().orderBy('t.uid', s),
   dapp: byDapp,
   function: pointFreeKnex.where('function_name'),
 };
