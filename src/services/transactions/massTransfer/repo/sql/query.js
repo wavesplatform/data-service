@@ -46,24 +46,6 @@ const withGrouping = q =>
 const selectFromFiltered = pipe(
   filtered =>
     pg
-      .with(
-        't_cte',
-        withTransfers(pg({ t: filtered }))
-          .select({
-            tx_uid: 't.tx_uid',
-            height: 't.height',
-            sender_uid: 't.sender_uid',
-            asset_id: pg.raw(`coalesce(a.asset_id,'WAVES')`),
-            attachment: 't.attachment',
-            amount: pg.raw(
-              'tfs.amount * 10^(-coalesce(a.decimals, 8))::double precision'
-            ),
-            position_in_tx: 'tfs.position_in_tx',
-            recipient_alias_uid: 'tfs.recipient_alias_uid',
-            address: 'recipient_addr.address',
-          })
-          .leftJoin({ a: 'assets_data' }, 'a.uid', 't.asset_uid')
-      )
       .select({
         tx_uid: 't.tx_uid',
         id: 'txs.id',
@@ -81,7 +63,23 @@ const selectFromFiltered = pipe(
         asset_id: 't.asset_id',
         attachment: 't.attachment',
       })
-      .from({ t: 't_cte' })
+      .from({
+        t: withTransfers(pg({ t: filtered }))
+          .select({
+            tx_uid: 't.tx_uid',
+            height: 't.height',
+            sender_uid: 't.sender_uid',
+            asset_id: pg.raw(`coalesce(a.asset_id,'WAVES')`),
+            attachment: 't.attachment',
+            amount: pg.raw(
+              'tfs.amount * 10^(-coalesce(a.decimals, 8))::double precision'
+            ),
+            position_in_tx: 'tfs.position_in_tx',
+            recipient_alias_uid: 'tfs.recipient_alias_uid',
+            address: 'recipient_addr.address',
+          })
+          .leftJoin({ a: 'assets_data' }, 'a.uid', 't.asset_uid'),
+      })
       .leftJoin('txs', 'txs.uid', 't.tx_uid')
       .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid'),
   withGrouping

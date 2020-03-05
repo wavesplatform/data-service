@@ -4,20 +4,6 @@ const select = pg({ t: 'txs_4' });
 
 const selectFromFiltered = filtered =>
   pg
-    .with(
-      'ts',
-      filtered.select({
-        tx_uid: 't.tx_uid',
-        height: 't.height',
-        asset_uid: 't.asset_uid',
-        attachment: 't.attachment',
-        sender_uid: 't.sender_uid',
-        amount: 't.amount',
-        recipient_address_uid: 't.recipient_address_uid',
-        recipient_alias_uid: 't.recipient_alias_uid',
-        fee_asset_uid: 't.fee_asset_uid',
-      })
-    )
     .select({
       // common
       tx_uid: 't.tx_uid',
@@ -43,7 +29,19 @@ const selectFromFiltered = filtered =>
       fee_asset: pg.raw("coalesce(fa.asset_id, 'WAVES')"),
       attachment: 't.attachment',
     })
-    .from({ t: 'ts' })
+    .from({
+      t: filtered.select({
+        tx_uid: 't.tx_uid',
+        height: 't.height',
+        asset_uid: 't.asset_uid',
+        attachment: 't.attachment',
+        sender_uid: 't.sender_uid',
+        amount: 't.amount',
+        recipient_address_uid: 't.recipient_address_uid',
+        recipient_alias_uid: 't.recipient_alias_uid',
+        fee_asset_uid: 't.fee_asset_uid',
+      }),
+    })
     .leftJoin('txs', 'txs.uid', 't.tx_uid')
     .leftJoin({ a: 'assets_data' }, 'a.uid', 't.asset_uid')
     .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid')

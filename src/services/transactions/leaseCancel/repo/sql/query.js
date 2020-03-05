@@ -4,17 +4,6 @@ const select = pg({ t: 'txs_9' });
 
 const selectFromFiltered = filtered =>
   pg
-    .with(
-      't_cte',
-      filtered
-        .select({
-          tx_uid: 't.tx_uid',
-          height: 't.height',
-          sender_uid: 't.sender_uid',
-          lease_id: 'l.id',
-        })
-        .leftJoin({ l: 'txs' }, 'l.uid', 't.lease_tx_uid')
-    )
     .select({
       tx_uid: 't.tx_uid',
       height: 't.height',
@@ -29,7 +18,16 @@ const selectFromFiltered = filtered =>
       sender_public_key: 'addr.public_key',
       lease_id: 't.lease_id',
     })
-    .from({ t: 't_cte' })
+    .from({
+      t: filtered
+        .select({
+          tx_uid: 't.tx_uid',
+          height: 't.height',
+          sender_uid: 't.sender_uid',
+          lease_id: 'l.id',
+        })
+        .leftJoin({ l: 'txs' }, 'l.uid', 't.lease_tx_uid'),
+    })
     .leftJoin('txs', 'txs.uid', 't.tx_uid')
     .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid');
 

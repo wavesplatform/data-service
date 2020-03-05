@@ -4,36 +4,6 @@ const select = pg({ t: 'txs_8' });
 
 const selectFromFiltered = filtered =>
   pg
-    .with(
-      't_cte',
-      filtered
-        .select({
-          tx_uid: 't.tx_uid',
-          sender_uid: 't.sender_uid',
-          height: 't.height',
-          recipient_address_uid: 't.recipient_address_uid',
-          amount: pg.raw('t.amount * 10^(-8)'),
-          recipient_alias: 'recipient_alias.alias',
-        })
-        .leftJoin(
-          { recipient_alias: 'txs_10' },
-          'recipient_alias.tx_uid',
-          't.recipient_alias_uid'
-        )
-    )
-    .with(
-      't_with_recipient_cte',
-      pg({ t: 't_cte' })
-        .select('*')
-        .select({
-          recipient_address: 'recipient_addr.address',
-        })
-        .leftJoin(
-          { recipient_addr: 'addresses' },
-          'recipient_addr.uid',
-          't.recipient_address_uid'
-        )
-    )
     .select({
       tx_uid: 't.tx_uid',
       height: 't.height',
@@ -49,7 +19,33 @@ const selectFromFiltered = filtered =>
       amount: 't.amount',
       recipient: pg.raw('coalesce(t.recipient_alias, t.recipient_address)'),
     })
-    .from({ t: 't_with_recipient_cte' })
+    .from({
+      t: pg({
+        t: filtered
+          .select({
+            tx_uid: 't.tx_uid',
+            sender_uid: 't.sender_uid',
+            height: 't.height',
+            recipient_address_uid: 't.recipient_address_uid',
+            amount: pg.raw('t.amount * 10^(-8)'),
+            recipient_alias: 'recipient_alias.alias',
+          })
+          .leftJoin(
+            { recipient_alias: 'txs_10' },
+            'recipient_alias.tx_uid',
+            't.recipient_alias_uid'
+          ),
+      })
+        .select('*')
+        .select({
+          recipient_address: 'recipient_addr.address',
+        })
+        .leftJoin(
+          { recipient_addr: 'addresses' },
+          'recipient_addr.uid',
+          't.recipient_address_uid'
+        ),
+    })
     .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tx_uid')
     .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid');
 
