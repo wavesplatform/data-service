@@ -1,15 +1,20 @@
-const { compose } = require('ramda');
+const { compose, defaultTo } = require('ramda');
 
 const { createSql } = require('../../../_common/sql');
 const { sort } = require('../../../_common/sql/filters');
+const { SORT } = require('../../../_common/sql/defaults');
 
 const { select, selectFromFiltered } = require('./query');
 const { filters, filtersOrder } = require('./filters');
 
+const sortWithDefault = defaultTo(SORT);
+
 const queryAfterFilters = {
-  get: selectFromFiltered,
-  mget: selectFromFiltered,
-  search: (q, fValues) => compose(sort(fValues.sort), selectFromFiltered)(q),
+  // get, mget does not has sort value
+  get: (q, fValues) => selectFromFiltered(sortWithDefault(fValues.sort))(q),
+  mget: (q, fValues) => selectFromFiltered(sortWithDefault(fValues.sort))(q),
+  search: (q, fValues) =>
+    compose(sort(fValues.sort), selectFromFiltered(fValues.sort))(q),
 };
 
 module.exports = createSql({

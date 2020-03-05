@@ -2,7 +2,7 @@ const pg = require('knex')({ client: 'pg' });
 
 const select = pg({ t: 'txs_2' }).select('*');
 
-const selectFromFiltered = filtered =>
+const selectFromFiltered = s => filtered =>
   pg
     .select({
       // common
@@ -29,7 +29,7 @@ const selectFromFiltered = filtered =>
         .select('*')
         .select({
           rn: pg.raw(
-            'row_number() over (partition by tx_uid order by tx_uid asc)'
+            `row_number() over (partition by tx_uid order by tx_uid ${s})`
           ),
         })
         .from({ t: filtered }),
