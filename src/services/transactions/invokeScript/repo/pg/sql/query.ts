@@ -34,10 +34,8 @@ const columnsWithoutFeeAndPaymentAssetId = [
   'p.position_in_payment',
 ];
 
-// orderBy is tip for index usage
-export const getOrMgetSelect = pg({ t: 'txs_16 ' }).orderBy('tx_uid');
-
-export const search = (s: string) =>
+// in get/mget requests sort is tip for postgresql to use index
+export const select = (s: string) =>
   pg({ t: 'txs_16 ' }).orderBy('t.tx_uid', s);
 
 export const selectFromFiltered = (filtered: knex.QueryBuilder) =>

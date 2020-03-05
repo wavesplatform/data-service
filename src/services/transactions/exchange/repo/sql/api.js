@@ -24,6 +24,8 @@ const createApi = ({ filters: F }) => ({
   mget: ids =>
     pipe(
       F.ids(ids),
+      // tip for postgresql to use index
+      F.sort(defaultValues.SORT),
       getOrMgetPrepareForSelectFromFiltered,
       selectFromFiltered,
       String

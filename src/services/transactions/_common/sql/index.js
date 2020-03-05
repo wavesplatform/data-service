@@ -41,6 +41,8 @@ const createSql = ({
       compose(
         String,
         q => queryAfterFiltersWithDefaults.mget(q, ids),
+        // tip for postgresql to use index
+        filters.sort(defaultValues.SORT),
         filters.ids(ids)
       )(query),
 

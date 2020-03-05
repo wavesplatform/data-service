@@ -9,7 +9,14 @@ const { select, selectFromFiltered } = require('./query');
 module.exports = ({ filters: F }) => ({
   get: id => pipe(F.id(id), selectFromFiltered, String)(select),
 
-  mget: ids => pipe(F.ids(ids), selectFromFiltered, String)(select),
+  mget: ids =>
+    pipe(
+      F.ids(ids),
+      // tip for postgresql to use index
+      F.sort(defaultValues.SORT),
+      selectFromFiltered,
+      String
+    )(select),
 
   search: (fValues = {}) => {
     const fNames = [
