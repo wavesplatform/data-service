@@ -34,6 +34,8 @@ const createSql = ({
       compose(
         String,
         q => queryAfterFiltersWithDefaults.get(q, id),
+        // tip for postgresql to use index
+        filters.limit(1),
         filters.id(id)
       )(query),
 
@@ -43,6 +45,8 @@ const createSql = ({
         q => queryAfterFiltersWithDefaults.mget(q, ids),
         // tip for postgresql to use index
         filters.sort(defaultValues.SORT),
+        // tip for postgresql to use index
+        filters.limit(ids.length),
         filters.ids(ids)
       )(query),
 

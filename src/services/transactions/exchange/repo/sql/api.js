@@ -16,6 +16,8 @@ const createApi = ({ filters: F }) => ({
   get: id =>
     pipe(
       F.id(id),
+      // tips for postgresql to use index
+      F.limit(1),
       getOrMgetPrepareForSelectFromFiltered,
       selectFromFiltered,
       String
@@ -26,6 +28,7 @@ const createApi = ({ filters: F }) => ({
       F.ids(ids),
       // tip for postgresql to use index
       F.sort(defaultValues.SORT),
+      F.limit(ids.length),
       getOrMgetPrepareForSelectFromFiltered,
       selectFromFiltered,
       String

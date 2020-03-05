@@ -8,10 +8,22 @@ const { select, selectFromFiltered } = require('./query');
 // mget/search — apply filters
 const createApi = ({ filters: F }) => ({
   get: id =>
-    pipe(F.id(id), selectFromFiltered, String)(select(defaultValues.SORT)),
+    pipe(
+      F.id(id),
+      // tip for postgresql to use index
+      F.limit(1),
+      selectFromFiltered,
+      String
+    )(select(defaultValues.SORT)),
 
   mget: ids =>
-    pipe(F.ids(ids), selectFromFiltered, String)(select(defaultValues.SORT)),
+    pipe(
+      F.ids(ids),
+      // tip for postgresql to use index
+      F.limit(ids.length),
+      selectFromFiltered,
+      String
+    )(select(defaultValues.SORT)),
 
   search: fValues => {
     const fNames = [

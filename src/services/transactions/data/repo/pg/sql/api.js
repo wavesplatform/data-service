@@ -7,13 +7,21 @@ const { select, selectFromFiltered } = require('./query');
 // one — get by id
 // many — apply filters
 module.exports = ({ filters: F }) => ({
-  get: id => pipe(F.id(id), selectFromFiltered, String)(select),
+  get: id =>
+    pipe(
+      F.id(id),
+      // tips for postgresql to use index
+      F.limit(1),
+      selectFromFiltered,
+      String
+    )(select),
 
   mget: ids =>
     pipe(
       F.ids(ids),
-      // tip for postgresql to use index
+      // tips for postgresql to use index
       F.sort(defaultValues.SORT),
+      F.limit(ids.length),
       selectFromFiltered,
       String
     )(select),
