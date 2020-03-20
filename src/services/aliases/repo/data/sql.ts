@@ -12,8 +12,8 @@ const getAliasRowNumber = (after: string) =>
     .select('rn')
     .where('alias', after);
 
-const selectFromSet = (aliasSet: string[] | knex.QueryBuilder) =>
-  pg.select(columnsWithRowNumber).from({
+const fromSet = (aliasSet: string[] | knex.QueryBuilder) =>
+  pg.from({
     counted_aliases: pg({ t: 'txs_10' })
       .select({ alias: 't.alias' })
       .min({ address: 'addr.address' }) // first sender
@@ -28,12 +28,12 @@ const selectFromSet = (aliasSet: string[] | knex.QueryBuilder) =>
 
 export default {
   get: (alias: string) =>
-    selectFromSet([alias])
+    fromSet([alias])
       .select(columns)
       .clone()
       .toString(),
   mget: (aliases: string[]) =>
-    selectFromSet(aliases)
+    fromSet(aliases)
       .select(columns)
       .clone()
       .toString(),
@@ -41,7 +41,7 @@ export default {
     const q = pg('aliases_cte')
       .with(
         'aliases_cte',
-        selectFromSet(
+        fromSet(
           pg('txs_10')
             .select('alias')
             .where(
@@ -52,7 +52,7 @@ export default {
                 .where('address', address)
                 .limit(1)
             )
-        )
+        ).select(columnsWithRowNumber)
       )
       .select(columns)
       .orderBy('rn', 'asc')
