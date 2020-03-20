@@ -1,5 +1,9 @@
 import * as Router from 'koa-router';
-import { AliasesService } from '../../services/aliases';
+import {
+  AliasesService,
+  AliasesServiceMgetRequest,
+  AliasesServiceSearchRequest,
+} from '../../services/aliases';
 import { alias } from '../../types';
 import { createHttpHandler } from '../_common';
 import { postToGet } from '../_common/postToGet';
@@ -8,13 +12,14 @@ import {
   mget as mgetSerializer,
   search as searchSerializer,
 } from '../_common/serialize';
-import {
-  isMgetRequest,
-  get as parseGet,
-  mgetOrSearch as parseMgetOrSearch,
-} from './parse';
+import { get as parseGet, mgetOrSearch as parseMgetOrSearch } from './parse';
 
 const subrouter: Router = new Router();
+
+const isMgetRequest = (
+  req: AliasesServiceMgetRequest | AliasesServiceSearchRequest
+): req is AliasesServiceMgetRequest =>
+  'aliases' in req && Array.isArray(req.aliases);
 
 const mgetOrSearchHandler = (aliasesService: AliasesService) =>
   createHttpHandler(

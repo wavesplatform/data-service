@@ -1,8 +1,21 @@
 import { Result, Ok as ok, Error as error } from 'folktale/result';
-import { compose, reject, isNil, mapObjIndexed } from 'ramda';
+import { compose, isNil, mapObjIndexed, merge, reject } from 'ramda';
 import { ParseError } from '../../../errorHandling';
 import commonFilters from './filters';
 import { CommonFilters, Parser } from './types';
+import { SortOrder, WithLimit, WithSortOrder } from '../../../services/_common';
+
+const DEFAULT_LIMIT = 100;
+const DEFAULT_SORT = SortOrder.Descending;
+
+export const withDefaults = <T>(fValues: T): T & WithLimit & WithSortOrder =>
+  merge(
+    {
+      sort: DEFAULT_SORT,
+      limit: DEFAULT_LIMIT,
+    },
+    fValues
+  );
 
 export const parseFilterValues = <
   Filters extends Record<string, Parser<any, any>>
@@ -13,14 +26,18 @@ export const parseFilterValues = <
     [K in keyof Filters]: ReturnType<Filters[K]>;
   } &
     { [K in keyof CommonFilters]: ReturnType<CommonFilters[K]> },
-  ParsedFilterValues extends {
-    [K in keyof Filters]: Filters[K] extends Parser<infer R> ? R : never;
-  } &
+  ParsedFilterValues extends Partial<
     {
-      [K in keyof CommonFilters]: CommonFilters[K] extends Parser<infer R>
-        ? R
-        : never;
-    }
+      [K in keyof Filters]: Filters[K] extends Parser<infer R> ? R : never;
+    } &
+      {
+        [K in keyof CommonFilters]: CommonFilters[K] extends Parser<infer R>
+          ? R extends undefined
+            ? Partial<R>
+            : R
+          : never;
+      }
+  >
 >(
   values: Partial<
     // Parameters<Filters[K]>[0] is the 1st arg of Parser - raw value

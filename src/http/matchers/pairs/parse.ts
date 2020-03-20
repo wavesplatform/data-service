@@ -1,15 +1,20 @@
 import { Result, Ok as ok, Error as error } from 'folktale/result';
 import { isNil } from 'ramda';
 import { ParseError } from '../../../errorHandling';
-import { parseFilterValues } from '../../_common/filters';
-import commonFilters from '../../_common/filters/filters';
-import { HttpRequest } from '../../_common/types';
 import {
   PairsGetRequest,
   PairsMgetRequest,
 } from '../../../services/pairs/repo/types';
 import { PairsServiceSearchRequest } from '../../../services/pairs';
-import { parseArrayQuery, parsePairs } from '../../../utils/parsers';
+import { withDefaults } from '../../_common/filters';
+import { HttpRequest } from '../../_common/types';
+import {
+  mgetOrSearchParser,
+  isMgetRequest,
+  isSearchByAssetRequest,
+  isSearchByAssetsRequest,
+  isSearchCommonRequest,
+} from '../../pairs/utils';
 
 export const get = ({
   params,
@@ -36,9 +41,6 @@ export const get = ({
   }
 };
 
-export const isMgetRequest = (req: unknown): req is PairsMgetRequest =>
-  typeof req === 'object' && req !== null && req.hasOwnProperty('pairs');
-
 export const mgetOrSearch = ({
   params,
   query,
@@ -54,40 +56,25 @@ export const mgetOrSearch = ({
     return error(new ParseError(new Error('Query is empty')));
   }
 
-  return parseFilterValues({
-    pairs: parsePairs,
-    match_exactly: parseArrayQuery,
-    search_by_asset: commonFilters.query,
-    search_by_assets: parseArrayQuery,
-  })(query).map(fValues => {
+  return mgetOrSearchParser(query).chain(fValues => {
     if (isMgetRequest(fValues)) {
-      return {
+      return ok({
         pairs: fValues.pairs,
         matcher: params.matcher,
-      };
+      });
     } else {
-      if (fValues.search_by_asset) {
-        return {
-          matcher: params.matcher,
-          sort: fValues.sort,
-          limit: fValues.limit,
-          match_exactly: fValues.match_exactly,
-          search_by_asset: fValues.search_by_asset,
-        };
-      } else if (fValues.search_by_assets) {
-        return {
-          matcher: params.matcher,
-          sort: fValues.sort,
-          limit: fValues.limit,
-          match_exactly: fValues.match_exactly,
-          search_by_assets: fValues.search_by_assets,
-        };
+      const fValuesWithDefaults = withDefaults(fValues);
+
+      if (isSearchCommonRequest(fValuesWithDefaults)) {
+        if (isSearchByAssetRequest(fValuesWithDefaults)) {
+          return ok(fValuesWithDefaults);
+        } else if (isSearchByAssetsRequest(fValuesWithDefaults)) {
+          return ok(fValuesWithDefaults);
+        } else {
+          return ok(fValuesWithDefaults);
+        }
       } else {
-        return {
-          matcher: params.matcher,
-          sort: fValues.sort,
-          limit: fValues.limit,
-        };
+        return error(new ParseError(new Error('Invalid request data')));
       }
     }
   });

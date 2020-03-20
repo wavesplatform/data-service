@@ -1,6 +1,5 @@
 import { Result, Error as error, Ok as ok } from 'folktale/result';
 import * as Router from 'koa-router';
-
 import { ParseError } from '../../errorHandling';
 import { ServiceMesh } from '../../services';
 import { WithSortOrder, WithLimit } from '../../services/_common';
@@ -11,10 +10,9 @@ import {
   TransactionInfo,
   Transaction,
 } from '../../types';
-
 import { createHttpHandler } from '../_common';
 import { HttpRequest } from '../_common/types';
-import { parseFilterValues } from '../_common/filters';
+import { parseFilterValues, withDefaults } from '../_common/filters';
 import { Parser } from '../_common/filters/types';
 import {
   get as getSerializer,
@@ -24,7 +22,7 @@ import {
 import { postToGet } from '../_common/postToGet';
 
 export const isMgetRequest = (req: unknown): req is ServiceMgetRequest =>
-  typeof req === 'object' && req !== null && req.hasOwnProperty('ids');
+  typeof req === 'object' && req !== null && 'ids' in req;
 
 export const parseGet = ({
   params,
@@ -49,9 +47,9 @@ export const parseMgetOrSearch = <SearchRequest>(
 
   return parseFilterValues(customFilters)(query).map(fValues => {
     if (isMgetRequest(fValues)) {
-      return { ids: fValues.ids };
+      return fValues;
     } else {
-      return fValues as SearchRequest;
+      return withDefaults(fValues as SearchRequest);
     }
   });
 };

@@ -5,7 +5,7 @@ import { ParseError } from '../../errorHandling';
 import { DataTxsServiceSearchRequest } from '../../services/transactions/data';
 import { DataEntryValue } from '../../services/transactions/data/repo/types';
 import { DataEntryType, ServiceMgetRequest } from '../../types';
-import { parseFilterValues } from '../_common/filters';
+import { parseFilterValues, withDefaults } from '../_common/filters';
 import commonFilters from '../_common/filters/filters';
 import { Parser } from '../_common/filters/types';
 import { HttpRequest } from '../_common/types';
@@ -89,13 +89,20 @@ export const parseDataMgetOrSearch = ({
     if (isMgetRequest(fValues)) {
       return ok(fValues);
     } else {
-      if (!isNil(fValues.value) && isNil(fValues.type)) {
+      const fValuesWithDefaults = withDefaults(fValues);
+      if (
+        !isNil(fValuesWithDefaults.value) &&
+        isNil(fValuesWithDefaults.type)
+      ) {
         return error(
           new ParseError(new Error('Type param has to be set with value param'))
         );
       }
-      return parseValue(fValues.type, fValues.value).map(value => ({
-        ...fValues,
+      return parseValue(
+        fValuesWithDefaults.type,
+        fValuesWithDefaults.value
+      ).map(value => ({
+        ...fValuesWithDefaults,
         ...(value ? { value } : {}),
       }));
     }

@@ -3,7 +3,7 @@ import { isNil } from 'ramda';
 import { ParseError } from '../../errorHandling';
 import { Parser } from '../../http/_common/filters/types';
 
-export type ParseDate = Parser<Date | undefined>;
+export type ParseDate = Parser<Date>;
 
 export const parseDate: ParseDate = str => {
   if (isNil(str)) return ok(undefined);

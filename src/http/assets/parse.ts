@@ -5,12 +5,34 @@ import {
   AssetsServiceMgetRequest,
   AssetsServiceSearchRequest,
 } from '../../services/assets';
-import { parseFilterValues } from '../_common/filters';
+import { parseFilterValues, withDefaults } from '../_common/filters';
 import commonFilters from '../_common/filters/filters';
 import { HttpRequest } from '../_common/types';
+import {
+  SearchByTicker,
+  FullTextSearch,
+} from '../../services/assets/repo/types';
+import { ParsedFilterValues } from '../_common/filters/types';
 
-const isMgetRequest = (req: any): req is AssetsServiceMgetRequest =>
-  'ids' in req && typeof req.ids !== 'undefined' && Array.isArray(req.ids);
+const mgetOrSearchParser = parseFilterValues({
+  ticker: commonFilters.query,
+  search: commonFilters.query,
+});
+
+type ParserFnType = typeof mgetOrSearchParser;
+
+const isMgetRequest = (
+  req: ParsedFilterValues<ParserFnType>
+): req is AssetsServiceMgetRequest =>
+  typeof req.ids !== 'undefined' && Array.isArray(req.ids);
+
+const isSearchByTickerRequest = (
+  req: ParsedFilterValues<ParserFnType>
+): req is SearchByTicker => typeof req.ticker !== 'undefined';
+
+const isFullTextSearchRequest = (
+  req: ParsedFilterValues<ParserFnType>
+): req is FullTextSearch => typeof req.search !== 'undefined';
 
 export const get = ({
   params,
@@ -32,27 +54,16 @@ export const mgetOrSearch = ({
     return error(new ParseError(new Error('Query is empty')));
   }
 
-  return parseFilterValues({
-    ticker: commonFilters.query,
-    search: commonFilters.query,
-  })(query).chain(fValues => {
+  return mgetOrSearchParser(query).chain(fValues => {
     if (isMgetRequest(fValues)) {
       return ok(fValues);
     } else {
-      if ('ticker' in fValues && typeof fValues.ticker !== 'undefined') {
-        return ok({
-          ticker: fValues.ticker,
-          sort: fValues.sort,
-          limit: fValues.limit,
-          after: fValues.after,
-        });
-      } else if ('search' in fValues && typeof fValues.search !== 'undefined') {
-        return ok({
-          search: fValues.search,
-          sort: fValues.sort,
-          limit: fValues.limit,
-          after: fValues.after,
-        });
+      const fValuesWithDefaults = withDefaults(fValues);
+
+      if (isSearchByTickerRequest(fValuesWithDefaults)) {
+        return ok(fValuesWithDefaults);
+      } else if (isFullTextSearchRequest(fValuesWithDefaults)) {
+        return ok(fValuesWithDefaults);
       } else {
         return error(
           new ParseError(new Error('There is neither ticker nor search query'))

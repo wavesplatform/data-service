@@ -1,7 +1,11 @@
 import * as Router from 'koa-router';
 import { omit } from 'ramda';
 
-import { PairsService } from '../../services/pairs';
+import {
+  PairsService,
+  PairsServiceMgetRequest,
+  PairsServiceSearchRequest,
+} from '../../services/pairs';
 import { pair, PairInfo, AssetIdsPair, Pair } from '../../types';
 import { createHttpHandler } from '../_common';
 import {
@@ -10,13 +14,13 @@ import {
   search as serachSerializer,
 } from '../_common/serialize';
 import { postToGet } from '../_common/postToGet';
-import {
-  get as parseGet,
-  mgetOrSearch as parseMgetOrSearch,
-  isMgetRequest,
-} from './parse';
+import { get as parseGet, mgetOrSearch as parseMgetOrSearch } from './parse';
 
 const subrouter = new Router();
+
+export const isMgetRequest = (
+  req: PairsServiceMgetRequest | PairsServiceSearchRequest
+): req is PairsServiceMgetRequest => 'pairs' in req && Array.isArray(req.pairs);
 
 export const pairWithData = (p: (PairInfo & AssetIdsPair) | null): Pair =>
   p

@@ -1,3 +1,10 @@
+import {
+  DataTxsGetRequest,
+  DataTxsMgetRequest,
+  DataTxsSearchRequest,
+} from '../types';
+import { PgDriver } from 'db/driver';
+
 const Maybe = require('folktale/maybe');
 const { head, propEq } = require('ramda');
 
@@ -8,7 +15,7 @@ const transformResult = require('./transformResult');
 const sql = require('./sql').default;
 
 const pg = {
-  get: pg => id =>
+  get: (pg: PgDriver) => (id: DataTxsGetRequest) =>
     pg
       .any(sql.get(id))
       .map(transformResult)
@@ -16,14 +23,14 @@ const pg = {
       .map(Maybe.fromNullable)
       .mapRejected(addMeta({ request: 'transactions.data.get', params: id })),
 
-  mget: pg => ids =>
+  mget: (pg: PgDriver) => (ids: DataTxsMgetRequest) =>
     pg
       .any(sql.mget(ids))
       .map(transformResult)
       .map(matchRequestsResults(propEq('id'), ids))
       .mapRejected(addMeta({ request: 'transactions.data.mget', params: ids })),
 
-  search: pg => filters =>
+  search: (pg: PgDriver) => (filters: DataTxsSearchRequest) =>
     pg
       .any(sql.search(filters))
       .map(transformResult)

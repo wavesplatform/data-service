@@ -1,7 +1,7 @@
 import { Result, Error as error, Ok as ok } from 'folktale/result';
-import { compose, defaultTo } from 'ramda';
+import { compose } from 'ramda';
 import { ParseError } from '../../../errorHandling';
-import { SortOrder, isSortOrder } from '../../../services/_common';
+import { isSortOrder } from '../../../services/_common';
 import {
   parseDate,
   parseArrayQuery,
@@ -10,27 +10,25 @@ import {
 
 import { CommonFilters } from './types';
 
-const limitFilter: CommonFilters['limit'] = compose(
-  n =>
-    isNaN(n)
-      ? error(new ParseError(new Error('limit has to be a number')))
-      : ok(n),
-  parseInt,
-  String,
-  defaultTo(100)
-);
+// default limit is 100
+const limitFilter: CommonFilters['limit'] = raw =>
+  typeof raw === 'undefined'
+    ? ok(undefined)
+    : compose<string, number, Result<ParseError, number>>(
+        n =>
+          isNaN(n)
+            ? error(new ParseError(new Error('limit has to be a number')))
+            : ok(n),
+        parseInt
+      )(raw);
 
-const sortFilter: CommonFilters['sort'] = compose<
-  string | undefined,
-  SortOrder | string,
-  Result<ParseError, SortOrder>
->(
-  s =>
-    isSortOrder(s)
-      ? ok(s)
-      : error(new ParseError(new Error('Invalid sort value'))),
-  defaultTo<SortOrder>(SortOrder.Descending)
-);
+// default sort is SortOrder.Descending
+const sortFilter: CommonFilters['sort'] = s =>
+  typeof s === 'undefined'
+    ? ok(undefined)
+    : isSortOrder(s)
+    ? ok(s)
+    : error(new ParseError(new Error('Invalid sort value')));
 
 const afterFilter: CommonFilters['after'] = parseTrimmedStringIfDefined;
 

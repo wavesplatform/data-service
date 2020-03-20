@@ -17,7 +17,7 @@ export const result = Joi.object().keys({
   sender_public_key: Joi.string()
     .base58()
     .required(),
-  recipients: Joi.array().items(Joi.string()),
+  recipients: Joi.array().items(Joi.string().allow(null)),
   amounts: Joi.array().items(
     Joi.object()
       .bignumber()

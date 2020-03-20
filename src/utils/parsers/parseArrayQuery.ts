@@ -4,7 +4,7 @@ import { isNil } from 'ramda';
 import { ParseError } from '../../errorHandling';
 import { Parser } from '../../http/_common/filters/types';
 
-export type ParseArrayQuery = Parser<string[] | undefined, string | string[]>;
+export type ParseArrayQuery = Parser<string[], string | string[]>;
 
 export function parseArrayQuery(
   strOrArr: undefined

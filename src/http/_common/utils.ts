@@ -22,7 +22,10 @@ export const setHttpResponse = (ctx: Context) => (
   }
 };
 
-const LSN_FORMAT_KEY = 'large-significand-format';
+export const LSN_FORMAT_KEY = 'large-significand-format';
+export const DEFAULT_LSN_FORMAT = LSNFormat.Number;
+
+export const DEFAULT_DECIMALS_FORMAT = DecimalsFormat.Float;
 
 export const parseLSN = (
   httpHeaders: RequestHeaders
@@ -34,7 +37,7 @@ export const parseLSN = (
     acceptHeader.includes(LSN_FORMAT_KEY)
   ) {
     const lsnFormat = acceptHeader.substr(
-      acceptHeader.indexOf(LSN_FORMAT_KEY) + LSN_FORMAT_KEY.length + 1  // + 1 cause the equal sign 
+      acceptHeader.indexOf(LSN_FORMAT_KEY) + LSN_FORMAT_KEY.length + 1 // + 1 cause the equal sign
     ) as LSNFormat;
 
     if (![LSNFormat.Number, LSNFormat.String].includes(lsnFormat)) {
@@ -45,7 +48,7 @@ export const parseLSN = (
       return ok(lsnFormat);
     }
   } else {
-    return ok(LSNFormat.Number);
+    return ok(DEFAULT_LSN_FORMAT);
   }
 };
 
@@ -73,7 +76,7 @@ export const parseDecimals = (
 
   return ok(
     defaultTo(
-      DecimalsFormat.Float,
+      DEFAULT_DECIMALS_FORMAT,
       httpHeaders[WITH_DECIMALS_HEADER] as DecimalsFormat
     )
   );

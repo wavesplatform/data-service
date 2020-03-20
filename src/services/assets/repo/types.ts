@@ -1,5 +1,5 @@
 import { Asset } from '@waves/data-entities';
-import { CacheSync, Repo, XOR } from '../../../types';
+import { CacheSync, Repo } from '../../../types';
 import { WithSortOrder, WithLimit } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
 
@@ -12,12 +12,12 @@ export type SearchByTicker = {
   ticker: string;
 };
 
-export type SearchFullText = {
+export type FullTextSearch = {
   search: string;
 };
 
 export type AssetsSearchRequest = RequestWithCursor<
-  XOR<SearchByTicker, SearchFullText> & WithSortOrder & WithLimit,
+  (SearchByTicker | FullTextSearch) & WithSortOrder & WithLimit,
   string
 >;
 

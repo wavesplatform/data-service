@@ -11,6 +11,7 @@ import {
   PairsRepo,
 } from './repo/types';
 
+export type PairsServiceMgetRequest = PairsMgetRequest;
 export type PairsServiceSearchRequest = PairsSearchRequest;
 export type PairsService = {
   get: Service<
@@ -18,7 +19,7 @@ export type PairsService = {
     Maybe<PairInfo & AssetIdsPair>
   >;
   mget: Service<
-    PairsMgetRequest & WithDecimalsFormat,
+    PairsServiceMgetRequest & WithDecimalsFormat,
     Maybe<PairInfo & AssetIdsPair>[]
   >;
   search: Service<
