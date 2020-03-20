@@ -1,14 +1,16 @@
 import { Result, Error as error, Ok as ok } from 'folktale/result';
-import { isNil } from 'ramda';
+import { isNil, mergeAll } from 'ramda';
 import { ParseError } from '../../errorHandling';
-import { parseFilterValues, withDefaults } from '../_common/filters';
-import commonFilters from '../_common/filters/filters';
-import { HttpRequest } from '../_common/types';
+import { loadConfig } from '../../loadConfig';
+import { WithMatcher, WithSortOrder, WithLimit } from '../../services/_common';
 import {
   PairsGetRequest,
   PairsMgetRequest,
 } from '../../services/pairs/repo/types';
 import { PairsServiceSearchRequest } from '../../services/pairs';
+import { parseFilterValues, withDefaults } from '../_common/filters';
+import commonFilters from '../_common/filters/filters';
+import { HttpRequest } from '../_common/types';
 import {
   withMatcher,
   isMgetRequest,
@@ -17,6 +19,8 @@ import {
   isSearchByAssetsRequest,
   mgetOrSearchParser,
 } from './utils';
+
+const config = loadConfig();
 
 export const get = ({
   params,
@@ -64,7 +68,14 @@ export const mgetOrSearch = ({
     if (isMgetRequest(fValues)) {
       return ok(fValues);
     } else {
-      const fValuesWithDefaults = withDefaults(fValues);
+      const fValuesWithDefaults = mergeAll<
+        PairsServiceSearchRequest & WithMatcher & WithSortOrder & WithLimit
+      >([
+        {
+          matcher: config.matcher.defaultMatcherAddress,
+        },
+        withDefaults(fValues),
+      ]);
 
       if (isSearchCommonRequest(fValuesWithDefaults)) {
         if (isSearchByAssetRequest(fValuesWithDefaults)) {
@@ -75,7 +86,9 @@ export const mgetOrSearch = ({
           return ok(fValuesWithDefaults);
         }
       } else {
-        return error(new ParseError(new Error('Invalid request data')));
+        return error(
+          new ParseError(new Error('Invalid request data'), fValuesWithDefaults)
+        );
       }
     }
   });

@@ -1,6 +1,11 @@
 import { Result, Ok as ok, Error as error } from 'folktale/result';
-import { isNil } from 'ramda';
+import { isNil, mergeAll } from 'ramda';
 import { ParseError } from '../../../errorHandling';
+import {
+  WithMatcher,
+  WithSortOrder,
+  WithLimit,
+} from '../../../services/_common';
 import {
   PairsGetRequest,
   PairsMgetRequest,
@@ -63,7 +68,14 @@ export const mgetOrSearch = ({
         matcher: params.matcher,
       });
     } else {
-      const fValuesWithDefaults = withDefaults(fValues);
+      const fValuesWithDefaults = mergeAll<
+        PairsServiceSearchRequest & WithMatcher & WithSortOrder & WithLimit
+      >([
+        withDefaults(fValues),
+        {
+          matcher: params.matcher,
+        },
+      ]);
 
       if (isSearchCommonRequest(fValuesWithDefaults)) {
         if (isSearchByAssetRequest(fValuesWithDefaults)) {
@@ -74,7 +86,9 @@ export const mgetOrSearch = ({
           return ok(fValuesWithDefaults);
         }
       } else {
-        return error(new ParseError(new Error('Invalid request data')));
+        return error(
+          new ParseError(new Error('Invalid request data'), fValuesWithDefaults)
+        );
       }
     }
   });

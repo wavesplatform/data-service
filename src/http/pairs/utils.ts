@@ -45,7 +45,7 @@ type ParserFnType = typeof mgetOrSearchParser;
 
 export const withMatcher = (
   req: ParsedFilterValues<ParserFnType>
-): req is WithMatcher => 'matcher' in req && typeof req.matcher !== 'undefined';
+): req is WithMatcher => 'matcher' in req && typeof req.matcher === 'string';
 
 export const isMgetRequest = (
   req: ParsedFilterValues<ParserFnType>
