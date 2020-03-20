@@ -1,5 +1,5 @@
 import { Result, Ok as ok, Error as error } from 'folktale/result';
-import { merge } from 'ramda';
+import { mergeAll } from 'ramda';
 import { ParseError } from '../../errorHandling';
 import {
   AliasesServiceGetRequest,
@@ -63,7 +63,11 @@ export const mgetOrSearch = ({
 
       if (isSearchRequest(fValuesWithDefaults)) {
         return ok(
-          merge({ showBroken: false, limit: LIMIT }, fValuesWithDefaults)
+          mergeAll([
+            { showBroken: false },
+            fValuesWithDefaults,
+            { limit: LIMIT },
+          ])
         );
       } else {
         return error(
