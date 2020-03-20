@@ -19,7 +19,12 @@ import { serialize, deserialize, Cursor } from '../../_common/cursor';
 import { result as resultSchema } from './schema';
 import { pg as pgData } from './pg';
 import * as transformTxInfo from './transformTxInfo';
-import { DataTxsSearchRequest, DataTxDbResponse, DataTxsRepo } from './types';
+import {
+  DataTxsSearchRequest,
+  DataTxDbResponse,
+  DataTxsRepo,
+  DataTxsGetRequest,
+} from './types';
 
 const createServiceName = (type: string): string => `transactions.data.${type}`;
 
@@ -32,7 +37,7 @@ export default ({
     get: get({
       transformInput: ok,
       transformResult: transformResultGet<
-        string,
+        DataTxsGetRequest,
         DataTxDbResponse,
         TransactionInfo
       >(transformTxInfo),
