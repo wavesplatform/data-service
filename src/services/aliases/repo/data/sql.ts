@@ -12,28 +12,31 @@ const getAliasRowNumber = (after: string) =>
     .select('rn')
     .where('alias', after);
 
-const fromSet = (aliasSet: string[] | knex.QueryBuilder) =>
+const filterByAliases = (aliasSet: string[]) =>
+  pg({ t: 'txs_10' })
+    .select('t.tx_uid')
+    .whereIn('t.alias', aliasSet);
+
+const selectFiltered = (filtered: knex.QueryBuilder) =>
   pg.from({
     counted_aliases: pg({ t: 'txs_10' })
       .select({ alias: 't.alias' })
       .min({ address: 'addr.address' }) // first sender
-      .min({ time_stamp: 'txs.time_stamp' }) // first tx timestamp
       .count({ duplicates: 't.sender_uid' }) // count senders grouped by alias
       .column({ rn: pg.raw('row_number() over (order by t.tx_uid)') }) // rn for pagination
-      .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tx_uid')
       .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid')
-      .whereIn('t.alias', aliasSet)
+      .whereIn('t.tx_uid', filtered)
       .groupBy('t.alias', 't.tx_uid'),
   });
 
 export default {
   get: (alias: string) =>
-    fromSet([alias])
+    selectFiltered(filterByAliases([alias]))
       .select(columns)
       .clone()
       .toString(),
   mget: (aliases: string[]) =>
-    fromSet(aliases)
+    selectFiltered(filterByAliases(aliases))
       .select(columns)
       .clone()
       .toString(),
@@ -41,9 +44,9 @@ export default {
     const q = pg('aliases_cte')
       .with(
         'aliases_cte',
-        fromSet(
+        selectFiltered(
           pg('txs_10')
-            .select('alias')
+            .select('tx_uid')
             .where(
               'sender_uid',
               pg('addresses')
