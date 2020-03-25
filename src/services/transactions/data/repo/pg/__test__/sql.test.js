@@ -41,11 +41,13 @@ describe('transactions.data api method', () => {
     it('limit', () => {
       expect(sql.search({ limit: 11 })).toMatchSnapshot();
     });
+
     it('after', () => {
       expect(
         sql.search({
           after: {
-            tx_uid: 20000000,
+            height: 20000000,
+            position_in_block: 0,
             sort: 'asc',
           },
         })

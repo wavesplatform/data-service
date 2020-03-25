@@ -1,5 +1,8 @@
 const Joi = require('./joi');
-const { deserialize } = require('../../services/transactions/_common/cursor');
+const {
+  serialize,
+  deserialize,
+} = require('../../services/transactions/_common/cursor');
 
 const { BigNumber } = require('@waves/data-entities');
 
@@ -17,7 +20,16 @@ describe('Joi extended with custom types', () => {
 
   it('should validate cursor correctly', () => {
     const validateCursor = validate(Joi.cursor().valid(deserialize));
-    assertPass(validateCursor('MjUwMDAwMDA6OmRlc2M='));
+    const validCursor = serialize(
+      {
+        sort: 'desc',
+      },
+      {
+        height: 100,
+        position_in_block: 1,
+      }
+    );
+    assertPass(validateCursor(validCursor));
     assertError(validateCursor('q')); // not base64
     assertError(validateCursor('MjAxOC0wOS')); // not decodable
     assertError(validateCursor(1));
