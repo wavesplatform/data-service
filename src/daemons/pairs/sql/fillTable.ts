@@ -11,20 +11,29 @@ const selectExchanges = pg({ t: 'txs_7' })
     time_stamp: 't.time_stamp',
     sender_uid: 't.sender_uid',
   })
-  .where(
-    't.tx_uid',
-    '>=',
-    pg('txs')
-      .select('uid')
+  .with('hp_cte', qb =>
+    qb
+      .select('height', 'position_in_block')
       .from('txs')
       .whereRaw(`time_stamp >= now() - interval '1 day'`)
       .limit(1)
   )
-  .orderBy('t.tx_uid', 'desc');
+  .where('t.height', '>', pg('hp_cte').select('height'))
+  .orWhere(function() {
+    this.where('height', pg('hp_cte').select('height')).andWhere(
+      'position_in_block',
+      '>=',
+      pg('hp_cte')
+        .select('position_in_block')
+        .from('hp_cte')
+    );
+  })
+  .orderBy('t.height', 'desc')
+  .orderBy('t.position_in_block', 'desc');
 
 const selectPairsCTE = pg
-  .with('pairs_cte', qp => {
-    qp.select({
+  .with('pairs_cte', qb => {
+    qb.select({
       amount_asset_uid: 'amount_asset_uid',
       price_asset_uid: 'price_asset_uid',
       last_price: pg.raw(

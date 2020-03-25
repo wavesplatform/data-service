@@ -1,25 +1,24 @@
 const { curryN } = require('ramda');
+const knex = require('knex');
+const pg = knex({ client: 'pg' });
 
 const commonFilters = require('../../../_common/sql/filters');
 const commonFiltersOrder = require('../../../_common/sql/filtersOrder');
 
 const byOrderSender = curryN(2, (orderSender, q) =>
-  q.where('t.order_sender_uid', function() {
-    this.select('uid')
-      .from('addresses')
+  // uses index gin array[order1_sender_uid, order2_sender_uid]
+  q.whereRaw(
+    `array[t.order1_sender_uid, t.order2_sender_uid] @> array[(${pg('addresses')
+      .select('uid')
       .where('address', orderSender)
-      .limit(1);
-  })
+      .limit(1)})]`
+  )
 );
 
 const byOrder = curryN(2, (orderId, q) =>
+  // uses index gin array[order1->>'id', order2->>'id']
   q
-    .where('t.order_uid', function() {
-      this.select('uid')
-        .from('orders')
-        .where('id', orderId)
-        .limit(1);
-    })
+    .whereRaw(`array[t.order1->>'id', t.order2->>'id'] @> array[${orderId}]`)
     .limit(1)
 );
 

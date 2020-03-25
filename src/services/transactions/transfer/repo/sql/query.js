@@ -8,6 +8,7 @@ const selectFromFiltered = filtered =>
       // common
       tx_uid: 't.tx_uid',
       height: 't.height',
+      position_in_block: 't.position_in_block',
       tx_type: 'txs.tx_type',
       id: 'txs.id',
       time_stamp: 'txs.time_stamp',
@@ -33,6 +34,7 @@ const selectFromFiltered = filtered =>
       t: filtered.select({
         tx_uid: 't.tx_uid',
         height: 't.height',
+        position_in_block: 't.position_in_block',
         asset_uid: 't.asset_uid',
         attachment: 't.attachment',
         sender_uid: 't.sender_uid',

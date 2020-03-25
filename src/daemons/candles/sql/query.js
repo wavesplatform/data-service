@@ -86,7 +86,7 @@ const selectExchangesAfterTimestamp = fromTimestamp =>
   selectExchanges.clone().where(
     't.tx_uid',
     '>=',
-    pg('txs')
+    pg('txs_7')
       .select('uid')
       .from('txs')
       .whereRaw(
@@ -111,6 +111,7 @@ const selectLastExchangeTxHeight = () =>
     .select('height')
     .limit(1)
     .orderBy('height', 'desc')
+    .orderBy('position_in_block', 'desc')
     .toString();
 
 /** selectLastExchangeTx :: String query */
@@ -119,7 +120,8 @@ const selectMinTimestampFromHeight = height =>
     t: pg('txs_7')
       .column('time_stamp')
       .where('height', '>=', height)
-      .orderBy('tx_uid')
+      .orderBy('height')
+      .orderBy('position_in_block')
       .limit(1),
   })
     .column({ time_stamp: pg.min('t.time_stamp') })

@@ -1,14 +1,8 @@
-const { compose, defaultTo, merge, pick, pipe } = require('ramda');
+const { defaultTo, pick, pipe } = require('ramda');
 
 const { pickBindFilters } = require('../../../../../utils/db');
 const defaultValues = require('../../../_common/sql/defaults');
-const {
-  getOrMget,
-  getOrMgetPrepareForSelectFromFiltered,
-  search,
-  searchPrepareForSelectFromFiltered,
-  selectFromFiltered,
-} = require('./query');
+const { select, selectFromFiltered } = require('./query');
 
 // get — get by id
 // mget/search — apply filters
@@ -18,10 +12,9 @@ const createApi = ({ filters: F }) => ({
       F.id(id),
       // tips for postgresql to use index
       F.limit(1),
-      getOrMgetPrepareForSelectFromFiltered,
       selectFromFiltered,
       String
-    )(getOrMget),
+    )(select),
 
   mget: ids =>
     pipe(
@@ -29,10 +22,9 @@ const createApi = ({ filters: F }) => ({
       // tip for postgresql to use index
       F.sort(defaultValues.SORT),
       F.limit(ids.length),
-      getOrMgetPrepareForSelectFromFiltered,
       selectFromFiltered,
       String
-    )(getOrMget),
+    )(select),
 
   search: fValues => {
     const fNames = [
@@ -51,25 +43,14 @@ const createApi = ({ filters: F }) => ({
     ];
 
     // { [fName]: fValue }
-    const withDefaults = compose(
-      pick(fNames),
-      merge({
-        ...defaultValues,
-        limit: defaultValues.LIMIT * 2, // hack for filtering in txs_7_orders - there are 2 rows on each tx
-      })
-    )({ ...fValues, limit: fValues.limit * 2 });
+    const withDefaults = pick(fNames, fValues);
 
     const sort = defaultTo(defaultValues.SORT, fValues.sort);
 
     const fs = pickBindFilters(F, fNames, withDefaults);
-    const fQuery = pipe(F.sort(sort), ...fs)(search);
+    const fQuery = pipe(F.sort(sort), ...fs)(select);
 
-    return pipe(
-      searchPrepareForSelectFromFiltered,
-      selectFromFiltered,
-      F.sort(sort),
-      String
-    )(fQuery);
+    return pipe(selectFromFiltered, F.sort(sort), String)(fQuery);
   },
 });
 

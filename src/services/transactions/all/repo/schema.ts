@@ -12,4 +12,6 @@ export const result = Joi.object().keys({
   id: Joi.string()
     .base58()
     .required(),
+  height: Joi.number().required(),
+  position_in_block: Joi.number().required(),
 });

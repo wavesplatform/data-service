@@ -7,6 +7,7 @@ const selectFromFiltered = filtered =>
     .select({
       tx_uid: 't.tx_uid',
       height: 't.height',
+      position_in_block: 't.position_in_block',
       tx_type: 'txs.tx_type',
       id: 'txs.id',
       time_stamp: 'txs.time_stamp',
@@ -26,6 +27,7 @@ const selectFromFiltered = filtered =>
             tx_uid: 't.tx_uid',
             sender_uid: 't.sender_uid',
             height: 't.height',
+            position_in_block: 't.position_in_block',
             recipient_address_uid: 't.recipient_address_uid',
             amount: pg.raw('t.amount * 10^(-8)'),
             recipient_alias: 'recipient_alias.alias',

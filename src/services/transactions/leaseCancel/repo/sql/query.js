@@ -7,6 +7,7 @@ const selectFromFiltered = filtered =>
     .select({
       tx_uid: 't.tx_uid',
       height: 't.height',
+      position_in_block: 't.position_in_block',
       tx_type: 'txs.tx_type',
       id: 'txs.id',
       time_stamp: 'txs.time_stamp',
@@ -23,6 +24,7 @@ const selectFromFiltered = filtered =>
         .select({
           tx_uid: 't.tx_uid',
           height: 't.height',
+          position_in_block: 't.position_in_block',
           sender_uid: 't.sender_uid',
           lease_id: 'l.id',
         })

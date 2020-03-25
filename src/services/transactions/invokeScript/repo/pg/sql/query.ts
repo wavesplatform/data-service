@@ -5,6 +5,7 @@ const columnsWithoutFeeAndPaymentAssetId = [
   // common
   't.tx_uid',
   't.height',
+  't.position_in_block',
   'txs.tx_type',
   'txs.id',
   'txs.time_stamp',
@@ -36,7 +37,9 @@ const columnsWithoutFeeAndPaymentAssetId = [
 
 // in get/mget requests sort is tip for postgresql to use index
 export const select = (s: string) =>
-  pg({ t: 'txs_16 ' }).orderBy('t.tx_uid', s);
+  pg({ t: 'txs_16 ' })
+    .orderBy('t.height', s)
+    .orderBy('t.position_in_block', s);
 
 export const selectFromFiltered = (filtered: knex.QueryBuilder) =>
   pg

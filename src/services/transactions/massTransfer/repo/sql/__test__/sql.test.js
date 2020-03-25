@@ -1,4 +1,4 @@
-const sql = require('../sql');
+const sql = require('./sql');
 
 const filterValues = {
   recipient: 'recipient',

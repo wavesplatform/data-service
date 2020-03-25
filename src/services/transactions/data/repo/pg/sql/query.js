@@ -7,6 +7,7 @@ const selectFromFiltered = filtered =>
       tx_type: 'txs.tx_type',
       tx_version: 'txs.tx_version',
       height: 't.height',
+      position_in_block: 't.position_in_block',
       id: 'txs.id',
       signature: 'txs.signature',
       time_stamp: 'txs.time_stamp',
