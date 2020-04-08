@@ -69,7 +69,7 @@ const selectPairsCTE = pg
       .andOn('p1.matcher', 'p.matcher');
   })
   .leftJoin('pairs_cte as p2', function() {
-    this.on('p2.amount_asset_id', 'p.amount_asset_id')
+    this.on('p2.amount_asset_id', 'p.price_asset_id')
       .andOn(pg.raw("p2.price_asset_id='WAVES'"))
       .andOn('p2.matcher', 'p.matcher');
   });
