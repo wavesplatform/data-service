@@ -87,7 +87,7 @@ const selectPairsCTE = pg
       .andOn('p1.matcher_address_uid', 'p.matcher_address_uid');
   })
   .leftJoin({ p2: 'pairs_cte' }, function() {
-    this.on('p2.amount_asset_uid', 'p.amount_asset_uid')
+    this.on('p2.amount_asset_uid', 'p.price_asset_uid')
       .andOn(pg.raw('p2.price_asset_uid is null'))
       .andOn('p2.matcher_address_uid', 'p.matcher_address_uid');
   });
