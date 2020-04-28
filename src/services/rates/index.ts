@@ -1,5 +1,4 @@
 import { BigNumber } from '@waves/data-entities';
-import { withStatementTimeout } from '../../db/driver';
 import {
   ServiceMget,
   Rate,
@@ -17,27 +16,23 @@ export { default as RateCacheImpl } from './repo/impl/RateCache';
 
 export type RateWithPairIds = RateInfo & AssetIdsPair;
 
-export default function({
+export default function ({
   drivers,
   cache,
-  timeouts,
 }: RateSerivceCreatorDependencies): ServiceMget<RateMgetParams, Rate> {
-  const estimator = new RateEstimator(
-    cache,
-    new RemoteRateRepo(withStatementTimeout(drivers.pg, timeouts.mget))
-  );
+  const estimator = new RateEstimator(cache, new RemoteRateRepo(drivers.pg));
 
   return {
     mget(request: RateMgetParams) {
       return estimator
         .mget(request)
-        .map(data =>
-          data.map(item =>
+        .map((data) =>
+          data.map((item) =>
             rate(
               {
                 rate: item.res.fold(
                   () => new BigNumber(0),
-                  it => it.rate
+                  (it) => it.rate
                 ),
               },
               {

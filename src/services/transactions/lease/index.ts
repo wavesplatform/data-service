@@ -1,14 +1,8 @@
 import { propEq, compose } from 'ramda';
 import { BigNumber } from '@waves/data-entities';
 
-import { withStatementTimeout } from '../../../db/driver';
 import { CommonServiceDependencies } from '../..';
-import {
-  transaction,
-  TransactionInfo,
-  Transaction,
-  Service,
-} from '../../../types';
+import { transaction, TransactionInfo, Transaction, Service } from '../../../types';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
 import { getByIdPreset } from '../../presets/pg/getById';
@@ -21,10 +15,7 @@ import { Cursor, serialize, deserialize } from '../_common/cursor';
 import { RawTx, CommonFilters } from '../_common/types';
 import { transformTxInfo } from '../_common/transformTxInfo';
 
-import {
-  result as resultSchema,
-  inputSearch as inputSearchSchema,
-} from './schema';
+import { result as resultSchema, inputSearch as inputSearchSchema } from './schema';
 import * as sql from './sql';
 
 type LeaseTxsSearchRequest = RequestWithCursor<
@@ -50,29 +41,21 @@ export type LeaseTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
-  timeouts,
 }: CommonServiceDependencies): LeaseTxsService => {
   return {
-    get: getByIdPreset<string, LeaseTxDbResponse, TransactionInfo, Transaction>(
-      {
-        name: 'transactions.lease.get',
-        sql: sql.get,
-        inputSchema: inputGet,
-        resultSchema,
-        resultTypeFactory: transaction,
-        transformResult: transformTxInfo,
-      }
-    )({
-      pg: withStatementTimeout(pg, timeouts.get),
+    get: getByIdPreset<string, LeaseTxDbResponse, TransactionInfo, Transaction>({
+      name: 'transactions.lease.get',
+      sql: sql.get,
+      inputSchema: inputGet,
+      resultSchema,
+      resultTypeFactory: transaction,
+      transformResult: transformTxInfo,
+    })({
+      pg,
       emitEvent,
     }),
 
-    mget: mgetByIdsPreset<
-      string,
-      LeaseTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
+    mget: mgetByIdsPreset<string, LeaseTxDbResponse, TransactionInfo, Transaction>({
       name: 'transactions.lease.mget',
       matchRequestResult: propEq('id'),
       sql: sql.mget,
@@ -81,7 +64,7 @@ export default ({
       resultSchema,
       transformResult: transformTxInfo,
     })({
-      pg: withStatementTimeout(pg, timeouts.mget),
+      pg,
       emitEvent,
     }),
 
@@ -99,7 +82,7 @@ export default ({
       transformResult: compose(transaction, transformTxInfo),
       cursorSerialization: { serialize, deserialize },
     })({
-      pg: withStatementTimeout(pg, timeouts.search),
+      pg,
       emitEvent,
     }),
   };

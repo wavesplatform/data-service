@@ -31,9 +31,7 @@ export type DefaultConfig = PostgresConfig & ServerConfig & LoggerConfig;
 export type DataServiceConfig = PostgresConfig &
   ServerConfig &
   LoggerConfig &
-  MatcherConfig & {
-    defaultTimeout: number;
-  };
+  MatcherConfig;
 
 const commonEnvVariables = ['PGHOST', 'PGDATABASE', 'PGUSER', 'PGPASSWORD'];
 
@@ -48,9 +46,7 @@ export const loadDefaultConfig = (): DefaultConfig => {
     postgresDatabase: process.env.PGDATABASE || 'mainnet',
     postgresUser: process.env.PGUSER || 'postgres',
     postgresPassword: process.env.PGPASSWORD || 'postgres',
-    postgresPoolSize: process.env.PGPOOLSIZE
-      ? parseInt(process.env.PGPOOLSIZE)
-      : 20,
+    postgresPoolSize: process.env.PGPOOLSIZE ? parseInt(process.env.PGPOOLSIZE) : 20,
     postgresStatementTimeout:
       isNil(process.env.PGSTATEMENTTIMEOUT) ||
       isNaN(parseInt(process.env.PGSTATEMENTTIMEOUT))
@@ -82,10 +78,6 @@ const load = (): DataServiceConfig => {
   return {
     ...loadDefaultConfig(),
     ...matcher,
-
-    defaultTimeout: process.env.DEFAULT_TIMEOUT
-      ? parseInt(process.env.DEFAULT_TIMEOUT)
-      : 30000,
   };
 };
 

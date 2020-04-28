@@ -3,7 +3,6 @@ import { of as taskOf } from 'folktale/concurrency/task';
 import { of as just, Maybe } from 'folktale/maybe';
 import { tap } from '../../utils/tap';
 import { forEach, isEmpty } from '../../utils/fp/maybeOps';
-import { withStatementTimeout } from '../../db/driver/utils';
 import { asset, Asset, AssetInfo, List } from '../../types';
 
 import { CommonServiceDependencies } from '..';
@@ -22,10 +21,7 @@ import { searchWithPaginationPreset } from '../presets/pg/searchWithPagination';
 // validation
 import { inputGet } from '../presets/pg/getById/inputSchema';
 import { inputMget } from '../presets/pg/mgetByIds/inputSchema';
-import {
-  result as resultSchema,
-  inputSearch as inputSearchSchema,
-} from './schema';
+import { result as resultSchema, inputSearch as inputSearchSchema } from './schema';
 
 import { transformDbResponse } from './transformAsset';
 import * as sql from './sql';
@@ -43,7 +39,6 @@ export default ({
   drivers: { pg },
   emitEvent,
   cache,
-  timeouts,
 }: CommonServiceDependencies & {
   cache: AssetsCache;
 }): AssetsService => {
@@ -57,46 +52,42 @@ export default ({
     get: createGetResolver<string, string, AssetDbResponse, Asset>({
       transformInput: identity,
       validateInput: validateInput(inputGet, SERVICE_NAME.GET),
-      getData: req =>
+      getData: (req) =>
         cache.get(req).matchWith({
           Just: ({ value }) => taskOf(just(value)),
           Nothing: () =>
             getByIdPg<AssetDbResponse, string>({
               name: SERVICE_NAME.GET,
               sql: sql.get,
-              pg: withStatementTimeout(pg, timeouts.get),
-            })(req).map(
-              tap(maybeResp => forEach(x => cache.set(req, x), maybeResp))
-            ),
+              pg,
+            })(req).map(tap((maybeResp) => forEach((x) => cache.set(req, x), maybeResp))),
         }),
       validateResult: validateResult(resultSchema, SERVICE_NAME.GET),
-      transformResult: res => res.map(transformDbResponse).map(asset),
+      transformResult: (res) => res.map(transformDbResponse).map(asset),
       emitEvent,
     }),
 
     mget: createMgetResolver<string[], string[], AssetDbResponse, List<Asset>>({
       transformInput: identity,
       validateInput: validateInput(inputMget, SERVICE_NAME.MGET),
-      getData: request => {
-        let results: Array<Maybe<AssetDbResponse>> = request.map(x =>
-          cache.get(x)
-        );
+      getData: (request) => {
+        let results: Array<Maybe<AssetDbResponse>> = request.map((x) => cache.get(x));
 
         const notCachedIndexes = results.reduce<number[]>((acc, x, i) => {
           if (isEmpty(x)) acc.push(i);
           return acc;
         }, []);
 
-        const notCachedAssetIds = notCachedIndexes.map(i => request[i]);
+        const notCachedAssetIds = notCachedIndexes.map((i) => request[i]);
 
         return mgetByIdsPg<AssetDbResponse, string>({
           name: SERVICE_NAME.MGET,
           sql: sql.mget,
           matchRequestResult: propEq('asset_id'),
-          pg: withStatementTimeout(pg, timeouts.mget),
-        })(notCachedAssetIds).map(fromDb => {
+          pg,
+        })(notCachedAssetIds).map((fromDb) => {
           fromDb.forEach((assetInfo, index) =>
-            forEach(value => {
+            forEach((value) => {
               results[notCachedIndexes[index]] = assetInfo;
               cache.set(notCachedAssetIds[index], value);
             }, assetInfo)
@@ -105,12 +96,9 @@ export default ({
         });
       },
       validateResult: validateResult(resultSchema, SERVICE_NAME.MGET),
-      transformResult: transformMgetResults<
-        string[],
-        AssetDbResponse,
-        AssetInfo,
-        Asset
-      >(asset)(transformDbResponse),
+      transformResult: transformMgetResults<string[], AssetDbResponse, AssetInfo, Asset>(
+        asset
+      )(transformDbResponse),
       emitEvent,
     }),
 
@@ -131,7 +119,7 @@ export default ({
         deserialize,
       },
     })({
-      pg: withStatementTimeout(pg, timeouts.search),
+      pg,
       emitEvent,
     }),
   };

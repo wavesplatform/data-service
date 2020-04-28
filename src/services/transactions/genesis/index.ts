@@ -1,14 +1,8 @@
 import { propEq, compose, Omit } from 'ramda';
 import { BigNumber } from '@waves/data-entities';
 
-import { withStatementTimeout } from '../../../db/driver';
 import { CommonServiceDependencies } from '../..';
-import {
-  transaction,
-  TransactionInfo,
-  Transaction,
-  Service,
-} from '../../../types';
+import { transaction, TransactionInfo, Transaction, Service } from '../../../types';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
 import { getByIdPreset } from '../../presets/pg/getById';
@@ -21,10 +15,7 @@ import { Cursor, serialize, deserialize } from '../_common/cursor';
 import { transformTxInfo } from '../_common/transformTxInfo';
 import { RawTx, CommonFilters } from '../_common/types';
 
-import {
-  result as resultSchema,
-  inputSearch as inputSearchSchema,
-} from './schema';
+import { result as resultSchema, inputSearch as inputSearchSchema } from './schema';
 import * as sql from './sql';
 
 type GenesisTxsSearchRequest = RequestWithCursor<
@@ -50,15 +41,9 @@ export type GenesisTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
-  timeouts,
 }: CommonServiceDependencies): GenesisTxsService => {
   return {
-    get: getByIdPreset<
-      string,
-      GenesisTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
+    get: getByIdPreset<string, GenesisTxDbResponse, TransactionInfo, Transaction>({
       name: 'transactions.genesis.get',
       sql: sql.get,
       inputSchema: inputGet,
@@ -66,16 +51,11 @@ export default ({
       resultTypeFactory: transaction,
       transformResult: transformTxInfo,
     })({
-      pg: withStatementTimeout(pg, timeouts.get),
+      pg,
       emitEvent,
     }),
 
-    mget: mgetByIdsPreset<
-      string,
-      GenesisTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
+    mget: mgetByIdsPreset<string, GenesisTxDbResponse, TransactionInfo, Transaction>({
       name: 'transactions.genesis.mget',
       matchRequestResult: propEq('id'),
       sql: sql.mget,
@@ -84,7 +64,7 @@ export default ({
       resultSchema,
       transformResult: transformTxInfo,
     })({
-      pg: withStatementTimeout(pg, timeouts.mget),
+      pg,
       emitEvent,
     }),
 
@@ -105,7 +85,7 @@ export default ({
         deserialize,
       },
     })({
-      pg: withStatementTimeout(pg, timeouts.search),
+      pg,
       emitEvent,
     }),
   };

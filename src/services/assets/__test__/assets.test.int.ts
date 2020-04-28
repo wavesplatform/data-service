@@ -15,29 +15,22 @@ const drivers = {
 };
 const cache = createCache(10, 10000);
 
-const DEFAULT_TIMEOUT_IN_MS = 30000;
-
 const service = createService({
   drivers,
   emitEvent: () => () => null,
   cache,
-  timeouts: {
-    get: DEFAULT_TIMEOUT_IN_MS,
-    mget: DEFAULT_TIMEOUT_IN_MS,
-    search: DEFAULT_TIMEOUT_IN_MS,
-  },
 });
 
 const assetId = 'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH';
 
 describe('Assets service', () => {
   describe('get', () => {
-    it('fetches a real asset', async done => {
+    it('fetches a real asset', async (done) => {
       service
         .get(assetId)
         .run()
         .promise()
-        .then(x => {
+        .then((x) => {
           expect(x.unsafeGet()).toMatchSnapshot();
           done();
         })
@@ -45,43 +38,40 @@ describe('Assets service', () => {
     });
 
     it('returns null for unreal tx', async () => {
-      const tx = await service
-        .get('UNREAL')
-        .run()
-        .promise();
+      const tx = await service.get('UNREAL').run().promise();
 
       expect(tx).toBeNothing();
     });
   });
 
   describe('mget', () => {
-    it('fetches real assets with nulls for unreal', async done => {
+    it('fetches real assets with nulls for unreal', async (done) => {
       service
         .mget([assetId, 'UNREAL'])
         .run()
         .promise()
-        .then(xs => {
+        .then((xs) => {
           expect(xs).toMatchSnapshot();
           done();
         })
-        .catch(e => done(JSON.stringify(e)));
+        .catch((e) => done(JSON.stringify(e)));
     });
   });
 
   describe('search', () => {
-    it('fetches WAVES by ticker', async done => {
+    it('fetches WAVES by ticker', async (done) => {
       service
         .search({ ticker: 'WAVES', limit: 100 })
         .run()
         .promise()
-        .then(xs => {
+        .then((xs) => {
           expect(xs).toMatchSnapshot();
           done();
         })
-        .catch(e => done(JSON.stringify(e)));
+        .catch((e) => done(JSON.stringify(e)));
     });
 
-    it('fetches non-WAVES asset by ticker (BTC)', async done => {
+    it('fetches non-WAVES asset by ticker (BTC)', async (done) => {
       http.get(
         'http://nodes.wavesnodes.com/assets/details/8LQW8f7P5d5PZM7GtZEBgaqRPGSzS3DfPuiXrURJ4AJS',
         (res: EventEmitter) => {
@@ -93,12 +83,10 @@ describe('Assets service', () => {
               .search({ ticker: 'BTC', limit: 100 })
               .run()
               .promise()
-              .then(xs => {
+              .then((xs) => {
                 const assetInfo = xs.data[0].data;
                 if (assetInfo !== null) {
-                  expect(assetInfo.description).toMatch(
-                    assetInfoFromNode.description
-                  );
+                  expect(assetInfo.description).toMatch(assetInfoFromNode.description);
                   expect(assetInfo.height.toString()).toMatch(
                     assetInfoFromNode.issueHeight.toString()
                   );
@@ -130,11 +118,11 @@ describe('Assets service', () => {
         .search({ ticker: '*', limit: 100 })
         .run()
         .promise()
-        .then(as => {
+        .then((as) => {
           expect(as.data.length).toBeGreaterThan(100);
           // make sure WAVES is included
           expect(
-            as.data.find(a => a.data && a.data.ticker === 'WAVES')
+            as.data.find((a) => a.data && a.data.ticker === 'WAVES')
           ).not.toBeUndefined();
         }));
   });

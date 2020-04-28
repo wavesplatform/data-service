@@ -1,13 +1,7 @@
 import { propEq, compose } from 'ramda';
 
-import { withStatementTimeout } from '../../../db/driver';
 import { CommonServiceDependencies } from '../..';
-import {
-  transaction,
-  TransactionInfo,
-  Transaction,
-  Service,
-} from '../../../types';
+import { transaction, TransactionInfo, Transaction, Service } from '../../../types';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
 import { getByIdPreset } from '../../presets/pg/getById';
@@ -19,10 +13,7 @@ import { inputMget } from '../../presets/pg/mgetByIds/inputSchema';
 import { Cursor, serialize, deserialize } from '../_common/cursor';
 import { RawTx, CommonFilters } from '../_common/types';
 
-import {
-  result as resultSchema,
-  inputSearch as inputSearchSchema,
-} from './schema';
+import { result as resultSchema, inputSearch as inputSearchSchema } from './schema';
 import * as sql from './sql';
 import * as transformTxInfo from './transformTxInfo';
 
@@ -48,15 +39,9 @@ export type LeaseCancelTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
-  timeouts,
 }: CommonServiceDependencies): LeaseCancelTxsService => {
   return {
-    get: getByIdPreset<
-      string,
-      LeaseCancelTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
+    get: getByIdPreset<string, LeaseCancelTxDbResponse, TransactionInfo, Transaction>({
       name: 'transactions.leaseCancel.get',
       sql: sql.get,
       inputSchema: inputGet,
@@ -64,16 +49,11 @@ export default ({
       resultTypeFactory: transaction,
       transformResult: transformTxInfo,
     })({
-      pg: withStatementTimeout(pg, timeouts.get),
+      pg,
       emitEvent,
     }),
 
-    mget: mgetByIdsPreset<
-      string,
-      LeaseCancelTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
+    mget: mgetByIdsPreset<string, LeaseCancelTxDbResponse, TransactionInfo, Transaction>({
       name: 'transactions.leaseCancel.mget',
       matchRequestResult: propEq('id'),
       sql: sql.mget,
@@ -82,7 +62,7 @@ export default ({
       resultSchema,
       transformResult: transformTxInfo,
     })({
-      pg: withStatementTimeout(pg, timeouts.mget),
+      pg,
       emitEvent,
     }),
 
@@ -100,7 +80,7 @@ export default ({
       transformResult: compose(transaction, transformTxInfo),
       cursorSerialization: { serialize, deserialize },
     })({
-      pg: withStatementTimeout(pg, timeouts.search),
+      pg,
       emitEvent,
     }),
   };

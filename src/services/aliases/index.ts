@@ -18,8 +18,6 @@ import { inputGet, inputMGet, inputSearch, output } from './schema';
 import { mgetByIdsPreset } from '../../services/presets/pg/mgetByIds';
 import { propEq } from 'ramda';
 
-import { withStatementTimeout } from '../../db/driver';
-
 type AliasesSearchRequest = {
   address: string;
   showBroken: boolean;
@@ -31,11 +29,7 @@ export type AliasService = ServiceGet<string, Alias> &
   ServiceSearch<AliasesSearchRequest, Alias> &
   ServiceMget<AliasMGetParams, Alias>;
 
-export default ({
-  drivers,
-  emitEvent,
-  timeouts,
-}: CommonServiceDependencies): AliasService => {
+export default ({ drivers, emitEvent }: CommonServiceDependencies): AliasService => {
   return {
     get: getByIdPreset<string, AliasDbResponse, AliasInfo, Alias>({
       name: 'aliases.get',
@@ -45,7 +39,7 @@ export default ({
       transformResult: transformDbResponse,
       resultTypeFactory: alias,
     })({
-      pg: withStatementTimeout(drivers.pg, timeouts.get),
+      pg: drivers.pg,
       emitEvent: emitEvent,
     }),
 
@@ -58,27 +52,20 @@ export default ({
       resultTypeFactory: alias,
       matchRequestResult: propEq('alias'),
     })({
-      pg: withStatementTimeout(drivers.pg, timeouts.mget),
+      pg: drivers.pg,
       emitEvent: emitEvent,
     }),
 
-    search: searchPreset<
-      AliasesSearchRequest,
-      AliasDbResponse,
-      AliasInfo,
-      List<Alias>
-    >({
+    search: searchPreset<AliasesSearchRequest, AliasDbResponse, AliasInfo, List<Alias>>({
       name: 'aliases.search',
       sql: sql.search,
       inputSchema: inputSearch,
       resultSchema: output,
-      transformResult: transformSearch<
-        AliasesSearchRequest,
-        AliasDbResponse,
-        Alias
-      >(alias)(transformDbResponse),
+      transformResult: transformSearch<AliasesSearchRequest, AliasDbResponse, Alias>(
+        alias
+      )(transformDbResponse),
     })({
-      pg: withStatementTimeout(drivers.pg, timeouts.search),
+      pg: drivers.pg,
       emitEvent: emitEvent,
     }),
   };

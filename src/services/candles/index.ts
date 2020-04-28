@@ -1,7 +1,6 @@
 import { Task } from 'folktale/concurrency/task';
 import { identity } from 'ramda';
 
-import { withStatementTimeout } from '../../db/driver';
 import { Candle, List, ServiceSearch, AssetIdsPair } from '../../types';
 import { CommonServiceDependencies } from '..';
 
@@ -30,7 +29,6 @@ export type CandlesService = ServiceSearch<CandlesSearchRequest, Candle>;
 export default ({
   drivers: { pg },
   emitEvent,
-  timeouts,
   validatePair,
 }: CommonServiceDependencies & {
   validatePair: (matcher: string, pair: AssetIdsPair) => Task<AppError, void>;
@@ -45,7 +43,7 @@ export default ({
     >({
       transformInput: identity,
       transformResult: transformResults,
-      validateInput: req =>
+      validateInput: (req) =>
         validateInput<CandlesSearchRequest>(
           inputSearch,
           SERVICE_NAME
@@ -59,7 +57,7 @@ export default ({
       getData: getData({
         name: SERVICE_NAME,
         sql,
-        pg: withStatementTimeout(pg, timeouts.search),
+        pg,
       }),
       emitEvent,
     }),
