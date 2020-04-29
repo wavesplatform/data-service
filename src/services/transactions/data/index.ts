@@ -1,15 +1,8 @@
 import { identity, compose } from 'ramda';
 
-import { withStatementTimeout } from '../../../db/driver';
 import { CommonServiceDependencies } from '../..';
 import { DataTxEntryType } from '../../../types';
-import {
-  transaction,
-  TransactionInfo,
-  Transaction,
-  List,
-  Service,
-} from '../../../types';
+import { transaction, TransactionInfo, Transaction, List, Service } from '../../../types';
 
 import { WithLimit, WithSortOrder } from '../../_common';
 import { get, mget, search } from '../../_common/createResolver';
@@ -27,10 +20,7 @@ import { transformInput as transformInputSearch } from '../../presets/pg/searchW
 import { transformResults as transformResultSearch } from '../../presets/pg/searchWithPagination/transformResult';
 
 import { serialize, deserialize } from '../_common/cursor';
-import {
-  result as resultSchema,
-  inputSearch as inputSearchSchema,
-} from './schema';
+import { result as resultSchema, inputSearch as inputSearchSchema } from './schema';
 import { pg as pgData } from './pg';
 import * as transformTxInfo from './transformTxInfo';
 
@@ -55,17 +45,11 @@ type DataTxDbResponse = RawTx & {
   data: DataEntry[];
 };
 
-export type DataTxsService = Service<
-  string,
-  string[],
-  DataTxsSearchRequest,
-  Transaction
->;
+export type DataTxsService = Service<string, string[], DataTxsSearchRequest, Transaction>;
 
 export default ({
   drivers: { pg },
   emitEvent,
-  timeouts,
 }: CommonServiceDependencies): DataTxsService => {
   return {
     get: get<string, string, DataTxDbResponse, Transaction>({
@@ -78,7 +62,7 @@ export default ({
       >(transaction)(transformTxInfo),
       validateInput: validateInput(inputGet, createServiceName('get')),
       validateResult: validateResult(resultSchema, createServiceName('get')),
-      getData: pgData.get(withStatementTimeout(pg, timeouts.get)),
+      getData: pgData.get(pg),
       emitEvent,
     }),
 
@@ -92,7 +76,7 @@ export default ({
       >(transaction)(transformTxInfo),
       validateInput: validateInput(inputMget, createServiceName('mget')),
       validateResult: validateResult(resultSchema, createServiceName('mget')),
-      getData: pgData.mget(withStatementTimeout(pg, timeouts.mget)),
+      getData: pgData.mget(pg),
       emitEvent,
     }),
 
@@ -110,12 +94,9 @@ export default ({
         ),
         serialize
       ),
-      validateInput: validateInput(
-        inputSearchSchema,
-        createServiceName('search')
-      ),
+      validateInput: validateInput(inputSearchSchema, createServiceName('search')),
       validateResult: validateResult(resultSchema, createServiceName('search')),
-      getData: pgData.search(withStatementTimeout(pg, timeouts.search)),
+      getData: pgData.search(pg),
       emitEvent,
     }),
   };

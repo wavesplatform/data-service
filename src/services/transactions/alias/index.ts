@@ -1,13 +1,7 @@
 import { propEq, compose } from 'ramda';
 
-import { withStatementTimeout } from '../../../db/driver';
 import { CommonServiceDependencies } from '../..';
-import {
-  transaction,
-  TransactionInfo,
-  Transaction,
-  Service,
-} from '../../../types';
+import { transaction, TransactionInfo, Transaction, Service } from '../../../types';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
 import { getByIdPreset } from '../../presets/pg/getById';
@@ -20,10 +14,7 @@ import { Cursor, serialize, deserialize } from '../_common/cursor';
 import { RawTx, CommonFilters } from '../_common/types';
 import { transformTxInfo } from '../_common/transformTxInfo';
 
-import {
-  result as resultSchema,
-  inputSearch as inputSearchSchema,
-} from './schema';
+import { result as resultSchema, inputSearch as inputSearchSchema } from './schema';
 import * as sql from './sql';
 
 type AliasTxsSearchRequest = RequestWithCursor<
@@ -45,29 +36,21 @@ export type AliasTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
-  timeouts,
 }: CommonServiceDependencies): AliasTxsService => {
   return {
-    get: getByIdPreset<string, AliasTxDbResponse, TransactionInfo, Transaction>(
-      {
-        name: 'transactions.alias.get',
-        sql: sql.get,
-        inputSchema: inputGet,
-        resultSchema,
-        resultTypeFactory: transaction,
-        transformResult: transformTxInfo,
-      }
-    )({
-      pg: withStatementTimeout(pg, timeouts.get),
+    get: getByIdPreset<string, AliasTxDbResponse, TransactionInfo, Transaction>({
+      name: 'transactions.alias.get',
+      sql: sql.get,
+      inputSchema: inputGet,
+      resultSchema,
+      resultTypeFactory: transaction,
+      transformResult: transformTxInfo,
+    })({
+      pg,
       emitEvent,
     }),
 
-    mget: mgetByIdsPreset<
-      string,
-      AliasTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
+    mget: mgetByIdsPreset<string, AliasTxDbResponse, TransactionInfo, Transaction>({
       name: 'transactions.alias.mget',
       matchRequestResult: propEq('id'),
       sql: sql.mget,
@@ -76,7 +59,7 @@ export default ({
       resultSchema,
       transformResult: transformTxInfo,
     })({
-      pg: withStatementTimeout(pg, timeouts.mget),
+      pg,
       emitEvent,
     }),
 
@@ -97,7 +80,7 @@ export default ({
         deserialize,
       },
     })({
-      pg: withStatementTimeout(pg, timeouts.search),
+      pg,
       emitEvent,
     }),
   };

@@ -3,16 +3,11 @@ import { head, propEq } from 'ramda';
 
 import { PgDriver } from '../../../../db/driver';
 import { matchRequestsResults } from '../../../../utils/db';
-
 import { addMeta } from '../../../../errorHandling';
-
-import { InvokeScriptTxsSearchRequest } from '..';
+import { TransformedInvokeScriptTxsSearchRequest } from '..';
+import { RawInvokeScriptTx as DbRawInvokeScriptTx, RawInvokeScriptTx } from '../types';
 import sql from './sql';
 import { transformResult } from './transformResult';
-import {
-  RawInvokeScriptTx as DbRawInvokeScriptTx,
-  RawInvokeScriptTx,
-} from '../types';
 
 export default {
   get: (pg: PgDriver) => (id: string) =>
@@ -40,7 +35,7 @@ export default {
         })
       ),
 
-  search: (pg: PgDriver) => (filters: InvokeScriptTxsSearchRequest) =>
+  search: (pg: PgDriver) => (filters: TransformedInvokeScriptTxsSearchRequest) =>
     pg
       .any<DbRawInvokeScriptTx>(sql.search(filters))
       .map(transformResult)

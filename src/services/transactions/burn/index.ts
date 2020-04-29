@@ -1,12 +1,6 @@
 import { propEq, compose } from 'ramda';
 
-import { withStatementTimeout } from '../../../db/driver';
-import {
-  transaction,
-  TransactionInfo,
-  Transaction,
-  Service,
-} from '../../../types';
+import { transaction, TransactionInfo, Transaction, Service } from '../../../types';
 import { CommonServiceDependencies } from '../..';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
@@ -19,10 +13,7 @@ import { inputMget } from '../../presets/pg/mgetByIds/inputSchema';
 import { Cursor, serialize, deserialize } from '../_common/cursor';
 import { RawTx, CommonFilters } from '../_common/types';
 
-import {
-  result as resultSchema,
-  inputSearch as inputSearchSchema,
-} from './schema';
+import { result as resultSchema, inputSearch as inputSearchSchema } from './schema';
 import * as sql from './sql';
 import transformTxInfo from './transformTxInfo';
 
@@ -39,17 +30,11 @@ type BurnTxDbResponse = RawTx & {
   amount: string;
 };
 
-export type BurnTxsService = Service<
-  string,
-  string[],
-  BurnTxsSearchRequest,
-  Transaction
->;
+export type BurnTxsService = Service<string, string[], BurnTxsSearchRequest, Transaction>;
 
 export default ({
   drivers: { pg },
   emitEvent,
-  timeouts,
 }: CommonServiceDependencies): BurnTxsService => {
   return {
     get: getByIdPreset<string, BurnTxDbResponse, TransactionInfo, Transaction>({
@@ -60,16 +45,11 @@ export default ({
       resultTypeFactory: transaction,
       transformResult: transformTxInfo,
     })({
-      pg: withStatementTimeout(pg, timeouts.get),
+      pg,
       emitEvent,
     }),
 
-    mget: mgetByIdsPreset<
-      string,
-      BurnTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
+    mget: mgetByIdsPreset<string, BurnTxDbResponse, TransactionInfo, Transaction>({
       name: 'transactions.burn.mget',
       matchRequestResult: propEq('id'),
       sql: sql.mget,
@@ -78,7 +58,7 @@ export default ({
       resultSchema,
       transformResult: transformTxInfo,
     })({
-      pg: withStatementTimeout(pg, timeouts.mget),
+      pg,
       emitEvent,
     }),
 
@@ -99,7 +79,7 @@ export default ({
         deserialize,
       },
     })({
-      pg: withStatementTimeout(pg, timeouts.search),
+      pg,
       emitEvent,
     }),
   };

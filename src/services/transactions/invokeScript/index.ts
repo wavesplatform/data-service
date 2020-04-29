@@ -1,14 +1,7 @@
 import { compose, identity } from 'ramda';
 
-import { withStatementTimeout } from '../../../db/driver';
 import { CommonServiceDependencies } from '../..';
-import {
-  transaction,
-  TransactionInfo,
-  Transaction,
-  List,
-  Service,
-} from '../../../types';
+import { transaction, TransactionInfo, Transaction, List, Service } from '../../../types';
 import { WithSortOrder, WithLimit } from '../../_common';
 import { get, mget, search } from '../../_common/createResolver';
 import { CommonFilters } from '../_common/types';
@@ -23,17 +16,14 @@ import { transformResults as transformResultSearch } from '../../presets/pg/sear
 import { serialize, deserialize, Cursor } from '../_common/cursor';
 
 import pgData from './pg';
-import {
-  result as resultSchema,
-  inputSearch as inputSearchSchema,
-} from './schema';
+import { result as resultSchema, inputSearch as inputSearchSchema } from './schema';
 import * as transformTxInfo from './transformTxInfo';
 import { RawInvokeScriptTx, InvokeScriptTx } from './types';
 import { RequestWithCursor } from '../../_common/pagination';
 
 const createServiceName = (type: string) => `transactions.invokeScript.${type}`;
 
-export type InvokeScriptTxsSearchRequest = RequestWithCursor<
+type InvokeScriptTxsSearchRequest<C> = RequestWithCursor<
   CommonFilters &
     WithSortOrder &
     WithLimit &
@@ -41,20 +31,24 @@ export type InvokeScriptTxsSearchRequest = RequestWithCursor<
       dapp: string;
       function: string;
     }>,
+  C
+>;
+
+export type RawInvokeScriptTxsSearchRequest = InvokeScriptTxsSearchRequest<string>;
+export type TransformedInvokeScriptTxsSearchRequest = InvokeScriptTxsSearchRequest<
   Cursor
 >;
 
 export type InvokeScriptTxsService = Service<
   string,
   string[],
-  InvokeScriptTxsSearchRequest,
+  RawInvokeScriptTxsSearchRequest,
   Transaction
 >;
 
 export default ({
   drivers: { pg },
   emitEvent,
-  timeouts,
 }: CommonServiceDependencies): InvokeScriptTxsService => {
   return {
     get: get<string, string, RawInvokeScriptTx, Transaction>({
@@ -70,7 +64,7 @@ export default ({
         resultSchema,
         createServiceName('get')
       ),
-      getData: pgData.get(withStatementTimeout(pg, timeouts.get)),
+      getData: pgData.get(pg),
       emitEvent,
     }),
 
@@ -84,13 +78,13 @@ export default ({
       >(transaction)(transformTxInfo),
       validateInput: validateInput(inputMget, createServiceName('mget')),
       validateResult: validateResult(resultSchema, createServiceName('mget')),
-      getData: pgData.mget(withStatementTimeout(pg, timeouts.mget)),
+      getData: pgData.mget(pg),
       emitEvent,
     }),
 
     search: search<
-      InvokeScriptTxsSearchRequest,
-      InvokeScriptTxsSearchRequest,
+      RawInvokeScriptTxsSearchRequest,
+      TransformedInvokeScriptTxsSearchRequest,
       RawInvokeScriptTx,
       List<Transaction>
     >({
@@ -99,7 +93,7 @@ export default ({
         compose(transaction, transformTxInfo),
         serialize
       ),
-      validateInput: validateInput<InvokeScriptTxsSearchRequest>(
+      validateInput: validateInput<RawInvokeScriptTxsSearchRequest>(
         inputSearchSchema,
         createServiceName('search')
       ),
@@ -107,7 +101,7 @@ export default ({
         resultSchema,
         createServiceName('search')
       ),
-      getData: pgData.search(withStatementTimeout(pg, timeouts.search)),
+      getData: pgData.search(pg),
       emitEvent,
     }),
   };

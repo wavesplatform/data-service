@@ -1,14 +1,8 @@
 import { propEq, compose } from 'ramda';
 import { BigNumber } from '@waves/data-entities';
 
-import { withStatementTimeout } from '../../../db/driver';
 import { CommonServiceDependencies } from '../..';
-import {
-  transaction,
-  TransactionInfo,
-  Transaction,
-  Service,
-} from '../../../types';
+import { transaction, TransactionInfo, Transaction, Service } from '../../../types';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
 import { getByIdPreset } from '../../presets/pg/getById';
@@ -53,15 +47,9 @@ export type MassTransferTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
-  timeouts,
 }: CommonServiceDependencies): MassTransferTxsService => {
   return {
-    get: getByIdPreset<
-      string,
-      MassTransferTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
+    get: getByIdPreset<string, MassTransferTxDbResponse, TransactionInfo, Transaction>({
       name: 'transactions.massTransfer.get',
       sql: sql.get,
       inputSchema: inputGet,
@@ -69,25 +57,22 @@ export default ({
       resultTypeFactory: transaction,
       transformResult: transformTxInfo,
     })({
-      pg: withStatementTimeout(pg, timeouts.get),
+      pg,
       emitEvent,
     }),
 
-    mget: mgetByIdsPreset<
-      string,
-      MassTransferTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
-      name: 'transactions.massTransfer.mget',
-      matchRequestResult: propEq('id'),
-      sql: sql.mget,
-      inputSchema: inputMget,
-      resultTypeFactory: transaction,
-      resultSchema: result,
-      transformResult: transformTxInfo,
-    })({
-      pg: withStatementTimeout(pg, timeouts.mget),
+    mget: mgetByIdsPreset<string, MassTransferTxDbResponse, TransactionInfo, Transaction>(
+      {
+        name: 'transactions.massTransfer.mget',
+        matchRequestResult: propEq('id'),
+        sql: sql.mget,
+        inputSchema: inputMget,
+        resultTypeFactory: transaction,
+        resultSchema: result,
+        transformResult: transformTxInfo,
+      }
+    )({
+      pg,
       emitEvent,
     }),
 
@@ -105,7 +90,7 @@ export default ({
       transformResult: compose(transaction, transformTxInfo),
       cursorSerialization: { serialize, deserialize },
     })({
-      pg: withStatementTimeout(pg, timeouts.search),
+      pg,
       emitEvent,
     }),
   };

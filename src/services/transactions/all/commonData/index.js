@@ -1,6 +1,5 @@
 const { propEq, compose } = require('ramda');
 
-const { withStatementTimeout } = require('../../../../db/driver');
 const { getByIdPreset } = require('../../../presets/pg/getById');
 const { mgetByIdsPreset } = require('../../../presets/pg/mgetByIds');
 const {
@@ -18,7 +17,7 @@ const { result, inputSearch } = require('./schema');
 
 const { serialize, deserialize } = require('../../_common/cursor');
 
-module.exports = ({ drivers: { pg }, emitEvent, timeouts }) => {
+module.exports = ({ drivers: { pg }, emitEvent }) => {
   return {
     get: getByIdPreset({
       name: 'transactions.all.commonData.get',
@@ -28,7 +27,7 @@ module.exports = ({ drivers: { pg }, emitEvent, timeouts }) => {
       resultTypeFactory: transaction,
       transformResult: transformTxInfo,
     })({
-      pg: withStatementTimeout(pg, timeouts.get),
+      pg,
       emitEvent,
     }),
 
@@ -41,7 +40,7 @@ module.exports = ({ drivers: { pg }, emitEvent, timeouts }) => {
       resultSchema: result,
       transformResult: transformTxInfo,
     })({
-      pg: withStatementTimeout(pg, timeouts.mget),
+      pg,
       emitEvent,
     }),
 
@@ -56,7 +55,7 @@ module.exports = ({ drivers: { pg }, emitEvent, timeouts }) => {
         deserialize,
       },
     })({
-      pg: withStatementTimeout(pg, timeouts.search),
+      pg,
       emitEvent,
     }),
   };

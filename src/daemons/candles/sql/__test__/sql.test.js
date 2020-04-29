@@ -1,5 +1,6 @@
-const sql = require('../query');
 const { BigNumber } = require('@waves/data-entities');
+const { CandleInterval } = require('../../../../types');
+const sql = require('../query');
 
 describe('candles daemon sql test', () => {
   it('truncate table', () => {
@@ -15,7 +16,9 @@ describe('candles daemon sql test', () => {
   });
 
   it('get all candles from exchange tx grouped by 1 minute and after timestamp', () => {
-    expect(sql.selectCandlesByMinute(new Date('2019-01-01T00:00:00.000Z'))).toMatchSnapshot();
+    expect(
+      sql.selectCandlesAfterTimestamp(new Date('2019-01-01T00:00:00.000Z'))
+    ).toMatchSnapshot();
   });
 
   it('insert or update array of candles', () => {
@@ -40,9 +43,7 @@ describe('candles daemon sql test', () => {
   });
 
   it('insert or update candles empty', () => {
-    expect(
-      sql.insertOrUpdateCandles('candles', []).toString()
-    ).toMatchSnapshot();
+    expect(sql.insertOrUpdateCandles('candles', []).toString()).toMatchSnapshot();
   });
 
   it('get last candle', () => {
@@ -59,8 +60,8 @@ describe('candles daemon sql test', () => {
         .insertOrUpdateCandlesFromShortInterval(
           'candles',
           new Date('2019-01-01T00:00:00.000Z'),
-          60,
-          300
+          CandleInterval.Minute1,
+          CandleInterval.Minute5
         )
         .toString()
     ).toMatchSnapshot();

@@ -25,7 +25,7 @@ export const transformInput = <Cursor, Request extends WithLimit>(
   } else {
     return {
       ...requestWithoutAfter,
-      after: deserialize(request.after).getOrElse({}),
+      after: deserialize(request.after).getOrElse(undefined),
     };
   }
 };

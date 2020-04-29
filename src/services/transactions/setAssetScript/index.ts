@@ -1,13 +1,7 @@
 import { propEq, compose } from 'ramda';
 
-import { withStatementTimeout } from '../../../db/driver';
 import { CommonServiceDependencies } from '../..';
-import {
-  transaction,
-  TransactionInfo,
-  Transaction,
-  Service,
-} from '../../../types';
+import { transaction, TransactionInfo, Transaction, Service } from '../../../types';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
 import { getByIdPreset } from '../../presets/pg/getById';
@@ -47,15 +41,9 @@ export type SetAssetScriptTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
-  timeouts,
 }: CommonServiceDependencies): SetAssetScriptTxsService => {
   return {
-    get: getByIdPreset<
-      string,
-      SetAssetScriptTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
+    get: getByIdPreset<string, SetAssetScriptTxDbResponse, TransactionInfo, Transaction>({
       name: 'transactions.setAssetScript.get',
       sql: sql.get,
       inputSchema: inputGet,
@@ -63,7 +51,7 @@ export default ({
       resultTypeFactory: transaction,
       transformResult: transformTxInfo,
     })({
-      pg: withStatementTimeout(pg, timeouts.get),
+      pg,
       emitEvent,
     }),
 
@@ -81,7 +69,7 @@ export default ({
       resultSchema: result,
       transformResult: transformTxInfo,
     })({
-      pg: withStatementTimeout(pg, timeouts.mget),
+      pg,
       emitEvent,
     }),
 
@@ -102,7 +90,7 @@ export default ({
         deserialize,
       },
     })({
-      pg: withStatementTimeout(pg, timeouts.search),
+      pg,
       emitEvent,
     }),
   };

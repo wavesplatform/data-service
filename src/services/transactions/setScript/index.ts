@@ -1,13 +1,7 @@
 import { propEq, compose } from 'ramda';
 
-import { withStatementTimeout } from '../../../db/driver';
 import { CommonServiceDependencies } from '../..';
-import {
-  transaction,
-  TransactionInfo,
-  Transaction,
-  Service,
-} from '../../../types';
+import { transaction, TransactionInfo, Transaction, Service } from '../../../types';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
 import { getByIdPreset } from '../../presets/pg/getById';
@@ -46,15 +40,9 @@ export type SetScriptTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
-  timeouts,
 }: CommonServiceDependencies): SetScriptTxsService => {
   return {
-    get: getByIdPreset<
-      string,
-      SetScriptTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
+    get: getByIdPreset<string, SetScriptTxDbResponse, TransactionInfo, Transaction>({
       name: 'transactions.setScript.get',
       sql: sql.get,
       inputSchema: inputGet,
@@ -62,16 +50,11 @@ export default ({
       resultTypeFactory: transaction,
       transformResult: transformTxInfo,
     })({
-      pg: withStatementTimeout(pg, timeouts.get),
+      pg,
       emitEvent,
     }),
 
-    mget: mgetByIdsPreset<
-      string,
-      SetScriptTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
+    mget: mgetByIdsPreset<string, SetScriptTxDbResponse, TransactionInfo, Transaction>({
       name: 'transactions.setScript.mget',
       matchRequestResult: propEq('id'),
       sql: sql.mget,
@@ -80,7 +63,7 @@ export default ({
       resultSchema: result,
       transformResult: transformTxInfo,
     })({
-      pg: withStatementTimeout(pg, timeouts.mget),
+      pg,
       emitEvent,
     }),
 
@@ -101,7 +84,7 @@ export default ({
         deserialize,
       },
     })({
-      pg: withStatementTimeout(pg, timeouts.search),
+      pg,
       emitEvent,
     }),
   };

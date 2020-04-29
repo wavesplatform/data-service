@@ -1,12 +1,6 @@
 import { propEq, compose } from 'ramda';
 
-import { withStatementTimeout } from '../../../db/driver';
-import {
-  transaction,
-  TransactionInfo,
-  Transaction,
-  Service,
-} from '../../../types';
+import { transaction, TransactionInfo, Transaction, Service } from '../../../types';
 import { CommonServiceDependencies } from '../..';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
@@ -19,10 +13,7 @@ import { searchWithPaginationPreset } from '../../presets/pg/searchWithPaginatio
 import { Cursor, serialize, deserialize } from '../_common/cursor';
 import { RawTx, CommonFilters } from '../_common/types';
 
-import {
-  result as resultSchema,
-  inputSearch as inputSearchSchema,
-} from './schema';
+import { result as resultSchema, inputSearch as inputSearchSchema } from './schema';
 import * as sql from './sql';
 import * as transformTxInfo from './transformTxInfo';
 
@@ -50,15 +41,9 @@ export type ReissueTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
-  timeouts,
 }: CommonServiceDependencies): ReissueTxsService => {
   return {
-    get: getByIdPreset<
-      string,
-      ReissueTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
+    get: getByIdPreset<string, ReissueTxDbResponse, TransactionInfo, Transaction>({
       name: 'transactions.reissue.get',
       sql: sql.get,
       inputSchema: inputGet,
@@ -66,16 +51,11 @@ export default ({
       resultTypeFactory: transaction,
       transformResult: transformTxInfo,
     })({
-      pg: withStatementTimeout(pg, timeouts.get),
+      pg,
       emitEvent,
     }),
 
-    mget: mgetByIdsPreset<
-      string,
-      ReissueTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
+    mget: mgetByIdsPreset<string, ReissueTxDbResponse, TransactionInfo, Transaction>({
       name: 'transactions.reissue.mget',
       matchRequestResult: propEq('id'),
       sql: sql.mget,
@@ -84,7 +64,7 @@ export default ({
       resultSchema,
       transformResult: transformTxInfo,
     })({
-      pg: withStatementTimeout(pg, timeouts.mget),
+      pg,
       emitEvent,
     }),
 
@@ -105,7 +85,7 @@ export default ({
         deserialize,
       },
     })({
-      pg: withStatementTimeout(pg, timeouts.search),
+      pg,
       emitEvent,
     }),
   };

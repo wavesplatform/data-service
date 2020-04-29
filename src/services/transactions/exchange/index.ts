@@ -1,13 +1,7 @@
 import { propEq, compose } from 'ramda';
 import { BigNumber } from '@waves/data-entities';
 
-import { withStatementTimeout } from '../../../db/driver';
-import {
-  transaction,
-  TransactionInfo,
-  Transaction,
-  Service,
-} from '../../../types';
+import { transaction, TransactionInfo, Transaction, Service } from '../../../types';
 import { CommonServiceDependencies } from '../..';
 import { WithLimit, WithSortOrder } from '../../_common';
 import { RequestWithCursor } from '../../_common/pagination';
@@ -80,15 +74,9 @@ export type ExchangeTxsService = Service<
 export default ({
   drivers: { pg },
   emitEvent,
-  timeouts,
 }: CommonServiceDependencies): ExchangeTxsService => {
   return {
-    get: getByIdPreset<
-      string,
-      ExchangeTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
+    get: getByIdPreset<string, ExchangeTxDbResponse, TransactionInfo, Transaction>({
       name: 'transactions.exchange.get',
       sql: sql.get,
       inputSchema: inputGet,
@@ -96,16 +84,11 @@ export default ({
       resultTypeFactory: transaction,
       transformResult: transformTxInfo,
     })({
-      pg: withStatementTimeout(pg, timeouts.get),
+      pg,
       emitEvent,
     }),
 
-    mget: mgetByIdsPreset<
-      string,
-      ExchangeTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
+    mget: mgetByIdsPreset<string, ExchangeTxDbResponse, TransactionInfo, Transaction>({
       name: 'transactions.exchange.mget',
       matchRequestResult: propEq('id'),
       sql: sql.mget,
@@ -114,7 +97,7 @@ export default ({
       resultSchema: result,
       transformResult: transformTxInfo,
     })({
-      pg: withStatementTimeout(pg, timeouts.mget),
+      pg,
       emitEvent,
     }),
 
@@ -135,7 +118,7 @@ export default ({
         deserialize,
       },
     })({
-      pg: withStatementTimeout(pg, timeouts.search),
+      pg,
       emitEvent,
     }),
   };
