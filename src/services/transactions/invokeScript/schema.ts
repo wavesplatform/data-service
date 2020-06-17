@@ -10,7 +10,7 @@ export const inputSearch = Joi.object()
     dapp: Joi.string(),
     function: Joi.string(),
   })
-  .xor('sender', 'senders');
+  .nand('sender', 'senders');
 
 export const result = Joi.object().keys({
   ...commonFields,

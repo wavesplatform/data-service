@@ -9,7 +9,7 @@ const inputSearch = Joi.object()
     
     script: Joi.string().base64Prefixed(),
   })
-  .xor('sender', 'senders');
+  .nand('sender', 'senders');
 
 const result = Joi.object().keys({
   ...commonFields,

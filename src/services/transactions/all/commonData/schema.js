@@ -6,7 +6,7 @@ const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
   })
-  .xor('sender', 'senders');
+  .nand('sender', 'senders');
 
 const result = Joi.object().keys({
   tx_type: Joi.number()

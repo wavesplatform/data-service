@@ -10,7 +10,7 @@ const inputSearch = Joi.object()
     assetId: Joi.string().assetId(),
     script: Joi.string().base64Prefixed(),
   })
-  .xor('sender', 'senders');
+  .nand('sender', 'senders');
 
 const result = Joi.object().keys({
   ...commonFields,

@@ -6,7 +6,7 @@ const commonFilterSchemas = require('../_common/commonFilterSchemas').default;
 const inputSearch = Joi.object().keys({
   ...commonFilterSchemas,
   
-}).xor('sender', 'senders');
+}).nand('sender', 'senders');
 
 const result = Joi.object().keys({
   ...commonFields,

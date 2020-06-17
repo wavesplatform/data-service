@@ -12,7 +12,7 @@ const inputSearch = Joi.object()
     amountAsset: Joi.string().assetId(),
     priceAsset: Joi.string().assetId(),
   })
-  .xor('sender', 'senders');
+  .nand('sender', 'senders');
 
 const orderTypes = prefix => ({
   [`${prefix}_id`]: Joi.string()

@@ -7,7 +7,7 @@ const inputSearch = Joi.object().keys({
   ...commonFilters,
 
   assetId: Joi.string().base58(),
-}).xor('sender', 'senders');
+}).nand('sender', 'senders');
 
 const result = Joi.object().keys({
   ...commonFields,

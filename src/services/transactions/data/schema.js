@@ -35,7 +35,7 @@ const inputSearch = Joi.object()
       }),
   })
   .with('value', ['type'])
-  .xor('sender', 'senders');
+  .nand('sender', 'senders');
 
 const result = Joi.object().keys({
   ...commonFields,

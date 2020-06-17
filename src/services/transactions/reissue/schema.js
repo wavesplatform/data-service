@@ -9,7 +9,7 @@ const inputSearch = Joi.object()
 
     assetId: Joi.string().assetId(),
   })
-  .xor('sender', 'senders');
+  .nand('sender', 'senders');
   
 const result = Joi.object().keys({
   ...commonFields,
