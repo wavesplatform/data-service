@@ -3,6 +3,15 @@ import * as Joi from '../../../utils/validation/joi';
 import * as commonFields from '../_common/commonFieldsSchemas';
 import commonFilters from '../_common/commonFilterSchemas';
 
+export const inputSearch = Joi.object()
+  .keys({
+    ...commonFilters,
+
+    dapp: Joi.string(),
+    function: Joi.string(),
+  })
+  .xor('sender', 'senders');
+
 export const result = Joi.object().keys({
   ...commonFields,
 
@@ -26,11 +35,3 @@ export const result = Joi.object().keys({
       .allow(null),
   }),
 });
-
-export const inputSearch = Joi.object()
-  .keys({
-    ...commonFilters,
-    dapp: Joi.string(),
-    function: Joi.string(),
-  })
-  .required();

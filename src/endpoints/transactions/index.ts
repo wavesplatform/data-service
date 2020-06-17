@@ -13,6 +13,7 @@ import {
   sort,
   query,
 } from '../_common/filters';
+import { parseArrayQuery } from '../utils/parseArrayQuery';
 import { Serializable, Service } from '../../types';
 
 import { parseFilters as parseDataTxFilters } from './parseDataTxFilters';
@@ -26,6 +27,7 @@ const commonTxFilters = {
   after,
   sort,
   sender: identity,
+  senders: parseArrayQuery,
 };
 
 // common options

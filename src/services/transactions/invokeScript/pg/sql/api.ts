@@ -20,6 +20,7 @@ export const createApi = ({ filters: F }: { filters: any }) => ({
       'timeStart',
       'timeEnd',
       'sender',
+      'senders',
       // specific attributes
       'dapp',
       'function',

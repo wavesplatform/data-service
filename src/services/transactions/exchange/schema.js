@@ -3,6 +3,17 @@ const Joi = require('../../../utils/validation/joi');
 const commonFields = require('../_common/commonFieldsSchemas');
 const commonFilters = require('../_common/commonFilterSchemas').default;
 
+const inputSearch = Joi.object()
+  .keys({
+    ...commonFilters,
+
+    matcher: Joi.string().base58(),
+    orderId: Joi.string().base58(),
+    amountAsset: Joi.string().assetId(),
+    priceAsset: Joi.string().assetId(),
+  })
+  .xor('sender', 'senders');
+
 const orderTypes = prefix => ({
   [`${prefix}_id`]: Joi.string()
     .base58()
@@ -68,16 +79,5 @@ const result = Joi.object().keys({
   ...orderTypes('o1'),
   ...orderTypes('o2'),
 });
-
-const inputSearch = Joi.object()
-  .keys({
-    ...commonFilters,
-
-    matcher: Joi.string().base58(),
-    orderId: Joi.string().base58(),
-    amountAsset: Joi.string().assetId(),
-    priceAsset: Joi.string().assetId(),
-  })
-  .required();
 
 module.exports = { result, inputSearch };

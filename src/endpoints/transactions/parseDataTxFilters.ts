@@ -31,6 +31,7 @@ export const parseFilters = ({
   timeStart, // No default value for timestart, other way - bad for desc pagination
   timeEnd,
   sender,
+  senders,
   limit = '100',
   sort = 'desc',
   key,
@@ -42,6 +43,7 @@ export const parseFilters = ({
   timeStart?: string;
   timeEnd?: string;
   sender?: string;
+  senders?: string | string[];
   limit: string;
   sort: string;
   key?: string;
@@ -56,6 +58,7 @@ export const parseFilters = ({
     limit: parseInt(limit),
     sort,
     sender,
+    senders: senders && parseArrayQuery(senders),
     key,
     type,
     value: parseValue(type, value),

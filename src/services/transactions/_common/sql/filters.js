@@ -5,6 +5,8 @@ const ids = whereIn('id');
 
 const sender = where('sender');
 
+const senders = whereIn('sender');
+
 const timeStart = where('time_stamp', '>=');
 const timeEnd = where('time_stamp', '<=');
 
@@ -25,6 +27,7 @@ module.exports = {
   id,
   ids,
   sender,
+  senders,
   timeStart,
   timeEnd,
   sort,

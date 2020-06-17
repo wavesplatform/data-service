@@ -3,6 +3,14 @@ const Joi = require('../../../utils/validation/joi');
 const commonFields = require('../_common/commonFieldsSchemas');
 const commonFilters = require('../_common/commonFilterSchemas').default;
 
+const inputSearch = Joi.object()
+  .keys({
+    ...commonFilters,
+
+    assetId: Joi.string().assetId(),
+  })
+  .xor('sender', 'senders');
+
 const result = Joi.object().keys({
   ...commonFields,
 
@@ -13,14 +21,6 @@ const result = Joi.object().keys({
     .bignumber()
     .required(),
 });
-
-const inputSearch = Joi.object()
-  .keys({
-    ...commonFilters,
-
-    assetId: Joi.string().assetId(),
-  })
-  .required();
 
 module.exports = {
   result,
