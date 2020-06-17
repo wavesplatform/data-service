@@ -14,7 +14,7 @@ const bySender = curryN(
 const bySenders = curryN(
   2,
   (senders, q) => q.clone()
-    .whereRaw("array[order1->>'sender', order2->>'sender'] @> ?", `{${senders.join(',')}}`)
+    .whereRaw("array[order1->>'sender', order2->>'sender'] && ?", `{${senders.join(',')}}`)
 );
 
 // adding unneeded sort to force the use of index
