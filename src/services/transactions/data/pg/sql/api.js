@@ -28,6 +28,7 @@ module.exports = ({ filters: F }) => ({
       'timeStart',
       'timeEnd',
       'sender',
+      'senders',
       // data attributes
       'key',
       'type',

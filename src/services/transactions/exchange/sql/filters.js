@@ -11,6 +11,12 @@ const bySender = curryN(
     .whereRaw("array[order1->>'sender', order2->>'sender'] @> ?", `{${sender}}`)
 );
 
+const bySenders = curryN(
+  2,
+  (senders, q) => q.clone()
+    .whereRaw("array[order1->>'sender', order2->>'sender'] && ?", `{${senders.join(',')}}`)
+);
+
 // adding unneeded sort to force the use of index
 // https://stackoverflow.com/questions/21385555/postgresql-query-very-slow-with-limit-1/27237698#27237698
 const byOrder = curryN(
@@ -24,6 +30,7 @@ module.exports = {
   filters: {
     ...commonFilters,
     sender: bySender,
+    senders: bySenders,
     matcher: where('t.sender'),
     amountAsset: where('t.amount_asset'),
     priceAsset: where('t.price_asset'),

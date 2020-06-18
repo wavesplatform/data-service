@@ -15,4 +15,5 @@ export default {
   }),
   sort: Joi.string().valid('asc', 'desc'),
   sender: Joi.string().base58(),
+  senders: Joi.array().items(Joi.string().base58())
 };

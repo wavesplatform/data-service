@@ -10,30 +10,10 @@ const CORRECT_TYPE = Joi.string().valid([
   'binary',
 ]);
 
-const result = Joi.object().keys({
-  ...commonFields,
-  data: Joi.array()
-    .items(
-      Joi.object().keys({
-        key: Joi.string()
-          .allow('')
-          .required(),
-        type: CORRECT_TYPE.required(),
-        value: [
-          Joi.object()
-            .bignumber()
-            .int64(),
-          Joi.string().allow(''),
-          Joi.boolean(),
-        ],
-      })
-    )
-    .required(),
-});
-
 const inputSearch = Joi.object()
   .keys({
     ...commonFilters,
+
     key: Joi.string().noNullChars(),
     type: CORRECT_TYPE,
     value: Joi.when('type', {
@@ -54,7 +34,29 @@ const inputSearch = Joi.object()
           .allow(''),
       }),
   })
-  .with('value', 'type')
-  .required();
+  .with('value', ['type'])
+  .nand('sender', 'senders');
+
+const result = Joi.object().keys({
+  ...commonFields,
+
+  data: Joi.array()
+    .items(
+      Joi.object().keys({
+        key: Joi.string()
+          .allow('')
+          .required(),
+        type: CORRECT_TYPE.required(),
+        value: [
+          Joi.object()
+            .bignumber()
+            .int64(),
+          Joi.string().allow(''),
+          Joi.boolean(),
+        ],
+      })
+    )
+    .required(),
+});
 
 module.exports = { result, inputSearch };

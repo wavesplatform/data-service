@@ -10,5 +10,5 @@ module.exports = {
     recipient: where('recipient'),
   }),
 
-  filtersOrder: without('sender', [...commonFiltersOrder, 'recipient']),
+  filtersOrder: without(['sender'], [...commonFiltersOrder, 'recipient']),
 };
