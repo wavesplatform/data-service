@@ -283,7 +283,7 @@ paths:
       parameters:
         - in: query
           name: sender
-          description: Address-sender of the transaction; has exclusive relation with senders
+          description: Address-sender of the transaction
           schema:
             type: string
         - in: query
