@@ -25,4 +25,5 @@ export type CommonFilters = {
   timeStart?: Date;
   timeEnd?: Date;
   sender?: string;
+  senders?: string[]
 };

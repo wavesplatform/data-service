@@ -4,15 +4,8 @@ import * as Router from 'koa-router';
 import { ServiceMesh } from '../../services';
 
 import * as createEndpoint from '../_common';
-import {
-  timeStart,
-  timeEnd,
-  after,
-  limit,
-  ids,
-  sort,
-  query,
-} from '../_common/filters';
+import { timeStart, timeEnd, after, limit, ids, sort, query } from '../_common/filters';
+import { parseArrayQuery } from '../utils/parseArrayQuery';
 import { Serializable, Service } from '../../types';
 
 import { parseFilters as parseDataTxFilters } from './parseDataTxFilters';
@@ -26,13 +19,12 @@ const commonTxFilters = {
   after,
   sort,
   sender: identity,
+  senders: parseArrayQuery,
 };
 
 // common options
 // @todo make types better
-const createOptions = (
-  specificFilters?: Record<string, (param: string) => any>
-) => ({
+const createOptions = (specificFilters?: Record<string, (param: string) => any>) => ({
   filterParsers: { ...commonTxFilters, ...specificFilters },
 });
 
@@ -41,7 +33,9 @@ const transactionsEndpointsConfig = (
 ): { [url: string]: EndpointDependencies } => ({
   '/transactions/all': {
     service: services.all,
-    options: createOptions(),
+    options: {
+      filterParsers: omit(['senders'], commonTxFilters),
+    },
   },
   '/transactions/genesis': {
     service: services.genesis,
@@ -154,8 +148,7 @@ export default (txsServices: ServiceMesh['transactions']) =>
     Router<any, any>
   >(
     reduce(
-      (acc, [url, { service, options }]) =>
-        createEndpoint(url, service, options)(acc),
+      (acc, [url, { service, options }]) => createEndpoint(url, service, options)(acc),
       new Router()
     ),
     toPairs

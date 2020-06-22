@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "version": "0.28.0",
+    "version": "0.28.5",
     "title": "Waves Data Service",
     "description": "This is a a public Waves Data Services API documentation. The goal of the API is to provide a simple and convenient way to get data from Waves blockchain."
   },
@@ -184,7 +184,7 @@
           {
             "in": "query",
             "name": "timeStart",
-            "description": "Time range filter, start (ISO-8601 or timestamp in milliseconds).",
+            "description": "Time range filter, start (ISO-8601 or timestamp in millisecondss).",
             "required": true,
             "schema": {
               "oneOf": [
@@ -201,7 +201,7 @@
           {
             "in": "query",
             "name": "timeEnd",
-            "description": "Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).",
+            "description": "Time range filter, end. Defaults to now. (ISO-8601 or timestamp in millisecondss)",
             "schema": {
               "oneOf": [
                 {
@@ -469,7 +469,7 @@
           {
             "in": "query",
             "name": "timeStart",
-            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db (ISO-8601 or timestamp in milliseconds).",
+            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db (ISO-8601 or timestamp in millisecondss).",
             "schema": {
               "oneOf": [
                 {
@@ -485,7 +485,7 @@
           {
             "in": "query",
             "name": "timeEnd",
-            "description": "Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).",
+            "description": "Time range filter, end. Defaults to now (ISO-8601 or timestamp in millisecondss).",
             "schema": {
               "oneOf": [
                 {
@@ -721,9 +721,20 @@
           {
             "in": "query",
             "name": "sender",
-            "description": "Address-sender of the transaction",
+            "description": "Address-sender of the transaction; has exclusive relation with senders",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "senders",
+            "description": "Array of address-senders of the transaction; has exclusive relation with sender",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           {
@@ -859,9 +870,20 @@
           {
             "in": "query",
             "name": "sender",
-            "description": "Address-sender of the transaction",
+            "description": "Address-sender of the transaction; has exclusive relation with senders",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "senders",
+            "description": "Array of address-senders of the transaction; has exclusive relation with sender",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           {
@@ -1005,9 +1027,20 @@
           {
             "in": "query",
             "name": "sender",
-            "description": "Address-sender of the transaction",
+            "description": "Address-sender of the transaction; has exclusive relation with senders",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "senders",
+            "description": "Array of address-senders of the transaction; has exclusive relation with sender",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           {
@@ -1151,9 +1184,20 @@
           {
             "in": "query",
             "name": "sender",
-            "description": "Address-sender of the transaction",
+            "description": "Address-sender of the transaction; has exclusive relation with senders",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "senders",
+            "description": "Array of address-senders of the transaction; has exclusive relation with sender",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           {
@@ -1289,9 +1333,20 @@
           {
             "in": "query",
             "name": "sender",
-            "description": "Address-sender of the transaction",
+            "description": "Address-sender of the transaction; has exclusive relation with senders",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "senders",
+            "description": "Array of address-senders of the transaction; has exclusive relation with sender",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           {
@@ -1443,9 +1498,20 @@
           {
             "in": "query",
             "name": "sender",
-            "description": "Address of a trader-participant in a transaction — an ORDER sender",
+            "description": "Address-sender of the transaction; has exclusive relation with senders",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "senders",
+            "description": "Array of address-senders of the transaction; has exclusive relation with sender",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           {
@@ -1589,9 +1655,20 @@
           {
             "in": "query",
             "name": "sender",
-            "description": "Address-sender of the transaction",
+            "description": "Address-sender of the transaction; has exclusive relation with senders",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "senders",
+            "description": "Array of address-senders of the transaction; has exclusive relation with sender",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           {
@@ -1727,9 +1804,20 @@
           {
             "in": "query",
             "name": "sender",
-            "description": "Address-sender of the transaction",
+            "description": "Address-sender of the transaction; has exclusive relation with senders",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "senders",
+            "description": "Array of address-senders of the transaction; has exclusive relation with sender",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           {
@@ -1865,9 +1953,20 @@
           {
             "in": "query",
             "name": "sender",
-            "description": "Address-sender of the transaction",
+            "description": "Address-sender of the transaction; has exclusive relation with senders",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "senders",
+            "description": "Array of address-senders of the transaction; has exclusive relation with sender",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           {
@@ -1995,9 +2094,20 @@
           {
             "in": "query",
             "name": "sender",
-            "description": "Address-sender of the transaction",
+            "description": "Address-sender of the transaction; has exclusive relation with senders",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "senders",
+            "description": "Array of address-senders of the transaction; has exclusive relation with sender",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           {
@@ -2141,9 +2251,20 @@
           {
             "in": "query",
             "name": "sender",
-            "description": "Address-sender of the transaction",
+            "description": "Address-sender of the transaction; has exclusive relation with senders",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "senders",
+            "description": "Array of address-senders of the transaction; has exclusive relation with sender",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           {
@@ -2311,9 +2432,20 @@
           {
             "in": "query",
             "name": "sender",
-            "description": "Address-sender of the transaction",
+            "description": "Address-sender of the transaction; has exclusive relation with senders",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "senders",
+            "description": "Array of address-senders of the transaction; has exclusive relation with sender",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           {
@@ -2449,9 +2581,20 @@
           {
             "in": "query",
             "name": "sender",
-            "description": "Address-sender of the transaction",
+            "description": "Address-sender of the transaction; has exclusive relation with senders",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "senders",
+            "description": "Array of address-senders of the transaction; has exclusive relation with sender",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           {
@@ -2587,9 +2730,20 @@
           {
             "in": "query",
             "name": "sender",
-            "description": "Address-sender of the transaction",
+            "description": "Address-sender of the transaction; has exclusive relation with senders",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "senders",
+            "description": "Array of address-senders of the transaction; has exclusive relation with sender",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           {
@@ -2733,9 +2887,20 @@
           {
             "in": "query",
             "name": "sender",
-            "description": "Address-sender of the transaction",
+            "description": "Address-sender of the transaction; has exclusive relation with senders",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "senders",
+            "description": "Array of address-senders of the transaction; has exclusive relation with sender",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           {
