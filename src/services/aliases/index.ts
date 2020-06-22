@@ -20,6 +20,8 @@ import { propEq } from 'ramda';
 
 type AliasesSearchRequest = {
   address: string;
+  addresses: string[];
+  queries: string[];
   showBroken: boolean;
 };
 

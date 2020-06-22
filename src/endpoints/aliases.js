@@ -9,6 +9,8 @@ module.exports = aliasesService =>
   createEndpoint('/aliases', aliasesService, {
     filterParsers: {
       address: identity,
+      addresses: parseArrayQuery,
+      queries: parseArrayQuery,
       showBroken: parseBool,
       aliases: parseArrayQuery,
     },
