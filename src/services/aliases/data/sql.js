@@ -16,7 +16,7 @@ const selectAfterFilters = (q) =>
 const withAliases = (qb, aliasSet) => qb.whereIn('alias', aliasSet);
 
 const selectFromSet = (aliasSet) =>
-  selectAfterFilters(withAliases(baseSelect().clone(), aliasSet));
+  selectAfterFilters(withAliases(baseSelect.clone(), aliasSet));
 
 // address has 31 <= length <= 45
 // alias has 4 <= length <= 15
