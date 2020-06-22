@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 0.28.5
+  version: 0.30.0
   title: Waves Data Service
   description: This is a a public Waves Data Services API documentation. The goal of the API is to provide a simple and convenient way to get data from Waves blockchain.
 servers:
@@ -1859,10 +1859,26 @@ paths:
       parameters:
         - in: query
           name: address
-          description: Address
+          description: Address. In XOR relation with addresses and queries.
           required: false
           schema:
             type: string
+        - in: query
+          name: addresses
+          description: Search by array of address. In XOR relation with address and queries.
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: queries
+          description: Search by array of addressOrAlias. In XOR relation with address and addresses.
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
         - in: query
           name: showBroken
           description: Show broken aliases (taken by several people)
