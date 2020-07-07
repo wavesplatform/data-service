@@ -8,7 +8,6 @@ export default {
     .base58()
     .required(),
   height: Joi.number().required(),
-  position_in_block: Joi.number().required(),
   tx_type: Joi.number()
     .min(1)
     .max(16)

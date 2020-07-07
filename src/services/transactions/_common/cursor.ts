@@ -1,38 +1,34 @@
 import { Result, Error as error, Ok as ok } from 'folktale/result';
+import { BigNumber } from '@waves/data-entities';
 import { ValidationError } from '../../../errorHandling';
 import { SortOrder, WithSortOrder } from '../../_common';
-import { WithHeight, WithPositionInBlock } from './types';
+import { WithTxUid } from './types';
 
 const isSortOrder = (s: string): s is SortOrder =>
   s === SortOrder.Ascending || s === SortOrder.Descending;
 
 export type Cursor = {
-  height: number;
-  position_in_block: number;
+  tx_uid: BigNumber;
   sort: SortOrder;
 };
 
 export const serialize = <
   Request extends WithSortOrder,
-  Response extends WithHeight & WithPositionInBlock
+  Response extends WithTxUid
 >(
   request: Request,
   response: Response
 ): string | undefined =>
   response === null
     ? undefined
-    : Buffer.from(
-        `${response.height.toString()}::${response.position_in_block.toString()}::${
-          request.sort
-        }`
-      ).toString('base64');
+    : Buffer.from(`${response.tx_uid.toString()}::${request.sort}`).toString(
+        'base64'
+      );
 
 export const deserialize = (
   cursor: string
 ): Result<ValidationError, Cursor> => {
-  const data = Buffer.from(cursor, 'base64')
-    .toString('utf8')
-    .split('::');
+  const data = Buffer.from(cursor, 'base64').toString('utf8').split('::');
 
   const err = (message?: string) =>
     new ValidationError('Cursor deserialization is failed', {
@@ -43,30 +39,28 @@ export const deserialize = (
   return (
     ok<ValidationError, string[]>(data)
       // validate length
-      .chain(d =>
-        d.length === 3
+      .chain((d) =>
+        d.length === 2
           ? ok<ValidationError, string[]>(d)
           : error<ValidationError, string[]>(
-              err('Cursor length is not equals to 3')
+              err('Cursor length is not equals to 2')
             )
       )
-      .chain(d => {
-        const s = d[2];
+      .chain((d) => {
+        const s = d[1];
         if (isSortOrder(s)) {
-          return ok<ValidationError, [number, number, SortOrder]>([
-            parseInt(d[0]),
-            parseInt(d[1]),
+          return ok<ValidationError, [BigNumber, SortOrder]>([
+            new BigNumber(d[0]),
             s,
           ]);
         } else {
-          return error<ValidationError, [number, number, SortOrder]>(
+          return error<ValidationError, [BigNumber, SortOrder]>(
             err('Sort is not valid')
           );
         }
       })
-      .map(([height, position_in_block, sort]) => ({
-        height,
-        position_in_block,
+      .map(([tx_uid, sort]) => ({
+        tx_uid,
         sort,
       }))
   );

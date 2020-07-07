@@ -50,7 +50,7 @@ const getStartBlock = (exchangeTx, candle) => {
 };
 
 /** updateCandlesLoop :: (LogTask, Pg, String) -> Task */
-const updateCandlesLoop = (logTask, pg, tableName) => {
+const updateCandlesLoop = (logTask, pg, candlesTableName) => {
   const logMessages = {
     start: timeStart => ({
       message: '[CANDLES] start updating candles',
@@ -72,7 +72,7 @@ const updateCandlesLoop = (logTask, pg, tableName) => {
   const pgPromiseUpdateCandles = (t, fromTimetamp) =>
     t
       .any(selectCandlesAfterTimestamp(fromTimetamp))
-      .then(candles => t.any(insertOrUpdateCandles(tableName, candles)));
+      .then(candles => t.any(insertOrUpdateCandles(candlesTableName, candles)));
 
   return logTask(
     logMessages,
@@ -80,7 +80,7 @@ const updateCandlesLoop = (logTask, pg, tableName) => {
       t
         .batch([
           t.oneOrNone(selectLastExchangeTxHeight()),
-          t.oneOrNone(selectLastCandleHeight(tableName)),
+          t.oneOrNone(selectLastCandleHeight(candlesTableName)),
         ])
         .then(([lastTx, candle]) => {
           if (!lastTx) {
@@ -97,7 +97,7 @@ const updateCandlesLoop = (logTask, pg, tableName) => {
             map(interval =>
               t.any(
                 insertOrUpdateCandlesFromShortInterval(
-                  tableName,
+                  candlesTableName,
                   timestamp,
                   interval[0],
                   interval[1]
@@ -117,7 +117,7 @@ const updateCandlesLoop = (logTask, pg, tableName) => {
 };
 
 /** fillCandlesDBAll :: (LogTask, Pg, String) -> Task */
-const fillCandlesDBAll = (logTask, pg, tableName) =>
+const fillCandlesDBAll = (logTask, pg, candlesTableName) =>
   logTask(
     {
       start: timeStart => ({
@@ -137,10 +137,10 @@ const fillCandlesDBAll = (logTask, pg, tableName) =>
     pg.tx(t =>
       t.batch([
         t.none(withoutStatementTimeout()),
-        t.any(truncateTable(tableName)),
-        t.any(insertAllMinuteCandles(tableName)),
+        t.any(truncateTable(candlesTableName)),
+        t.any(insertAllMinuteCandles(candlesTableName)),
         ...intervalPairs.map(([shorter, longer]) =>
-          t.any(insertAllCandles(tableName, shorter, longer))
+          t.any(insertAllCandles(candlesTableName, shorter, longer))
         ),
       ])
     )

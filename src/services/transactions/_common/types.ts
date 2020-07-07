@@ -13,18 +13,8 @@ export type WithTxUid = {
   tx_uid: BigNumber;
 };
 
-export type WithHeight = {
-  height: number;
-};
-
-export type WithPositionInBlock = {
-  position_in_block: number;
-};
-
 export type RawTx = CommonTxFields &
-  WithTxUid &
-  WithHeight &
-  WithPositionInBlock & {
+  WithTxUid & {
     tx_type: number;
     time_stamp: Date;
     tx_version: number | null;

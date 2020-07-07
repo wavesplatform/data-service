@@ -6,7 +6,6 @@ const columns = {
   id: 'txs.id',
   time_stamp: 'txs.time_stamp',
   height: 't.height',
-  position_in_block: 't.position_in_block',
   signature: 'txs.signature',
   proofs: 'txs.proofs',
 
@@ -62,23 +61,25 @@ const columns = {
   o2_matcher_fee_asset_id: pg.raw("t.order2->>'matcherFeeAssetId'"),
 };
 
-const columnsFromFiltered = filtered =>
-  filtered.columns([
-    'tx_uid',
-    'height',
-    'position_in_block',
-    'price',
-    'amount',
-    'sell_matcher_fee',
-    'buy_matcher_fee',
-    'sender_uid',
-    'order1',
-    'order2',
-  ]);
+const columnsFromFiltered = (filtered) =>
+  filtered
+    .columns([
+      't.tx_uid',
+      't.height',
+      't.price',
+      't.amount',
+      't.sell_matcher_fee',
+      't.buy_matcher_fee',
+      't.sender_uid',
+      'o1.order as order1',
+      'o2.order as order2',
+    ])
+    .leftJoin({ o1: 'orders' }, 'o1.uid', 't.order1_uid')
+    .leftJoin({ o2: 'orders' }, 'o2.uid', 't.order2_uid');
 
 const select = pg({ t: 'txs_7' });
 
-const selectFromFiltered = filtered =>
+const selectFromFiltered = (filtered) =>
   pg
     .with('filtered_cte', columnsFromFiltered(filtered))
     .with(

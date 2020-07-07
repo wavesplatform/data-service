@@ -2,19 +2,14 @@ import { BigNumber } from '@waves/data-entities';
 import { Repo, CommonTransactionInfo } from '../../../../types';
 import { WithSortOrder, WithLimit } from '../../../_common';
 import { RequestWithCursor } from '../../../_common/pagination';
-import {
-  CommonFilters,
-  WithHeight,
-  WithPositionInBlock,
-} from '../../_common/types';
+import { CommonFilters } from '../../_common/types';
 
-export type TxDbResponse = WithHeight &
-  WithPositionInBlock & {
-    tx_uid: BigNumber;
-    tx_type: number;
-    id: string;
-    time_stamp: string;
-  };
+export type TxDbResponse = {
+  tx_uid: BigNumber;
+  tx_type: number;
+  id: string;
+  time_stamp: string;
+};
 
 export type AllTxsGetRequest = string;
 

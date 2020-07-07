@@ -2,12 +2,11 @@ const pg = require('knex')({ client: 'pg' });
 
 const select = pg({ t: 'txs_14' }).select('*');
 
-const selectFromFiltered = filtered =>
+const selectFromFiltered = (filtered) =>
   pg({ t: filtered })
     .column({
       tx_uid: 't.tx_uid',
       height: 't.height',
-      position_in_block: 't.position_in_block',
       tx_type: 'txs.tx_type',
       id: 'txs.id',
       time_stamp: 'txs.time_stamp',

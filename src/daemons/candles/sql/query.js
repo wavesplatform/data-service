@@ -52,8 +52,8 @@ const candleSelectColumns = {
 };
 
 /** insertIntoCandlesFromSelect :: (String, Function) -> QueryBuilder */
-const insertIntoCandlesFromSelect = (tableName, selectFunction) =>
-  pg.into(tableName).insert(selectFunction);
+const insertIntoCandlesFromSelect = (candlesTableName, selectFunction) =>
+  pg.into(candlesTableName).insert(selectFunction);
 
 /** selectExchanges :: QueryBuilder */
 const selectExchanges = pg({
@@ -86,9 +86,8 @@ const selectExchangesAfterTimestamp = fromTimestamp =>
   selectExchanges.clone().where(
     't.tx_uid',
     '>=',
-    pg('txs_7')
+    pg('txs')
       .select('uid')
-      .from('txs')
       .whereRaw(
         `time_stamp >= ${pgRawDateTrunc(
           `'${fromTimestamp.toISOString()}'::timestamp`
@@ -98,8 +97,8 @@ const selectExchangesAfterTimestamp = fromTimestamp =>
   );
 
 /** selectLastCandle :: String -> String query */
-const selectLastCandleHeight = tableName =>
-  pg({ t: tableName })
+const selectLastCandleHeight = candlesTableName =>
+  pg({ t: candlesTableName })
     .select('max_height')
     .limit(1)
     .orderBy('max_height', 'desc')
@@ -110,8 +109,7 @@ const selectLastExchangeTxHeight = () =>
   pg({ t: 'txs_7' })
     .select('height')
     .limit(1)
-    .orderBy('height', 'desc')
-    .orderBy('position_in_block', 'desc')
+    .orderBy('tx_uid', 'desc')
     .toString();
 
 /** selectLastExchangeTx :: String query */
@@ -120,8 +118,7 @@ const selectMinTimestampFromHeight = height =>
     t: pg('txs_7')
       .column('time_stamp')
       .where('height', '>=', height)
-      .orderBy('height')
-      .orderBy('position_in_block')
+      .orderBy('tx_uid')
       .limit(1),
   })
     .column({ time_stamp: pg.min('t.time_stamp') })
@@ -143,11 +140,11 @@ const updatedFieldsExcluded = [
   .join(', ');
 
 /** insertOrUpdateCandles :: (String, Array[Object]) -> String query */
-const insertOrUpdateCandles = (tableName, candles) => {
+const insertOrUpdateCandles = (candlesTableName, candles) => {
   if (candles.length) {
     return pg
       .raw(
-        `${pg({ t: tableName }).insert(
+        `${pg({ t: candlesTableName }).insert(
           candles.map(serializeCandle)
         )} on conflict (time_start, amount_asset_uid, price_asset_uid, matcher_address_uid, interval) do update set ${updatedFieldsExcluded}`
       )
@@ -159,15 +156,15 @@ const insertOrUpdateCandles = (tableName, candles) => {
 
 /** insertOrUpdateCandlesFromShortInterval :: (String, Date, Number, Number) -> String query */
 const insertOrUpdateCandlesFromShortInterval = (
-  tableName,
+  candlesTableName,
   fromTimestamp,
   shortInterval,
   longerInterval
 ) =>
   pg
     .raw(
-      `${insertIntoCandlesFromSelect(tableName, function() {
-        this.from(tableName)
+      `${insertIntoCandlesFromSelect(candlesTableName, function() {
+        this.from(candlesTableName)
           .select(makeCandleCalculateColumns(longerInterval))
           .where('interval', shortInterval)
           .whereRaw(
@@ -193,14 +190,14 @@ const withoutStatementTimeout = () =>
   pg.raw('SET statement_timeout = 0').toString();
 
 /** truncateTable :: String -> String query */
-const truncateTable = tableName =>
-  pg(tableName)
+const truncateTable = candlesTableName =>
+  pg(candlesTableName)
     .truncate()
     .toString();
 
 /** insertAllMinuteCandles :: String -> String query */
-const insertAllMinuteCandles = tableName =>
-  insertIntoCandlesFromSelect(tableName, function() {
+const insertAllMinuteCandles = candlesTableName =>
+  insertIntoCandlesFromSelect(candlesTableName, function() {
     this.with('e_cte', selectExchanges)
       .select(candleSelectColumns)
       .from({ e: 'e_cte' })
@@ -210,9 +207,9 @@ const insertAllMinuteCandles = tableName =>
   }).toString();
 
 /** insertAllCandles :: (String, Number, Number, Number) -> String query */
-const insertAllCandles = (tableName, shortInterval, longerInterval) =>
-  insertIntoCandlesFromSelect(tableName, function() {
-    this.from({ t: tableName })
+const insertAllCandles = (candlesTableName, shortInterval, longerInterval) =>
+  insertIntoCandlesFromSelect(candlesTableName, function() {
+    this.from({ t: candlesTableName })
       .column(makeCandleCalculateColumns(longerInterval))
       .where('t.interval', shortInterval)
       .groupBy([

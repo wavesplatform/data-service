@@ -30,7 +30,6 @@ const withGrouping = q =>
       'txs.id',
       'txs.fee',
       't.height',
-      't.position_in_block',
       'txs.tx_type',
       'txs.time_stamp',
       'txs.signature',
@@ -54,7 +53,6 @@ const selectFromFiltered = pipe(
         recipients: pg.raw('array_agg(t.address order by t.position_in_tx)'),
         amounts: pg.raw('array_agg(t.amount  order by t.position_in_tx)'),
         height: 't.height',
-        position_in_block: 't.position_in_block',
         tx_type: 'txs.tx_type',
         time_stamp: 'txs.time_stamp',
         signature: 'txs.signature',
@@ -70,7 +68,6 @@ const selectFromFiltered = pipe(
           .select({
             tx_uid: 't.tx_uid',
             height: 't.height',
-            position_in_block: 't.position_in_block',
             sender_uid: 't.sender_uid',
             asset_id: pg.raw(`coalesce(a.asset_id,'WAVES')`),
             attachment: 't.attachment',

@@ -21,5 +21,5 @@ export const transformTxInfo = compose(
     sender_public_key: 'senderPublicKey',
     time_stamp: 'timestamp',
   }),
-  omit(['tx_uid', 'position_in_block'])
+  omit(['tx_uid'])
 );

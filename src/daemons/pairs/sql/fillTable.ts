@@ -11,28 +11,18 @@ const selectExchanges = pg({ t: 'txs_7' })
     time_stamp: 't.time_stamp',
     sender_uid: 't.sender_uid',
   })
-  .with('hp_cte', qb =>
+  .with('hp_cte', (qb) =>
     qb
-      .select('height', 'position_in_block')
+      .select('uid')
       .from('txs')
       .whereRaw(`time_stamp >= now() - interval '1 day'`)
       .limit(1)
   )
-  .where('t.height', '>', pg('hp_cte').select('height'))
-  .orWhere(function() {
-    this.where('height', pg('hp_cte').select('height')).andWhere(
-      'position_in_block',
-      '>=',
-      pg('hp_cte')
-        .select('position_in_block')
-        .from('hp_cte')
-    );
-  })
-  .orderBy('t.height', 'desc')
-  .orderBy('t.position_in_block', 'desc');
+  .where('t.tx_uid', pg('hp_cte').select('uid'))
+  .orderBy('t.tx_uid', 'desc');
 
 const selectPairsCTE = pg
-  .with('pairs_cte', qb => {
+  .with('pairs_cte', (qb) => {
     qb.select({
       amount_asset_uid: 'amount_asset_uid',
       price_asset_uid: 'price_asset_uid',
@@ -81,19 +71,16 @@ const selectPairsCTE = pg
     'p.txs_count',
     'p.matcher_address_uid'
   )
-  .leftJoin({ p1: 'pairs_cte' }, function() {
+  .leftJoin({ p1: 'pairs_cte' }, function () {
     this.on(pg.raw('p1.amount_asset_uid is null'))
       .andOn('p1.price_asset_uid', 'p.price_asset_uid')
       .andOn('p1.matcher_address_uid', 'p.matcher_address_uid');
   })
-  .leftJoin({ p2: 'pairs_cte' }, function() {
+  .leftJoin({ p2: 'pairs_cte' }, function () {
     this.on('p2.amount_asset_uid', 'p.price_asset_uid')
       .andOn(pg.raw('p2.price_asset_uid is null'))
       .andOn('p2.matcher_address_uid', 'p.matcher_address_uid');
   });
 
-export const fillTable = (tableName: string): string =>
-  pg
-    .into(tableName)
-    .insert(selectPairsCTE)
-    .toString();
+export const fillTable = (pairsTableName: string): string =>
+  pg.into(pairsTableName).insert(selectPairsCTE).toString();
