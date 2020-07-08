@@ -62,7 +62,7 @@ const columns = {
 };
 
 const columnsFromFiltered = (filtered) =>
-  filtered
+  pg({ t: filtered })
     .columns([
       't.tx_uid',
       't.height',
@@ -77,7 +77,17 @@ const columnsFromFiltered = (filtered) =>
     .leftJoin({ o1: 'orders' }, 'o1.uid', 't.order1_uid')
     .leftJoin({ o2: 'orders' }, 'o2.uid', 't.order2_uid');
 
-const select = pg({ t: 'txs_7' });
+const select = pg({ t: 'txs_7' }).columns([
+  't.tx_uid',
+  't.height',
+  't.price',
+  't.amount',
+  't.sell_matcher_fee',
+  't.buy_matcher_fee',
+  't.sender_uid',
+  't.order1_uid',
+  't.order2_uid',
+]);
 
 const selectFromFiltered = (filtered) =>
   pg
