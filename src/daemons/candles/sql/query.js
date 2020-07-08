@@ -11,7 +11,7 @@ const {
 } = require('./utils');
 
 /** makeCandleCalculateColumns :: String -> Array */
-const makeCandleCalculateColumns = interval => {
+const makeCandleCalculateColumns = (interval) => {
   return {
     candle_time: candlePresets.aggregate.candle_time(interval),
     amount_asset_uid: 'amount_asset_uid',
@@ -82,7 +82,7 @@ const selectExchanges = pg({
   .join({ p: 'assets_data' }, 'p.uid', 't.price_asset_uid');
 
 /** selectExchangesAfterTimestamp :: Date -> QueryBuilder */
-const selectExchangesAfterTimestamp = fromTimestamp =>
+const selectExchangesAfterTimestamp = (fromTimestamp) =>
   selectExchanges.clone().where(
     't.tx_uid',
     '>=',
@@ -97,7 +97,7 @@ const selectExchangesAfterTimestamp = fromTimestamp =>
   );
 
 /** selectLastCandle :: String -> String query */
-const selectLastCandleHeight = candlesTableName =>
+const selectLastCandleHeight = (candlesTableName) =>
   pg({ t: candlesTableName })
     .select('max_height')
     .limit(1)
@@ -113,15 +113,12 @@ const selectLastExchangeTxHeight = () =>
     .toString();
 
 /** selectLastExchangeTx :: String query */
-const selectMinTimestampFromHeight = height =>
-  pg({
-    t: pg('txs_7')
-      .column('time_stamp')
-      .where('height', '>=', height)
-      .orderBy('tx_uid')
-      .limit(1),
-  })
-    .column({ time_stamp: pg.min('t.time_stamp') })
+const selectMinTimestampFromHeight = (height) =>
+  pg('txs_7')
+    .column('time_stamp')
+    .where('height', '>=', height)
+    .orderBy('tx_uid')
+    .limit(1)
     .toString();
 
 /** for make complex query with "on conflict (...) update ... without set concrete values" See insertOrUpdateCandles or insertOrUpdateCandlesFromShortInterval */
@@ -136,7 +133,7 @@ const updatedFieldsExcluded = [
   'volume',
   'weighted_average_price',
 ]
-  .map(field => field + '=EXCLUDED.' + field)
+  .map((field) => field + '=EXCLUDED.' + field)
   .join(', ');
 
 /** insertOrUpdateCandles :: (String, Array[Object]) -> String query */
@@ -163,7 +160,7 @@ const insertOrUpdateCandlesFromShortInterval = (
 ) =>
   pg
     .raw(
-      `${insertIntoCandlesFromSelect(candlesTableName, function() {
+      `${insertIntoCandlesFromSelect(candlesTableName, function () {
         this.from(candlesTableName)
           .select(makeCandleCalculateColumns(longerInterval))
           .where('interval', shortInterval)
@@ -190,14 +187,12 @@ const withoutStatementTimeout = () =>
   pg.raw('SET statement_timeout = 0').toString();
 
 /** truncateTable :: String -> String query */
-const truncateTable = candlesTableName =>
-  pg(candlesTableName)
-    .truncate()
-    .toString();
+const truncateTable = (candlesTableName) =>
+  pg(candlesTableName).truncate().toString();
 
 /** insertAllMinuteCandles :: String -> String query */
-const insertAllMinuteCandles = candlesTableName =>
-  insertIntoCandlesFromSelect(candlesTableName, function() {
+const insertAllMinuteCandles = (candlesTableName) =>
+  insertIntoCandlesFromSelect(candlesTableName, function () {
     this.with('e_cte', selectExchanges)
       .select(candleSelectColumns)
       .from({ e: 'e_cte' })
@@ -208,7 +203,7 @@ const insertAllMinuteCandles = candlesTableName =>
 
 /** insertAllCandles :: (String, Number, Number, Number) -> String query */
 const insertAllCandles = (candlesTableName, shortInterval, longerInterval) =>
-  insertIntoCandlesFromSelect(candlesTableName, function() {
+  insertIntoCandlesFromSelect(candlesTableName, function () {
     this.from({ t: candlesTableName })
       .column(makeCandleCalculateColumns(longerInterval))
       .where('t.interval', shortInterval)
@@ -221,14 +216,10 @@ const insertAllCandles = (candlesTableName, shortInterval, longerInterval) =>
   }).toString();
 
 /** selectCandlesAfterTimestamp :: Date -> String query */
-const selectCandlesAfterTimestamp = timetamp =>
+const selectCandlesAfterTimestamp = (timetamp) =>
   pg
     .columns(candleSelectColumns)
-    .from(
-      selectExchangesAfterTimestamp(timetamp)
-        .clone()
-        .as('e')
-    )
+    .from(selectExchangesAfterTimestamp(timetamp).clone().as('e'))
     .groupBy([
       'e.candle_time',
       'e.amount_asset_uid',
