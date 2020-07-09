@@ -18,9 +18,10 @@ const sender = (addr) =>
 
 const byTimeStamp = (comparator) => (ts) => (q) => {
   const sortDirection = comparator === '>' ? 'asc' : 'desc';
+  const cteName = `cte_${sortDirection}`;
   return q
     .clone()
-    .with('hp_cte', function () {
+    .with(cteName, function () {
       this.select('uid')
         .from('txs')
         .where('time_stamp', comparator, ts)
@@ -28,7 +29,7 @@ const byTimeStamp = (comparator) => (ts) => (q) => {
         .limit(1);
     })
     .where('t.tx_uid', comparator, function () {
-      this.select('uid').from('hp_cte');
+      this.select('uid').from(cteName);
     });
 };
 
