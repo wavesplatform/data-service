@@ -19,6 +19,7 @@ const sender = (addr) =>
 const byTimeStamp = (comparator) => (ts) => (q) => {
   const sortDirection = comparator === '>' ? 'asc' : 'desc';
   return q
+    .clone()
     .with('hp_cte', function () {
       this.select('uid')
         .from('txs')
