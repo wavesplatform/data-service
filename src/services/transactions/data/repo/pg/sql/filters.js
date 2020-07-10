@@ -31,6 +31,9 @@ const byValue = curryN(3, (type, value, q) => {
 
 module.exports = {
   ...commonFilters,
+  
+  timeStart: commonFilters.timeStart(12),
+  timeEnd: commonFilters.timeEnd(12),
   key: byKey,
   type: byType,
   value: byValue,

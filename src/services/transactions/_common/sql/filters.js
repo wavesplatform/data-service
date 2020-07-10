@@ -16,7 +16,7 @@ const sender = (addr) =>
     this.select('uid').from('addresses').where('address', addr).limit(1);
   });
 
-const byTimeStamp = (comparator) => (ts) => (q) => {
+const byTimeStamp = (comparator) => (txType) => (ts) => (q) => {
   const sortDirection = comparator === '>' ? 'asc' : 'desc';
   const cteName = `cte_${sortDirection}`;
   return q
@@ -25,6 +25,7 @@ const byTimeStamp = (comparator) => (ts) => (q) => {
       this.select('uid')
         .from('txs')
         .where('time_stamp', comparator, ts)
+        .andWhere('tx_type', txType)
         .orderBy('uid', sortDirection)
         .limit(1);
     })

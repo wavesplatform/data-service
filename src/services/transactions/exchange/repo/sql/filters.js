@@ -32,6 +32,9 @@ const byAsset = (assetType) =>
 module.exports = {
   filters: {
     ...commonFilters,
+    
+    timeStart: commonFilters.timeStart(7),
+    timeEnd: commonFilters.timeEnd(7),
     matcher: commonFilters.sender,
     sender: byOrderSender,
     amountAsset: byAsset('amount'),
