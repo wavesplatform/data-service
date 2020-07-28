@@ -21,8 +21,6 @@ module.exports = {
   filters: {
     ...commonFilters,
 
-    timeStart: commonFilters.timeStart(9),
-    timeEnd: commonFilters.timeEnd(9),
     recipient: byRecipient,
   },
   filtersOrder: [...commonFiltersOrder, 'recipient'],

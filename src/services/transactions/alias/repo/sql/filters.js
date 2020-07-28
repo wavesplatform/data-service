@@ -7,8 +7,6 @@ module.exports = {
   filters: {
     ...commonFilters,
 
-    timeStart: commonFilters.timeStart(10),
-    timeEnd: commonFilters.timeEnd(10),
     alias: where('alias'),
   },
   filtersOrder: [...commonFiltersOrder, 'alias'],

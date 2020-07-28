@@ -14,8 +14,6 @@ const byDapp = (dappAddress: string) =>
 export default {
   ...commonFilters,
   
-  timeStart: commonFilters.timeStart(16),
-  timeEnd: commonFilters.timeEnd(16),
   dapp: byDapp,
   function: pointFreeKnex.where('function_name'),
 };

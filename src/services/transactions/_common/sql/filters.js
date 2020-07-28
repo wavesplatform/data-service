@@ -16,23 +16,8 @@ const sender = (addr) =>
     this.select('uid').from('addresses').where('address', addr).limit(1);
   });
 
-const byTimeStamp = (comparator) => (txType) => (ts) => (q) => {
-  const sortDirection = comparator === '>' ? 'asc' : 'desc';
-  const cteName = `cte_${sortDirection}`;
-  return q
-    .clone()
-    .with(cteName, function () {
-      this.select('uid')
-        .from('txs')
-        .where('time_stamp', comparator, ts)
-        .andWhere('tx_type', txType)
-        .orderBy('uid', sortDirection)
-        .limit(1);
-    })
-    .where('t.tx_uid', comparator, function () {
-      this.select('uid').from(cteName);
-    });
-};
+const byTimeStamp = (comparator) => (ts) => (q) =>
+  q.clone().where('t.time_stamp', comparator, ts);
 
 const byAssetId = ifElse(
   equals('WAVES'),

@@ -2,11 +2,6 @@ const commonFilters = require('../../../_common/sql/filters');
 const commonFiltersOrder = require('../../../_common/sql/filtersOrder');
 
 module.exports = {
-  filters: {
-    ...commonFilters,
-    
-    timeStart: commonFilters.timeStart(5),
-    timeEnd: commonFilters.timeEnd(5),
-  },
+  filters: commonFilters,
   filtersOrder: [...commonFiltersOrder, 'assetId'],
 };

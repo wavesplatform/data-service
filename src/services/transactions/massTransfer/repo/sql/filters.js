@@ -10,8 +10,6 @@ module.exports = {
   filters: {
     ...commonFilters,
 
-    timeStart: commonFilters.timeStart(11),
-    timeEnd: commonFilters.timeEnd(11),
     recipient: byRecipient,
   },
   filtersOrder: [...commonFiltersOrder, 'assetId', 'recipient'],
