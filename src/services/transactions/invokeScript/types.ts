@@ -1,12 +1,13 @@
 import { RawTx, Tx } from '../_common/types';
 
-export type InvokeScriptTxArgType = 'integer' | 'boolean' | 'binary' | 'string';
+export type InvokeScriptTxArgType = 'integer' | 'boolean' | 'binary' | 'string' | 'list';
 
 export type RawInvokeScriptTxArgValue = {
   arg_value_integer: bigint | null;
   arg_value_boolean: boolean | null;
   arg_value_binary: Buffer | null;
   arg_value_string: string | null;
+  arg_value_list: Array<bigint | boolean | Buffer | string> | null;
 };
 
 export type RawInvokeScriptTxArg = RawInvokeScriptTxArgValue & {
@@ -33,7 +34,8 @@ export type InvokeScriptTxArg = {
     | RawInvokeScriptTx['arg_value_binary']
     | RawInvokeScriptTx['arg_value_boolean']
     | RawInvokeScriptTx['arg_value_integer']
-    | RawInvokeScriptTx['arg_value_string'];
+    | RawInvokeScriptTx['arg_value_string']
+    | RawInvokeScriptTx['arg_value_list'];
   positionInArgs: RawInvokeScriptTx['position_in_args'];
 };
 

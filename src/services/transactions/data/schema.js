@@ -8,6 +8,7 @@ const CORRECT_TYPE = Joi.string().valid([
   'boolean',
   'string',
   'binary',
+  null
 ]);
 
 const inputSearch = Joi.object()

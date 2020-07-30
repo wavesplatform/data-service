@@ -9,6 +9,7 @@ const select = pg({ t: 'txs_14' })
     signature: 't.signature',
     proofs: 't.proofs',
     tx_version: 't.tx_version',
+    status: 't.status',
     fee: pg.raw('t.fee * 10^(-8)'),
     sender: 't.sender',
     sender_public_key: 't.sender_public_key',

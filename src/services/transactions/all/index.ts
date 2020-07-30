@@ -46,6 +46,7 @@ import { SetScriptTxsService } from '../setScript';
 import { SponsorshipTxsService } from '../sponsorship';
 import { SetAssetScriptTxsService } from '../setAssetScript';
 import { InvokeScriptTxsService } from '../invokeScript';
+import { UpdateAssetInfoTxsService } from '../updateAssetInfo';
 
 const getData = prop('data');
 
@@ -66,6 +67,7 @@ type AllTxsServiceDep = {
   14: SponsorshipTxsService;
   15: SetAssetScriptTxsService;
   16: InvokeScriptTxsService;
+  17: UpdateAssetInfoTxsService;
 };
 
 type AllTxsSearchRequest = RequestWithCursor<

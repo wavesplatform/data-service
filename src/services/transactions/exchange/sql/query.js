@@ -8,9 +8,9 @@ const columns = {
   height: 't.height',
   signature: 't.signature',
   proofs: 't.proofs',
-
   tx_type: 't.tx_type',
   tx_version: 't.tx_version',
+  status: 't.status',
 
   sender: 't.sender',
   sender_public_key: 't.sender_public_key',

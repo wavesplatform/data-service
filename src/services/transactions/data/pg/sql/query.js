@@ -9,6 +9,7 @@ const select = pg
     'signature',
     'time_stamp',
     'proofs',
+    'status',
     'sender',
     'sender_public_key',
 

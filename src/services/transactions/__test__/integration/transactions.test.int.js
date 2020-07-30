@@ -33,6 +33,7 @@ const serviceNames = {
   14: 'sponsorship',
   15: 'setAssetScript',
   16: 'invokeScript',
+  17: 'updateAssetInfo',
 };
 
 const serviceInstances = zipObj(

@@ -10,8 +10,10 @@ const columnsWithoutFeeAndPaymentAssetId = [
   'signature',
   'proofs',
   'tx_version',
+  'status',
   'sender',
   'sender_public_key',
+
   // type-specific
   'dapp',
   'function_name',
@@ -22,6 +24,7 @@ const columnsWithoutFeeAndPaymentAssetId = [
   'arg_value_boolean',
   'arg_value_binary',
   'arg_value_string',
+  'arg_value_list',
   'position_in_args',
 
   // payment
