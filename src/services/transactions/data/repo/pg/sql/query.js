@@ -11,8 +11,8 @@ const selectFromFiltered = filtered =>
       signature: 'txs.signature',
       time_stamp: 'txs.time_stamp',
       proofs: 'txs.proofs',
-      sender: 'addr.address',
-      sender_public_key: 'addr.public_key',
+      sender: 't.sender',
+      sender_public_key: 't.sender_public_key',
 
       // data values
       data_key: 'td.data_key',
@@ -28,7 +28,6 @@ const selectFromFiltered = filtered =>
     })
     .from({ t: 'txs_12' })
     .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tx_uid')
-    .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid')
     .leftJoin({ td: 'txs_12_data' }, 'td.tx_uid', 't.tx_uid')
     .whereIn('t.tx_uid', filtered);
 

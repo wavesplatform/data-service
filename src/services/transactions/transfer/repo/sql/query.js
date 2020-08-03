@@ -15,17 +15,15 @@ const selectFromFiltered = (filtered) =>
       proofs: 'txs.proofs',
       tx_version: 'txs.tx_version',
       fee: pg.raw('txs.fee * 10^(-coalesce(fa.decimals, 8))::double precision'),
-      sender: 'addr.address',
-      sender_public_key: 'addr.public_key',
+      sender: 't.sender',
+      sender_public_key: 't.sender_public_key',
 
       // type-specific
       asset_id: pg.raw(`coalesce(a.asset_id,'WAVES')`),
       amount: pg.raw(
         't.amount * 10^(-coalesce(a.decimals, 8))::double precision'
       ),
-      recipient: pg.raw(
-        'coalesce(recipient_alias.alias, recipient_addr.address)'
-      ),
+      recipient: pg.raw('coalesce(t.recipient_alias, t.recipient_address)'),
       fee_asset: pg.raw("coalesce(fa.asset_id, 'WAVES')"),
       attachment: 't.attachment',
     })
@@ -35,27 +33,17 @@ const selectFromFiltered = (filtered) =>
         height: 't.height',
         asset_uid: 't.asset_uid',
         attachment: 't.attachment',
-        sender_uid: 't.sender_uid',
+        sender: 't.sender',
+        sender_public_key: 't.sender_public_key',
         amount: 't.amount',
-        recipient_address_uid: 't.recipient_address_uid',
-        recipient_alias_uid: 't.recipient_alias_uid',
+        recipient_address: 't.recipient_address',
+        recipient_alias: 't.recipient_alias',
         fee_asset_uid: 't.fee_asset_uid',
       }),
     })
     .leftJoin('txs', 'txs.uid', 't.tx_uid')
     .leftJoin({ a: 'assets_data' }, 'a.uid', 't.asset_uid')
-    .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid')
-    .leftJoin({ fa: 'assets_data' }, 'fa.uid', 't.fee_asset_uid')
-    .leftJoin(
-      { recipient_addr: 'addresses' },
-      'recipient_addr.uid',
-      't.recipient_address_uid'
-    )
-    .leftJoin(
-      { recipient_alias: 'txs_10' },
-      'recipient_alias.tx_uid',
-      't.recipient_alias_uid'
-    );
+    .leftJoin({ fa: 'assets_data' }, 'fa.uid', 't.fee_asset_uid');
 
 module.exports = {
   select,

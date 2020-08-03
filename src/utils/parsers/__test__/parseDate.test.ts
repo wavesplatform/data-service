@@ -27,8 +27,8 @@ describe('parseDate', () => {
     expect(parseDate(dateStr).unsafeGet()).toEqual(expectedValue);
   });
   it('works with short timestamp in ru locale', () => {
-    const dateStr = '01.05.2018'; // UTC+3
-    const expectedValue = new Date('2018-01-04T21:00:00.000Z'); // UTC
+    const dateStr = '01.05.2018';
+    const expectedValue = new Date('2018-01-05T00:00:00.000');
 
     expect(parseDate(dateStr).unsafeGet()).toEqual(expectedValue);
   });

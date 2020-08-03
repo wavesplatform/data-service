@@ -12,8 +12,8 @@ const columns = {
   tx_type: 'txs.tx_type',
   tx_version: 'txs.tx_version',
 
-  sender: 'addr.address',
-  sender_public_key: 'addr.public_key',
+  sender: 't.sender',
+  sender_public_key: 't.sender_public_key',
 
   amount_asset: pg.raw(
     "coalesce(t.order1->'assetPair'->>'amountAsset', 'WAVES')"
@@ -70,7 +70,8 @@ const columnsFromFiltered = (filtered) =>
       't.amount',
       't.sell_matcher_fee',
       't.buy_matcher_fee',
-      't.sender_uid',
+      't.sender',
+      't.sender_public_key',
       'o1.order as order1',
       'o2.order as order2',
     ])
@@ -84,7 +85,8 @@ const select = pg({ t: 'txs_7' }).columns([
   't.amount',
   't.sell_matcher_fee',
   't.buy_matcher_fee',
-  't.sender_uid',
+  't.sender',
+  't.sender_public_key',
   't.order1_uid',
   't.order2_uid',
 ]);
@@ -97,7 +99,6 @@ const selectFromFiltered = (filtered) =>
       pg({ t: 'filtered_cte' })
         .columns(columns)
         .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tx_uid')
-        .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid')
     )
     .from({ t: 'e_cte' })
     .columns(

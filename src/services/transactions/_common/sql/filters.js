@@ -11,10 +11,7 @@ const id = (id) => where('t.id', id);
 
 const ids = (ids) => whereIn('t.id', ids);
 
-const sender = (addr) =>
-  where('t.sender_uid', function () {
-    this.select('uid').from('addresses').where('address', addr).limit(1);
-  });
+const sender = (addr) => where('t.sender', addr);
 
 const byTimeStamp = (comparator) => (ts) => (q) =>
   q.clone().where('t.time_stamp', comparator, ts);
@@ -31,10 +28,7 @@ const byAssetId = ifElse(
     })
 );
 
-const byRecipient = (r) =>
-  where('recipient_address_uid', function () {
-    this.select('uid').from('addresses').where('address', r).limit(1);
-  });
+const byRecipient = r => where('recipient_address', r);
 
 const byScript = (s) => whereRaw('md5(script) = ?', md5(s));
 

@@ -15,21 +15,10 @@ const selectFromFiltered = (filtered) =>
       tx_version: 'txs.tx_version',
       fee: 'txs.fee',
       recipient: pg.raw(
-        'coalesce(recipient_alias.alias, recipient_addr.address)'
+        'coalesce(t.recipient_alias, t.recipient_address)'
       ),
       amount: pg.raw('t.amount * 10^(-8)'),
     })
-    .leftJoin('txs', 'txs.uid', 't.tx_uid')
-    .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid')
-    .leftJoin(
-      { recipient_addr: 'addresses' },
-      'recipient_addr.uid',
-      't.recipient_address_uid'
-    )
-    .leftJoin(
-      { recipient_alias: 'txs_10' },
-      'recipient_alias.tx_uid',
-      't.recipient_alias_uid'
-    );
+    .leftJoin('txs', 'txs.uid', 't.tx_uid');
 
 module.exports = { select, selectFromFiltered };

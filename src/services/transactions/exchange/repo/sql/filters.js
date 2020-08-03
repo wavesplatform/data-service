@@ -7,7 +7,7 @@ const byOrderSender = curryN(2, (orderSender, q) =>
   q
     .clone()
     .whereRaw(
-      `array[t.order1_sender_uid, t.order2_sender_uid] @> array[(select uid from addresses where address = '${orderSender}' limit 1)]`
+      `array[t.order1_sender, t.order2_sender] @> '{${orderSender}}'`
     )
 );
 

@@ -59,21 +59,11 @@ const query = (pairs: AssetIdsPair[], matcher: string): string =>
     })
     .join({ aa: 'assets_data' }, 'aa.uid', 't.amount_asset_uid')
     .join({ pa: 'assets_data' }, 'pa.uid', 't.price_asset_uid')
-    .leftJoin(
-      { matcher_addr: 'addresses' },
-      'matcher_addr.uid',
-      't.matcher_address_uid'
-    )
     .whereIn(
       ['aa.asset_id', 'pa.asset_id'],
       pairs.map(pair => [pair.amountAsset, pair.priceAsset])
     )
-    .whereIn('matcher_address_uid', function() {
-      this.select('uid')
-        .from('addresses')
-        .where('address', matcher)
-        .limit(1);
-    })
+    .where('matcher_address', matcher)
     .toString();
 
 const searchAssets = (
@@ -144,12 +134,7 @@ export const search = (req: PairsSearchRequest): string => {
     .join({ aa: 'assets_data' }, 'aa.uid', 't.amount_asset_uid')
     .join({ pa: 'assets_data' }, 'pa.uid', 't.price_asset_uid')
     .orderByRaw('volume_waves desc NULLS LAST')
-    .whereIn('matcher_address_uid', function() {
-      this.select('uid')
-        .from('addresses')
-        .where('address', matcher)
-        .limit(1);
-    })
+    .where('matcher_address', matcher)
     .limit(limit);
   if (isSearchByAssetRequest(req)) {
     const { search_by_asset: amountAsset, match_exactly: matchExactly } = req;
@@ -218,12 +203,7 @@ export const search = (req: PairsSearchRequest): string => {
           )
           .join({ aa: 'assets' }, 'aa.uid', 't1.amount_asset_uid')
           .join({ pa: 'assets' }, 'pa.uid', 't1.price_asset_uid')
-          .whereIn('matcher_address_uid', function() {
-            this.select('uid')
-              .from('addresses')
-              .where('address', matcher)
-              .limit(1);
-          })
+          .where('matcher_address',matcher)
       )
       .toString();
   } else {

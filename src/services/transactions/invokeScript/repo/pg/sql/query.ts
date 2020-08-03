@@ -11,11 +11,11 @@ const columnsWithoutFeeAndPaymentAssetId = [
   'txs.signature',
   'txs.proofs',
   'txs.tx_version',
-  'addr.address as sender',
-  'addr.public_key as sender_public_key',
+  't.sender',
+  't.sender_public_key',
 
   // type-specific
-  'daddr.address as dapp',
+  pg.raw('coalesce(t.dapp_alias, t.dapp_address) as dapp'),
   't.function_name',
 
   // args
@@ -46,6 +46,4 @@ export const selectFromFiltered = (filtered: knex.QueryBuilder) =>
     .leftJoin('txs_16_args as a', 'a.tx_uid', 't.tx_uid')
     .leftJoin('txs_16_payment as p', 'p.tx_uid', 't.tx_uid')
     .leftJoin('assets_data as ad', 'ad.uid', 'p.asset_uid')
-    .leftJoin('addresses as addr', 'addr.uid', 't.sender_uid')
-    .leftJoin('addresses as daddr', 'daddr.uid', 't.dapp_address_uid')
     .leftJoin('txs', 'txs.uid', 't.tx_uid');

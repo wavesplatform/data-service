@@ -14,39 +14,23 @@ const selectFromFiltered = (filtered) =>
       proofs: 'txs.proofs',
       tx_version: 'txs.tx_version',
       fee: pg.raw('txs.fee * 10^(-8)'),
-      sender: 'addr.address',
-      sender_public_key: 'addr.public_key',
+      sender: 't.sender',
+      sender_public_key: 't.sender_public_key',
       amount: 't.amount',
-      recipient: pg.raw('coalesce(t.recipient_alias, t.recipient_address)'),
+      recipient: 't.recipient',
     })
     .from({
       t: pg({
-        t: filtered
-          .select({
-            tx_uid: 't.tx_uid',
-            sender_uid: 't.sender_uid',
-            height: 't.height',
-            recipient_address_uid: 't.recipient_address_uid',
-            amount: pg.raw('t.amount * 10^(-8)'),
-            recipient_alias: 'recipient_alias.alias',
-          })
-          .leftJoin(
-            { recipient_alias: 'txs_10' },
-            'recipient_alias.tx_uid',
-            't.recipient_alias_uid'
-          ),
-      })
-        .select('*')
-        .select({
-          recipient_address: 'recipient_addr.address',
-        })
-        .leftJoin(
-          { recipient_addr: 'addresses' },
-          'recipient_addr.uid',
-          't.recipient_address_uid'
-        ),
+        t: filtered.select({
+          tx_uid: 't.tx_uid',
+          sender: 't.sender',
+          sender_public_key: 't.sender_public_key',
+          height: 't.height',
+          amount: pg.raw('t.amount * 10^(-8)'),
+          recipient: pg.raw('coalesce(t.recipient_alias, t.recipient_address)'),
+        }),
+      }),
     })
-    .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tx_uid')
-    .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid');
+    .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tx_uid');
 
 module.exports = { select, selectFromFiltered };

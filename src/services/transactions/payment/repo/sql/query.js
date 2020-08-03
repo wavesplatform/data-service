@@ -15,14 +15,12 @@ const selectFromFiltered = (s) => (filtered) =>
       proofs: 'txs.proofs',
       tx_version: 'txs.tx_version',
       fee: pg.raw('txs.fee * 10^(-8)'),
-      sender: 'addr.address',
-      sender_public_key: 'addr.public_key',
+      sender: 't.sender',
+      sender_public_key: 't.sender_public_key',
 
       // type-specific
       amount: pg.raw('t.amount * 10^(-8)'),
-      recipient: pg.raw(
-        'coalesce(recipient_alias.alias, recipient_addr.address)'
-      ),
+      recipient: pg.raw('coalesce(t.recipient_alias, t.recipient_address)'),
     })
     .from({
       t: pg
@@ -35,17 +33,6 @@ const selectFromFiltered = (s) => (filtered) =>
         .from({ t: filtered }),
     })
     .where('rn', '=', 1)
-    .leftJoin('txs', 'txs.uid', 't.tx_uid')
-    .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid')
-    .leftJoin(
-      { recipient_addr: 'addresses' },
-      'recipient_addr.uid',
-      't.recipient_address_uid'
-    )
-    .leftJoin(
-      { recipient_alias: 'txs_10' },
-      'recipient_alias.tx_uid',
-      't.recipient_alias_uid'
-    );
+    .leftJoin('txs', 'txs.uid', 't.tx_uid');
 
 module.exports = { select, selectFromFiltered };

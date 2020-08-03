@@ -14,8 +14,8 @@ const selectFromFiltered = (filtered) =>
       proofs: 'txs.proofs',
       tx_version: 'txs.tx_version',
       fee: pg.raw('txs.fee * 10^(-8)'),
-      sender: 'addr.address',
-      sender_public_key: 'addr.public_key',
+      sender: 't.sender',
+      sender_public_key: 't.sender_public_key',
 
       asset_id: 'a.asset_id',
       min_sponsored_asset_fee: pg.raw(
@@ -23,7 +23,6 @@ const selectFromFiltered = (filtered) =>
       ),
     })
     .leftJoin('txs', 'txs.uid', 't.tx_uid')
-    .leftJoin({ addr: 'addresses' }, 'addr.uid', 't.sender_uid')
     .leftJoin({ a: 'assets_data' }, 'a.uid', 't.asset_uid');
 
 module.exports = { select, selectFromFiltered };
