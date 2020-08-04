@@ -13,7 +13,7 @@ select
      where
        amount_asset_uid = p.amount_asset_uid
        and price_asset_uid = p.price_asset_uid
-       and matcher_address_uid = p.matcher_address_uid
+       and matcher_address = p.matcher
        and interval = '${CandleInterval.Minute1}'
        and volume > 0
        and time_start < ?
@@ -26,16 +26,14 @@ from (
     c.price_asset_uid as price_asset_uid,
     aa.asset_id as amount_asset_id,
     pa.asset_id as price_asset_id,
-    c.matcher_address_uid as matcher_address_uid,
-    a.address as matcher
+    c.matcher_address as matcher
   from candles c
-  left join addresses a on a.uid = c.matcher_address_uid
   left join assets_data aa on aa.uid = c.amount_asset_uid
   left join assets_data pa on pa.uid = c.price_asset_uid
   where
     c.interval = '${CandleInterval.Day1}'
     and a.address = ?
     and (aa.asset_id, pa.asset_id) in (${repeat('(?, ?)', tuplesCount)})
-  order by c.amount_asset_uid, c.price_asset_uid, c.matcher_address_uid
+  order by c.amount_asset_uid, c.price_asset_uid, c.matcher_address
 ) as p;
 `;

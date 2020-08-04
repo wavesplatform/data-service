@@ -10,7 +10,7 @@ const byRecipient = (addressOrAlias) =>
     this.select('tx_uid')
       .from('txs_8')
       .whereRaw(
-        `recipient_address = coalesce((select sender from txs_10 where alias='${addressOrAlias}' limit 1), '${addressOrAlias}')`
+        `recipient_address = coalesce((select sender from txs_10 where alias = '${addressOrAlias}' limit 1), '${addressOrAlias}')`
       );
   });
 
