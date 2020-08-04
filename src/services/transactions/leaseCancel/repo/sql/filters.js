@@ -5,9 +5,13 @@ const commonFiltersOrder = require('../../../_common/sql/filtersOrder');
 
 // txs_9 do not contain recipient info directly
 // only txs_8 do
-const byRecipient = (r) =>
+const byRecipient = (addressOrAlias) =>
   whereIn('lease_tx_uid', function () {
-    this.select('tx_uid').from('txs_8').where('recipient_address', r);
+    this.select('tx_uid')
+      .from('txs_8')
+      .whereRaw(
+        `recipient_address = coalesce((select sender from txs_10 where alias='${addressOrAlias}' limit 1), '${addressOrAlias}')`
+      );
   });
 
 module.exports = {

@@ -28,7 +28,10 @@ const byAssetId = ifElse(
     })
 );
 
-const byRecipient = r => where('recipient_address', r);
+const byRecipient = (addressOrAlias) =>
+  whereRaw(
+    `recipient_address = coalesce((select sender from txs_10 where alias = '${addressOrAlias}' limit 1), '${addressOrAlias}')`
+  );
 
 const byScript = (s) => whereRaw('md5(script) = ?', md5(s));
 
