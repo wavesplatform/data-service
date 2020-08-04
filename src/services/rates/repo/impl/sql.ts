@@ -32,7 +32,7 @@ from (
   left join assets_data pa on pa.uid = c.price_asset_uid
   where
     c.interval = '${CandleInterval.Day1}'
-    and a.address = ?
+    and c.matcher_address = ?
     and (aa.asset_id, pa.asset_id) in (${repeat('(?, ?)', tuplesCount)})
   order by c.amount_asset_uid, c.price_asset_uid, c.matcher_address
 ) as p;
