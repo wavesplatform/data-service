@@ -26,7 +26,7 @@ const makeCandleCalculateColumns = (interval) => {
     open: candlePresets.aggregate.open,
     close: candlePresets.aggregate.close,
     interval: pg.raw(`'${interval}'`),
-    matcher_address_uid: 'matcher_address_uid',
+    matcher_address: 'matcher_address',
   };
 };
 
@@ -48,7 +48,7 @@ const candleSelectColumns = {
     '(array_agg(e.price ORDER BY e.candle_time DESC)::numeric[])[1]'
   ),
   interval: pg.raw(`'${CandleInterval.Minute1}'`),
-  matcher_address_uid: 'e.sender_uid',
+  matcher_address: 'e.sender',
 };
 
 /** insertIntoCandlesFromSelect :: (String, Function) -> QueryBuilder */
@@ -61,7 +61,7 @@ const selectExchanges = pg({
     tx_uid: 't.tx_uid',
     amount_asset_uid: pg.raw('coalesce(t.amount_asset_uid, 0)'),
     price_asset_uid: pg.raw('coalesce(t.price_asset_uid, 0)'),
-    sender_uid: 't.sender_uid',
+    sender: 't.sender',
     height: 't.height',
     candle_time: pgRawDateTrunc('t.time_stamp')('minute'),
     amount: 't.amount',
@@ -72,7 +72,7 @@ const selectExchanges = pg({
     tx_uid: 't.tx_uid',
     amount_asset_uid: 't.amount_asset_uid',
     price_asset_uid: 't.price_asset_uid',
-    sender_uid: 't.sender_uid',
+    sender: 't.sender',
     height: 't.height',
     candle_time: 't.candle_time',
     amount: pg.raw('t.amount * 10 ^(-a.decimals)'),
@@ -143,7 +143,7 @@ const insertOrUpdateCandles = (candlesTableName, candles) => {
       .raw(
         `${pg({ t: candlesTableName }).insert(
           candles.map(serializeCandle)
-        )} on conflict (time_start, amount_asset_uid, price_asset_uid, matcher_address_uid, interval) do update set ${updatedFieldsExcluded}`
+        )} on conflict (time_start, amount_asset_uid, price_asset_uid, matcher_address, interval) do update set ${updatedFieldsExcluded}`
       )
       .toString();
   }
@@ -173,9 +173,9 @@ const insertOrUpdateCandlesFromShortInterval = (
             'candle_time',
             'amount_asset_uid',
             'price_asset_uid',
-            'matcher_address_uid'
+            'matcher_address'
           );
-      })} on conflict (time_start, amount_asset_uid, price_asset_uid, matcher_address_uid, interval) do update set ${updatedFieldsExcluded}`
+      })} on conflict (time_start, amount_asset_uid, price_asset_uid, matcher_address, interval) do update set ${updatedFieldsExcluded}`
     )
     .toString();
 
@@ -197,7 +197,7 @@ const insertAllMinuteCandles = (candlesTableName) =>
       .select(candleSelectColumns)
       .from({ e: 'e_cte' })
       .groupByRaw(
-        'e.candle_time, e.amount_asset_uid, e.price_asset_uid, e.sender_uid'
+        'e.candle_time, e.amount_asset_uid, e.price_asset_uid, e.sender'
       );
   }).toString();
 
@@ -211,7 +211,7 @@ const insertAllCandles = (candlesTableName, shortInterval, longerInterval) =>
         'candle_time',
         'amount_asset_uid',
         'price_asset_uid',
-        'matcher_address_uid',
+        'matcher_address',
       ]);
   }).toString();
 
@@ -224,7 +224,7 @@ const selectCandlesAfterTimestamp = (timetamp) =>
       'e.candle_time',
       'e.amount_asset_uid',
       'e.price_asset_uid',
-      'e.sender_uid',
+      'e.sender',
     ])
     .toString();
 
