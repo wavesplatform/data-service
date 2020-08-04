@@ -31,7 +31,7 @@ const FULL_FIELDS: Record<string, string> = {
   ),
   amount_asset_id: 'a.asset_id',
   price_asset_id: 'p.asset_id',
-  matcher: 'addr.address',
+  matcher: 'matcher_address',
   a_dec: 'a.decimals',
   p_dec: 'p.decimals',
 };

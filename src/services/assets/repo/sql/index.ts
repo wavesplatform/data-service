@@ -8,7 +8,7 @@ const pg = knex({ client: 'pg' });
 
 /*
  * coalesce(a.first_appeared_on_height, 0) is used because of first_appeared_on_height for WAVES is null
- * coalesce(addr.address, '') is used for the same reason
+ * coalesce(a.issuer_address, '') is used for the same reason
  */
 
 const getAssetIndex = (asset_uid: number) =>
@@ -21,10 +21,9 @@ export const mget = (ids: string[]): string =>
     .select(map(col => `a.${col}`, columns))
     .select({
       issue_height: pg.raw('coalesce(a.first_appeared_on_height, 0)'),
-      sender: pg.raw(`coalesce(addr.address, '')`),
+      sender: pg.raw(`coalesce(a.issuer_address, '')`),
     })
     .whereIn('asset_id', ids)
-    .leftJoin({ addr: 'addresses' }, 'addr.uid', 'a.issuer_address_uid')
     .toString();
 
 export const get = (id: string): string => mget([id]);
@@ -41,9 +40,8 @@ export const search = (request: AssetsSearchRequest): string => {
       q
         .select({
           issue_height: pg.raw('coalesce(a.first_appeared_on_height, 0)'),
-          sender: pg.raw(`coalesce(addr.address, '')`),
-        })
-        .leftJoin({ addr: 'addresses' }, 'addr.uid', 'a.issuer_address_uid'),
+          sender: pg.raw(`coalesce(a.issuer_address, '')`),
+        }),
     (request: AssetsSearchRequest) =>
       cond([
         [
