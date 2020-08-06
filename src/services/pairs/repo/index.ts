@@ -5,7 +5,6 @@ import { Ok as ok } from 'folktale/result';
 import { forEach, isEmpty } from '../../../utils/fp/maybeOps';
 import { tap } from '../../../utils/tap';
 
-import { withStatementTimeout } from '../../../db/driver';
 import { PairInfo, CacheSync, AssetIdsPair } from '../../../types';
 import { CommonRepoDependencies } from '../..';
 
@@ -36,7 +35,6 @@ import {
 export default ({
   drivers,
   emitEvent,
-  timeouts,
   cache,
 }: CommonRepoDependencies & {
   cache: CacheSync<PairsGetRequest, PairDbResponse>;
@@ -56,20 +54,20 @@ export default ({
     transformInput: ok,
 
     // cache first
-    getData: req =>
+    getData: (req) =>
       cache.get(req).matchWith({
         Just: ({ value }) => taskOf(justOf(value)),
         Nothing: () =>
           getByIdPg<PairDbResponse, PairsGetRequest>({
             name: SERVICE_NAME.GET,
             sql: sql.get,
-            pg: withStatementTimeout(drivers.pg, timeouts.get),
+            pg: drivers.pg,
           })(req).map(
-            tap(maybeResp => forEach(x => cache.set(req, x), maybeResp))
+            tap((maybeResp) => forEach((x) => cache.set(req, x), maybeResp))
           ),
       }),
     validateResult: validateResult(resultSchema, SERVICE_NAME.GET),
-    transformResult: res => res.map(transformResult),
+    transformResult: (res) => res.map(transformResult),
     emitEvent,
   });
 
@@ -80,8 +78,8 @@ export default ({
     PairInfo & AssetIdsPair
   >({
     transformInput: ok,
-    getData: request => {
-      let results = request.pairs.map(p =>
+    getData: (request) => {
+      let results = request.pairs.map((p) =>
         cache.get({
           pair: p,
           matcher: request.matcher,
@@ -93,19 +91,19 @@ export default ({
         return acc;
       }, []);
 
-      const notCachedPairs = notCachedIndexes.map(i => request.pairs[i]);
+      const notCachedPairs = notCachedIndexes.map((i) => request.pairs[i]);
 
       return mgetPairsPg({
         name: SERVICE_NAME.MGET,
         sql: sql.mget,
         matchRequestResult,
-        pg: withStatementTimeout(drivers.pg, timeouts.mget),
+        pg: drivers.pg,
       })({
         pairs: notCachedPairs,
         matcher: request.matcher,
-      }).map(pairsFromDb => {
+      }).map((pairsFromDb) => {
         pairsFromDb.forEach((pair, index) =>
-          forEach(p => {
+          forEach((p) => {
             results[notCachedIndexes[index]] = pair;
             cache.set(
               {
@@ -120,7 +118,7 @@ export default ({
       });
     },
     validateResult: validateResult(resultSchema, SERVICE_NAME.MGET),
-    transformResult: res => res.map((m, i) => m.map(transformResult)),
+    transformResult: (res) => res.map((m, i) => m.map(transformResult)),
     emitEvent,
   });
 
@@ -139,7 +137,7 @@ export default ({
       deserialize,
     },
   })({
-    pg: withStatementTimeout(drivers.pg, timeouts.search),
+    pg: drivers.pg,
     emitEvent,
   });
 

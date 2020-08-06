@@ -1,6 +1,5 @@
 import { Ok as ok } from 'folktale/result';
 
-import { withStatementTimeout } from '../../../../db/driver';
 import { CommonRepoDependencies } from '../../..';
 import { TransactionInfo } from '../../../../types';
 
@@ -31,7 +30,6 @@ const createServiceName = (type: string): string => `transactions.data.${type}`;
 export default ({
   drivers: { pg },
   emitEvent,
-  timeouts,
 }: CommonRepoDependencies): DataTxsRepo => {
   return {
     get: get({
@@ -42,7 +40,7 @@ export default ({
         TransactionInfo
       >(transformTxInfo),
       validateResult: validateResult(resultSchema, createServiceName('get')),
-      getData: pgData.get(withStatementTimeout(pg, timeouts.get)),
+      getData: pgData.get(pg),
       emitEvent,
     }),
 
@@ -54,7 +52,7 @@ export default ({
         TransactionInfo
       >(transformTxInfo),
       validateResult: validateResult(resultSchema, createServiceName('mget')),
-      getData: pgData.mget(withStatementTimeout(pg, timeouts.mget)),
+      getData: pgData.mget(pg),
       emitEvent,
     }),
 
@@ -67,7 +65,7 @@ export default ({
       transformInput: transformInputSearch(deserialize),
       transformResult: transformResultSearch(transformTxInfo, serialize),
       validateResult: validateResult(resultSchema, createServiceName('search')),
-      getData: pgData.search(withStatementTimeout(pg, timeouts.search)),
+      getData: pgData.search(pg),
       emitEvent,
     }),
   };

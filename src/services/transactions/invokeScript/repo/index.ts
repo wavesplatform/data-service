@@ -1,7 +1,6 @@
 import { Ok as ok } from 'folktale/result';
 import { compose } from 'ramda';
 
-import { withStatementTimeout } from '../../../../db/driver';
 import { CommonRepoDependencies } from '../../..';
 import { TransactionInfo } from '../../../../types';
 import { get, mget, search } from '../../../_common/createResolver';
@@ -27,7 +26,6 @@ const createServiceName = (type: string) => `transactions.invokeScript.${type}`;
 export default ({
   drivers: { pg },
   emitEvent,
-  timeouts,
 }: CommonRepoDependencies): InvokeScriptTxsRepo => {
   return {
     get: get({
@@ -37,7 +35,7 @@ export default ({
         resultSchema,
         createServiceName('get')
       ),
-      getData: pgData.get(withStatementTimeout(pg, timeouts.get)),
+      getData: pgData.get(pg),
       emitEvent,
     }),
 
@@ -45,7 +43,7 @@ export default ({
       transformInput: ok,
       transformResult: transformResultMget(transformTxInfo),
       validateResult: validateResult(resultSchema, createServiceName('mget')),
-      getData: pgData.mget(withStatementTimeout(pg, timeouts.mget)),
+      getData: pgData.mget(pg),
       emitEvent,
     }),
 
@@ -64,7 +62,7 @@ export default ({
         resultSchema,
         createServiceName('search')
       ),
-      getData: pgData.search(withStatementTimeout(pg, timeouts.search)),
+      getData: pgData.search(pg),
       emitEvent,
     }),
   };

@@ -4,7 +4,6 @@ import { of as just, Maybe } from 'folktale/maybe';
 import { Ok as ok } from 'folktale/result';
 import { Asset } from '@waves/data-entities';
 
-import { withStatementTimeout } from '../../../db/driver/utils';
 import { tap } from '../../../utils/tap';
 import { forEach, isEmpty } from '../../../utils/fp/maybeOps';
 import { AssetInfo } from '../../../types';
@@ -42,7 +41,6 @@ export default ({
   drivers: { pg },
   emitEvent,
   cache,
-  timeouts,
 }: CommonRepoDependencies & {
   cache: AssetsCache;
 }): AssetsRepo => {
@@ -60,20 +58,20 @@ export default ({
       Asset
     >({
       transformInput: ok,
-      getData: req =>
+      getData: (req) =>
         cache.get(req).matchWith({
           Just: ({ value }) => taskOf(just(value)),
           Nothing: () =>
             getByIdPg<AssetDbResponse, string>({
               name: SERVICE_NAME.GET,
               sql: sql.get,
-              pg: withStatementTimeout(pg, timeouts.get),
+              pg,
             })(req).map(
-              tap(maybeResp => forEach(x => cache.set(req, x), maybeResp))
+              tap((maybeResp) => forEach((x) => cache.set(req, x), maybeResp))
             ),
         }),
       validateResult: validateResult(resultSchema, SERVICE_NAME.GET),
-      transformResult: res => res.map(transformDbResponse),
+      transformResult: (res) => res.map(transformDbResponse),
       emitEvent,
     }),
 
@@ -84,8 +82,8 @@ export default ({
       Asset
     >({
       transformInput: ok,
-      getData: request => {
-        let results: Array<Maybe<AssetDbResponse>> = request.map(x =>
+      getData: (request) => {
+        let results: Array<Maybe<AssetDbResponse>> = request.map((x) =>
           cache.get(x)
         );
 
@@ -94,16 +92,16 @@ export default ({
           return acc;
         }, []);
 
-        const notCachedAssetIds = notCachedIndexes.map(i => request[i]);
+        const notCachedAssetIds = notCachedIndexes.map((i) => request[i]);
 
         return mgetByIdsPg<AssetDbResponse, string>({
           name: SERVICE_NAME.MGET,
           sql: sql.mget,
           matchRequestResult: propEq('asset_id'),
-          pg: withStatementTimeout(pg, timeouts.mget),
-        })(notCachedAssetIds).map(fromDb => {
+          pg,
+        })(notCachedAssetIds).map((fromDb) => {
           fromDb.forEach((assetInfo, index) =>
-            forEach(value => {
+            forEach((value) => {
               results[notCachedIndexes[index]] = assetInfo;
               cache.set(notCachedAssetIds[index], value);
             }, assetInfo)
@@ -135,7 +133,7 @@ export default ({
         deserialize,
       },
     })({
-      pg: withStatementTimeout(pg, timeouts.search),
+      pg,
       emitEvent,
     }),
   };

@@ -1,6 +1,5 @@
 import { propEq } from 'ramda';
 
-import { withStatementTimeout } from '../../../../db/driver';
 import { CommonRepoDependencies } from '../../..';
 import { TransactionInfo } from '../../../../types';
 import { getByIdPreset } from '../../../_common/presets/pg/getById';
@@ -21,7 +20,6 @@ import {
 export default ({
   drivers: { pg },
   emitEvent,
-  timeouts,
 }: CommonRepoDependencies): IssueTxsRepo => {
   return {
     get: getByIdPreset({
@@ -30,7 +28,7 @@ export default ({
       resultSchema,
       transformResult: transformTxInfo,
     })({
-      pg: withStatementTimeout(pg, timeouts.get),
+      pg,
       emitEvent,
     }),
 
@@ -41,7 +39,7 @@ export default ({
       resultSchema,
       transformResult: transformTxInfo,
     })({
-      pg: withStatementTimeout(pg, timeouts.mget),
+      pg,
       emitEvent,
     }),
 
@@ -57,7 +55,7 @@ export default ({
       transformResult: transformTxInfo,
       cursorSerialization: { serialize, deserialize },
     })({
-      pg: withStatementTimeout(pg, timeouts.search),
+      pg,
       emitEvent,
     }),
   };

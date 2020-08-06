@@ -1,6 +1,5 @@
 import { propEq } from 'ramda';
 
-import { withStatementTimeout } from '../../../db/driver';
 import { AliasInfo, Repo } from '../../../types';
 
 import { CommonRepoDependencies } from '../..';
@@ -36,7 +35,6 @@ export type AliasesRepo = Repo<
 export default ({
   drivers,
   emitEvent,
-  timeouts,
 }: CommonRepoDependencies): AliasesRepo => {
   return {
     get: getByIdPreset({
@@ -45,7 +43,7 @@ export default ({
       resultSchema: output,
       transformResult: transformDbResponse,
     })({
-      pg: withStatementTimeout(drivers.pg, timeouts.get),
+      pg: drivers.pg,
       emitEvent: emitEvent,
     }),
 
@@ -56,7 +54,7 @@ export default ({
       transformResult: transformDbResponse,
       matchRequestResult: propEq('alias'),
     })({
-      pg: withStatementTimeout(drivers.pg, timeouts.mget),
+      pg: drivers.pg,
       emitEvent: emitEvent,
     }),
 
@@ -75,7 +73,7 @@ export default ({
         deserialize,
       },
     })({
-      pg: withStatementTimeout(drivers.pg, timeouts.search),
+      pg: drivers.pg,
       emitEvent: emitEvent,
     }),
   };

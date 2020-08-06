@@ -1,6 +1,5 @@
 import { Ok as ok } from 'folktale/result';
 
-import { withStatementTimeout } from '../../../db/driver';
 import { CandleInfo, RepoSearch } from '../../../types';
 import { CommonRepoDependencies } from '../..';
 
@@ -27,7 +26,6 @@ export type CandlesRepo = RepoSearch<CandlesSearchRequest, CandleInfo>;
 export default ({
   drivers: { pg },
   emitEvent,
-  timeouts,
 }: CommonRepoDependencies): CandlesRepo => {
   const SERVICE_NAME = 'candles.search';
   return {
@@ -38,7 +36,7 @@ export default ({
       getData: getData({
         name: SERVICE_NAME,
         sql,
-        pg: withStatementTimeout(pg, timeouts.search),
+        pg,
       }),
       emitEvent,
     }),
