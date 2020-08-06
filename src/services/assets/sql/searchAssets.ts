@@ -60,10 +60,10 @@ const searchByName = (qb: knex.QueryBuilder, q: string) => {
     qb
       .table({ a: 'assets' })
       .columns({
-        asset_id: 'aa.asset_id',
-        asset_name: 'aa.asset_name',
+        asset_id: 'a.asset_id',
+        asset_name: 'a.asset_name',
         ticker: 'a.ticker',
-        height: 'a.height',
+        height: 'a.issue_height',
         rank: pg.raw(
           "ts_rank(to_tsvector('simple', a.asset_name), plainto_tsquery(?), 3) * case when a.ticker is null then 16 else 32 end",
           [q]
