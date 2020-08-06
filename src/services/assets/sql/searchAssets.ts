@@ -52,26 +52,24 @@ const searchByName = (qb: knex.QueryBuilder, q: string) => {
   const cleanedQuery = escapeForTsQuery(q);
   return compose((q: knex.QueryBuilder) =>
     cleanedQuery.length
-      ? q.orWhereRaw('am.searchable_asset_name @@ to_tsquery(?)', [
+      ? q.orWhereRaw('a.asset_name @@ to_tsquery(?)', [
           `${cleanedQuery}:*`,
         ])
       : q
   )(
     qb
-      .table({ am: 'assets_names_map' })
+      .table({ a: 'assets' })
       .columns({
-        asset_id: 'am.asset_id',
-        asset_name: 'am.asset_name',
-        ticker: 'ti.ticker',
-        height: 't.height',
+        asset_id: 'aa.asset_id',
+        asset_name: 'aa.asset_name',
+        ticker: 'a.ticker',
+        height: 'a.height',
         rank: pg.raw(
-          "ts_rank(to_tsvector('simple', am.asset_name), plainto_tsquery(?), 3) * case when ti.ticker is null then 16 else 32 end",
+          "ts_rank(to_tsvector('simple', a.asset_name), plainto_tsquery(?), 3) * case when a.ticker is null then 16 else 32 end",
           [q]
         ),
       })
-      .leftJoin({ t: 'txs_3' }, 'am.asset_id', 't.asset_id')
-      .leftJoin({ ti: 'tickers' }, 'am.asset_id', 'ti.asset_id')
-      .where('am.asset_name', 'ilike', prepareForLike(q))
+      .where('a.asset_name', 'ilike', prepareForLike(q))
   );
 };
 
