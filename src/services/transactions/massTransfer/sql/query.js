@@ -15,7 +15,7 @@ const transfers = pg('txs_11_transfers').select([
   'position_in_tx',
 ]);
 const withTransfers = q =>
-  q.clone().join({ tfs: transfers }, 'tfs.tx_id', '=', 'txs.id');
+  q.clone().leftJoin({ tfs: transfers }, 'tfs.tx_id', '=', 'txs.id');
 
 const decimals = pg('asset_decimals');
 const withDecimals = q =>
