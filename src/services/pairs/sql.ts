@@ -101,13 +101,13 @@ const searchAssets = (
       compose((q: knex.QueryBuilder) =>
         cleanedQuery.length
           ? q.orWhereRaw(
-              `${tableAlias}3.searchable_asset_name @@ to_tsquery(?)`,
+              `${tableAlias}3.asset_name @@ to_tsquery(?)`,
               [`${cleanedQuery}:*`]
             )
           : q
       )(
         q
-          .from({ [`${tableAlias}3`]: 'assets_names_map' })
+          .from({ [`${tableAlias}3`]: 'assets' })
           .column({ asset_id: `${tableAlias}3.asset_id` })
           .where(
             `${tableAlias}3.asset_name`,

@@ -38,6 +38,7 @@ import createSponsorshipTxsService, {
   SponsorshipTxsService,
 } from './transactions/sponsorship';
 import createTransferTxsService, { TransferTxsService } from './transactions/transfer';
+import createUpdateAssetInfoTxsService, { UpdateAssetInfoTxsService } from './transactions/updateAssetInfo';
 import { DataServiceConfig } from '../loadConfig';
 import createRateService, { RateCacheImpl } from './rates';
 
@@ -89,6 +90,7 @@ export type ServiceMesh = {
     setScript: SetScriptTxsService;
     sponsorship: SponsorshipTxsService;
     transfer: TransferTxsService;
+    updateAssetInfo: UpdateAssetInfoTxsService;
   };
 };
 
@@ -144,6 +146,7 @@ export default ({
     const setScriptTxs = createSetScriptTxsService(commonDeps);
     const sponsorshipTxs = createSponsorshipTxsService(commonDeps);
     const transferTxs = createTransferTxsService(commonDeps);
+    const updateAssetInfoTxs = createUpdateAssetInfoTxsService(commonDeps);
     const rates = createRateService({
       ...commonDeps,
       cache: ratesCache,
@@ -189,6 +192,7 @@ export default ({
       14: sponsorshipTxs,
       15: setAssetScriptTxs,
       16: invokeScriptTxs,
+      17: updateAssetInfoTxs,
     });
 
     return {
@@ -214,6 +218,7 @@ export default ({
         sponsorship: sponsorshipTxs,
         setAssetScript: setAssetScriptTxs,
         invokeScript: invokeScriptTxs,
+        updateAssetInfo: updateAssetInfoTxs,
       },
       matchers: {
         rates,

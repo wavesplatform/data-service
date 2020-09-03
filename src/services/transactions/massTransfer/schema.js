@@ -15,24 +15,12 @@ const inputSearch = Joi.object()
 const result = Joi.object().keys({
   ...commonFields,
 
-  asset_id: Joi.string()
-    .assetId()
-    .required(),
-  attachment: Joi.string()
-    .required()
-    .allow(''),
-  sender: Joi.string()
-    .base58()
-    .required(),
-  sender_public_key: Joi.string()
-    .base58()
-    .required(),
-  recipients: Joi.array().items(Joi.string()),
-  amounts: Joi.array().items(
-    Joi.object()
-      .bignumber()
-      .required()
-  ),
+  asset_id: Joi.string().assetId().required(),
+  attachment: Joi.string().required().allow(''),
+  sender: Joi.string().base58().required(),
+  sender_public_key: Joi.string().base58().required(),
+  recipients: Joi.array().items(Joi.string().allow(null)),
+  amounts: Joi.array().items(Joi.object().bignumber().required()),
 });
 
 module.exports = { result, inputSearch };

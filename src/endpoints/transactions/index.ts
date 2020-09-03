@@ -128,6 +128,12 @@ const transactionsEndpointsConfig = (
     service: services.invokeScript,
     options: createOptions({ dapp: identity, function: identity }),
   },
+  '/transactions/update-asset-info': {
+    service: services.updateAssetInfo,
+    options: createOptions({
+      assetId: identity,
+    }),
+  },
 });
 
 type EndpointDependencies = {

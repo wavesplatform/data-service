@@ -40,6 +40,8 @@ const getArgFieldByType = (
       return 'arg_value_binary';
     case 'string':
       return 'arg_value_string';
+    case 'list':
+      return 'arg_value_list';
   }
 };
 
@@ -64,6 +66,7 @@ const removeUnnecessaryFromRaw = omit([
   'arg_value_boolean',
   'arg_value_string',
   'arg_value_binary',
+  'arg_value_list',
   'position_in_args',
 
   'amount',

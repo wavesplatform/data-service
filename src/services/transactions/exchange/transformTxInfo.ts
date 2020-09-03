@@ -55,6 +55,7 @@ export default (tx: ExchangeTxDbResponse) => {
       'signature',
       'proofs',
       'fee',
+      'status',
       'sender',
       'sender_public_key',
     ])

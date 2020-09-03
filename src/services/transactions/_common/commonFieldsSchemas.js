@@ -7,7 +7,7 @@ module.exports = {
   height: Joi.number().required(),
   tx_type: Joi.number()
     .min(1)
-    .max(16)
+    .max(17)
     .required(),
   tx_version: Joi.number()
     .required()
@@ -21,6 +21,7 @@ module.exports = {
     .required()
     .allow(null),
   proofs: Joi.array().required(),
+  status: Joi.string().required(),
 
   sender: Joi.string().base58().required(),
   sender_public_key: Joi.string().base58().required(),

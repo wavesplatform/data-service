@@ -96,6 +96,50 @@ paths:
                 $ref: '#/components/schemas/ListOfAsset'
         '400':
           description: 'Invalid query, check params'
+    post:
+      tags:
+        - assets
+      summary: Get a list of assets info from a list of IDs
+      operationId: postAssetListByIds
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'Asset IDs array'
+                  items:
+                    type: string
+                ticker:
+                  type: string
+                  description: 'Examples: WAVES, BTC, \*. A wildcard request **ticker=***  returns all assets with tickers.'
+                  example: '*'
+                search:
+                  type: string
+                  description: 'Assets prefix-search by the query in asset names, tickers, id.'
+                  example: bitc
+                after:
+                  type: string
+                  description: 'After which assets its should search'
+                limit:
+                  type: integer
+                  description: 'How many Assets to await in response.'
+                  minimum: 1
+                  maximum: 100
+                  default: 100
+                  example: 100
+      responses:
+        '200':
+          description: List of Assets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfAsset'
+        '400':
+          description: 'Invalid query, check params'
   '/candles/{amountAsset}/{priceAsset}':
     get:
       tags:
@@ -117,7 +161,7 @@ paths:
             type: string
         - in: query
           name: timeStart
-          description: 'Time range filter, start (ISO-8601 or timestamp in millisecondss).'
+          description: 'Time range filter, start. (ISO-8601 or timestamp in milliseconds, UTC)'
           required: true
           schema:
             oneOf:
@@ -126,7 +170,7 @@ paths:
               - type: number
         - in: query
           name: timeEnd
-          description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in millisecondss)'
+          description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -244,6 +288,54 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListOfPair'
+    post:
+      tags:
+        - pairs
+      summary: 1) Get list of pairs info by serialized pairs list; 2) Get all list of pairs info by limit (sort by volume in WAVES)
+      operationId: postPairsListAll
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pairs:
+                  type: array
+                  description: '`{amountAsset}/{priceAsset}` strings list'
+                  items:
+                    type: string
+                search_by_asset:
+                  type: string
+                  description: 'For searching pairs, that have the `search_by_asset` in asset names, tickers, id of one asset of the pair.'
+                  example: bitc
+                search_by_assets:
+                  type: array
+                  description: 'For searching pairs, that have the `search_by_asset` in asset names, tickers, id of one asset of the pair.'
+                  items:
+                    type: string
+                match_exactly:
+                  type: array
+                  description: 'Whether to search assets of pairs exactly or not. Parameter position is corresponds to asset position.'
+                  items:
+                    type: boolean
+                matcher:
+                  type: string
+                  description: Matcher address
+                limit:
+                  type: number
+                  description: How many pairs to await in response.
+                  example: 100
+                  minimum: 1
+                  maximum: 1000
+                  default: 100
+      responses:
+        '200':
+          description: List of Pairs info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfPair'
   '/transactions/all/{id}':
     get:
       tags:
@@ -282,13 +374,21 @@ paths:
       operationId: searchTxsAll
       parameters:
         - in: query
+          name: ids
+          description: Transaction IDs array
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
           name: sender
           description: Address-sender of the transaction
           schema:
             type: string
         - in: query
           name: timeStart
-          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db (ISO-8601 or timestamp in millisecondss).'
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -296,7 +396,7 @@ paths:
               - type: number
         - in: query
           name: timeEnd
-          description: 'Time range filter, end. Defaults to now (ISO-8601 or timestamp in millisecondss).'
+          description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -324,6 +424,64 @@ paths:
             minimum: 1
             maximum: 100
             default: 100
+      responses:
+        '200':
+          description: List of transactions satisfying provided filters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfAllTx'
+    post:
+      tags:
+        - transactions
+      summary: Get a list of transactions by applying 
+      operationId: postSearchTxsAll
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'Transaction IDs array'
+                  items:
+                    type: string
+                sender:
+                  type: string
+                  description: 'Address-sender of the transaction'
+                timeStart:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2019-01-01T00:00:00.000'
+                timeEnd:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2020-01-01T00:00:00.000'
+                after:
+                  type: string
+                  description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
+                sort:
+                  type: string
+                  description: 'Sort order. Gonna be rewritten by cursor''s sort if present.'
+                  enum:
+                    - asc
+                    - desc
+                  default: desc
+                limit:
+                  type: integer
+                  description: 'How many transactions to await in response.'
+                  minimum: 1
+                  maximum: 100
+                  default: 100
+                  example: 100
       responses:
         '200':
           description: List of transactions satisfying provided filters
@@ -361,8 +519,16 @@ paths:
       operationId: searchTxsGenesis
       parameters:
         - in: query
+          name: ids
+          description: Transaction IDs array
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
           name: timeStart
-          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -370,7 +536,7 @@ paths:
               - type: number
         - in: query
           name: timeEnd
-          description: 'Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -410,6 +576,67 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListOfTxGenesis'
+    post:
+      tags:
+        - transactions
+      summary: Get a list of genesis transactions by applying filters
+      operationId: postSearchTxsGenesis
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'Transaction IDs array'
+                  items:
+                    type: string
+                sender:
+                  type: string
+                  description: 'Address-sender of the transaction'
+                timeStart:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2019-01-01T00:00:00.000'
+                timeEnd:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2020-01-01T00:00:00.000'
+                recipient:
+                  type: string
+                  description: 'Search transactions by recipient address'
+                after:
+                  type: string
+                  description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
+                sort:
+                  type: string
+                  description: 'Sort order. Gonna be rewritten by cursor''s sort if present.'
+                  enum:
+                    - asc
+                    - desc
+                  default: desc
+                limit:
+                  type: integer
+                  description: 'How many transactions to await in response.'
+                  minimum: 1
+                  maximum: 100
+                  default: 100
+                  example: 100
+      responses:
+        '200':
+          description: List of genesis transactions satisfying provided filters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfTxGenesis'
   '/transactions/payment/{id}':
     get:
       tags:
@@ -440,6 +667,14 @@ paths:
       operationId: searchTxsSend
       parameters:
         - in: query
+          name: ids
+          description: Transaction IDs array
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
           name: sender
           description: Address-sender of the transaction; has exclusive relation with senders
           schema:
@@ -453,7 +688,7 @@ paths:
               type: string
         - in: query
           name: timeStart
-          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -461,7 +696,7 @@ paths:
               - type: number
         - in: query
           name: timeEnd
-          description: 'Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -501,6 +736,67 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListOfTxPayment'
+    post:
+      tags:
+        - transactions
+      summary: Get a list of payment transactions by applying filters
+      operationId: PostSearchTxsSend
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'Transaction IDs array'
+                  items:
+                    type: string
+                sender:
+                  type: string
+                  description: 'Address-sender of the transaction'
+                timeStart:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2019-01-01T00:00:00.000'
+                timeEnd:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2020-01-01T00:00:00.000'
+                recipient:
+                  type: string
+                  description: 'Search transactions by recipient address'
+                after:
+                  type: string
+                  description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
+                sort:
+                  type: string
+                  description: 'Sort order. Gonna be rewritten by cursor''s sort if present.'
+                  enum:
+                    - asc
+                    - desc
+                  default: desc
+                limit:
+                  type: integer
+                  description: 'How many transactions to await in response.'
+                  minimum: 1
+                  maximum: 100
+                  default: 100
+                  example: 100
+      responses:
+        '200':
+          description: List of payment transactions satisfying provided filters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfTxPayment'
   '/transactions/issue/{id}':
     get:
       tags:
@@ -531,6 +827,14 @@ paths:
       operationId: searchTxsIssue
       parameters:
         - in: query
+          name: ids
+          description: Transaction IDs array
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
           name: sender
           description: Address-sender of the transaction; has exclusive relation with senders
           schema:
@@ -544,7 +848,7 @@ paths:
               type: string
         - in: query
           name: timeStart
-          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -552,7 +856,7 @@ paths:
               - type: number
         - in: query
           name: timeEnd
-          description: 'Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -597,6 +901,70 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListOfTxIssue'
+    post:
+      tags:
+        - transactions
+      summary: Get a list of issue transactions by applying filters
+      operationId: postSearchTxsIssue
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'Transaction IDs array'
+                  items:
+                    type: string
+                sender:
+                  type: string
+                  description: 'Address-sender of the transaction'
+                timeStart:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2019-01-01T00:00:00.000'
+                timeEnd:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2020-01-01T00:00:00.000'
+                after:
+                  type: string
+                  description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
+                sort:
+                  type: string
+                  description: 'Sort order. Gonna be rewritten by cursor''s sort if present.'
+                  enum:
+                    - asc
+                    - desc
+                  default: desc
+                limit:
+                  type: integer
+                  description: 'How many transactions to await in response.'
+                  minimum: 1
+                  maximum: 100
+                  default: 100
+                  example: 100
+                assetId:
+                  type: string
+                  description: 'Filter transactions by assetId'
+                script:
+                  type: string
+                  description: 'Filter transactions by script. Supports only exact match. Needs to be url-encoded!'
+      responses:
+        '200':
+          description: List of issue transactions satisfying provided filters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfTxIssue'
   '/transactions/transfer/{id}':
     get:
       tags:
@@ -627,6 +995,14 @@ paths:
       operationId: searchTxsTransfer
       parameters:
         - in: query
+          name: ids
+          description: Transaction IDs array
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
           name: sender
           description: Address-sender of the transaction; has exclusive relation with senders
           schema:
@@ -640,7 +1016,7 @@ paths:
               type: string
         - in: query
           name: timeStart
-          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -648,7 +1024,7 @@ paths:
               - type: number
         - in: query
           name: timeEnd
-          description: 'Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -693,6 +1069,70 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListOfTxTransfer'
+    post:
+      tags:
+        - transactions
+      summary: Get a list of transfer transactions by applying filters
+      operationId: postSearchTxsTransfer
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'Transaction IDs array'
+                  items:
+                    type: string
+                sender:
+                  type: string
+                  description: 'Address-sender of the transaction'
+                timeStart:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2019-01-01T00:00:00.000'
+                timeEnd:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2020-01-01T00:00:00.000'
+                recipient:
+                  type: string
+                  description: 'Search transactions by recipient address'
+                assetId:
+                  type: string
+                  description: 'Filter transactions by assetId'
+                after:
+                  type: string
+                  description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
+                sort:
+                  type: string
+                  description: 'Sort order. Gonna be rewritten by cursor''s sort if present.'
+                  enum:
+                    - asc
+                    - desc
+                  default: desc
+                limit:
+                  type: integer
+                  description: 'How many transactions to await in response.'
+                  minimum: 1
+                  maximum: 100
+                  default: 100
+                  example: 100
+      responses:
+        '200':
+          description: List of transfer transactions satisfying provided filters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfTxTransfer'
   '/transactions/reissue/{id}':
     get:
       tags:
@@ -723,6 +1163,14 @@ paths:
       operationId: searchTxsReissue
       parameters:
         - in: query
+          name: ids
+          description: Transaction IDs array
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
           name: sender
           description: Address-sender of the transaction; has exclusive relation with senders
           schema:
@@ -736,7 +1184,7 @@ paths:
               type: string
         - in: query
           name: timeStart
-          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -744,7 +1192,7 @@ paths:
               - type: number
         - in: query
           name: timeEnd
-          description: 'Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -784,6 +1232,67 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListOfTxReissue'
+    post:
+      tags:
+        - transactions
+      summary: Get a list of reissue transactions by applying filters
+      operationId: postSearchTxsReissue
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'Transaction IDs array'
+                  items:
+                    type: string
+                sender:
+                  type: string
+                  description: 'Address-sender of the transaction'
+                timeStart:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2019-01-01T00:00:00.000'
+                timeEnd:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2020-01-01T00:00:00.000'
+                after:
+                  type: string
+                  description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
+                sort:
+                  type: string
+                  description: 'Sort order. Gonna be rewritten by cursor''s sort if present.'
+                  enum:
+                    - asc
+                    - desc
+                  default: desc
+                limit:
+                  type: integer
+                  description: 'How many transactions to await in response.'
+                  minimum: 1
+                  maximum: 100
+                  default: 100
+                  example: 100
+                assetId:
+                  type: string
+                  description: 'Filter transactions by assetId'
+      responses:
+        '200':
+          description: List of reissue transactions satisfying provided filters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfTxReissue'
   '/transactions/burn/{id}':
     get:
       tags:
@@ -814,6 +1323,14 @@ paths:
       operationId: searchTxsBurn
       parameters:
         - in: query
+          name: ids
+          description: Transaction IDs array
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
           name: sender
           description: Address-sender of the transaction; has exclusive relation with senders
           schema:
@@ -827,7 +1344,7 @@ paths:
               type: string
         - in: query
           name: timeStart
-          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -835,7 +1352,7 @@ paths:
               - type: number
         - in: query
           name: timeEnd
-          description: 'Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -875,6 +1392,67 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListOfTxBurn'
+    post:
+      tags:
+        - transactions
+      summary: Get a list of burn transactions by applying filters
+      operationId: postSearchTxsBurn
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'Transaction IDs array'
+                  items:
+                    type: string
+                sender:
+                  type: string
+                  description: 'Address-sender of the transaction'
+                timeStart:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2019-01-01T00:00:00.000'
+                timeEnd:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2020-01-01T00:00:00.000'
+                after:
+                  type: string
+                  description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
+                sort:
+                  type: string
+                  description: 'Sort order. Gonna be rewritten by cursor''s sort if present.'
+                  enum:
+                    - asc
+                    - desc
+                  default: desc
+                limit:
+                  type: integer
+                  description: 'How many transactions to await in response.'
+                  minimum: 1
+                  maximum: 100
+                  default: 100
+                  example: 100
+                assetId:
+                  type: string
+                  description: 'Filter transactions by assetId'
+      responses:
+        '200':
+          description: List of burn transactions satisfying provided filters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfTxBurn'
   '/transactions/exchange/{id}':
     get:
       tags:
@@ -905,6 +1483,14 @@ paths:
       operationId: searchTxsExchange
       parameters:
         - in: query
+          name: ids
+          description: Transaction IDs array
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
           name: matcher
           description: Address of a matcher which sent the transaction
           schema:
@@ -928,7 +1514,7 @@ paths:
               type: string
         - in: query
           name: timeStart
-          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -936,7 +1522,7 @@ paths:
               - type: number
         - in: query
           name: timeEnd
-          description: 'Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -981,6 +1567,76 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListOfTxExchange'
+    post:
+      tags:
+        - transactions
+      summary: Get a list of exchange transactions by applying filters
+      operationId: postSearchTxsExchange
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'Transaction IDs array'
+                  items:
+                    type: string
+                matcher:
+                  type: string
+                  description: 'Address of a matcher which sent the transaction'
+                orderId:
+                  type: string
+                  description: I'd of order related to the transaction'
+                sender:
+                  type: string
+                  description: 'Address-sender of the transaction'
+                timeStart:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2019-01-01T00:00:00.000'
+                timeEnd:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2020-01-01T00:00:00.000'
+                amountAsset:
+                  type: string
+                  description: 'Asset ID of the amount asset.'
+                priceAsset:
+                  type: string
+                  description: 'Asset ID of the price asset.'
+                after:
+                  type: string
+                  description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
+                sort:
+                  type: string
+                  description: 'Sort order. Gonna be rewritten by cursor''s sort if present.'
+                  enum:
+                    - asc
+                    - desc
+                  default: desc
+                limit:
+                  type: integer
+                  description: 'How many transactions to await in response.'
+                  minimum: 1
+                  maximum: 100
+                  default: 100
+                  example: 100
+      responses:
+        '200':
+          description: List of exchange transactions satisfy provided filters in descending order by timestamp
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfTxExchange'
   '/transactions/lease/{id}':
     get:
       tags:
@@ -1011,6 +1667,14 @@ paths:
       operationId: searchTxsLease
       parameters:
         - in: query
+          name: ids
+          description: Transaction IDs array
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
           name: sender
           description: Address-sender of the transaction; has exclusive relation with senders
           schema:
@@ -1024,7 +1688,7 @@ paths:
               type: string
         - in: query
           name: timeStart
-          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -1032,7 +1696,7 @@ paths:
               - type: number
         - in: query
           name: timeEnd
-          description: 'Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -1072,6 +1736,67 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListOfTxLease'
+    post:
+      tags:
+        - transactions
+      summary: Get a list of lease transactions by applying filters
+      operationId: postSearchTxsLease
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'Transaction IDs array'
+                  items:
+                    type: string
+                sender:
+                  type: string
+                  description: 'Address-sender of the transaction'
+                timeStart:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2019-01-01T00:00:00.000'
+                timeEnd:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2020-01-01T00:00:00.000'
+                recipient:
+                  type: string
+                  description: 'Search transactions by recipient address'
+                after:
+                  type: string
+                  description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
+                sort:
+                  type: string
+                  description: 'Sort order. Gonna be rewritten by cursor''s sort if present.'
+                  enum:
+                    - asc
+                    - desc
+                  default: desc
+                limit:
+                  type: integer
+                  description: 'How many transactions to await in response.'
+                  minimum: 1
+                  maximum: 100
+                  default: 100
+                  example: 100
+      responses:
+        '200':
+          description: List of lease transactions satisfying provided filters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfTxLease'
   '/transactions/lease-cancel/{id}':
     get:
       tags:
@@ -1102,6 +1827,14 @@ paths:
       operationId: searchTxsLeaseCancel
       parameters:
         - in: query
+          name: ids
+          description: Transaction IDs array
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
           name: sender
           description: Address-sender of the transaction; has exclusive relation with senders
           schema:
@@ -1115,7 +1848,7 @@ paths:
               type: string
         - in: query
           name: timeStart
-          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -1123,7 +1856,7 @@ paths:
               - type: number
         - in: query
           name: timeEnd
-          description: 'Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -1163,6 +1896,67 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListOfTxLeaseCancel'
+    post:
+      tags:
+        - transactions
+      summary: Get a list of lease cancel transactions by applying filters
+      operationId: postSearchTxsLeaseCancel
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'Transaction IDs array'
+                  items:
+                    type: string
+                sender:
+                  type: string
+                  description: 'Address-sender of the transaction'
+                timeStart:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2019-01-01T00:00:00.000'
+                timeEnd:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2020-01-01T00:00:00.000'
+                recipient:
+                  type: string
+                  description: 'Search transactions by recipient address'
+                after:
+                  type: string
+                  description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
+                sort:
+                  type: string
+                  description: 'Sort order. Gonna be rewritten by cursor''s sort if present.'
+                  enum:
+                    - asc
+                    - desc
+                  default: desc
+                limit:
+                  type: integer
+                  description: 'How many transactions to await in response.'
+                  minimum: 1
+                  maximum: 100
+                  default: 100
+                  example: 100
+      responses:
+        '200':
+          description: List of lease cancel transactions satisfying provided filters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfTxLeaseCancel'
   '/transactions/alias/{id}':
     get:
       tags:
@@ -1193,6 +1987,14 @@ paths:
       operationId: searchTxsAlias
       parameters:
         - in: query
+          name: ids
+          description: Transaction IDs array
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
           name: sender
           description: Address-sender of the transaction; has exclusive relation with senders
           schema:
@@ -1206,7 +2008,7 @@ paths:
               type: string
         - in: query
           name: timeStart
-          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -1214,7 +2016,7 @@ paths:
               - type: number
         - in: query
           name: timeEnd
-          description: 'Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -1242,6 +2044,64 @@ paths:
             minimum: 1
             maximum: 100
             default: 100
+      responses:
+        '200':
+          description: List of alias transactions satisfying provided filters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfTxAlias'
+    post:
+      tags:
+        - transactions
+      summary: Get a list of alias transactions by applying filters
+      operationId: postSearchTxsAlias
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'Transaction IDs array'
+                  items:
+                    type: string
+                sender:
+                  type: string
+                  description: 'Address-sender of the transaction'
+                timeStart:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2019-01-01T00:00:00.000'
+                timeEnd:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2020-01-01T00:00:00.000'
+                after:
+                  type: string
+                  description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
+                sort:
+                  type: string
+                  description: 'Sort order. Gonna be rewritten by cursor''s sort if present.'
+                  enum:
+                    - asc
+                    - desc
+                  default: desc
+                limit:
+                  type: integer
+                  description: 'How many transactions to await in response.'
+                  minimum: 1
+                  maximum: 100
+                  default: 100
+                  example: 100
       responses:
         '200':
           description: List of alias transactions satisfying provided filters
@@ -1279,6 +2139,14 @@ paths:
       operationId: searchTxsMassTransfer
       parameters:
         - in: query
+          name: ids
+          description: Transaction IDs array
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
           name: sender
           description: Address-sender of the transaction; has exclusive relation with senders
           schema:
@@ -1292,7 +2160,7 @@ paths:
               type: string
         - in: query
           name: timeStart
-          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -1300,7 +2168,7 @@ paths:
               - type: number
         - in: query
           name: timeEnd
-          description: 'Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -1345,6 +2213,70 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListOfTxMassTransfer'
+    post:
+      tags:
+        - transactions
+      summary: Get a list of mass-transfer transactions by applying filters
+      operationId: postSearchTxsMassTransfer
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'Transaction IDs array'
+                  items:
+                    type: string
+                sender:
+                  type: string
+                  description: 'Address-sender of the transaction'
+                timeStart:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2019-01-01T00:00:00.000'
+                timeEnd:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2020-01-01T00:00:00.000'
+                recipient:
+                  type: string
+                  description: 'Search transactions by recipient address'
+                assetId:
+                  type: string
+                  description: 'Filter transactions by assetId'
+                after:
+                  type: string
+                  description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
+                sort:
+                  type: string
+                  description: 'Sort order. Gonna be rewritten by cursor''s sort if present.'
+                  enum:
+                    - asc
+                    - desc
+                  default: desc
+                limit:
+                  type: integer
+                  description: 'How many transactions to await in response.'
+                  minimum: 1
+                  maximum: 100
+                  default: 100
+                  example: 100
+      responses:
+        '200':
+          description: List of mass-transfer transactions satisfying provided filters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfTxMassTransfer'
   '/transactions/data/{id}':
     get:
       tags:
@@ -1375,6 +2307,14 @@ paths:
       operationId: searchTxsData
       parameters:
         - in: query
+          name: ids
+          description: Transaction IDs array
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
           name: sender
           description: Address-sender of the transaction; has exclusive relation with senders
           schema:
@@ -1388,7 +2328,7 @@ paths:
               type: string
         - in: query
           name: timeStart
-          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -1396,7 +2336,7 @@ paths:
               - type: number
         - in: query
           name: timeEnd
-          description: 'Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -1454,6 +2394,82 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListOfTxData'
+    post:
+      tags:
+        - transactions
+      summary: Get a list of data transactions by applying filters
+      operationId: postSearchTxsData
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'Transaction IDs array'
+                  items:
+                    type: string
+                sender:
+                  type: string
+                  description: 'Address-sender of the transaction'
+                timeStart:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2019-01-01T00:00:00.000'
+                timeEnd:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2020-01-01T00:00:00.000'
+                key:
+                  type: string
+                  description: 'Search transactions by data-enties with given key'
+                type:
+                  type: string
+                  description: 'Search transactions by data-enties with given data type'
+                  enum:
+                    - integer
+                    - boolean
+                    - string
+                    - binary
+                value:
+                  description: 'Search transactions by data-enties with given value. Can be used only together with `type` parameter'
+                  oneOf:
+                    - type: string
+                    - type: boolean
+                    - type: number
+                  example: string
+                after:
+                  type: string
+                  description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
+                sort:
+                  type: string
+                  description: 'Sort order. Gonna be rewritten by cursor''s sort if present.'
+                  enum:
+                    - asc
+                    - desc
+                  default: desc
+                limit:
+                  type: integer
+                  description: 'How many transactions to await in response.'
+                  minimum: 1
+                  maximum: 100
+                  default: 100
+                  example: 100
+      responses:
+        '200':
+          description: List of data transactions satisfying provided filters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfTxData'
   '/transactions/sponsorship/{id}':
     get:
       tags:
@@ -1484,6 +2500,14 @@ paths:
       operationId: searchTxsSponsorship
       parameters:
         - in: query
+          name: ids
+          description: Transaction IDs array
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
           name: sender
           description: Address-sender of the transaction; has exclusive relation with senders
           schema:
@@ -1497,7 +2521,7 @@ paths:
               type: string
         - in: query
           name: timeStart
-          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -1505,7 +2529,7 @@ paths:
               - type: number
         - in: query
           name: timeEnd
-          description: 'Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -1545,6 +2569,67 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListOfTxSponsorship'
+    post:
+      tags:
+        - transactions
+      summary: Get a list of sponsorship transactions by applying filters
+      operationId: postSearchTxsSponsorship
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'Transaction IDs array'
+                  items:
+                    type: string
+                sender:
+                  type: string
+                  description: 'Address-sender of the transaction'
+                timeStart:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2019-01-01T00:00:00.000'
+                timeEnd:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2020-01-01T00:00:00.000'
+                after:
+                  type: string
+                  description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
+                sort:
+                  type: string
+                  description: 'Sort order. Gonna be rewritten by cursor''s sort if present.'
+                  enum:
+                    - asc
+                    - desc
+                  default: desc
+                limit:
+                  type: integer
+                  description: 'How many transactions to await in response.'
+                  minimum: 1
+                  maximum: 100
+                  default: 100
+                  example: 100
+                assetId:
+                  type: string
+                  description: 'Filter transactions by assetId'
+      responses:
+        '200':
+          description: List of sponsorship transactions satisfying provided filters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfTxSponsorship'
   '/transactions/set-script/{id}':
     get:
       tags:
@@ -1575,6 +2660,14 @@ paths:
       operationId: searchTxsSetScript
       parameters:
         - in: query
+          name: ids
+          description: Transaction IDs array
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
           name: sender
           description: Address-sender of the transaction; has exclusive relation with senders
           schema:
@@ -1588,7 +2681,7 @@ paths:
               type: string
         - in: query
           name: timeStart
-          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -1596,7 +2689,7 @@ paths:
               - type: number
         - in: query
           name: timeEnd
-          description: 'Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -1636,6 +2729,67 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListOfTxSetScript'
+    post:
+      tags:
+        - transactions
+      summary: Get a list of Set script transactions by applying filters
+      operationId: postSearchTxsSetScript
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'Transaction IDs array'
+                  items:
+                    type: string
+                sender:
+                  type: string
+                  description: 'Address-sender of the transaction'
+                timeStart:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2019-01-01T00:00:00.000'
+                timeEnd:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2020-01-01T00:00:00.000'
+                script:
+                  type: string
+                  description: 'Search transactions by the script. Supports only exact match. Needs to be url-encoded!'
+                after:
+                  type: string
+                  description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
+                sort:
+                  type: string
+                  description: 'Sort order. Gonna be rewritten by cursor''s sort if present.'
+                  enum:
+                    - asc
+                    - desc
+                  default: desc
+                limit:
+                  type: integer
+                  description: 'How many transactions to await in response.'
+                  minimum: 1
+                  maximum: 100
+                  default: 100
+                  example: 100
+      responses:
+        '200':
+          description: List of SetScript transactions satisfying provided filters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfTxSetScript'
   '/transactions/set-asset-script/{id}':
     get:
       tags:
@@ -1666,6 +2820,14 @@ paths:
       operationId: searchTxsSetAssetScript
       parameters:
         - in: query
+          name: ids
+          description: Transaction IDs array
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
           name: sender
           description: Address-sender of the transaction; has exclusive relation with senders
           schema:
@@ -1679,7 +2841,7 @@ paths:
               type: string
         - in: query
           name: timeStart
-          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -1687,7 +2849,7 @@ paths:
               - type: number
         - in: query
           name: timeEnd
-          description: 'Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -1732,6 +2894,70 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListOfTxSetAssetScript'
+    post:
+      tags:
+        - transactions
+      summary: Get a list of Set asset script transactions by applying filters
+      operationId: postSearchTxsSetAssetScript
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'Transaction IDs array'
+                  items:
+                    type: string
+                sender:
+                  type: string
+                  description: 'Address-sender of the transaction'
+                timeStart:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2019-01-01T00:00:00.000'
+                timeEnd:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2020-01-01T00:00:00.000'
+                assetId:
+                  type: string
+                  description: 'Search transactions by the assetId.'
+                script:
+                  type: string
+                  description: 'Search transactions by the script. Supports only exact match. Needs to be url-encoded!'
+                after:
+                  type: string
+                  description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
+                sort:
+                  type: string
+                  description: 'Sort order. Gonna be rewritten by cursor''s sort if present.'
+                  enum:
+                    - asc
+                    - desc
+                  default: desc
+                limit:
+                  type: integer
+                  description: 'How many transactions to await in response.'
+                  minimum: 1
+                  maximum: 100
+                  default: 100
+                  example: 100
+      responses:
+        '200':
+          description: List of SetAssetScript transactions satisfying provided filters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfTxSetAssetScript'
   '/transactions/invoke-script/{id}':
     get:
       tags:
@@ -1762,6 +2988,14 @@ paths:
       operationId: searchTxsInvokeScript
       parameters:
         - in: query
+          name: ids
+          description: Transaction IDs array
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
           name: sender
           description: Address-sender of the transaction; has exclusive relation with senders
           schema:
@@ -1775,7 +3009,7 @@ paths:
               type: string
         - in: query
           name: timeStart
-          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -1783,7 +3017,7 @@ paths:
               - type: number
         - in: query
           name: timeEnd
-          description: 'Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -1821,6 +3055,70 @@ paths:
             minimum: 1
             maximum: 100
             default: 100
+      responses:
+        '200':
+          description: List of InvokeScript transactions satisfying provided filters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfTxInvokeScript'
+    post:
+      tags:
+        - transactions
+      summary: Get a list of Invoke script transactions by applying filters
+      operationId: postSearchTxsInvokeScript
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'Transaction IDs array'
+                  items:
+                    type: string
+                sender:
+                  type: string
+                  description: 'Address-sender of the transaction'
+                timeStart:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, start. Defaults to first transaction''s time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2019-01-01T00:00:00.000'
+                timeEnd:
+                  oneOf:
+                  - type: string
+                    format: date-time
+                  - type: number
+                  description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
+                  example: '2020-01-01T00:00:00.000'
+                dapp:
+                  type: string
+                  description: 'Search transactions by the dApp address. Supports only exact match.'
+                function:
+                  type: string
+                  description: 'Search transactions by the called function name. Supports only exact match.'
+                after:
+                  type: string
+                  description: 'Cursor in base64 encoding. Holds information about timestamp, id, sort.'
+                sort:
+                  type: string
+                  description: 'Sort order. Gonna be rewritten by cursor''s sort if present.'
+                  enum:
+                    - asc
+                    - desc
+                  default: desc
+                limit:
+                  type: integer
+                  description: 'How many transactions to await in response.'
+                  minimum: 1
+                  maximum: 100
+                  default: 100
+                  example: 100
       responses:
         '200':
           description: List of InvokeScript transactions satisfying provided filters
@@ -1893,6 +3191,36 @@ paths:
             type: array
             items:
               type: string
+      responses:
+        '200':
+          description: List of aliases
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfAlias'
+    post:
+      tags:
+        - aliases
+      summary: Get a list of aliases
+      operationId: postAliasesForAddress
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                address:
+                  type: string
+                  description: 'Address'
+                showBroken:
+                  type: boolean
+                  description: 'Show broken aliases (taken by several people)'
+                  default: false
+                aliases:
+                  type: array
+                  items:
+                    type: string
       responses:
         '200':
           description: List of aliases
@@ -2005,6 +3333,61 @@ paths:
                 $ref: '#/components/schemas/ListOfPair'
         '400':
           description: If assets order in one of the pairs is incorrect or at least on of the assets does not exist
+    post:
+      tags:
+        - matchers
+      summary: 1) Get list of pairs info by serialized pairs list; 2) Get all list of pairs info by limit (sort by volume in WAVES)
+      operationId: matcherPostPairsListAll
+      parameters:
+        - in: path
+          name: matcher
+          description: Matcher address
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pairs:
+                  type: array
+                  description: '`{amountAsset}/{priceAsset}` strings list'
+                  items:
+                    type: string
+                search_by_asset:
+                  type: string
+                  description: 'For searching pairs, that have the `search_by_asset` in asset names, tickers, id of one asset of the pair.'
+                  example: bitc
+                search_by_assets:
+                  type: array
+                  description: 'For searching pairs, that have the `search_by_asset` in asset names, tickers, id of one asset of the pair.'
+
+                  items:
+                    type: string
+                match_exactly:
+                  type: array
+                  description: 'Whether to search assets of pairs exactly or not. Parameter position is corresponds to asset position.'
+                  items:
+                    type: boolean
+                limit:
+                  type: number
+                  description: 'How many pairs to await in response.'
+                  example: 100
+                  minimum: 1
+                  maximum: 1000
+                  default: 100
+      responses:
+        '200':
+          description: List of Pairs info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfPair'
+        '400':
+          description: If assets order in one of the pairs is incorrect or at least on of the assets does not exist
   '/matchers/{matcher}/candles/{amountAsset}/{priceAsset}':
     get:
       tags:
@@ -2032,7 +3415,7 @@ paths:
             type: string
         - in: query
           name: timeStart
-          description: 'Time range filter, start (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, start. (ISO-8601 or timestamp in milliseconds, UTC)'
           required: true
           schema:
             oneOf:
@@ -2041,7 +3424,7 @@ paths:
               - type: number
         - in: query
           name: timeEnd
-          description: 'Time range filter, end. Defaults to now (ISO-8601 or timestamp in milliseconds).'
+          description: 'Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)'
           schema:
             oneOf:
               - type: string
@@ -2096,6 +3479,44 @@ paths:
               - type: string
                 format: date-time
               - type: number
+      responses:
+        '200':
+          description: Pair info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfRates'
+    post:
+      tags:
+        - matchers
+      summary: Estimate assets relative assets rate for asset pairs at specific time
+      operationId: postEstimateRates
+      parameters:
+        - name: matcher
+          in: path
+          description: Matcher address
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pairs:
+                  type: array
+                  description: '`{amountAsset}/{priceAsset}` strings list'
+                  items:
+                    type: string
+                timestamp:
+                  description: 'Time to estimate the rates at. Defaults to now.'
+                  oneOf:
+                    - type: string
+                      format: date-time
+                    - type: number
+                  example: '2020-01-01T00:00:00.000'
       responses:
         '200':
           description: Pair info
