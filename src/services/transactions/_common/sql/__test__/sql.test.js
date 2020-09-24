@@ -1,13 +1,13 @@
 const pg = require('knex')({ client: 'pg' });
 
-const { createSql } = require('../sql');
+const { createSql } = require('..');
 
 // sample query
 const query = pg('some_table').select('*');
 const filterValues = {
   sender: 'sender',
-  timeStart: 'timeStart',
-  timeEnd: 'timeEnd',
+  timeStart: new Date('2020-01-01'),
+  timeEnd: new Date('2020-02-01'),
   sort: 'desc',
   limit: 1,
 };

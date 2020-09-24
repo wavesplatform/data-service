@@ -14,7 +14,7 @@ const ids = (ids) => whereIn('t.id', ids);
 const sender = (addr) => where('t.sender', addr);
 
 const byTimeStamp = (comparator) => (ts) => (q) =>
-  q.clone().where('t.time_stamp', comparator, ts);
+  q.clone().where('t.time_stamp', comparator, ts.toISOString());
 
 const byAssetId = ifElse(
   equals('WAVES'),

@@ -1,9 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`Sql builder  get works 1`] = `"select * from \\"some_table\\" where \\"t\\".\\"id\\" = 'id' limit 1"`;
-
-exports[`Sql builder mget works 1`] = `"select * from \\"some_table\\" where \\"t\\".\\"id\\" in ('id1', 'id2') order by \\"t\\".\\"tx_uid\\" desc limit 2"`;
-
-exports[`Sql builder search covers case with all filters (without after) 1`] = `"select * from \\"some_table\\" where \\"t\\".\\"sender\\" = 'sender' and \\"t\\".\\"time_stamp\\" > 'timeStart' and \\"t\\".\\"time_stamp\\" < 'timeEnd' order by \\"t\\".\\"tx_uid\\" desc limit 1"`;
-
-exports[`Sql builder search covers case with all filters with after 1`] = `"select * from \\"some_table\\" where \\"t\\".\\"sender\\" = 'sender' and \\"t\\".\\"time_stamp\\" > 'timeStart' and \\"t\\".\\"time_stamp\\" < 'timeEnd' and t.tx_uid > 20000000 order by \\"t\\".\\"tx_uid\\" desc limit 1"`;
