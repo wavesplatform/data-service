@@ -1,6 +1,5 @@
 import { propEq } from 'ramda';
 
-import { TransactionInfo } from '../../../../types';
 import { CommonRepoDependencies } from '../../..';
 import { getByIdPreset } from '../../../_common/presets/pg/getById';
 import { mgetByIdsPreset } from '../../../_common/presets/pg/mgetByIds';
@@ -15,6 +14,7 @@ import {
   ExchangeTxsRepo,
   ExchangeTxsSearchRequest,
   ExchangeTxDbResponse,
+  ExchangeTx,
 } from './types';
 
 export default ({
@@ -47,7 +47,7 @@ export default ({
       Cursor,
       ExchangeTxsSearchRequest,
       ExchangeTxDbResponse,
-      TransactionInfo
+      ExchangeTx
     >({
       name: 'transactions.exchange.search',
       sql: sql.search,

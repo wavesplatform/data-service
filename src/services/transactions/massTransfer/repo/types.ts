@@ -1,16 +1,25 @@
-import { Repo, TransactionInfo } from '../../../../types';
+import { Repo } from '../../../../types';
 import { WithSortOrder, WithLimit } from '../../../_common';
 import { RequestWithCursor } from '../../../_common/pagination';
-import { CommonFilters, RawTx } from '../../_common/types';
+import { CommonFilters, RawTx, Tx } from '../../_common/types';
 import { BigNumber } from '@waves/data-entities';
 
 export type MassTransferTxDbResponse = RawTx & {
   asset_id: string;
   attachment: string;
-  sender: string;
-  sender_public_key: string;
-  recipients: string;
+  recipients: string[];
   amounts: BigNumber[];
+};
+
+type Transfer = {
+  amount: BigNumber;
+  recipient: string;
+};
+
+export type MassTransferTx = Tx & {
+  assetId: string;
+  attachment: string;
+  transfers: Transfer[];
 };
 
 export type MassTransferTxsGetRequest = string;
@@ -31,5 +40,5 @@ export type MassTransferTxsRepo = Repo<
   MassTransferTxsGetRequest,
   MassTransferTxsMgetRequest,
   MassTransferTxsSearchRequest,
-  TransactionInfo
+  MassTransferTx
 >;

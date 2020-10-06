@@ -12,22 +12,23 @@ import {
   CommonTransactionInfo,
 } from '../../../types';
 import { SortOrder } from '../../_common';
-import { GenesisTxsService } from '../genesis';
-import { PaymentTxsService } from '../payment';
-import { IssueTxsService } from '../issue';
-import { TransferTxsService } from '../transfer';
-import { ReissueTxsService } from '../reissue';
-import { BurnTxsService } from '../burn';
-import { ExchangeTxsService } from '../exchange';
-import { LeaseTxsService } from '../lease';
-import { LeaseCancelTxsService } from '../leaseCancel';
-import { AliasTxsService } from '../alias';
-import { MassTransferTxsService } from '../massTransfer';
-import { DataTxsService } from '../data';
-import { SetScriptTxsService } from '../setScript';
-import { SponsorshipTxsService } from '../sponsorship';
-import { SetAssetScriptTxsService } from '../setAssetScript';
-import { InvokeScriptTxsService } from '../invokeScript';
+import { GenesisTxsService } from '../genesis/types';
+import { PaymentTxsService } from '../payment/types';
+import { IssueTxsService } from '../issue/types';
+import { TransferTxsService } from '../transfer/types';
+import { ReissueTxsService } from '../reissue/types';
+import { BurnTxsService } from '../burn/types';
+import { ExchangeTxsService } from '../exchange/types';
+import { LeaseTxsService } from '../lease/types';
+import { LeaseCancelTxsService } from '../leaseCancel/types';
+import { AliasTxsService } from '../alias/types';
+import { MassTransferTxsService } from '../massTransfer/types';
+import { DataTxsService } from '../data/types';
+import { SetScriptTxsService } from '../setScript/types';
+import { SponsorshipTxsService } from '../sponsorship/types';
+import { SetAssetScriptTxsService } from '../setAssetScript/types';
+import { InvokeScriptTxsService } from '../invokeScript/types';
+import { UpdateAssetInfoTxsService } from '../updateAssetInfo/types';
 import {
   AllTxsRepo,
   AllTxsGetRequest,
@@ -54,6 +55,7 @@ type AllTxsServiceDep = {
   14: SponsorshipTxsService;
   15: SetAssetScriptTxsService;
   16: InvokeScriptTxsService;
+  17: UpdateAssetInfoTxsService;
 };
 
 export type AllTxsServiceGetRequest = ServiceGetRequest<AllTxsGetRequest>;
@@ -82,10 +84,10 @@ export type AllTxsService = {
 export default (repo: AllTxsRepo) => (
   txsServices: AllTxsServiceDep
 ): AllTxsService => ({
-  get: req =>
+  get: (req) =>
     repo
       .get(req.id) //Task tx
-      .chain(m =>
+      .chain((m) =>
         m.matchWith({
           Just: ({ value }) => {
             return txsServices[value.type as keyof AllTxsServiceDep].get({
@@ -97,12 +99,12 @@ export default (repo: AllTxsRepo) => (
         })
       ),
 
-  mget: req =>
+  mget: (req) =>
     repo
       .mget(req.ids) // Task tx[]. tx can have data: null
       .chain((txsList: Maybe<TransactionInfo>[]) =>
         waitAll(
-          txsList.map(m =>
+          txsList.map((m) =>
             m.matchWith({
               Just: ({ value }) => {
                 return txsServices[value.type as keyof AllTxsServiceDep].get({
@@ -116,7 +118,7 @@ export default (repo: AllTxsRepo) => (
         )
       ),
 
-  search: req =>
+  search: (req) =>
     repo.search(req).chain((txsList: SearchedItems<CommonTransactionInfo>) =>
       waitAll<AppError, Maybe<TransactionInfo>[]>(
         pipe<
@@ -125,24 +127,24 @@ export default (repo: AllTxsRepo) => (
           [string, CommonTransactionInfo[]][],
           Task<AppError, Maybe<TransactionInfo>[]>[]
         >(
-          groupBy(t => String(t.type)),
+          groupBy((t) => String(t.type)),
           toPairs,
-          tuples =>
+          (tuples) =>
             tuples.map(([type, txs]) => {
               return txsServices[
                 (type as unknown) as keyof AllTxsServiceDep
               ].mget({
-                ids: txs.map(t => t.id),
+                ids: txs.map((t) => t.id),
                 decimalsFormat: req.decimalsFormat,
               });
             })
         )(txsList.items)
       )
-        .map(mss => flatten<Maybe<TransactionInfo>>(mss))
-        .map(ms => collect(m => m.getOrElse(undefined), ms))
-        .map(txs => {
+        .map((mss) => flatten<Maybe<TransactionInfo>>(mss))
+        .map((ms) => collect((m) => m.getOrElse(undefined), ms))
+        .map((txs) => {
           const s = indexBy(
-            tx => `${tx.id}:${tx.timestamp.valueOf()}`,
+            (tx) => `${tx.id}:${tx.timestamp.valueOf()}`,
             txsList.items
           );
           return sort((a, b) => {
@@ -153,7 +155,7 @@ export default (repo: AllTxsRepo) => (
               : bTxUid.minus(aTxUid).toNumber();
           }, txs);
         })
-        .map(txs => ({
+        .map((txs) => ({
           ...txsList,
           items: txs,
         }))

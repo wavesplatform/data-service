@@ -13,16 +13,15 @@ const selectFromFiltered = (filtered) =>
       signature: 'txs.signature',
       proofs: 'txs.proofs',
       tx_version: 'txs.tx_version',
-      fee: pg.raw('txs.fee * 10^(-8)'),
+      fee: 'txs.fee',
+      status: 'txs.status',
       sender: 't.sender',
       sender_public_key: 't.sender_public_key',
 
-      asset_id: 'a.asset_id',
-      quantity: pg.raw('t.quantity * 10^(-dec.decimals)'),
+      asset_id: 't.asset_id',
+      quantity: 't.quantity',
       reissuable: 't.reissuable',
     })
-    .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tx_uid')
-    .leftJoin({ a: 'assets_data' }, 'a.uid', 't.asset_uid')
-    .join({ dec: 'txs_3' }, 'dec.asset_uid', '=', 't.asset_uid');
+    .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tx_uid');
 
 module.exports = { select, selectFromFiltered };

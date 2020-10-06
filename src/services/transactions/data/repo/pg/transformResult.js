@@ -13,14 +13,13 @@ const {
   cond,
   always,
   isEmpty,
-  identity,
   either,
   sortBy,
   evolve,
   T,
 } = require('ramda');
 
-const getDataObject = txRow => ({
+const getDataObject = (txRow) => ({
   key: txRow.data_key,
   type: txRow.data_type,
   value: txRow[`data_value_${txRow.data_type}`],
@@ -39,13 +38,7 @@ const removeDataEntryFromRow = omit([
 
 const appendRowToTx = (tx, row) =>
   compose(
-    cond([
-      [
-        always(!isNil(row.data_type)),
-        assoc('data', append(getDataObject(row), tx.data)),
-      ],
-      [T, identity],
-    ]),
+    assoc('data', append(getDataObject(row), tx.data)),
     merge(removeDataEntryFromRow(row))
   )(tx);
 

@@ -40,13 +40,14 @@ const getArgFieldByType = (
       return 'arg_value_binary';
     case 'string':
       return 'arg_value_string';
+    case 'list':
+      return 'arg_value_list';
   }
 };
 
 const getArg = (txRaw: DbRawInvokeScriptTx): InvokeScriptTxArg => ({
   type: txRaw.arg_type,
   value: txRaw.arg_type ? txRaw[getArgFieldByType(txRaw.arg_type)] : null,
-  // value: txRaw.arg_type ? txRaw[`arg_value_${txRaw.arg_type}`] : null,
   positionInArgs: txRaw.position_in_args, // for sorting later
 });
 
@@ -64,6 +65,7 @@ const removeUnnecessaryFromRaw = omit([
   'arg_value_boolean',
   'arg_value_string',
   'arg_value_binary',
+  'arg_value_list',
   'position_in_args',
 
   'amount',
@@ -125,12 +127,5 @@ export const transformResult = (
 ): RawInvokeScriptTx[] =>
   cond([
     [either(isNil, isEmpty), always([])],
-    [
-      T,
-      compose(
-        map(buildTxFromTxs),
-        values,
-        groupBy(prop('id'))
-      ),
-    ],
+    [T, compose(map(buildTxFromTxs), values, groupBy(prop('id')))],
   ])(t);

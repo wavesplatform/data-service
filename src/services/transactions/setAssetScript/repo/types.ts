@@ -1,10 +1,15 @@
-import { Repo, TransactionInfo } from '../../../../types';
+import { Repo } from '../../../../types';
 import { WithSortOrder, WithLimit } from '../../../_common';
 import { RequestWithCursor } from '../../../_common/pagination';
-import { CommonFilters, RawTx } from '../../_common/types';
+import { CommonFilters, RawTx, Tx } from '../../_common/types';
 
 export type SetAssetScriptTxDbResponse = RawTx & {
   asset_id: string;
+  script: string;
+};
+
+export type SetAssetScriptTx = Tx & {
+  assetId: string;
   script: string;
 };
 
@@ -25,5 +30,5 @@ export type SetAssetScriptTxsRepo = Repo<
   SetAssetScriptTxsGetRequest,
   SetAssetScriptTxsMgetRequest,
   SetAssetScriptTxsSearchRequest,
-  TransactionInfo
+  SetAssetScriptTx
 >;

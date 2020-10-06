@@ -1,44 +1,15 @@
-import { Maybe } from 'folktale/maybe';
-import {
-  Service,
-  SearchedItems,
-  ServiceGetRequest,
-  ServiceMgetRequest,
-} from '../../../types';
-import { WithDecimalsFormat } from '../../types';
-import {
-  ReissueTxsRepo,
-  ReissueTxsGetRequest,
-  ReissueTxsMgetRequest,
-  ReissueTxsSearchRequest,
-} from './repo/types';
-import { TransactionInfo } from '../../../types';
+import { AssetsService } from '../../assets';
+import { createService } from '../_common/createService';
+import { withDecimalsTransformation } from '../_common/withDecimalsTransformation';
+import { ReissueTxsRepo } from './repo/types';
+import { ReissueTxsService } from './types';
+import { modifyDecimals } from './modifyDecimals';
 
-export type ReissueTxsServiceGetRequest = ServiceGetRequest<
-  ReissueTxsGetRequest
->;
-export type ReissueTxsServiceMgetRequest = ServiceMgetRequest<
-  ReissueTxsMgetRequest
->;
-export type ReissueTxsServiceSearchRequest = ReissueTxsSearchRequest;
-
-export type ReissueTxsService = {
-  get: Service<
-    ReissueTxsServiceGetRequest & WithDecimalsFormat,
-    Maybe<TransactionInfo>
-  >;
-  mget: Service<
-    ReissueTxsServiceMgetRequest & WithDecimalsFormat,
-    Maybe<TransactionInfo>[]
-  >;
-  search: Service<
-    ReissueTxsServiceSearchRequest & WithDecimalsFormat,
-    SearchedItems<TransactionInfo>
-  >;
-};
-
-export default (repo: ReissueTxsRepo): ReissueTxsService => ({
-  get: req => repo.get(req.id),
-  mget: req => repo.mget(req.ids),
-  search: req => repo.search(req),
-});
+export default (
+  repo: ReissueTxsRepo,
+  assetsService: AssetsService
+): ReissueTxsService =>
+  withDecimalsTransformation(
+    modifyDecimals(assetsService),
+    createService(repo)
+  );

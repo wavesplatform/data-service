@@ -10,7 +10,7 @@ export const serialize = <Response extends AssetDbResponse>(
 ): string | undefined =>
   response === null
     ? undefined
-    : Buffer.from(response.uid.toString()).toString('base64');
+    : Buffer.from(response.asset_id.toString()).toString('base64');
 
 export const deserialize = (
   cursor: string

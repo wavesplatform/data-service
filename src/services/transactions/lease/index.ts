@@ -1,42 +1,15 @@
-import { Maybe } from 'folktale/maybe';
-import {
-  Service,
-  SearchedItems,
-  ServiceGetRequest,
-  ServiceMgetRequest,
-} from '../../../types';
-import { WithDecimalsFormat } from '../../types';
-import {
-  LeaseTxsRepo,
-  LeaseTxsGetRequest,
-  LeaseTxsMgetRequest,
-  LeaseTxsSearchRequest,
-} from './repo/types';
-import { TransactionInfo } from '../../../types';
+import { AssetsService } from '../../assets';
+import { createService } from '../_common/createService';
+import { withDecimalsTransformation } from '../_common/withDecimalsTransformation';
+import { modifyDecimals } from './modifyDecimals';
+import { LeaseTxsRepo } from './repo/types';
+import { LeaseTxsService } from './types';
 
-export type LeaseTxsServiceGetRequest = ServiceGetRequest<LeaseTxsGetRequest>;
-export type LeaseTxsServiceMgetRequest = ServiceMgetRequest<
-  LeaseTxsMgetRequest
->;
-export type LeaseTxsServiceSearchRequest = LeaseTxsSearchRequest;
-
-export type LeaseTxsService = {
-  get: Service<
-    LeaseTxsServiceGetRequest & WithDecimalsFormat,
-    Maybe<TransactionInfo>
-  >;
-  mget: Service<
-    LeaseTxsServiceMgetRequest & WithDecimalsFormat,
-    Maybe<TransactionInfo>[]
-  >;
-  search: Service<
-    LeaseTxsServiceSearchRequest & WithDecimalsFormat,
-    SearchedItems<TransactionInfo>
-  >;
-};
-
-export default (repo: LeaseTxsRepo): LeaseTxsService => ({
-  get: req => repo.get(req.id),
-  mget: req => repo.mget(req.ids),
-  search: req => repo.search(req),
-});
+export default (
+  repo: LeaseTxsRepo,
+  assetsService: AssetsService
+): LeaseTxsService =>
+  withDecimalsTransformation(
+    modifyDecimals(assetsService),
+    createService(repo)
+  );

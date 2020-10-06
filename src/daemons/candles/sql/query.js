@@ -14,8 +14,8 @@ const {
 const makeCandleCalculateColumns = (interval) => {
   return {
     candle_time: candlePresets.aggregate.candle_time(interval),
-    amount_asset_uid: 'amount_asset_uid',
-    price_asset_uid: 'price_asset_uid',
+    amount_asset_id: 'amount_asset_id',
+    price_asset_id: 'price_asset_id',
     low: candlePresets.aggregate.low,
     high: candlePresets.aggregate.high,
     volume: candlePresets.aggregate.volume,
@@ -32,8 +32,8 @@ const makeCandleCalculateColumns = (interval) => {
 
 const candleSelectColumns = {
   time_start: 'e.candle_time',
-  amount_asset_uid: 'amount_asset_uid',
-  price_asset_uid: 'price_asset_uid',
+  amount_asset_id: 'amount_asset_id',
+  price_asset_id: 'price_asset_id',
   low: pg.min('e.price'),
   high: pg.max('e.price'),
   volume: pg.sum('e.amount'),
@@ -56,30 +56,16 @@ const insertIntoCandlesFromSelect = (candlesTableName, selectFunction) =>
   pg.into(candlesTableName).insert(selectFunction);
 
 /** selectExchanges :: QueryBuilder */
-const selectExchanges = pg({
-  t: pg({ t: 'txs_7' }).select({
-    tx_uid: 't.tx_uid',
-    amount_asset_uid: pg.raw('coalesce(t.amount_asset_uid, 0)'),
-    price_asset_uid: pg.raw('coalesce(t.price_asset_uid, 0)'),
-    sender: 't.sender',
-    height: 't.height',
-    candle_time: pgRawDateTrunc('t.time_stamp')('minute'),
-    amount: 't.amount',
-    price: 't.price',
-  }),
-})
-  .select({
-    tx_uid: 't.tx_uid',
-    amount_asset_uid: 't.amount_asset_uid',
-    price_asset_uid: 't.price_asset_uid',
-    sender: 't.sender',
-    height: 't.height',
-    candle_time: 't.candle_time',
-    amount: pg.raw('t.amount * 10 ^(-a.decimals)'),
-    price: pg.raw('t.price * 10 ^(-8 - p.decimals + a.decimals)'),
-  })
-  .join({ a: 'assets_data' }, 'a.uid', 't.amount_asset_uid')
-  .join({ p: 'assets_data' }, 'p.uid', 't.price_asset_uid');
+const selectExchanges = pg({ t: 'txs_7' }).select({
+  tx_uid: 't.tx_uid',
+  amount_asset_id: 't.amount_asset_id',
+  price_asset_id: 't.price_asset_id',
+  sender: 't.sender',
+  height: 't.height',
+  candle_time: pgRawDateTrunc('t.time_stamp')('minute'),
+  amount: 't.amount',
+  price: 't.price',
+});
 
 /** selectExchangesAfterTimestamp :: Date -> QueryBuilder */
 const selectExchangesAfterTimestamp = (fromTimestamp) =>
@@ -143,7 +129,7 @@ const insertOrUpdateCandles = (candlesTableName, candles) => {
       .raw(
         `${pg({ t: candlesTableName }).insert(
           candles.map(serializeCandle)
-        )} on conflict (time_start, amount_asset_uid, price_asset_uid, matcher_address, interval) do update set ${updatedFieldsExcluded}`
+        )} on conflict (time_start, amount_asset_id, price_asset_id, matcher_address, interval) do update set ${updatedFieldsExcluded}`
       )
       .toString();
   }
@@ -171,11 +157,11 @@ const insertOrUpdateCandlesFromShortInterval = (
           )
           .groupBy(
             'candle_time',
-            'amount_asset_uid',
-            'price_asset_uid',
+            'amount_asset_id',
+            'price_asset_id',
             'matcher_address'
           );
-      })} on conflict (time_start, amount_asset_uid, price_asset_uid, matcher_address, interval) do update set ${updatedFieldsExcluded}`
+      })} on conflict (time_start, amount_asset_id, price_asset_id, matcher_address, interval) do update set ${updatedFieldsExcluded}`
     )
     .toString();
 
@@ -197,7 +183,7 @@ const insertAllMinuteCandles = (candlesTableName) =>
       .select(candleSelectColumns)
       .from({ e: 'e_cte' })
       .groupByRaw(
-        'e.candle_time, e.amount_asset_uid, e.price_asset_uid, e.sender'
+        'e.candle_time, e.amount_asset_id, e.price_asset_id, e.sender'
       );
   }).toString();
 
@@ -209,8 +195,8 @@ const insertAllCandles = (candlesTableName, shortInterval, longerInterval) =>
       .where('t.interval', shortInterval)
       .groupBy([
         'candle_time',
-        'amount_asset_uid',
-        'price_asset_uid',
+        'amount_asset_id',
+        'price_asset_id',
         'matcher_address',
       ]);
   }).toString();
@@ -222,8 +208,8 @@ const selectCandlesAfterTimestamp = (timetamp) =>
     .from(selectExchangesAfterTimestamp(timetamp).clone().as('e'))
     .groupBy([
       'e.candle_time',
-      'e.amount_asset_uid',
-      'e.price_asset_uid',
+      'e.amount_asset_id',
+      'e.price_asset_id',
       'e.sender',
     ])
     .toString();

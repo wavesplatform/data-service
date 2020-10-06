@@ -177,6 +177,14 @@ export default (txsServices: ServiceMesh['transactions']) => {
     })
   );
 
+  const updateAssetInfo = createTransactionHttpHandlers(
+    new Router(),
+    '/transactions/update-asset-info',
+    txsServices['updateAssetInfo'],
+    createParseRequest({
+      assetId: commonFilters.query,
+    })
+  );
   return subrouter.use(
     alias.routes(),
     all.routes(),
@@ -194,6 +202,7 @@ export default (txsServices: ServiceMesh['transactions']) => {
     setAssetScript.routes(),
     setScript.routes(),
     sponsorship.routes(),
-    transfer.routes()
+    transfer.routes(),
+    updateAssetInfo.routes(),
   );
 };

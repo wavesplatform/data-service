@@ -1,44 +1,15 @@
-import { Maybe } from 'folktale/maybe';
-import {
-  Service,
-  SearchedItems,
-  ServiceGetRequest,
-  ServiceMgetRequest,
-} from '../../../types';
-import { WithDecimalsFormat } from '../../types';
-import {
-  MassTransferTxsRepo,
-  MassTransferTxsGetRequest,
-  MassTransferTxsMgetRequest,
-  MassTransferTxsSearchRequest,
-} from './repo/types';
-import { TransactionInfo } from '../../../types';
+import { AssetsService } from '../../assets';
+import { createService } from '../_common/createService';
+import { withDecimalsTransformation } from '../_common/withDecimalsTransformation';
+import { modifyDecimals } from './modifyDecimals';
+import { MassTransferTxsRepo } from './repo/types';
+import { MassTransferTxsService } from './types';
 
-export type MassTransferTxsServiceGetRequest = ServiceGetRequest<
-  MassTransferTxsGetRequest
->;
-export type MassTransferTxsServiceMgetRequest = ServiceMgetRequest<
-  MassTransferTxsMgetRequest
->;
-export type MassTransferTxsServiceSearchRequest = MassTransferTxsSearchRequest;
-
-export type MassTransferTxsService = {
-  get: Service<
-    MassTransferTxsServiceGetRequest & WithDecimalsFormat,
-    Maybe<TransactionInfo>
-  >;
-  mget: Service<
-    MassTransferTxsServiceMgetRequest & WithDecimalsFormat,
-    Maybe<TransactionInfo>[]
-  >;
-  search: Service<
-    MassTransferTxsServiceSearchRequest & WithDecimalsFormat,
-    SearchedItems<TransactionInfo>
-  >;
-};
-
-export default (repo: MassTransferTxsRepo): MassTransferTxsService => ({
-  get: req => repo.get(req.id),
-  mget: req => repo.mget(req.ids),
-  search: req => repo.search(req),
-});
+export default (
+  repo: MassTransferTxsRepo,
+  assetsService: AssetsService
+): MassTransferTxsService =>
+  withDecimalsTransformation(
+    modifyDecimals(assetsService),
+    createService(repo)
+  );

@@ -6,12 +6,12 @@ import { columns } from './common';
 const pg = knex({ client: 'pg' });
 
 const searchById = (q: string) =>
-  pg({ a: 'assets_data' })
+  pg({ a: 'assets' })
     .columns({
-      asset_uid: `a.${columns.uid}`,
+      asset_id: `a.${columns.asset_id}`,
       asset_name: `a.${columns.asset_name}`,
       ticker: `a.${columns.ticker}`,
-      height: pg.raw(`coalesce(a.first_appeared_on_height, 0)`),
+      height: `a.${columns.issue_height}`,
       rank: pg.raw(
         `ts_rank(to_tsvector('simple', a.${columns.asset_id}), plainto_tsquery(?), 3) * case when a.${columns.ticker} is null then 128 else 256 end`,
         [q]
@@ -27,7 +27,7 @@ const searchByNameInMeta = (qb: knex.QueryBuilder, q: string) =>
   qb
     .table('assets_metadata')
     .columns([
-      'asset_uid',
+      'asset_id',
       'asset_name',
       'ticker',
       'height',
@@ -42,12 +42,12 @@ const searchByNameInMeta = (qb: knex.QueryBuilder, q: string) =>
 
 const searchByTicker = (qb: knex.QueryBuilder, q: string): knex.QueryBuilder =>
   qb
-    .table({ a: 'assets_data' })
+    .table({ a: 'assets' })
     .columns({
-      asset_uid: `a.${columns.uid}`,
+      asset_id: `a.${columns.asset_id}`,
       asset_name: `a.${columns.asset_name}`,
       ticker: `a.${columns.ticker}`,
-      height: pg.raw(`coalesce(a.first_appeared_on_height, 0)`),
+      height: `a.${columns.issue_height}`,
       rank: pg.raw('32'),
     })
     .where(`a.${columns.ticker}`, 'ilike', prepareForLike(q));
@@ -62,12 +62,12 @@ const searchByName = (qb: knex.QueryBuilder, q: string) => {
       : q
   )(
     qb
-      .table({ a: 'assets_data' })
+      .table({ a: 'assets' })
       .columns({
-        asset_uid: `a.${columns.uid}`,
+        asset_id: `a.${columns.asset_id}`,
         asset_name: `a.${columns.asset_name}`,
         ticker: `a.${columns.ticker}`,
-        height: pg.raw(`coalesce(a.first_appeared_on_height, 0)`),
+        height: `a.${columns.issue_height}`,
         rank: pg.raw(
           `ts_rank(to_tsvector('simple', a.${columns.asset_name}), plainto_tsquery(?), 3) * case when a.${columns.ticker} is null then 16 else 32 end`,
           [q]
@@ -79,27 +79,27 @@ const searchByName = (qb: knex.QueryBuilder, q: string) => {
 
 export const searchAssets = (query: string): knex.QueryBuilder =>
   pg
-    .with('assets_cte', qb => {
+    .with('assets_cte', (qb) => {
       qb.select([
-        pg.raw('distinct on ("r"."asset_uid") "r"."asset_uid"'),
+        pg.raw('distinct on ("r"."asset_id") "r"."asset_id"'),
         'r.ticker',
         'r.asset_name',
         {
           rn: pg.raw(
-            'row_number() over (order by r.rank desc, r.height asc, r.asset_uid asc)'
+            'row_number() over (order by r.rank desc, r.height asc, r.asset_id asc)'
           ),
         },
       ])
         .from({
           r: searchById(query)
-            .unionAll(qb => searchByNameInMeta(qb, query))
-            .unionAll(qb => searchByTicker(qb, query))
-            .unionAll(qb => searchByName(qb, query)),
+            .unionAll((qb) => searchByNameInMeta(qb, query))
+            .unionAll((qb) => searchByTicker(qb, query))
+            .unionAll((qb) => searchByName(qb, query)),
         })
-        .orderBy('r.asset_uid')
+        .orderBy('r.asset_id')
         .orderBy('r.rank', 'desc');
     })
     .from('assets_cte')
-    .select(map(col => `a.${col}`, columns))
-    .innerJoin({ a: 'assets' }, 'assets_cte.asset_uid', 'a.uid')
+    .select(map((col) => `a.${col}`, columns))
+    .innerJoin({ a: 'assets' }, 'assets_cte.asset_id', 'a.id')
     .orderBy('rn', 'asc');

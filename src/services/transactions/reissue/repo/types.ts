@@ -1,11 +1,18 @@
-import { Repo, TransactionInfo } from '../../../../types';
+import { BigNumber } from '@waves/data-entities';
+import { Repo } from '../../../../types';
 import { WithSortOrder, WithLimit } from '../../../_common';
 import { RequestWithCursor } from '../../../_common/pagination';
-import { CommonFilters, RawTx } from '../../_common/types';
+import { CommonFilters, RawTx, Tx } from '../../_common/types';
 
 export type ReissueTxDbResponse = RawTx & {
   asset_id: string;
   quantity: string;
+  reissuable: string;
+};
+
+export type ReissueTx = Tx & {
+  assetId: string;
+  quantity: BigNumber;
   reissuable: string;
 };
 
@@ -25,5 +32,5 @@ export type ReissueTxsRepo = Repo<
   ReissueTxsGetRequest,
   ReissueTxsMgetRequest,
   ReissueTxsSearchRequest,
-  TransactionInfo
+  ReissueTx
 >;

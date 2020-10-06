@@ -26,6 +26,9 @@ export type Tx = CommonTxFields & {
   timestamp: Date;
   version?: number;
   senderPublicKey: string;
+  fee: BigNumber;
+  feeAsset?: string;
+  feeAssetId?: string;
 };
 
 export type CommonFilters = {

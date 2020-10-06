@@ -58,8 +58,8 @@ export default ({
       Asset
     >({
       transformInput: ok,
-      getData: (req) =>
-        cache.get(req).matchWith({
+      getData: (req) => {
+        return cache.get(req).matchWith({
           Just: ({ value }) => taskOf(just(value)),
           Nothing: () =>
             getByIdPg<AssetDbResponse, string>({
@@ -69,7 +69,8 @@ export default ({
             })(req).map(
               tap((maybeResp) => forEach((x) => cache.set(req, x), maybeResp))
             ),
-        }),
+        });
+      },
       validateResult: validateResult(resultSchema, SERVICE_NAME.GET),
       transformResult: (res) => res.map(transformDbResponse),
       emitEvent,

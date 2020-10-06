@@ -1,8 +1,8 @@
 import { BigNumber } from '@waves/data-entities';
-import { Repo, TransactionInfo, DataEntryType } from '../../../../types';
+import { Repo, DataEntryType } from '../../../../types';
 import { WithSortOrder, WithLimit } from '../../../_common';
 import { RequestWithCursor } from '../../../_common/pagination';
-import { CommonFilters, RawTx } from '../../_common/types';
+import { CommonFilters, RawTx, Tx } from '../../_common/types';
 
 type DataEntry = {
   key: string;
@@ -13,6 +13,10 @@ type DataEntry = {
 export type DataEntryValue = boolean | BigNumber | string;
 
 export type DataTxDbResponse = RawTx & {
+  data: DataEntry[];
+};
+
+export type DataTx = Tx & {
   data: DataEntry[];
 };
 
@@ -36,5 +40,5 @@ export type DataTxsRepo = Repo<
   DataTxsGetRequest,
   DataTxsMgetRequest,
   DataTxsSearchRequest,
-  TransactionInfo
+  DataTx
 >;

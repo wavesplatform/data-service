@@ -1,7 +1,7 @@
 import * as knex from 'knex';
 const pg = knex({ client: 'pg' });
 
-const columnsWithoutFeeAndPaymentAssetId = [
+const columns = [
   // common
   't.tx_uid',
   't.height',
@@ -11,6 +11,8 @@ const columnsWithoutFeeAndPaymentAssetId = [
   'txs.signature',
   'txs.proofs',
   'txs.tx_version',
+  'txs.status',
+  'txs.fee',
   't.sender',
   't.sender_public_key',
 
@@ -24,13 +26,12 @@ const columnsWithoutFeeAndPaymentAssetId = [
   'a.arg_value_boolean',
   'a.arg_value_binary',
   'a.arg_value_string',
+  'a.arg_value_list',
   'a.position_in_args',
 
   // payment
-  'ad.asset_id as asset_id',
-  pg.raw(
-    'p.amount * 10^(case when p.asset_uid is null then -8 else -ad.decimals end) as amount'
-  ),
+  'p.asset_id',
+  'p.amount',
   'p.position_in_payment',
 ];
 
@@ -40,10 +41,8 @@ export const select = (s: string) =>
 
 export const selectFromFiltered = (filtered: knex.QueryBuilder) =>
   pg
-    .select(columnsWithoutFeeAndPaymentAssetId)
-    .select([pg.raw('fee * 10^(-8) as fee')])
+    .select(columns)
     .from({ t: filtered })
     .leftJoin('txs_16_args as a', 'a.tx_uid', 't.tx_uid')
     .leftJoin('txs_16_payment as p', 'p.tx_uid', 't.tx_uid')
-    .leftJoin('assets_data as ad', 'ad.uid', 'p.asset_uid')
     .leftJoin('txs', 'txs.uid', 't.tx_uid');

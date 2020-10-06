@@ -6,22 +6,15 @@ import { AssetsSearchRequest } from '../types';
 
 const pg = knex({ client: 'pg' });
 
-/*
- * coalesce(a.first_appeared_on_height, 0) is used because of first_appeared_on_height for WAVES is null
- * coalesce(a.issuer_address, '') is used for the same reason
- */
-
-const getAssetIndex = (asset_uid: number) =>
-  pg('assets_cte')
-    .column('rn')
-    .where('asset_uid', asset_uid);
+const getAssetIndex = (asset_id: string) =>
+  pg('assets_cte').column('rn').where('asset_id', asset_id);
 
 export const mget = (ids: string[]): string =>
   pg({ a: 'assets' })
-    .select(map(col => `a.${col}`, columns))
+    .select(map((col) => `a.${col}`, columns))
     .select({
-      issue_height: pg.raw('coalesce(a.first_appeared_on_height, 0)'),
-      sender: pg.raw(`coalesce(a.issuer_address, '')`),
+      issue_height: pg.raw('a.issue_height'),
+      sender: pg.raw(`a.sender`),
     })
     .whereIn('asset_id', ids)
     .toString();
@@ -37,16 +30,15 @@ export const search = (request: AssetsSearchRequest): string => {
   return compose(
     (q: knex.QueryBuilder) => q.toString(),
     (q: knex.QueryBuilder) =>
-      q
-        .select({
-          issue_height: pg.raw('coalesce(a.first_appeared_on_height, 0)'),
-          sender: pg.raw(`coalesce(a.issuer_address, '')`),
-        }),
+      q.select({
+        issue_height: pg.raw('a.issue_height'),
+        sender: pg.raw(`a.sender`),
+      }),
     (request: AssetsSearchRequest) =>
       cond([
         [
-          request => isNil(request.ticker),
-          request =>
+          (request) => isNil(request.ticker),
+          (request) =>
             compose(
               (q: knex.QueryBuilder) =>
                 request.limit ? q.clone().limit(request.limit) : q,
@@ -58,9 +50,9 @@ export const search = (request: AssetsSearchRequest): string => {
         ],
         [
           complement(isNil),
-          request =>
+          (request) =>
             compose(filter(request.ticker))(
-              pg({ a: 'assets' }).select(map(col => `a.${col}`, columns))
+              pg({ a: 'assets' }).select(map((col) => `a.${col}`, columns))
             ),
         ],
       ])(request)

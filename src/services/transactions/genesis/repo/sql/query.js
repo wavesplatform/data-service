@@ -14,10 +14,9 @@ const selectFromFiltered = (filtered) =>
       proofs: 'txs.proofs',
       tx_version: 'txs.tx_version',
       fee: 'txs.fee',
-      recipient: pg.raw(
-        'coalesce(t.recipient_alias, t.recipient_address)'
-      ),
-      amount: pg.raw('t.amount * 10^(-8)'),
+      status: 'txs.status',
+      recipient: pg.raw('coalesce(t.recipient_alias, t.recipient_address)'),
+      amount: pg.raw('t.amount'),
     })
     .leftJoin('txs', 'txs.uid', 't.tx_uid');
 

@@ -1,6 +1,5 @@
 import { propEq } from 'ramda';
 
-import { TransactionInfo } from '../../../../types';
 import { CommonRepoDependencies } from '../../..';
 import { getByIdPreset } from '../../../_common/presets/pg/getById';
 import { mgetByIdsPreset } from '../../../_common/presets/pg/mgetByIds';
@@ -15,6 +14,7 @@ import {
   ReissueTxsRepo,
   ReissueTxsSearchRequest,
   ReissueTxDbResponse,
+  ReissueTx,
 } from './types';
 
 export default ({
@@ -47,7 +47,7 @@ export default ({
       Cursor,
       ReissueTxsSearchRequest,
       ReissueTxDbResponse,
-      TransactionInfo
+      ReissueTx
     >({
       name: 'transactions.reissue.search',
       sql: sql.search,

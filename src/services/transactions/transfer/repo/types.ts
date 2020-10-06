@@ -1,7 +1,7 @@
-import { Repo, TransactionInfo } from '../../../../types';
+import { Repo } from '../../../../types';
 import { WithSortOrder, WithLimit } from '../../../_common';
 import { RequestWithCursor } from '../../../_common/pagination';
-import { CommonFilters, RawTx } from '../../_common/types';
+import { CommonFilters, RawTx, Tx } from '../../_common/types';
 import { BigNumber } from '@waves/data-entities';
 
 export type TransferTxDbResponse = RawTx & {
@@ -10,6 +10,13 @@ export type TransferTxDbResponse = RawTx & {
   fee_asset: string;
   attachment: string;
   recipient: string;
+};
+
+export type TransferTx = Tx & {
+  amount: BigNumber;
+  assetId: string;
+  recipient: string;
+  attachment: string;
 };
 
 export type TransferTxsGetRequest = string;
@@ -30,5 +37,5 @@ export type TransferTxsRepo = Repo<
   TransferTxsGetRequest,
   TransferTxsMgetRequest,
   TransferTxsSearchRequest,
-  TransactionInfo
+  TransferTx
 >;

@@ -1,7 +1,6 @@
 import { propEq } from 'ramda';
 
 import { CommonRepoDependencies } from '../../..';
-import { TransactionInfo } from '../../../../types';
 import { getByIdPreset } from '../../../_common/presets/pg/getById';
 import { mgetByIdsPreset } from '../../../_common/presets/pg/mgetByIds';
 import { searchPreset } from '../../../_common/presets/pg/search';
@@ -15,6 +14,7 @@ import {
   MassTransferTxsRepo,
   MassTransferTxsSearchRequest,
   MassTransferTxDbResponse,
+  MassTransferTx,
 } from './types';
 
 export default ({
@@ -47,7 +47,7 @@ export default ({
       Cursor,
       MassTransferTxsSearchRequest,
       MassTransferTxDbResponse,
-      TransactionInfo
+      MassTransferTx
     >({
       name: 'transactions.massTransfer.search',
       sql: sql.search,

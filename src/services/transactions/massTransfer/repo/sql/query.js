@@ -20,6 +20,7 @@ const withGrouping = (q) =>
       'txs.signature',
       'txs.proofs',
       'txs.tx_version',
+      'txs.status',
       't.sender',
       't.sender_public_key',
       't.asset_id',
@@ -34,7 +35,7 @@ const selectFromFiltered = pipe(
       .select({
         tx_uid: 't.tx_uid',
         id: 'txs.id',
-        fee: pg.raw('(txs.fee * 10^(-8)) :: DOUBLE PRECISION'),
+        fee: 'txs.fee',
         recipients: pg.raw('array_agg(t.recipient order by t.position_in_tx)'),
         amounts: pg.raw('array_agg(t.amount  order by t.position_in_tx)'),
         height: 't.height',
@@ -43,27 +44,26 @@ const selectFromFiltered = pipe(
         signature: 'txs.signature',
         proofs: 'txs.proofs',
         tx_version: 'txs.tx_version',
+        status: 'txs.status',
         sender: 't.sender',
         sender_public_key: 't.sender_public_key',
         asset_id: 't.asset_id',
         attachment: 't.attachment',
       })
       .from({
-        t: withTransfers(pg({ t: filtered }))
-          .select({
-            tx_uid: 't.tx_uid',
-            height: 't.height',
-            sender: 't.sender',
-            sender_public_key: 't.sender_public_key',
-            asset_id: pg.raw(`coalesce(a.asset_id,'WAVES')`),
-            attachment: 't.attachment',
-            amount: pg.raw(
-              'tfs.amount * 10^(-coalesce(a.decimals, 8))::double precision'
-            ),
-            position_in_tx: 'tfs.position_in_tx',
-            recipient: pg.raw('coalesce(tfs.recipient_address, tfs.recipient_alias)'),
-          })
-          .leftJoin({ a: 'assets_data' }, 'a.uid', 't.asset_uid'),
+        t: withTransfers(pg({ t: filtered })).select({
+          tx_uid: 't.tx_uid',
+          height: 't.height',
+          sender: 't.sender',
+          sender_public_key: 't.sender_public_key',
+          asset_id: `t.asset_id`,
+          attachment: 't.attachment',
+          amount: 'tfs.amount',
+          position_in_tx: 'tfs.position_in_tx',
+          recipient: pg.raw(
+            'coalesce(tfs.recipient_alias, tfs.recipient_address)'
+          ),
+        }),
       })
       .leftJoin('txs', 'txs.uid', 't.tx_uid'),
   withGrouping

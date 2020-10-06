@@ -5,7 +5,7 @@ const { transformTxInfo } = require('../../_common/transformTxInfo');
 
 /** addZippedTransfers ::
  * TxInfo -> TxInfoWithTransfers */
-const addZippedTransfers = tx =>
+const addZippedTransfers = (tx) =>
   pipe(({ amounts, recipients }) => {
     if (
       isNil(amounts) ||
@@ -14,7 +14,7 @@ const addZippedTransfers = tx =>
       !Array.isArray(recipients) ||
       // if there are not any recipients, recipients will be [null],
       // and amounts will be ['NaN']
-      (recipients.length === 1 && recipients[0] === null)
+      (recipients.length === 1 && !isNil(recipients[0]))
     ) {
       return [];
     }

@@ -7,6 +7,7 @@ const CORRECT_TYPE = Joi.string().valid([
   'boolean',
   'string',
   'binary',
+  null
 ]);
 
 export const result = Joi.object().keys({

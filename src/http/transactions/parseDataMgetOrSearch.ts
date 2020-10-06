@@ -2,7 +2,7 @@ import { Result, Error as error, Ok as ok } from 'folktale/result';
 import { isNil } from 'ramda';
 import { BigNumber } from '@waves/data-entities';
 import { ParseError } from '../../errorHandling';
-import { DataTxsServiceSearchRequest } from '../../services/transactions/data';
+import { DataTxsServiceSearchRequest } from '../../services/transactions/data/types';
 import { DataEntryValue } from '../../services/transactions/data/repo/types';
 import { DataEntryType, ServiceMgetRequest } from '../../types';
 import { parseFilterValues, withDefaults } from '../_common/filters';
@@ -61,7 +61,7 @@ function parseValue(
   } else return ok(value);
 }
 
-const parseDataEntryType: Parser<DataEntryType | undefined> = raw => {
+const parseDataEntryType: Parser<DataEntryType | undefined> = (raw) => {
   if (isNil(raw)) return ok(undefined);
 
   if (isDataEntryType(raw)) {
@@ -85,7 +85,7 @@ export const parseDataMgetOrSearch = ({
     key: commonFilters.query,
     type: parseDataEntryType,
     value: commonFilters.query,
-  })(query).chain(fValues => {
+  })(query).chain((fValues) => {
     if (isMgetRequest(fValues)) {
       return ok(fValues);
     } else {
@@ -101,7 +101,7 @@ export const parseDataMgetOrSearch = ({
       return parseValue(
         fValuesWithDefaults.type,
         fValuesWithDefaults.value
-      ).map(value => ({
+      ).map((value) => ({
         ...fValuesWithDefaults,
         ...(value ? { value } : {}),
       }));

@@ -10,7 +10,7 @@ export default {
   height: Joi.number().required(),
   tx_type: Joi.number()
     .min(1)
-    .max(16)
+    .max(17)
     .required(),
   tx_version: Joi.number()
     .required()
@@ -24,6 +24,7 @@ export default {
     .required()
     .allow(null),
   proofs: Joi.array().required(),
+  status: Joi.string().required(),
 
   sender: Joi.string()
     .base58()

@@ -29,7 +29,6 @@ export type AssetsRepo = Repo<
 >;
 
 export type AssetDbResponse = {
-  uid: number;
   asset_id: string;
   asset_name: string;
   description: string;

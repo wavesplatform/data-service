@@ -7,7 +7,9 @@ const { CandleInterval } = require('../../../types');
  *
  * @param {string} from
  */
-const pgRawExtractFromToTimestamp = from => /** @param {string} interval */ interval =>
+const pgRawExtractFromToTimestamp = (from) => /** @param {string} interval */ (
+  interval
+) =>
   pg.raw(
     `to_timestamp(floor((extract('epoch' from ${from}) / ${interval} )) * ${interval})`
   );
@@ -16,7 +18,7 @@ const pgRawExtractFromToTimestamp = from => /** @param {string} interval */ inte
  *
  * @param {string} from
  */
-const pgRawDateTrunc = from => /** @param {string} interval */ interval =>
+const pgRawDateTrunc = (from) => /** @param {string} interval */ (interval) =>
   pg.raw(`date_trunc('${interval}', ${from})`);
 
 /**
@@ -73,10 +75,10 @@ const makeRawTimestamp = (timestamp, interval) => {
 
 // serializeCandle:: Object => Object
 // @todo refactor after pg updating for work with BigInt instead of BigNumber
-const serializeCandle = candle => ({
+const serializeCandle = (candle) => ({
   time_start: candle.time_start,
-  amount_asset_uid: candle.amount_asset_uid.toString(), // uid is bigint (BigNumber)
-  price_asset_uid: candle.price_asset_uid.toString(), // uid is bigint (BigNumber)
+  amount_asset_id: candle.amount_asset_id,
+  price_asset_id: candle.price_asset_id,
   matcher_address: candle.matcher_address,
   low: candle.low.toString(),
   high: candle.high.toString(),
@@ -92,7 +94,7 @@ const serializeCandle = candle => ({
 
 const candlePresets = {
   aggregate: {
-    candle_time: interval => toRawTimestamp('time_start', interval),
+    candle_time: (interval) => toRawTimestamp('time_start', interval),
     low: pg.min('low'),
     high: pg.max('high'),
     volume: pg.sum('volume'),

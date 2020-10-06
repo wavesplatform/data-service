@@ -1,4 +1,3 @@
-const { equals, ifElse } = require('ramda');
 const {
   where,
   whereIn,
@@ -16,17 +15,7 @@ const sender = (addr) => where('t.sender', addr);
 const byTimeStamp = (comparator) => (ts) => (q) =>
   q.clone().where('t.time_stamp', comparator, ts.toISOString());
 
-const byAssetId = ifElse(
-  equals('WAVES'),
-  () => where('asset_uid', null),
-  (assetId) =>
-    where('asset_uid', function () {
-      this.select('uid')
-        .from('assets_data')
-        .where('asset_id', assetId)
-        .limit(1);
-    })
-);
+const byAssetId = (assetId) => where('asset_id', assetId);
 
 const byRecipient = (addressOrAlias) =>
   whereRaw(

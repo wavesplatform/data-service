@@ -1,5 +1,4 @@
 import * as knex from 'knex';
-import { omit } from 'ramda';
 import { interval, CandleInterval } from '../../../../types';
 import { unsafeIntervalsFromStrings } from '../../../../utils/interval';
 import { highestDividerLessThan } from './utils';
@@ -9,8 +8,8 @@ const pg = knex({ client: 'pg' });
 
 const FIELDS = {
   time_start: 'c.time_start',
-  amount_asset_uid: 'c.amount_asset_uid',
-  price_asset_uid: 'c.price_asset_uid',
+  amount_asset_id: 'c.amount_asset_id',
+  price_asset_id: 'c.price_asset_id',
   low: 'c.low',
   high: 'c.high',
   volume: 'c.volume',
@@ -22,18 +21,6 @@ const FIELDS = {
   close: 'c.close',
   interval: 'c.interval',
   matcher_address: 'c.matcher_address',
-};
-
-const FULL_FIELDS: Record<string, string> = {
-  ...omit(
-    ['amount_asset_uid', 'price_asset_uid', 'matcher_address'],
-    FIELDS
-  ),
-  amount_asset_id: 'a.asset_id',
-  price_asset_id: 'p.asset_id',
-  matcher: 'matcher_address',
-  a_dec: 'a.decimals',
-  p_dec: 'p.decimals',
 };
 
 const DIVIDERS = [
@@ -71,18 +58,8 @@ export const selectCandles = ({
 }: CandleSelectionParams): knex.QueryBuilder =>
   pg({ c: 'candles' })
     .select(FIELDS)
-    .whereIn('amount_asset_uid', function() {
-      this.select('uid')
-        .from('assets_data')
-        .where('asset_id', amountAsset)
-        .limit(1);
-    })
-    .whereIn('price_asset_uid', function() {
-      this.select('uid')
-        .from('assets_data')
-        .where('asset_id', priceAsset)
-        .limit(1);
-    })
+    .where('amount_asset_id', amountAsset)
+    .where('price_asset_id', priceAsset)
     .where('time_start', '>=', timeStart)
     .where('time_start', '<=', timeEnd)
     .where('matcher_address', matcher)
@@ -107,7 +84,7 @@ export const sql = ({
   matcher,
 }: CandlesSearchRequest): string =>
   pg('candles')
-    .select(FULL_FIELDS)
+    .select(FIELDS)
     .from({
       c: selectCandles({
         amountAsset,
@@ -118,8 +95,6 @@ export const sql = ({
         matcher,
       }),
     })
-    .innerJoin({ a: 'assets_data' }, 'c.amount_asset_uid', 'a.uid')
-    .innerJoin({ p: 'assets_data' }, 'c.price_asset_uid', 'p.uid')
     .orderBy('c.time_start', 'asc')
     .toString();
 

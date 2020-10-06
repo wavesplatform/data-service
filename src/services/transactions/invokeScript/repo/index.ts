@@ -2,7 +2,6 @@ import { Ok as ok } from 'folktale/result';
 import { compose } from 'ramda';
 
 import { CommonRepoDependencies } from '../../..';
-import { TransactionInfo } from '../../../../types';
 import { get, mget, search } from '../../../_common/createResolver';
 import { validateResult } from '../../../_common/presets/validation';
 import { transformResults as transformResultGet } from '../../../_common/presets/pg/getById/transformResult';
@@ -19,6 +18,7 @@ import {
   RawInvokeScriptTx,
   InvokeScriptTxsSearchRequest,
   InvokeScriptTxsRepo,
+  InvokeScriptTx,
 } from './types';
 
 const createServiceName = (type: string) => `transactions.invokeScript.${type}`;
@@ -51,7 +51,7 @@ export default ({
       InvokeScriptTxsSearchRequest,
       InvokeScriptTxsSearchRequest<Cursor>,
       RawInvokeScriptTx,
-      TransactionInfo
+      InvokeScriptTx
     >({
       transformInput: transformInputSearch(deserialize),
       transformResult: transformResultSearch(

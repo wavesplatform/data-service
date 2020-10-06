@@ -1,10 +1,14 @@
-import { Repo, TransactionInfo } from '../../../../types';
+import { Repo } from '../../../../types';
 import { WithSortOrder, WithLimit } from '../../../_common';
 import { RequestWithCursor } from '../../../_common/pagination';
-import { CommonFilters, RawTx } from '../../_common/types';
+import { CommonFilters, RawTx, Tx } from '../../_common/types';
 
 export type LeaseCancelTxDbResponse = RawTx & {
   lease_id: string;
+};
+
+export type LeaseCancelTx = Tx & {
+  leaseId: string;
 };
 
 export type LeaseCancelTxsGetRequest = string;
@@ -23,5 +27,5 @@ export type LeaseCancelTxsRepo = Repo<
   LeaseCancelTxsGetRequest,
   LeaseCancelTxsMgetRequest,
   LeaseCancelTxsSearchRequest,
-  TransactionInfo
+  LeaseCancelTx
 >;

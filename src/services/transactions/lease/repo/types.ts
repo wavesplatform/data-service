@@ -1,10 +1,15 @@
 import { BigNumber } from '@waves/data-entities';
-import { Repo, TransactionInfo } from '../../../../types';
+import { Repo } from '../../../../types';
 import { WithSortOrder, WithLimit } from '../../../_common';
 import { RequestWithCursor } from '../../../_common/pagination';
-import { CommonFilters, RawTx } from '../../_common/types';
+import { CommonFilters, RawTx, Tx } from '../../_common/types';
 
 export type LeaseTxDbResponse = RawTx & {
+  amount: BigNumber;
+  recipient: string;
+};
+
+export type LeaseTx = Tx & {
   amount: BigNumber;
   recipient: string;
 };
@@ -25,5 +30,5 @@ export type LeaseTxsRepo = Repo<
   LeaseTxsGetRequest,
   LeaseTxsMgetRequest,
   LeaseTxsSearchRequest,
-  TransactionInfo
+  LeaseTx
 >;

@@ -14,15 +14,15 @@ const selectFromFiltered = (filtered) =>
       signature: 'txs.signature',
       proofs: 'txs.proofs',
       tx_version: 'txs.tx_version',
-      fee: pg.raw('txs.fee * 10^(-8)'),
+      fee: 'txs.fee',
+      status: 'txs.status',
       sender: 't.sender',
       sender_public_key: 't.sender_public_key',
 
       // type-specific
-      asset_id: 'a.asset_id',
+      asset_id: 't.asset_id',
       script: 't.script',
     })
-    .leftJoin('txs', 'txs.uid', 't.tx_uid')
-    .leftJoin({ a: 'assets_data' }, 'a.uid', 't.asset_uid');
+    .leftJoin('txs', 'txs.uid', 't.tx_uid');
 
 module.exports = { select, selectFromFiltered };

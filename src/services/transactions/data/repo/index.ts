@@ -1,7 +1,6 @@
 import { Ok as ok } from 'folktale/result';
 
 import { CommonRepoDependencies } from '../../..';
-import { TransactionInfo } from '../../../../types';
 
 import { get, mget, search } from '../../../_common/createResolver';
 
@@ -23,6 +22,7 @@ import {
   DataTxDbResponse,
   DataTxsRepo,
   DataTxsGetRequest,
+  DataTx,
 } from './types';
 
 const createServiceName = (type: string): string => `transactions.data.${type}`;
@@ -37,7 +37,7 @@ export default ({
       transformResult: transformResultGet<
         DataTxsGetRequest,
         DataTxDbResponse,
-        TransactionInfo
+        DataTx
       >(transformTxInfo),
       validateResult: validateResult(resultSchema, createServiceName('get')),
       getData: pgData.get(pg),
@@ -46,11 +46,9 @@ export default ({
 
     mget: mget({
       transformInput: ok,
-      transformResult: transformResultMget<
-        string[],
-        DataTxDbResponse,
-        TransactionInfo
-      >(transformTxInfo),
+      transformResult: transformResultMget<string[], DataTxDbResponse, DataTx>(
+        transformTxInfo
+      ),
       validateResult: validateResult(resultSchema, createServiceName('mget')),
       getData: pgData.mget(pg),
       emitEvent,
@@ -60,7 +58,7 @@ export default ({
       DataTxsSearchRequest,
       DataTxsSearchRequest<Cursor>,
       DataTxDbResponse,
-      TransactionInfo
+      DataTx
     >({
       transformInput: transformInputSearch(deserialize),
       transformResult: transformResultSearch(transformTxInfo, serialize),
