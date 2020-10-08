@@ -37,7 +37,7 @@ const candleSelectColumns = {
   low: pg.min('e.price'),
   high: pg.max('e.price'),
   volume: pg.sum('e.amount'),
-  quote_volume: pg.raw('sum(e.amount * e.price)'),
+  quote_volume: pg.raw('sum((e.amount)::numeric * (e.price)::numeric)'),
   max_height: pg.max('height'),
   txs_count: pg.count('e.price'),
   weighted_average_price: pg.raw(
@@ -76,9 +76,10 @@ const selectExchangesAfterTimestamp = (fromTimestamp) =>
       .select('uid')
       .whereRaw(
         `time_stamp >= ${pgRawDateTrunc(
-          `'${fromTimestamp.toISOString()}'::timestamp`
+          `'${fromTimestamp.toISOString()}'::timestamptz`
         )('minute')}`
       )
+      .orderBy('uid')
       .limit(1)
   );
 

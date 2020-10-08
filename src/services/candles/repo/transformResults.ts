@@ -1,14 +1,5 @@
 import { BigNumber } from '@waves/data-entities';
-import {
-  compose,
-  curry,
-  groupBy,
-  map,
-  sort,
-  toPairs,
-  merge,
-  evolve,
-} from 'ramda';
+import { compose, curry, groupBy, map, sort, toPairs, merge } from 'ramda';
 import { Interval, CandleInfo, SearchedItems } from '../../../types';
 import { interval, Unit, CandleInterval } from '../../../types';
 import { concatAll } from '../../../utils/fp/concatAll';
@@ -23,7 +14,6 @@ export type CandleDbResponse = {
   time_start: Date;
   amount_asset_id: string;
   price_asset_id: string;
-  matcher: string;
   max_height: number;
   open: BigNumber;
   high: BigNumber;
@@ -34,8 +24,6 @@ export type CandleDbResponse = {
   weighted_average_price: BigNumber;
   txs_count: number;
   interval: string;
-  a_dec: number;
-  p_dec: number;
 };
 
 export type RawCandle = {
@@ -49,8 +37,6 @@ export type RawCandle = {
   quote_volume: BigNumber;
   weighted_average_price: BigNumber;
   txs_count: number;
-  a_dec: number | null;
-  p_dec: number | null;
 };
 
 export const transformCandle = (candleInterval: string) => ([time, c]: [
@@ -66,10 +52,7 @@ export const transformCandle = (candleInterval: string) => ([time, c]: [
   });
 
   return {
-    time: new Date(time),
-    timeClose,
-    txsCount: c.txs_count,
-    ...map(v => (c.txs_count === 0 ? null : v), {
+    ...map((v) => (c.txs_count === 0 ? null : v), {
       maxHeight: c.max_height,
       open: c.open,
       high: c.high,
@@ -79,6 +62,9 @@ export const transformCandle = (candleInterval: string) => ([time, c]: [
       quoteVolume: c.quote_volume,
       weightedAveragePrice: c.weighted_average_price,
     }),
+    time: new Date(time),
+    timeClose,
+    txsCount: c.txs_count,
   };
 };
 
@@ -106,27 +92,6 @@ export const addMissingCandles = curry(
   }
 );
 
-const candleFixedDecimals = (
-  candle: RawCandle,
-  aDecimals: number,
-  pDecimals: number
-) =>
-  evolve(
-    {
-      open: (t: BigNumber | null) =>
-        t ? t.decimalPlaces(8 + pDecimals - aDecimals) : null,
-      close: (t: BigNumber | null) =>
-        t ? t.decimalPlaces(8 + pDecimals - aDecimals) : null,
-      high: (t: BigNumber) => t.decimalPlaces(8 + pDecimals - aDecimals),
-      low: (t: BigNumber) => t.decimalPlaces(8 + pDecimals - aDecimals),
-      volume: (t: BigNumber) => t.decimalPlaces(aDecimals),
-      quote_volume: (t: BigNumber) => t.decimalPlaces(pDecimals),
-      weighted_average_price: (t: BigNumber) =>
-        t.decimalPlaces(8 + pDecimals - aDecimals),
-    },
-    candle
-  );
-
 export const transformResults = (
   result: CandleDbResponse[],
   request: CandlesSearchRequest
@@ -136,25 +101,18 @@ export const transformResults = (
     Record<string, CandleDbResponse[]>,
     Record<string, RawCandle[]>,
     Record<string, RawCandle>,
-    Record<string, RawCandle>,
     [string, RawCandle][],
     [string, RawCandle][],
     CandleInfo[],
     SearchedItems<CandleInfo>
   >(
-    items => ({
+    (items) => ({
       items: items,
       isLastPage: false,
     }),
     map(transformCandle(request.interval)),
     sort((a, b): number => new Date(a[0]).valueOf() - new Date(b[0]).valueOf()),
     toPairs,
-    map<Record<string, RawCandle>, Record<string, RawCandle>>(
-      (candle: RawCandle) =>
-        candle.a_dec && candle.p_dec
-          ? candleFixedDecimals(candle, candle.a_dec, candle.p_dec)
-          : candle
-    ),
     map<Record<string, RawCandle[]>, Record<string, RawCandle>>(
       concatAll(candleMonoid)
     ),
@@ -163,7 +121,7 @@ export const transformResults = (
       request.timeStart,
       request.timeEnd
     ),
-    groupBy(candle =>
+    groupBy((candle) =>
       truncToMinutes(
         floor(
           interval(request.interval).getOrElse(defaultInterval.unsafeGet()),

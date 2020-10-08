@@ -10,17 +10,16 @@ const FIELDS = {
   time_start: 'c.time_start',
   amount_asset_id: 'c.amount_asset_id',
   price_asset_id: 'c.price_asset_id',
-  low: 'c.low',
-  high: 'c.high',
-  volume: 'c.volume',
-  quote_volume: 'c.quote_volume',
+  low: pg.raw('(c.low)::numeric'),
+  high: pg.raw('(c.high)::numeric'),
+  volume: pg.raw('(c.volume)::numeric'),
+  quote_volume: pg.raw('(c.quote_volume)::numeric'),
   max_height: 'c.max_height',
   txs_count: 'c.txs_count',
-  weighted_average_price: 'c.weighted_average_price',
-  open: 'c.open',
-  close: 'c.close',
+  weighted_average_price: pg.raw('(c.weighted_average_price)::numeric'),
+  open: pg.raw('(c.open)::numeric'),
+  close: pg.raw('(c.close)::numeric'),
   interval: 'c.interval',
-  matcher_address: 'c.matcher_address',
 };
 
 const DIVIDERS = [
@@ -60,8 +59,8 @@ export const selectCandles = ({
     .select(FIELDS)
     .where('amount_asset_id', amountAsset)
     .where('price_asset_id', priceAsset)
-    .where('time_start', '>=', timeStart)
-    .where('time_start', '<=', timeEnd)
+    .where('time_start', '>=', timeStart.toISOString())
+    .where('time_start', '<=', timeEnd.toISOString())
     .where('matcher_address', matcher)
     .where(
       'interval',

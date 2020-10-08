@@ -59,8 +59,6 @@ export const candleMonoid: Monoid<RawCandle> = {
     weighted_average_price: weightedAveragePriceMonoid.concat(a, b),
     max_height: maxMonoid.concat(a.max_height, b.max_height),
     txs_count: sumMonoid.concat(a.txs_count, b.txs_count),
-    a_dec: rightNotNullMonoid.concat(a.a_dec, b.a_dec),
-    p_dec: rightNotNullMonoid.concat(a.p_dec, b.p_dec),
   }),
   empty: {
     time_start: leftNotNullMonoid.empty,
@@ -73,7 +71,5 @@ export const candleMonoid: Monoid<RawCandle> = {
     weighted_average_price: weightedAveragePriceMonoid.empty,
     max_height: maxMonoid.empty,
     txs_count: sumMonoid.empty,
-    a_dec: rightNotNullMonoid.empty,
-    p_dec: rightNotNullMonoid.empty,
   },
 };

@@ -1,4 +1,4 @@
-import { withDecimalsTransformation } from '../_common/withDecimalsTransformation';
+import { withDecimalsProcessing } from '../../_common/transformation/withDecimalsProcessing';
 import { modifyFeeDecimals } from '../_common/modifyFeeDecimals';
 import { UpdateAssetInfoTxsRepo } from './repo/types';
 import { AssetsService } from '../../assets';
@@ -9,7 +9,4 @@ export default (
   repo: UpdateAssetInfoTxsRepo,
   assetsService: AssetsService
 ): UpdateAssetInfoTxsService =>
-  withDecimalsTransformation(
-    modifyFeeDecimals(assetsService),
-    createService(repo)
-  );
+  withDecimalsProcessing(modifyFeeDecimals(assetsService), createService(repo));

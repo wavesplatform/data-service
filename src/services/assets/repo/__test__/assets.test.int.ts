@@ -16,17 +16,10 @@ const drivers = {
 };
 const cache = createCache(10, 10000);
 
-const DEFAULT_TIMEOUT_IN_MS = 30000;
-
 const repo = createRepo({
   drivers,
   emitEvent: () => () => null,
   cache,
-  timeouts: {
-    get: DEFAULT_TIMEOUT_IN_MS,
-    mget: DEFAULT_TIMEOUT_IN_MS,
-    search: DEFAULT_TIMEOUT_IN_MS,
-  },
 });
 
 const assetId = 'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH';

@@ -188,7 +188,6 @@ const output = Joi.object().keys({
   price_asset_id: Joi.string()
     .assetId()
     .required(),
-  matcher: Joi.string().base58(),
   max_height: Joi.number()
     .integer()
     .required(),
@@ -217,8 +216,6 @@ const output = Joi.object().keys({
   interval: Joi.string()
     .valid(CandleIntervals)
     .required(),
-  a_dec: Joi.number().required(),
-  p_dec: Joi.number().required(),
 });
 
 module.exports = { inputSearch, output };

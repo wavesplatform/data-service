@@ -109,11 +109,6 @@ export type CommonRepoDependencies = {
     pg: PgDriver;
   };
   emitEvent: EmitEvent;
-  timeouts: {
-    get: number;
-    mget: number;
-    search: number;
-  };
 };
 
 export type RateSerivceCreatorDependencies = CommonRepoDependencies & {
@@ -181,11 +176,6 @@ export default ({
           pg: pgDriver,
         },
         emitEvent,
-        timeouts: {
-          get: options.defaultTimeout,
-          mget: options.defaultTimeout,
-          search: options.defaultTimeout,
-        },
       };
 
       // common init services
@@ -267,13 +257,16 @@ export default ({
       );
 
       const candlesRepo = createCandlesRepo(commonDeps);
-      const candlesNoAsyncValidation = createCandlesService(candlesRepo, () =>
-        taskOf(undefined)
+      const candlesNoAsyncValidation = createCandlesService(
+        candlesRepo,
+        () => taskOf(undefined),
+        assets
       );
       const candlesWithAsyncValidation = createCandlesService(
         candlesRepo,
         (matcher: string, pairs: AssetIdsPair[]) =>
-          validatePairs(assets.mget, pairOrderingService)(matcher, pairs)
+          validatePairs(assets.mget, pairOrderingService)(matcher, pairs),
+        assets
       );
 
       // specific init services

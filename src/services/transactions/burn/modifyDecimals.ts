@@ -1,35 +1,20 @@
 import { Task } from 'folktale/concurrency/task';
-import { zipWith, splitEvery } from 'ramda';
 import { AppError } from '../../../errorHandling';
-import { AssetsService } from '../..//assets';
-import { withDecimals } from '../_common/withDecimals';
+import { AssetsService } from '../../assets';
 import { BurnTx } from './repo/types';
 
 export const modifyDecimals = (assetsService: AssetsService) => (
   txs: BurnTx[]
 ): Task<AppError, BurnTx[]> =>
-  withDecimals(
-    assetsService,
-    txs
-      .map((tx) => [
-        {
-          value: tx.fee,
-          assetId: 'WAVES',
-        },
-        {
-          value: tx.amount,
-          assetId: tx.assetId,
-        },
-      ])
-      .reduce((acc, cur) => acc.concat(cur), [])
-  ).map((v) =>
-    zipWith(
-      (tx, [fee, amount]) => ({
+  assetsService
+    .precisions({
+      ids: ['WAVES'].concat(txs.map((tx) => tx.assetId)),
+    })
+    .map((precisions) => {
+      const feePrecision = precisions.splice(0, 1)[0];
+      return txs.map((tx, idx) => ({
         ...tx,
-        fee: fee,
-        amount: amount,
-      }),
-      txs,
-      splitEvery(2, v)
-    )
-  );
+        fee: tx.fee.dividedBy(10 ** feePrecision),
+        amount: tx.amount.dividedBy(10 ** precisions[idx]),
+      }));
+    });

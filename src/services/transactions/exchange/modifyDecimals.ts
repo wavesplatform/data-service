@@ -2,7 +2,6 @@ import { Task } from 'folktale/concurrency/task';
 import { defaultTo, splitEvery, zipWith } from 'ramda';
 import { AppError } from '../../../errorHandling';
 import { AssetsService } from '../../assets';
-import { withDecimals } from '../_common/withDecimals';
 import { ExchangeTx, OrderType } from './repo/types';
 
 const wavesByDefault = defaultTo('WAVES');
@@ -10,100 +9,74 @@ const wavesByDefault = defaultTo('WAVES');
 export const modifyDecimals = (assetsService: AssetsService) => (
   txs: ExchangeTx[]
 ): Task<AppError, ExchangeTx[]> =>
-  withDecimals(
-    assetsService,
-    txs
-      .map((tx) => [
-        {
-          value: tx.fee,
-          assetId: wavesByDefault(tx.feeAsset),
-        },
-        {
-          value: tx.amount,
-          assetId: wavesByDefault(tx.amountAsset),
-        },
-        {
-          value: tx.price,
-          assetId: wavesByDefault(tx.priceAsset),
-        },
-        {
-          value: tx.buyMatcherFee,
-          assetId:
-            tx.order1.type === OrderType.Buy
-              ? wavesByDefault(tx.order1.matcherFeeAssetId)
-              : wavesByDefault(tx.order2.matcherFeeAssetId),
-        },
-        {
-          value: tx.sellMatcherFee,
-          assetId:
-            tx.order1.type === OrderType.Sell
-              ? wavesByDefault(tx.order1.matcherFeeAssetId)
-              : wavesByDefault(tx.order2.matcherFeeAssetId),
-        },
-        {
-          value: tx.order1.amount,
-          assetId: wavesByDefault(tx.amountAsset),
-        },
-        {
-          value: tx.order1.price,
-          assetId: wavesByDefault(tx.priceAsset),
-        },
-        {
-          value: tx.order1.matcherFee,
-          assetId: wavesByDefault(tx.order1.matcherFeeAssetId),
-        },
-        {
-          value: tx.order2.amount,
-          assetId: wavesByDefault(tx.amountAsset),
-        },
-        {
-          value: tx.order2.price,
-          assetId: wavesByDefault(tx.priceAsset),
-        },
-        {
-          value: tx.order2.matcherFee,
-          assetId: wavesByDefault(tx.order2.matcherFeeAssetId),
-        },
-      ])
-      .reduce((acc, cur) => acc.concat(cur), [])
-  ).map((v) =>
-    zipWith(
-      (
-        tx,
-        [
-          fee,
-          amount,
-          price,
-          buyMatcherFee,
-          sellMatcherFee,
-          order1Amount,
-          order1Price,
-          order1MatcherFee,
-          order2Amount,
-          order2Price,
-          order2MatcherFee,
-        ]
-      ) => ({
-        ...tx,
-        fee: fee,
-        amount: amount,
-        price: price,
-        buyMatcherFee: buyMatcherFee,
-        sellMatcherFee: sellMatcherFee,
-        order1: {
-          ...tx.order1,
-          amount: order1Amount,
-          price: order1Price,
-          matcherFee: order1MatcherFee,
-        },
-        order2: {
-          ...tx.order2,
-          amount: order2Amount,
-          price: order2Price,
-          matcherFee: order2MatcherFee,
-        },
-      }),
-      txs,
-      splitEvery(11, v)
-    )
-  );
+  assetsService
+    .precisions({
+      ids: txs
+        .map((tx) => [
+          wavesByDefault(tx.feeAsset),
+          wavesByDefault(tx.amountAsset),
+          wavesByDefault(tx.priceAsset),
+          tx.order1.type === OrderType.Buy
+            ? wavesByDefault(tx.order1.matcherFeeAssetId)
+            : wavesByDefault(tx.order2.matcherFeeAssetId),
+          tx.order1.type === OrderType.Sell
+            ? wavesByDefault(tx.order1.matcherFeeAssetId)
+            : wavesByDefault(tx.order2.matcherFeeAssetId),
+          wavesByDefault(tx.amountAsset),
+          wavesByDefault(tx.priceAsset),
+          wavesByDefault(tx.order1.matcherFeeAssetId),
+          wavesByDefault(tx.amountAsset),
+          wavesByDefault(tx.priceAsset),
+          wavesByDefault(tx.order2.matcherFeeAssetId),
+        ])
+        .reduce((acc, cur) => acc.concat(cur), []),
+    })
+    .map((v) =>
+      zipWith(
+        (
+          tx,
+          [
+            feePrecision,
+            amountPrecision,
+            pricePrecision,
+            buyMatcherFeePrecision,
+            sellMatcherFeePrecision,
+            order1AmountPrecision,
+            order1PricePrecision,
+            order1MatcherFeePrecision,
+            order2AmountPrecision,
+            order2PricePrecision,
+            order2MatcherFeePrecision,
+          ]
+        ) => ({
+          ...tx,
+          fee: tx.fee.dividedBy(10 ** feePrecision),
+          amount: tx.amount.dividedBy(10 ** amountPrecision),
+          price: tx.price.dividedBy(10 ** pricePrecision),
+          buyMatcherFee: tx.buyMatcherFee.dividedBy(
+            10 ** buyMatcherFeePrecision
+          ),
+          sellMatcherFee: tx.sellMatcherFee.dividedBy(
+            10 ** sellMatcherFeePrecision
+          ),
+          order1: {
+            ...tx.order1,
+            amount: tx.order1.amount.dividedBy(10 ** order1AmountPrecision),
+            price: tx.order1.price.dividedBy(10 ** order1PricePrecision),
+            matcherFee: tx.order1.matcherFee.dividedBy(
+              10 ** order1MatcherFeePrecision
+            ),
+          },
+          order2: {
+            ...tx.order2,
+            amount: tx.order2.amount.dividedBy(10 ** order2AmountPrecision),
+            price: tx.order2.price.dividedBy(10 ** order2PricePrecision),
+            matcherFee: tx.order2.matcherFee.dividedBy(
+              10 ** order2MatcherFeePrecision
+            ),
+          },
+        }),
+        txs,
+        splitEvery(11, v)
+      )
+    );

@@ -2,11 +2,9 @@ import { BigNumber } from '@waves/data-entities';
 import { compose, tail, init, split } from 'ramda';
 import { IMain } from 'pg-promise';
 import * as pgPromise from 'pg-promise';
-import { attach } from 'pg-monitor'
 import { toBigNumber } from '../../utils/bigNumber';
-const i = {}
-const pgp: IMain = pgPromise(i);
-attach(i)
+
+const pgp: IMain = pgPromise();
 
 const parsePgArray = compose<string, string, string, string[]>(
   split(','),

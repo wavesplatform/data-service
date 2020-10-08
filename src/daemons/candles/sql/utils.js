@@ -61,22 +61,16 @@ const toRawTimestamp = (from, interval) => {
 };
 
 /**
- * @param {Date | string} timestamp
+ * @param {Date} timestamp
  * @param {string} interval
  */
-const makeRawTimestamp = (timestamp, interval) => {
-  const ts =
-    timestamp instanceof Date
-      ? `'${timestamp.toISOString()}'::timestamp`
-      : timestamp;
-
-  return toRawTimestamp(ts, interval);
-};
+const makeRawTimestamp = (timestamp, interval) =>
+  toRawTimestamp(`'${timestamp.toISOString()}'::timestamptz`, interval);
 
 // serializeCandle:: Object => Object
 // @todo refactor after pg updating for work with BigInt instead of BigNumber
 const serializeCandle = (candle) => ({
-  time_start: candle.time_start,
+  time_start: candle.time_start.toISOString(),
   amount_asset_id: candle.amount_asset_id,
   price_asset_id: candle.price_asset_id,
   matcher_address: candle.matcher_address,

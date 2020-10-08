@@ -49,7 +49,7 @@ const selectPairsCTE = pg
   .from({ p: 'pairs_cte' })
   .columns(
     'p.amount_asset_id',
-    'p.price_asset_iid',
+    'p.price_asset_id',
     'p.first_price',
     'p.last_price',
     'p.volume',
