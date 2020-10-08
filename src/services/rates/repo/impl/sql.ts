@@ -6,7 +6,7 @@ select
   p.amount_asset_id,
   p.price_asset_id,
   p.matcher,
-  (select sum(wap.weighted_average_price * wap.volume) / sum(wap.volume) from 
+  (select floor(sum(wap.weighted_average_price * wap.volume) / sum(wap.volume)) from 
    (
      select weighted_average_price, volume
      from candles

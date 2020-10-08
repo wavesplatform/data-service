@@ -41,12 +41,10 @@ const candleSelectColumns = {
   max_height: pg.max('height'),
   txs_count: pg.count('e.price'),
   weighted_average_price: pg.raw(
-    'sum((e.amount)::numeric * (e.price)::numeric)/sum((e.amount)::numeric)'
+    'floor(sum((e.amount)::numeric * (e.price)::numeric)/sum((e.amount)::numeric))::numeric'
   ),
-  open: pg.raw('(array_agg(e.price ORDER BY e.candle_time)::numeric[])[1]'),
-  close: pg.raw(
-    '(array_agg(e.price ORDER BY e.candle_time DESC)::numeric[])[1]'
-  ),
+  open: pg.raw('(array_agg(e.price ORDER BY e.tx_uid)::numeric[])[1]'),
+  close: pg.raw('(array_agg(e.price ORDER BY e.tx_uid DESC)::numeric[])[1]'),
   interval: pg.raw(`'${CandleInterval.Minute1}'`),
   matcher_address: 'e.sender',
 };

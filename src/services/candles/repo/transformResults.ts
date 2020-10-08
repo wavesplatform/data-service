@@ -4,8 +4,8 @@ import { Interval, CandleInfo, SearchedItems } from '../../../types';
 import { interval, Unit, CandleInterval } from '../../../types';
 import { concatAll } from '../../../utils/fp/concatAll';
 import { floor, ceil, add, trunc } from '../../../utils/date';
-import { candleMonoid } from './candleMonoid';
 import { CandlesSearchRequest } from '../repo';
+import { candleMonoid } from './candleMonoid';
 
 const truncToMinutes = trunc(Unit.Minute);
 const defaultInterval = interval(CandleInterval.Minute1);

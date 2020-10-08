@@ -18,7 +18,7 @@ const selectExchanges = pg({ t: 'txs_7' })
       .whereRaw(`time_stamp >= now() - interval '1 day'`)
       .limit(1)
   )
-  .where('t.tx_uid', pg('hp_cte').select('uid'))
+  .where('t.tx_uid', '>=', pg('hp_cte').select('uid'))
   .orderBy('t.tx_uid', 'desc');
 
 const selectPairsCTE = pg
@@ -34,7 +34,9 @@ const selectPairsCTE = pg
       ),
       volume: pg.raw('sum(e.amount)'),
       quote_volume: pg.raw('sum(e.amount * e.price)'),
-      weighted_average_price: pg.raw('sum(e.amount * e.price)/ sum(e.amount)'),
+      weighted_average_price: pg.raw(
+        'floor(sum(e.amount * e.price)/ sum(e.amount))'
+      ),
       volume_waves: pg.raw(
         `case when amount_asset_id='WAVES' then sum(e.amount) when price_asset_id='WAVES' then sum(e.amount * e.price) end`
       ),
@@ -55,7 +57,7 @@ const selectPairsCTE = pg
     'p.volume',
     {
       volume_waves: pg.raw(
-        `coalesce(p.volume_waves, p.quote_volume / p1.weighted_average_price, p.quote_volume * p2.weighted_average_price)`
+        `coalesce(p.volume_waves, floor(p.quote_volume / p1.weighted_average_price), p.quote_volume * p2.weighted_average_price)`
       ),
     },
     'p.quote_volume',

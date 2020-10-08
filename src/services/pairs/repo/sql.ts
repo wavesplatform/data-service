@@ -72,7 +72,7 @@ const searchAssets = (
   const cleanedQuery = escapeForTsQuery(query);
   return qb.distinct('asset_id').from(function (this: knex.QueryBuilder) {
     this.table({ [tableAlias]: 'assets' })
-      .column({ asset_id: `${tableAlias}.id` })
+      .column({ asset_id: `${tableAlias}.asset_id` })
       .where(`${tableAlias}.asset_id`, query)
       .orWhere(
         `${tableAlias}.ticker`,
@@ -100,7 +100,7 @@ const searchAssets = (
         )(
           q
             .from({ [`${tableAlias}3`]: 'assets' })
-            .column({ asset_id: `${tableAlias}3.id` })
+            .column({ asset_id: `${tableAlias}3.asset_id` })
             .where(
               `${tableAlias}3.asset_name`,
               'ilike',

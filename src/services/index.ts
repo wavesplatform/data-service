@@ -113,6 +113,7 @@ export type CommonRepoDependencies = {
 
 export type RateSerivceCreatorDependencies = CommonRepoDependencies & {
   cache: RateCache;
+  assets: AssetsService;
 };
 
 export type ServiceMesh = {
@@ -244,16 +245,20 @@ export default ({
       const rates = createRateService({
         ...commonDeps,
         cache: ratesCache,
+        assets,
       });
 
       const pairsRepo = createPairsRepo({ ...commonDeps, cache: pairsCache });
-      const pairsNoAsyncValidation = createPairsService(pairsRepo, () =>
-        taskOf(undefined)
+      const pairsNoAsyncValidation = createPairsService(
+        pairsRepo,
+        () => taskOf(undefined),
+        assets
       );
       const pairsWithAsyncValidation = createPairsService(
         pairsRepo,
         (matcher: string, pairs: AssetIdsPair[]) =>
-          validatePairs(assets.mget, pairOrderingService)(matcher, pairs)
+          validatePairs(assets.mget, pairOrderingService)(matcher, pairs),
+        assets
       );
 
       const candlesRepo = createCandlesRepo(commonDeps);
