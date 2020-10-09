@@ -13,7 +13,7 @@ export const modifyDecimals = (assetsService: AssetsService) => (
     .map(([assetPrecision]) =>
       txs.map((tx) => ({
         ...tx,
-        fee: tx.fee.dividedBy(10 ** assetPrecision),
-        amount: tx.amount.dividedBy(10 ** assetPrecision),
+        fee: tx.fee.multipliedBy(10 ** -assetPrecision),
+        amount: tx.amount.multipliedBy(10 ** -assetPrecision),
       }))
     );

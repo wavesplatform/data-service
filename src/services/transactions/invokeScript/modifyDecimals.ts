@@ -22,10 +22,10 @@ export const modifyDecimals = (assetsService: AssetsService) => (
         let currentTxValues = precisions.splice(0, 1 + tx.payment.length);
         return {
           ...tx,
-          fee: tx.fee.dividedBy(10 ** currentTxValues[0]),
+          fee: tx.fee.multipliedBy(10 ** -currentTxValues[0]),
           payment: tx.payment.map((p, idx) => ({
             ...p,
-            amount: p.amount.dividedBy(10 ** currentTxValues[idx + 1]),
+            amount: p.amount.multipliedBy(10 ** -currentTxValues[idx + 1]),
           })),
         };
       })

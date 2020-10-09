@@ -14,7 +14,7 @@ const addZippedTransfers = (tx) =>
       !Array.isArray(recipients) ||
       // if there are not any recipients, recipients will be [null],
       // and amounts will be ['NaN']
-      (recipients.length === 1 && !isNil(recipients[0]))
+      (recipients.length === 1 && isNil(recipients[0]))
     ) {
       return [];
     }

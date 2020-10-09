@@ -13,7 +13,7 @@ export const modifyFeeDecimals = <
     zipWith(
       (tx, feeAssetPrecision) => ({
         ...tx,
-        fee: tx.fee.dividedBy(10 ** feeAssetPrecision),
+        fee: tx.fee.multipliedBy(10 ** -feeAssetPrecision),
       }),
       txs
     )

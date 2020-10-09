@@ -50,29 +50,29 @@ export const modifyDecimals = (assetsService: AssetsService) => (
           ]
         ) => ({
           ...tx,
-          fee: tx.fee.dividedBy(10 ** feePrecision),
-          amount: tx.amount.dividedBy(10 ** amountPrecision),
-          price: tx.price.dividedBy(10 ** pricePrecision),
-          buyMatcherFee: tx.buyMatcherFee.dividedBy(
-            10 ** buyMatcherFeePrecision
+          fee: tx.fee.multipliedBy(10 ** -feePrecision),
+          amount: tx.amount.multipliedBy(10 ** -amountPrecision),
+          price: tx.price.multipliedBy(10 ** -pricePrecision),
+          buyMatcherFee: tx.buyMatcherFee.multipliedBy(
+            10 ** -buyMatcherFeePrecision
           ),
-          sellMatcherFee: tx.sellMatcherFee.dividedBy(
-            10 ** sellMatcherFeePrecision
+          sellMatcherFee: tx.sellMatcherFee.multipliedBy(
+            10 ** -sellMatcherFeePrecision
           ),
           order1: {
             ...tx.order1,
-            amount: tx.order1.amount.dividedBy(10 ** order1AmountPrecision),
-            price: tx.order1.price.dividedBy(10 ** order1PricePrecision),
-            matcherFee: tx.order1.matcherFee.dividedBy(
-              10 ** order1MatcherFeePrecision
+            amount: tx.order1.amount.multipliedBy(10 ** -order1AmountPrecision),
+            price: tx.order1.price.multipliedBy(10 ** -order1PricePrecision),
+            matcherFee: tx.order1.matcherFee.multipliedBy(
+              10 ** -order1MatcherFeePrecision
             ),
           },
           order2: {
             ...tx.order2,
-            amount: tx.order2.amount.dividedBy(10 ** order2AmountPrecision),
-            price: tx.order2.price.dividedBy(10 ** order2PricePrecision),
-            matcherFee: tx.order2.matcherFee.dividedBy(
-              10 ** order2MatcherFeePrecision
+            amount: tx.order2.amount.multipliedBy(10 ** -order2AmountPrecision),
+            price: tx.order2.price.multipliedBy(10 ** -order2PricePrecision),
+            matcherFee: tx.order2.matcherFee.multipliedBy(
+              10 ** -order2MatcherFeePrecision
             ),
           },
         }),

@@ -14,7 +14,7 @@ export const modifyDecimals = (assetsService: AssetsService) => (
       const feePrecision = precisions.splice(0, 1)[0];
       return txs.map((tx, idx) => ({
         ...tx,
-        fee: tx.fee.dividedBy(10 ** feePrecision),
-        amount: tx.quantity.dividedBy(10 ** precisions[idx]),
+        fee: tx.fee.multipliedBy(10 ** -feePrecision),
+        amount: tx.quantity.multipliedBy(10 ** -precisions[idx]),
       }));
     });
