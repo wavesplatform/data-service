@@ -33,12 +33,12 @@ const selectPairsCTE = pg
         '(array_agg(e.price ORDER BY e.tx_uid)::numeric[])[1]'
       ),
       volume: pg.raw('sum(e.amount)'),
-      quote_volume: pg.raw('sum(e.amount * e.price)'),
+      quote_volume: pg.raw('sum(e.amount::numeric * e.price::numeric)'),
       weighted_average_price: pg.raw(
-        'floor(sum(e.amount * e.price)/ sum(e.amount))'
+        'floor(sum(e.amount::numeric * e.price::numeric)/ sum(e.amount))'
       ),
       volume_waves: pg.raw(
-        `case when amount_asset_id='WAVES' then sum(e.amount) when price_asset_id='WAVES' then sum(e.amount * e.price) end`
+        `case when amount_asset_id='WAVES' then sum(e.amount) when price_asset_id='WAVES' then sum(e.amount::numeric * e.price::numeric) end`
       ),
       high: pg.raw('max(e.price)'),
       low: pg.raw('min(e.price)'),
