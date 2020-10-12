@@ -29,13 +29,17 @@ const COLUMNS = [
 const isSearchByAssetRequest = (
   req: PairsSearchRequest
 ): req is SearchByAssetRequest => {
-  return 'search_by_asset' in req;
+  return 'search_by_asset' in req && typeof req.search_by_asset === 'string';
 };
 
 const isSearchByAssetsRequest = (
   req: PairsSearchRequest
 ): req is SearchByAssetsRequest => {
-  return 'search_by_assets' in req && Array.isArray(req.search_by_assets);
+  return (
+    'search_by_assets' in req &&
+    Array.isArray(req.search_by_assets) &&
+    req.search_by_assets.length == 2
+  );
 };
 
 const getMatchExactly = (matchExactly: boolean[] | undefined): boolean[] => {

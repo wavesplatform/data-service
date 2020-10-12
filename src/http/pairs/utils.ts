@@ -72,7 +72,8 @@ export const isSearchByAssetsRequest = (
   req: ParsedFilterValues<ParserFnType>
 ): req is SearchByAssetsRequest =>
   'search_by_assets' in req &&
-  typeof req.search_by_assets === 'string' &&
+  Array.isArray(req.search_by_assets) &&
+  req.search_by_assets.length == 2 &&
   'match_exactly' in req &&
   Array.isArray(req.match_exactly) &&
-  req.match_exactly.length <= 2;
+  req.match_exactly.length == 2;
