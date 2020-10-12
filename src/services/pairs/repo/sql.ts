@@ -158,6 +158,10 @@ export const search = (req: PairsSearchRequest): string => {
           .crossJoin((qb: knex.QueryBuilder) =>
             searchAssets(qb, priceAsset, priceAssetExaclty, 'p').as('t2')
           )
+          .columns({
+            amount_asset_id: 't1.asset_id',
+            price_asset_id: 't2.asset_id',
+          })
       )
       .join(
         { direct_cte: 'assets_cte' },
