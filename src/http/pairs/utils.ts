@@ -1,9 +1,6 @@
 import { Ok as ok, Error as error } from 'folktale/result';
 import { isNil } from 'ramda';
-import { parseFilterValues } from '../_common/filters';
-import { ParsedFilterValues, Parser } from '../_common/filters/types';
-import commonFilters from '../_common/filters/filters';
-import { WithMatcher, isSortOrder } from '../../services/_common';
+import { isSortOrder } from '../../services/_common';
 import {
   PairsMgetRequest,
   SearchByAssetRequest,
@@ -12,6 +9,10 @@ import {
 } from '../../services/pairs/repo/types';
 import { parseArrayQuery, parseBool, parsePairs } from '../../utils/parsers';
 import { ParseArrayQuery } from '../../utils/parsers/parseArrayQuery';
+import { parseFilterValues } from '../_common/filters';
+import { ParsedFilterValues, Parser } from '../_common/filters/types';
+import commonFilters from '../_common/filters/filters';
+import { withMatcher } from '../_common/utils';
 
 export type ParseMatchExactly = Parser<boolean[]>;
 export const parseMatchExactly: ParseMatchExactly = (
@@ -19,11 +20,11 @@ export const parseMatchExactly: ParseMatchExactly = (
 ) =>
   isNil(matchExactlyRaw)
     ? ok(undefined)
-    : parseArrayQuery(matchExactlyRaw).chain(ss =>
+    : parseArrayQuery(matchExactlyRaw).chain((ss) =>
         typeof ss === 'undefined'
           ? ok(undefined)
           : ss.map(parseBool).reduceRight((acc, cur) => {
-              return acc.chain(a =>
+              return acc.chain((a) =>
                 cur.matchWith({
                   Ok: ({ value }) =>
                     typeof value === 'undefined' ? ok(a) : ok([...a, value]),
@@ -42,10 +43,6 @@ export const mgetOrSearchParser = parseFilterValues({
 });
 
 type ParserFnType = typeof mgetOrSearchParser;
-
-export const withMatcher = (
-  req: ParsedFilterValues<ParserFnType>
-): req is WithMatcher => 'matcher' in req && typeof req.matcher === 'string';
 
 export const isMgetRequest = (
   req: ParsedFilterValues<ParserFnType>

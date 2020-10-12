@@ -11,8 +11,8 @@ import { PairsServiceSearchRequest } from '../../services/pairs';
 import { parseFilterValues, withDefaults } from '../_common/filters';
 import commonFilters from '../_common/filters/filters';
 import { HttpRequest } from '../_common/types';
+import { withMatcher } from '../_common/utils';
 import {
-  withMatcher,
   isMgetRequest,
   isSearchCommonRequest,
   isSearchByAssetRequest,
@@ -39,13 +39,20 @@ export const get = ({
 
   return parseFilterValues({
     matcher: commonFilters.query,
-  })(query).chain(fValues => {
-    if (!withMatcher(fValues)) {
+  })(query).chain((fValues) => {
+    const fValuesWithDefaults = mergeAll<PairsGetRequest & WithMatcher>([
+      {
+        matcher: config.matcher.defaultMatcherAddress,
+      },
+      withDefaults(fValues),
+    ]);
+
+    if (!withMatcher(fValuesWithDefaults)) {
       return error(new ParseError(new Error('Matcher is not defined')));
     }
 
     return ok({
-      matcher: fValues.matcher,
+      matcher: fValuesWithDefaults.matcher,
       pair: {
         amountAsset: params.amountAsset,
         priceAsset: params.priceAsset,
@@ -64,7 +71,7 @@ export const mgetOrSearch = ({
     return error(new ParseError(new Error('Query is empty')));
   }
 
-  return mgetOrSearchParser(query).chain(fValues => {
+  return mgetOrSearchParser(query).chain((fValues) => {
     if (isMgetRequest(fValues)) {
       return ok(fValues);
     } else {

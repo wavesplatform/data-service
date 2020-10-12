@@ -5,6 +5,7 @@ import { defaultTo } from 'ramda';
 import { ParseError } from '../../errorHandling';
 import { stringify } from '../../utils/json';
 import { RequestHeaders, WITH_DECIMALS_HEADER } from '../../types';
+import { WithMatcher } from '../../services/_common';
 import { DecimalsFormat } from '../../services/types';
 import { LSNFormat } from '../types';
 import { HttpResponse } from './types';
@@ -81,3 +82,6 @@ export const parseDecimals = (
     )
   );
 };
+
+export const withMatcher = (req: any): req is WithMatcher =>
+  'matcher' in req && typeof req.matcher === 'string';

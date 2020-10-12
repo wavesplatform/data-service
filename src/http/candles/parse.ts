@@ -1,10 +1,15 @@
 import { Result, Error as error, Ok as ok } from 'folktale/result';
-import { isNil } from 'ramda';
+import { isNil, mergeAll } from 'ramda';
 import { ParseError } from '../../errorHandling';
+import { WithMatcher } from '../../services/_common';
 import { CandlesSearchRequest } from '../../services/candles/repo';
-import { parseFilterValues } from '../_common/filters';
+import { loadConfig } from '../../loadConfig';
+import { parseFilterValues, withDefaults } from '../_common/filters';
 import commonFilters from '../_common/filters/filters';
 import { HttpRequest } from '../_common/types';
+import { withMatcher } from '../_common/utils';
+
+const config = loadConfig();
 
 export const parse = ({
   params,
@@ -24,26 +29,37 @@ export const parse = ({
   return parseFilterValues({
     matcher: commonFilters.query,
     interval: commonFilters.query,
-  })(query).chain(fValues => {
-    if (isNil(fValues.timeStart)) {
+  })(query).chain((fValues) => {
+    const fValuesWithDefaults = mergeAll<CandlesSearchRequest & WithMatcher>([
+      {
+        matcher: config.matcher.defaultMatcherAddress,
+      },
+      withDefaults(fValues),
+    ]);
+
+    if (!withMatcher(fValuesWithDefaults)) {
+      return error(new ParseError(new Error('Matcher is not defined')));
+    }
+
+    if (isNil(fValuesWithDefaults.timeStart)) {
       return error(new ParseError(new Error('timeStart is required')));
     }
 
-    if (isNil(fValues.interval)) {
+    if (isNil(fValuesWithDefaults.interval)) {
       return error(new ParseError(new Error('interval is required')));
     }
 
-    if (isNil(fValues.matcher)) {
+    if (isNil(fValuesWithDefaults.matcher)) {
       return error(new ParseError(new Error('matcher is required')));
     }
 
     return ok({
       amountAsset: params.amountAsset,
       priceAsset: params.priceAsset,
-      matcher: fValues.matcher,
-      timeStart: fValues.timeStart,
-      timeEnd: fValues.timeEnd || new Date(),
-      interval: fValues.interval,
+      matcher: fValuesWithDefaults.matcher,
+      timeStart: fValuesWithDefaults.timeStart,
+      timeEnd: fValuesWithDefaults.timeEnd || new Date(),
+      interval: fValuesWithDefaults.interval,
     });
   });
 };
