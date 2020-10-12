@@ -101,5 +101,5 @@ export const searchAssets = (query: string): knex.QueryBuilder =>
     })
     .from('assets_cte')
     .select(map((col) => `a.${col}`, columns))
-    .innerJoin({ a: 'assets' }, 'assets_cte.asset_id', 'a.id')
+    .innerJoin({ a: 'assets' }, 'assets_cte.asset_id', 'a.asset_id')
     .orderBy('rn', 'asc');
