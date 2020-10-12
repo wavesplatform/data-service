@@ -1,6 +1,5 @@
 import { Task, of as taskOf } from 'folktale/concurrency/task';
 import { empty, Maybe, of as maybeOf } from 'folktale/maybe';
-import { sequence } from 'ramda';
 import { AppError } from '../../../errorHandling';
 import { SearchedItems } from '../../../types';
 import { swapMaybeF } from '../../../utils/fp';
@@ -32,17 +31,24 @@ export const mgetWithDecimalsProcessing = <
   mget(req).chain<AppError, Maybe<Response>[]>((ms) =>
     req.decimalsFormat == DecimalsFormat.Long
       ? taskOf(ms)
-      : swapMaybeF<AppError, Response[]>(
-          taskOf,
-          sequence<Maybe<Response>, Maybe<Response[]>>(maybeOf, ms).map(
-            modifyDecimals
-          )
-        ).map((m) =>
-          m.matchWith({
-            Just: ({ value: txs }) => txs.map(maybeOf),
-            Nothing: () => [empty()],
-          })
-        )
+      : modifyDecimals(
+          ms
+            .filter((m) =>
+              m.matchWith({
+                Just: () => true,
+                Nothing: () => false,
+              })
+            )
+            .map((m) => m.unsafeGet())
+        ).map((res) => {
+          let idx = 0;
+          return ms.map((m) =>
+            m.matchWith({
+              Just: (_) => maybeOf(res[idx++]),
+              Nothing: () => empty(),
+            })
+          );
+        })
   );
 
 export const searchWithDecimalsProcessing = <
