@@ -11,11 +11,11 @@ import {
 import { CommonFilters } from './types';
 
 // default limit is 100
-const limitFilter: CommonFilters['limit'] = raw =>
+const limitFilter: CommonFilters['limit'] = (raw) =>
   typeof raw === 'undefined'
     ? ok(undefined)
     : compose<string, number, Result<ParseError, number>>(
-        n =>
+        (n) =>
           isNaN(n)
             ? error(new ParseError(new Error('limit has to be a number')))
             : ok(n),
@@ -23,7 +23,7 @@ const limitFilter: CommonFilters['limit'] = raw =>
       )(raw);
 
 // default sort is SortOrder.Descending
-const sortFilter: CommonFilters['sort'] = s =>
+const sortFilter: CommonFilters['sort'] = (s) =>
   typeof s === 'undefined'
     ? ok(undefined)
     : isSortOrder(s)
@@ -37,6 +37,7 @@ export default {
   timeEnd: parseDate,
   limit: limitFilter,
   sender: parseTrimmedStringIfDefined,
+  senders: parseArrayQuery,
   sort: sortFilter,
   after: afterFilter,
   ids: parseArrayQuery,

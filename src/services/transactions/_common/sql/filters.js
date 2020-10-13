@@ -12,6 +12,8 @@ const ids = (ids) => whereIn('t.id', ids);
 
 const sender = (addr) => where('t.sender', addr);
 
+const senders = addrs => whereIn('t.sender', addrs);
+
 const byTimeStamp = (comparator) => (ts) => (q) =>
   q.clone().where('t.time_stamp', comparator, ts.toISOString());
 
@@ -35,6 +37,7 @@ module.exports = {
   id,
   ids,
   sender,
+  senders,
   timeStart: byTimeStamp('>'),
   timeEnd: byTimeStamp('<'),
   sort,
