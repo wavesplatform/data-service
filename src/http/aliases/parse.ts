@@ -21,6 +21,8 @@ const LIMIT = 1000;
 const mgetOrSearchParser = parseFilterValues({
   aliases: parseArrayQuery as ParseArrayQuery, // merge function type and overloads
   address: commonFilters.query,
+  addresses: parseArrayQuery as ParseArrayQuery,
+  queries: parseArrayQuery as ParseArrayQuery,
   showBroken: parseBool,
 });
 
@@ -33,7 +35,10 @@ const isMgetRequest = (
 
 const isSearchRequest = (
   req: ParsedFilterValues<ParserFnType>
-): req is AliasesServiceSearchRequest => typeof req.address !== 'undefined';
+): req is AliasesServiceSearchRequest =>
+  typeof req.address !== 'undefined' ||
+  typeof req.addresses !== 'undefined' ||
+  typeof req.queries !== 'undefined';
 
 export const get = ({
   params,
@@ -55,7 +60,7 @@ export const mgetOrSearch = ({
     return error(new ParseError(new Error('Query is empty')));
   }
 
-  return mgetOrSearchParser(query).chain(fValues => {
+  return mgetOrSearchParser(query).chain((fValues) => {
     if (isMgetRequest(fValues)) {
       return ok(fValues);
     } else {

@@ -1,6 +1,6 @@
 import { propEq } from 'ramda';
 
-import { AliasInfo, Repo } from '../../../types';
+import { AliasInfo, Repo, XOR } from '../../../types';
 
 import { CommonRepoDependencies } from '../..';
 import { WithLimit, WithSortOrder } from '../../_common';
@@ -16,10 +16,15 @@ import { output } from './schema';
 
 export type AliasesGetRequest = string;
 export type AliasesMgetRequest = string[];
+
+export type WithAddress = { address: string };
+export type WithAddresses = { addresses: string[] };
+export type WithQueries = { queries: string[] };
+
 export type AliasesSearchRequest = RequestWithCursor<
   WithSortOrder &
-    WithLimit & {
-      address: string;
+    WithLimit &
+    XOR<XOR<WithAddress, WithAddresses>, WithQueries> & {
       showBroken: boolean;
     },
   string
