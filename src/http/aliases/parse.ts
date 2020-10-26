@@ -18,6 +18,7 @@ import {
 } from '../../utils/parsers/parseArrayQuery';
 import { parseBool } from '../../utils/parsers/parseBool';
 import { ParsedFilterValues } from '../_common/filters/types';
+import { xor } from '../../utils/xor';
 
 const LIMIT = 1000;
 
@@ -81,6 +82,29 @@ export const mgetOrSearch = ({
         fValuesWithDefaults,
         { limit: LIMIT },
       ]);
+
+      if (
+        xor(
+          isSearchWithAddressRequest(fValuesWithDefaults),
+          isSearchWithAddressesRequest(fValuesWithDefaults)
+        ) ||
+        xor(
+          isSearchWithAddressesRequest(fValuesWithDefaults),
+          isSearchWithQueriesRequest(fValuesWithDefaults)
+        ) ||
+        xor(
+          isSearchWithAddressRequest(fValuesWithDefaults),
+          isSearchWithQueriesRequest(fValuesWithDefaults)
+        )
+      ) {
+        return error(
+          new ParseError(
+            new Error(
+              'Request contains a conflict between exclusive peers [address, addresses, queries]'
+            )
+          )
+        );
+      }
 
       if (isSearchWithAddressRequest(fValuesWithDefaults)) {
         if (!fValuesWithDefaults.address.length) {

@@ -32,6 +32,7 @@ const createApi = ({ filters: F }) => ({
       'timeStart',
       'timeEnd',
       'sender',
+      'senders',
       // specific attributes
       'matcher',
       'orderId',

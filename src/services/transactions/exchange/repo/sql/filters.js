@@ -1,12 +1,13 @@
 const { curryN } = require('ramda');
 
 const commonFilters = require('../../../_common/sql/filters');
-const commonFiltersOrder = require('../../../_common/sql/filtersOrder');
 
 const byOrderSender = curryN(2, (orderSender, q) =>
   q
     .clone()
-    .whereRaw(`array[t.order1->>'sender', t.order2->>'sender'] @> '{${orderSender}}'`)
+    .whereRaw(
+      `array[t.order1->>'sender', t.order2->>'sender'] @> '{${orderSender}}'`
+    )
 );
 
 const byOrder = curryN(2, (orderId, q) =>
@@ -28,11 +29,4 @@ module.exports = {
     priceAsset: byAsset('price'),
     orderId: byOrder,
   },
-  filtersOrder: [
-    ...commonFiltersOrder,
-    'matcher',
-    'amountAsset',
-    'priceAsset',
-    'orderId',
-  ],
 };
