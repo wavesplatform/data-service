@@ -21,14 +21,16 @@ export type WithAddress = { address: string };
 export type WithAddresses = { addresses: string[] };
 export type WithQueries = { queries: string[] };
 
-export type AliasesSearchRequest = RequestWithCursor<
+type BaseAliasesSearchRequest = RequestWithCursor<
   WithSortOrder &
-    WithLimit &
-    XOR<XOR<WithAddress, WithAddresses>, WithQueries> & {
+    WithLimit & {
       showBroken: boolean;
     },
   string
 >;
+
+export type AliasesSearchRequest = BaseAliasesSearchRequest &
+  XOR<WithAddress, XOR<WithAddresses, WithQueries>>;
 
 export type AliasesRepo = Repo<
   AliasesGetRequest,

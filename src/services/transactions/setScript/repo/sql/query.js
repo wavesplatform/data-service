@@ -1,6 +1,12 @@
 const pg = require('knex')({ client: 'pg' });
 
-const select = pg({ t: 'txs_13' }).select('*');
+const select = pg({ t: 'txs_13' }).select([
+  'tx_uid',
+  'height',
+  'sender',
+  'sender_public_key',
+  'script',
+]);
 
 const selectFromFiltered = (filtered) =>
   pg({ t: filtered })

@@ -5,6 +5,9 @@ import {
   AliasesServiceGetRequest,
   AliasesServiceMgetRequest,
   AliasesServiceSearchRequest,
+  WithAddress,
+  WithAddresses,
+  WithQueries,
 } from '../../services/aliases';
 import commonFilters from '../_common/filters/filters';
 import { parseFilterValues, withDefaults } from '../_common/filters';
@@ -33,12 +36,20 @@ const isMgetRequest = (
 ): req is AliasesServiceMgetRequest =>
   'aliases' in req && Array.isArray(req.aliases);
 
-const isSearchRequest = (
+const isSearchWithAddressRequest = (
   req: ParsedFilterValues<ParserFnType>
-): req is AliasesServiceSearchRequest =>
-  typeof req.address !== 'undefined' ||
-  typeof req.addresses !== 'undefined' ||
-  typeof req.queries !== 'undefined';
+): req is AliasesServiceSearchRequest & WithAddress =>
+  typeof req.address === 'string';
+
+const isSearchWithAddressesRequest = (
+  req: ParsedFilterValues<ParserFnType>
+): req is AliasesServiceSearchRequest & WithAddresses =>
+  Array.isArray(req.addresses);
+
+const isSearchWithQueriesRequest = (
+  req: ParsedFilterValues<ParserFnType>
+): req is AliasesServiceSearchRequest & WithQueries =>
+  Array.isArray(req.queries);
 
 export const get = ({
   params,
@@ -64,19 +75,42 @@ export const mgetOrSearch = ({
     if (isMgetRequest(fValues)) {
       return ok(fValues);
     } else {
-      const fValuesWithDefaults = withDefaults(fValues);
+      let fValuesWithDefaults = withDefaults(fValues);
+      fValuesWithDefaults = mergeAll<typeof fValuesWithDefaults>([
+        { showBroken: false },
+        fValuesWithDefaults,
+        { limit: LIMIT },
+      ]);
 
-      if (isSearchRequest(fValuesWithDefaults)) {
-        return ok(
-          mergeAll([
-            { showBroken: false },
-            fValuesWithDefaults,
-            { limit: LIMIT },
-          ])
-        );
+      if (isSearchWithAddressRequest(fValuesWithDefaults)) {
+        if (!fValuesWithDefaults.address.length) {
+          return error(
+            new ParseError(new Error('`address` is not allowed to be empty'))
+          );
+        } else {
+          return ok(fValuesWithDefaults);
+        }
+      } else if (isSearchWithAddressesRequest(fValuesWithDefaults)) {
+        if (
+          fValuesWithDefaults.addresses.filter((v) => v.length === 0).length > 0
+        ) {
+          return error(
+            new ParseError(
+              new Error('`addresses` is not allowed to be has an empty value')
+            )
+          );
+        } else {
+          return ok(fValuesWithDefaults);
+        }
+      } else if (isSearchWithQueriesRequest(fValuesWithDefaults)) {
+        return ok(fValuesWithDefaults);
       } else {
         return error(
-          new ParseError(new Error('Address is incorrect or undefined'))
+          new ParseError(
+            new Error(
+              'Neither `address` nor `addresses` nor `queries` were not provided'
+            )
+          )
         );
       }
     }

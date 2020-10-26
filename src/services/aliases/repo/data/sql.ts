@@ -1,6 +1,11 @@
 import * as knex from 'knex';
-import { complement, compose, isNil } from 'ramda';
-import { AliasesSearchRequest } from '../../repo';
+import { complement, compose } from 'ramda';
+import {
+  AliasesSearchRequest,
+  WithAddress,
+  WithAddresses,
+  WithQueries,
+} from '../../repo';
 
 const pg = knex({ client: 'pg' });
 
@@ -36,6 +41,18 @@ const selectFiltered = (filtered: knex.QueryBuilder) =>
       .groupBy('t.alias', 't.tx_uid'),
   });
 
+const withAddress = (
+  req: AliasesSearchRequest
+): req is AliasesSearchRequest & WithAddress => typeof req.address === 'string';
+
+const withAddresses = (
+  req: AliasesSearchRequest
+): req is AliasesSearchRequest & WithAddresses => Array.isArray(req.addresses);
+
+const withQueries = (
+  req: AliasesSearchRequest
+): req is AliasesSearchRequest & WithQueries => Array.isArray(req.queries);
+
 export default {
   get: (alias: string) =>
     selectAfterFilters(
@@ -49,31 +66,18 @@ export default {
     )
       .clone()
       .toString(),
-  search: ({
-    address,
-    addresses,
-    queries,
-    showBroken,
-    limit,
-    after,
-  }: AliasesSearchRequest) => {
+  search: (req: AliasesSearchRequest) => {
     const query = baseQuery(pg());
 
     let aliases: string[] = [];
 
-    switch (true) {
-      case !isNil(address):
-        query.where('sender', address as string);
-        break;
-
-      case !isNil(addresses):
-        query.whereIn('sender', addresses as string[]);
-        break;
-
-      case !isNil(queries):
-        query.whereIn('sender', (queries as string[]).filter(isAddress));
-        aliases = (queries as string[]).filter(complement(isAddress));
-        break;
+    if (withAddress(req)) {
+      query.where('sender', req.address);
+    } else if (withAddresses(req)) {
+      query.whereIn('sender', req.addresses);
+    } else if (withQueries(req)) {
+      query.whereIn('sender', req.queries.filter(isAddress));
+      aliases = req.queries.filter(complement(isAddress));
     }
 
     const q = selectAfterFilters(
@@ -89,13 +93,15 @@ export default {
       )
     )
       .orderBy('rn', 'asc')
-      .limit(limit);
+      .limit(req.limit);
 
     return compose<knex.QueryBuilder, knex.QueryBuilder, string>(
       // aliases are considered broken if 'duplicates' not equal to 1
       (q) =>
-        showBroken ? q.toString() : q.clone().where('duplicates', 1).toString(),
-      (q) => (after ? q.where('rn', '>', getAliasRowNumber(after)) : q)
+        req.showBroken
+          ? q.toString()
+          : q.clone().where('duplicates', 1).toString(),
+      (q) => (req.after ? q.where('rn', '>', getAliasRowNumber(req.after)) : q)
     )(q);
   },
 };

@@ -9,6 +9,7 @@ import {
   AliasesRepo,
 } from './repo';
 import { WithDecimalsFormat } from '../types';
+export { WithAddress, WithAddresses, WithQueries } from './repo';
 
 export type AliasesServiceGetRequest = {
   id: AliasesGetRequest;
@@ -33,7 +34,7 @@ export type AliasesService = {
 };
 
 export default (repo: AliasesRepo): AliasesService => ({
-  get: req => repo.get(req.id),
-  mget: req => repo.mget(req.aliases),
-  search: req => repo.search(req),
+  get: (req) => repo.get(req.id),
+  mget: (req) => repo.mget(req.aliases),
+  search: (req) => repo.search(req),
 });

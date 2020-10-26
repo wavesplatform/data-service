@@ -141,7 +141,7 @@ export default (repo: AllTxsRepo) => (
         )(txsList.items)
       )
         .map((mss) => flatten<Maybe<TransactionInfo>>(mss))
-        .map((ms) => collect((m) => m.getOrElse(undefined), ms))
+        .map(collect((m) => m.getOrElse(undefined)))
         .map((txs) => {
           const s = indexBy(
             (tx) => `${tx.id}:${tx.timestamp.valueOf()}`,

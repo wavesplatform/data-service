@@ -3,18 +3,18 @@ import { collect } from '../collection';
 
 describe('collect function', () => {
   it('should return empty arr when input arr is empty', () => {
-    expect(collect(identity, [])).toEqual([]);
+    expect(collect(identity)([])).toEqual([]);
   });
 
   it('should return full copy of input arr, when fn does not any changes and does not return undefined', () => {
     const arr = [1, 2, 3];
-    expect(collect(identity, arr)).toEqual(arr);
-    expect(collect(identity, arr)).not.toBe(arr);
+    expect(collect(identity)(arr)).toEqual(arr);
+    expect(collect(identity)(arr)).not.toBe(arr);
   });
 
   it('should not mutate input array', () => {
     const arr = [1, 2, 3, 4, 5];
-    collect(() => undefined, arr);
+    collect(() => undefined)(arr);
     expect(arr.length).toEqual(5);
   });
 
@@ -23,7 +23,7 @@ describe('collect function', () => {
     const evenArr = [2, 4];
     const arr = [1, 3, 5, ...evenArr];
     const isEven = (n: number) => (n % 2 === 0 ? n : undefined);
-    expect(collect(isEven, arr)).toEqual(evenArr);
+    expect(collect(isEven)(arr)).toEqual(evenArr);
   });
 
   // // A[] -> B[]
@@ -34,7 +34,7 @@ describe('collect function', () => {
 
     const expected = ['1', '2', '3'];
 
-    expect(collect(transform, arr)).toEqual(expected);
+    expect(collect(transform)(arr)).toEqual(expected);
   });
 
   // together
@@ -46,6 +46,6 @@ describe('collect function', () => {
 
     const expected = ['1w', '3w', '5w'];
 
-    expect(collect(takeOddToString, arr)).toEqual(expected);
+    expect(collect(takeOddToString)(arr)).toEqual(expected);
   });
 });

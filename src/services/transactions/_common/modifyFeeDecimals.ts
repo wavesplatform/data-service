@@ -1,6 +1,5 @@
 import { BigNumber } from '@waves/data-entities';
 import { Task } from 'folktale/concurrency/task';
-import { zipWith } from 'ramda';
 import { AppError } from '../../../errorHandling';
 import { AssetsService } from '../../assets';
 
@@ -9,12 +8,9 @@ export const modifyFeeDecimals = <
 >(
   assetsService: AssetsService
 ) => (txs: T[]): Task<AppError, T[]> =>
-  assetsService.precisions({ ids: ['WAVES'] }).map(
-    zipWith(
-      (tx, feeAssetPrecision) => ({
-        ...tx,
-        fee: tx.fee.multipliedBy(10 ** -feeAssetPrecision),
-      }),
-      txs
-    )
+  assetsService.precisions({ ids: ['WAVES'] }).map(([feeAssetPrecision]) =>
+    txs.map((tx) => ({
+      ...tx,
+      fee: tx.fee.multipliedBy(10 ** -feeAssetPrecision),
+    }))
   );
