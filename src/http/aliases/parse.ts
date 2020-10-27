@@ -1,5 +1,5 @@
 import { Result, Ok as ok, Error as error } from 'folktale/result';
-import { mergeAll } from 'ramda';
+import { identity, mergeAll } from 'ramda';
 import { ParseError } from '../../errorHandling';
 import {
   AliasesServiceGetRequest,
@@ -18,7 +18,6 @@ import {
 } from '../../utils/parsers/parseArrayQuery';
 import { parseBool } from '../../utils/parsers/parseBool';
 import { ParsedFilterValues } from '../_common/filters/types';
-import { xor } from '../../utils/xor';
 
 const LIMIT = 1000;
 
@@ -84,18 +83,11 @@ export const mgetOrSearch = ({
       ]);
 
       if (
-        xor(
+        [
           isSearchWithAddressRequest(fValuesWithDefaults),
-          isSearchWithAddressesRequest(fValuesWithDefaults)
-        ) ||
-        xor(
           isSearchWithAddressesRequest(fValuesWithDefaults),
-          isSearchWithQueriesRequest(fValuesWithDefaults)
-        ) ||
-        xor(
-          isSearchWithAddressRequest(fValuesWithDefaults),
-          isSearchWithQueriesRequest(fValuesWithDefaults)
-        )
+          isSearchWithQueriesRequest(fValuesWithDefaults),
+        ].filter(identity).length > 1
       ) {
         return error(
           new ParseError(
