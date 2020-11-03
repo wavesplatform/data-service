@@ -1,23 +1,21 @@
 const pg = require('knex')({ client: 'pg' });
 
-const select = pg({ t: 'txs_1' }).select('*');
+const select = pg({ t: 'txs_1' });
 
 const selectFromFiltered = (filtered) =>
-  pg({ t: filtered })
-    .select({
-      tx_uid: 't.tx_uid',
-      height: 't.height',
-      tx_type: 'txs.tx_type',
-      id: 'txs.id',
-      time_stamp: 'txs.time_stamp',
-      signature: 'txs.signature',
-      proofs: 'txs.proofs',
-      tx_version: 'txs.tx_version',
-      fee: 'txs.fee',
-      status: 'txs.status',
-      recipient: pg.raw('coalesce(t.recipient_alias, t.recipient_address)'),
-      amount: pg.raw('t.amount'),
-    })
-    .leftJoin('txs', 'txs.uid', 't.tx_uid');
+  filtered.select({
+    uid: 't.uid',
+    height: 't.height',
+    tx_type: 't.tx_type',
+    id: 't.id',
+    time_stamp: 't.time_stamp',
+    signature: 't.signature',
+    proofs: 't.proofs',
+    tx_version: 't.tx_version',
+    fee: 't.fee',
+    status: 't.status',
+    recipient: pg.raw('coalesce(t.recipient_alias, t.recipient_address)'),
+    amount: pg.raw('t.amount'),
+  });
 
 module.exports = { select, selectFromFiltered };

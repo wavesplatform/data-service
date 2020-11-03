@@ -11,18 +11,18 @@ import { WithLimit, WithSortOrder, SortOrder } from '../../../..';
 import { searchPreset } from '../../search';
 
 const mockTxs: ResponseRaw[] = [
-  { tx_uid: 1, id: 'q', timestamp: new Date() },
-  { tx_uid: 2, id: 'w', timestamp: new Date() },
+  { uid: 1, id: 'q', timestamp: new Date() },
+  { uid: 2, id: 'w', timestamp: new Date() },
 ];
 
 type ResponseRaw = {
-  tx_uid: number;
+  uid: number;
   id: string;
   timestamp: Date;
 };
 
 type Cursor = {
-  tx_uid: number;
+  uid: number;
 };
 
 const serialize = (
@@ -31,7 +31,7 @@ const serialize = (
 ): string | undefined =>
   response === null
     ? undefined
-    : Buffer.from(response.tx_uid.toString()).toString('base64');
+    : Buffer.from(response.uid.toString()).toString('base64');
 
 const deserialize = (cursor: string): Result<ValidationError, Cursor> => {
   const data = Buffer.from(cursor, 'base64')
@@ -54,8 +54,8 @@ const deserialize = (cursor: string): Result<ValidationError, Cursor> => {
               err('Cursor length is not equals to 1')
             )
       )
-      .map(tx_uid => ({
-        tx_uid,
+      .map(uid => ({
+        uid,
       }))
   );
 };

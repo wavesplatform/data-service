@@ -43,8 +43,8 @@ const candleSelectColumns = {
   weighted_average_price: pg.raw(
     'floor(sum((e.amount)::numeric * (e.price)::numeric)/sum((e.amount)::numeric))::numeric'
   ),
-  open: pg.raw('(array_agg(e.price ORDER BY e.tx_uid)::numeric[])[1]'),
-  close: pg.raw('(array_agg(e.price ORDER BY e.tx_uid DESC)::numeric[])[1]'),
+  open: pg.raw('(array_agg(e.price ORDER BY e.uid)::numeric[])[1]'),
+  close: pg.raw('(array_agg(e.price ORDER BY e.uid DESC)::numeric[])[1]'),
   interval: pg.raw(`'${CandleInterval.Minute1}'`),
   matcher_address: 'e.sender',
 };
@@ -55,7 +55,7 @@ const insertIntoCandlesFromSelect = (candlesTableName, selectFunction) =>
 
 /** selectExchanges :: QueryBuilder */
 const selectExchanges = pg({ t: 'txs_7' }).select({
-  tx_uid: 't.tx_uid',
+  uid: 't.uid',
   amount_asset_id: 't.amount_asset_id',
   price_asset_id: 't.price_asset_id',
   sender: 't.sender',
@@ -68,7 +68,7 @@ const selectExchanges = pg({ t: 'txs_7' }).select({
 /** selectExchangesAfterTimestamp :: Date -> QueryBuilder */
 const selectExchangesAfterTimestamp = (fromTimestamp) =>
   selectExchanges.clone().where(
-    't.tx_uid',
+    't.uid',
     '>=',
     pg('txs')
       .select('uid')
@@ -94,7 +94,7 @@ const selectLastExchangeTxHeight = () =>
   pg({ t: 'txs_7' })
     .select('height')
     .limit(1)
-    .orderBy('tx_uid', 'desc')
+    .orderBy('uid', 'desc')
     .toString();
 
 /** selectLastExchangeTx :: String query */
@@ -102,7 +102,7 @@ const selectMinTimestampFromHeight = (height) =>
   pg('txs_7')
     .column('time_stamp')
     .where('height', '>=', height)
-    .orderBy('tx_uid')
+    .orderBy('uid')
     .limit(1)
     .toString();
 

@@ -22,5 +22,5 @@ export const transformTxInfo = compose(
     time_stamp: 'timestamp',
     status: 'applicationStatus',
   }),
-  omit(['tx_uid'])
+  omit(['uid'])
 );

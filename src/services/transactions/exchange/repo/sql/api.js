@@ -7,7 +7,7 @@ const { select, selectFromFiltered } = require('./query');
 // get — get by id
 // mget/search — apply filters
 const createApi = ({ filters: F }) => ({
-  get: id =>
+  get: (id) =>
     pipe(
       F.id(id),
       // tips for postgresql to use index
@@ -16,7 +16,7 @@ const createApi = ({ filters: F }) => ({
       String
     )(select),
 
-  mget: ids =>
+  mget: (ids) =>
     pipe(
       F.ids(ids),
       // tip for postgresql to use index
@@ -26,7 +26,7 @@ const createApi = ({ filters: F }) => ({
       String
     )(select),
 
-  search: fValues => {
+  search: (fValues) => {
     const fNames = [
       // tx attributes
       'timeStart',
@@ -40,7 +40,6 @@ const createApi = ({ filters: F }) => ({
       'priceAsset',
       // common
       'after',
-      'limit',
     ];
 
     // { [fName]: fValue }
@@ -51,7 +50,12 @@ const createApi = ({ filters: F }) => ({
     const fs = pickBindFilters(F, fNames, withDefaults);
     const fQuery = pipe(F.sort(sort), ...fs)(select);
 
-    return pipe(selectFromFiltered, F.sort(sort), String)(fQuery);
+    return pipe(
+      selectFromFiltered,
+      F.limit(fValues.limit),
+      F.sort(sort),
+      String
+    )(fQuery);
   },
 });
 

@@ -7,9 +7,9 @@ const byRecipient = (addressOrAlias) => (q) =>
   q
     .clone()
     .whereIn(
-      'tx_uid',
+      'uid',
       pg('txs_11_transfers')
-        .select('tx_uid')
+        .select('uid')
         .whereRaw(
           `recipient_address = coalesce((select sender from txs_10 where alias = '${addressOrAlias}' limit 1), '${addressOrAlias}')`
         )

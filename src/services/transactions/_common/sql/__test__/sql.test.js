@@ -24,7 +24,7 @@ describe('Sql builder', () => {
         sql.search({
           ...filterValues,
           after: {
-            tx_uid: 20000000,
+            uid: 20000000,
             sort: 'sortDirection',
           },
         })

@@ -3,16 +3,16 @@ const pg = knex({ client: 'pg' });
 
 const columns = [
   // common
-  't.tx_uid',
+  't.uid',
   't.height',
-  'txs.tx_type',
-  'txs.id',
-  'txs.time_stamp',
-  'txs.signature',
-  'txs.proofs',
-  'txs.tx_version',
-  'txs.status',
-  'txs.fee',
+  't.tx_type',
+  't.id',
+  't.time_stamp',
+  't.signature',
+  't.proofs',
+  't.tx_version',
+  't.status',
+  't.fee',
   't.sender',
   't.sender_public_key',
 
@@ -36,13 +36,11 @@ const columns = [
 ];
 
 // in get/mget requests sort is tip for postgresql to use index
-export const select = (s: string) =>
-  pg({ t: 'txs_16 ' }).orderBy('t.tx_uid', s);
+export const select = (s: string) => pg({ t: 'txs_16 ' }).orderBy('t.uid', s);
 
 export const selectFromFiltered = (filtered: knex.QueryBuilder) =>
   pg
     .select(columns)
     .from({ t: filtered })
-    .leftJoin('txs_16_args as a', 'a.tx_uid', 't.tx_uid')
-    .leftJoin('txs_16_payment as p', 'p.tx_uid', 't.tx_uid')
-    .leftJoin('txs', 'txs.uid', 't.tx_uid');
+    .leftJoin('txs_16_args as a', 'a.tx_uid', 't.uid')
+    .leftJoin('txs_16_payment as p', 'p.tx_uid', 't.uid');

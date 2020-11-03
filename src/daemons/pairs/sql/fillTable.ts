@@ -3,7 +3,7 @@ const pg = knex({ client: 'pg' });
 
 const selectExchanges = pg({ t: 'txs_7' })
   .select({
-    tx_uid: 't.tx_uid',
+    uid: 't.uid',
     amount_asset_id: 't.amount_asset_id',
     price_asset_id: 't.price_asset_id',
     amount: 't.amount',
@@ -18,8 +18,8 @@ const selectExchanges = pg({ t: 'txs_7' })
       .whereRaw(`time_stamp >= now() - interval '1 day'`)
       .limit(1)
   )
-  .where('t.tx_uid', '>=', pg('hp_cte').select('uid'))
-  .orderBy('t.tx_uid', 'desc');
+  .where('t.uid', '>=', pg('hp_cte').select('uid'))
+  .orderBy('t.uid', 'desc');
 
 const selectPairsCTE = pg
   .with('pairs_cte', (qb) => {
@@ -27,10 +27,10 @@ const selectPairsCTE = pg
       amount_asset_id: 'amount_asset_id',
       price_asset_id: 'price_asset_id',
       last_price: pg.raw(
-        '(array_agg(e.price ORDER BY e.tx_uid DESC)::numeric[])[1]'
+        '(array_agg(e.price ORDER BY e.uid DESC)::numeric[])[1]'
       ),
       first_price: pg.raw(
-        '(array_agg(e.price ORDER BY e.tx_uid)::numeric[])[1]'
+        '(array_agg(e.price ORDER BY e.uid)::numeric[])[1]'
       ),
       volume: pg.raw('sum(e.amount)'),
       quote_volume: pg.raw('sum(e.amount::numeric * e.price::numeric)'),

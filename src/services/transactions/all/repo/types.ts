@@ -5,7 +5,7 @@ import { RequestWithCursor } from '../../../_common/pagination';
 import { CommonFilters } from '../../_common/types';
 
 export type TxDbResponse = {
-  tx_uid: BigNumber;
+  uid: BigNumber;
   tx_type: number;
   id: string;
   time_stamp: string;

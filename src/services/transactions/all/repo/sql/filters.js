@@ -3,9 +3,9 @@ const commonFilters = require('../../../_common/sql/filters');
 const byTimeStamp = (comparator) => (ts) => (q) =>
   q.clone().where('time_stamp', comparator, ts);
 
-const after = ({ tx_uid, sort }) => (q) => {
+const after = ({ uid, sort }) => (q) => {
   const comparator = sort === 'desc' ? '<' : '>';
-  return q.clone().whereRaw(`t.uid ${comparator} ${tx_uid.toString()}`);
+  return q.clone().whereRaw(`t.uid ${comparator} ${uid.toString()}`);
 };
 
 module.exports = {

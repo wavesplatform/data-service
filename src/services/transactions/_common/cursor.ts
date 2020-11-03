@@ -8,7 +8,7 @@ const isSortOrder = (s: string): s is SortOrder =>
   s === SortOrder.Ascending || s === SortOrder.Descending;
 
 export type Cursor = {
-  tx_uid: BigNumber;
+  uid: BigNumber;
   sort: SortOrder;
 };
 
@@ -21,7 +21,7 @@ export const serialize = <
 ): string | undefined =>
   response === null
     ? undefined
-    : Buffer.from(`${response.tx_uid.toString()}::${request.sort}`).toString(
+    : Buffer.from(`${response.uid.toString()}::${request.sort}`).toString(
         'base64'
       );
 
@@ -59,8 +59,8 @@ export const deserialize = (
           );
         }
       })
-      .map(([tx_uid, sort]) => ({
-        tx_uid,
+      .map(([uid, sort]) => ({
+        uid,
         sort,
       }))
   );

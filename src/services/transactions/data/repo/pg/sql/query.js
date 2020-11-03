@@ -1,21 +1,24 @@
 const pg = require('knex')({ client: 'pg' });
 
+const columnsTx = {
+  uid: 't.uid',
+  tx_type: 't.tx_type',
+  tx_version: 't.tx_version',
+  height: 't.height',
+  id: 't.id',
+  signature: 't.signature',
+  time_stamp: 't.time_stamp',
+  proofs: 't.proofs',
+  status: 't.status',
+  sender: 't.sender',
+  sender_public_key: 't.sender_public_key',
+  fee: 't.fee',
+};
+
 const selectFromFiltered = (filtered) =>
   pg
-    .columns({
-      tx_uid: 't.tx_uid',
-      tx_type: 'txs.tx_type',
-      tx_version: 'txs.tx_version',
-      height: 't.height',
-      id: 'txs.id',
-      signature: 'txs.signature',
-      time_stamp: 'txs.time_stamp',
-      proofs: 'txs.proofs',
-      status: 'txs.status',
-      sender: 't.sender',
-      sender_public_key: 't.sender_public_key',
-      fee: 'txs.fee',
-
+    .select(columnsTx)
+    .select({
       // data values
       data_key: 'td.data_key',
       data_type: 'td.data_type',
@@ -25,12 +28,10 @@ const selectFromFiltered = (filtered) =>
       data_value_binary: 'td.data_value_binary',
       position_in_tx: 'td.position_in_tx',
     })
-    .from({ t: 'txs_12' })
-    .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tx_uid')
-    .leftJoin({ td: 'txs_12_data' }, 'td.tx_uid', 't.tx_uid')
-    .whereIn('t.tx_uid', filtered);
+    .from({ t: filtered.select(columnsTx) })
+    .leftJoin({ td: 'txs_12_data' }, 'td.tx_uid', 't.uid');
 
-const select = pg.select('t.tx_uid').from({ t: 'txs_12' });
+const select = pg.from({ t: 'txs_12' });
 
 module.exports = {
   selectFromFiltered,

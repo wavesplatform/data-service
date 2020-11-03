@@ -12,7 +12,7 @@ const ids = (ids) => whereIn('t.id', ids);
 
 const sender = (addr) => where('t.sender', addr);
 
-const senders = addrs => whereIn('t.sender', addrs);
+const senders = (addrs) => whereIn('t.sender', addrs);
 
 const byTimeStamp = (comparator) => (ts) => (q) =>
   q.clone().where('t.time_stamp', comparator, ts.toISOString());
@@ -26,11 +26,11 @@ const byRecipient = (addressOrAlias) =>
 
 const byScript = (s) => whereRaw('md5(script) = ?', md5(s));
 
-const sort = (s) => (q) => q.clone().orderBy('t.tx_uid', s);
+const sort = (s) => (q) => q.clone().orderBy('t.uid', s);
 
-const after = ({ tx_uid, sort }) => (q) => {
+const after = ({ uid, sort }) => (q) => {
   const comparator = sort === 'desc' ? '<' : '>';
-  return q.clone().whereRaw(`t.tx_uid ${comparator} ${tx_uid.toString()}`);
+  return q.clone().whereRaw(`t.uid ${comparator} ${uid.toString()}`);
 };
 
 module.exports = {
@@ -38,8 +38,8 @@ module.exports = {
   ids,
   sender,
   senders,
-  timeStart: byTimeStamp('>'),
-  timeEnd: byTimeStamp('<'),
+  timeStart: byTimeStamp('>='),
+  timeEnd: byTimeStamp('<='),
   sort,
   after,
   limit,

@@ -2,8 +2,8 @@
 
 exports[`Sql builder  get works 1`] = `"select * from \\"some_table\\" where \\"t\\".\\"id\\" = 'id' limit 1"`;
 
-exports[`Sql builder mget works 1`] = `"select * from \\"some_table\\" where \\"t\\".\\"id\\" in ('id1', 'id2') order by \\"t\\".\\"tx_uid\\" desc limit 2"`;
+exports[`Sql builder mget works 1`] = `"select * from \\"some_table\\" where \\"t\\".\\"id\\" in ('id1', 'id2') order by \\"t\\".\\"uid\\" desc limit 2"`;
 
-exports[`Sql builder search covers case with all filters (without after) 1`] = `"select * from \\"some_table\\" where \\"t\\".\\"sender\\" = 'sender' and \\"t\\".\\"time_stamp\\" > '2020-01-01T00:00:00.000Z' and \\"t\\".\\"time_stamp\\" < '2020-02-01T00:00:00.000Z' order by \\"t\\".\\"tx_uid\\" desc limit 1"`;
+exports[`Sql builder search covers case with all filters (without after) 1`] = `"select * from \\"some_table\\" where \\"t\\".\\"sender\\" = 'sender' and \\"t\\".\\"time_stamp\\" >= '2020-01-01T00:00:00.000Z' and \\"t\\".\\"time_stamp\\" <= '2020-02-01T00:00:00.000Z' order by \\"t\\".\\"uid\\" desc limit 1"`;
 
-exports[`Sql builder search covers case with all filters with after 1`] = `"select * from \\"some_table\\" where \\"t\\".\\"sender\\" = 'sender' and \\"t\\".\\"time_stamp\\" > '2020-01-01T00:00:00.000Z' and \\"t\\".\\"time_stamp\\" < '2020-02-01T00:00:00.000Z' and t.tx_uid > 20000000 order by \\"t\\".\\"tx_uid\\" desc limit 1"`;
+exports[`Sql builder search covers case with all filters with after 1`] = `"select * from \\"some_table\\" where \\"t\\".\\"sender\\" = 'sender' and \\"t\\".\\"time_stamp\\" >= '2020-01-01T00:00:00.000Z' and \\"t\\".\\"time_stamp\\" <= '2020-02-01T00:00:00.000Z' and t.uid > 20000000 order by \\"t\\".\\"uid\\" desc limit 1"`;

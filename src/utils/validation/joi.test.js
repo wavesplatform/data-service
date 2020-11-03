@@ -25,7 +25,7 @@ describe('Joi extended with custom types', () => {
         sort: 'desc',
       },
       {
-        tx_uid: new BigNumber(100),
+        uid: new BigNumber(100),
       }
     );
     assertPass(validateCursor(validCursor));

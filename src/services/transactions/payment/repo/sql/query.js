@@ -1,39 +1,40 @@
 const pg = require('knex')({ client: 'pg' });
 
-const select = pg({ t: 'txs_2' }).select('*');
+const columnsWithoutRecipient = {
+  // common
+  uid: 't.uid',
+  height: 't.height',
+  tx_type: 't.tx_type',
+  id: 't.id',
+  time_stamp: 't.time_stamp',
+  signature: 't.signature',
+  proofs: 't.proofs',
+  tx_version: 't.tx_version',
+  fee: 't.fee',
+  status: 't.status',
+  sender: 't.sender',
+  sender_public_key: 't.sender_public_key',
+
+  // type-specific
+  amount: 't.amount',
+};
+
+const select = pg({ t: 'txs_2' });
 
 const selectFromFiltered = (s) => (filtered) =>
   pg
-    .select({
-      // common
-      tx_uid: 't.tx_uid',
-      height: 't.height',
-      tx_type: 'txs.tx_type',
-      id: 'txs.id',
-      time_stamp: 'txs.time_stamp',
-      signature: 'txs.signature',
-      proofs: 'txs.proofs',
-      tx_version: 'txs.tx_version',
-      fee: 'txs.fee',
-      status: 'txs.status',
-      sender: 't.sender',
-      sender_public_key: 't.sender_public_key',
-
-      // type-specific
-      amount: 't.amount',
-      recipient: pg.raw('coalesce(t.recipient_alias, t.recipient_address)'),
-    })
+    .select(columnsWithoutRecipient)
+    .select({ recipeint: 't.recipient' })
     .from({
-      t: pg
-        .select('*')
+      t: filtered
+        .select(columnsWithoutRecipient)
         .select({
-          rn: pg.raw(
-            `row_number() over (partition by tx_uid order by tx_uid ${s})`
-          ),
+          recipient: pg.raw('coalesce(t.recipient_alias, t.recipient_address)'),
         })
-        .from({ t: filtered }),
+        .select({
+          rn: pg.raw(`row_number() over (partition by uid order by uid ${s})`),
+        }),
     })
-    .where('rn', '=', 1)
-    .leftJoin('txs', 'txs.uid', 't.tx_uid');
+    .where('rn', '=', 1);
 
 module.exports = { select, selectFromFiltered };

@@ -1,15 +1,15 @@
 const pg = require('knex')({ client: 'pg' });
 
 const columns = {
-  tx_uid: 't.tx_uid',
-  id: 'txs.id',
-  time_stamp: 'txs.time_stamp',
+  uid: 't.uid',
+  id: 't.id',
+  time_stamp: 't.time_stamp',
   height: 't.height',
-  signature: 'txs.signature',
-  proofs: 'txs.proofs',
-  tx_type: 'txs.tx_type',
-  tx_version: 'txs.tx_version',
-  status: 'txs.status',
+  signature: 't.signature',
+  proofs: 't.proofs',
+  tx_type: 't.tx_type',
+  tx_version: 't.tx_version',
+  status: 't.status',
 
   sender: 't.sender',
   sender_public_key: 't.sender_public_key',
@@ -21,7 +21,7 @@ const columns = {
   price: 't.price',
   amount: 't.amount',
 
-  fee: 'txs.fee',
+  fee: 't.fee',
   sell_matcher_fee: 't.sell_matcher_fee',
   buy_matcher_fee: 't.buy_matcher_fee',
 
@@ -52,26 +52,9 @@ const columns = {
   o2_matcher_fee_asset_id: pg.raw("t.order2->>'matcherFeeAssetId'"),
 };
 
-const select = pg({ t: 'txs_7' }).columns([
-  't.tx_uid',
-  't.height',
-  't.price',
-  't.amount',
-  't.sell_matcher_fee',
-  't.buy_matcher_fee',
-  't.sender',
-  't.sender_public_key',
-  't.order1',
-  't.order2',
-  't.amount_asset_id',
-  't.price_asset_id',
-]);
+const select = pg({ t: 'txs_7' });
 
-const selectFromFiltered = (filtered) =>
-  pg
-    .from({ t: filtered })
-    .columns(columns)
-    .leftJoin({ txs: 'txs' }, 'txs.uid', 't.tx_uid');
+const selectFromFiltered = (filtered) => filtered.select(columns);
 
 module.exports = {
   select,

@@ -22,7 +22,7 @@ const getAliasRowNumber = (after: string) =>
   pg('aliases_cte').select('rn').where('alias', after);
 
 const baseQuery = (qb: knex.QueryBuilder) =>
-  qb.from({ t: 'txs_10' }).select('t.tx_uid');
+  qb.from({ t: 'txs_10' }).select('t.uid');
 
 const selectAfterFilters = (q: knex.QueryBuilder) =>
   pg.select(columns).from({ a: q });
@@ -36,9 +36,9 @@ const selectFiltered = (filtered: knex.QueryBuilder) =>
       .select({ alias: 't.alias' })
       .min({ address: 't.sender' }) // first sender
       .count({ duplicates: 't.sender' }) // count senders grouped by alias
-      .column({ rn: pg.raw('row_number() over (order by t.tx_uid)') }) // rn for pagination
-      .whereIn('t.tx_uid', filtered)
-      .groupBy('t.alias', 't.tx_uid'),
+      .column({ rn: pg.raw('row_number() over (order by t.uid)') }) // rn for pagination
+      .whereIn('t.uid', filtered)
+      .groupBy('t.alias', 't.uid'),
   });
 
 const withAddress = (

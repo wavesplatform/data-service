@@ -46,7 +46,7 @@ describe('transactions.data api method', () => {
       expect(
         sql.search({
           after: {
-            tx_uid: 20000000,
+            uid: 20000000,
             sort: 'asc',
           },
         })

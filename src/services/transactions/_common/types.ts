@@ -10,7 +10,7 @@ type CommonTxFields = {
 };
 
 export type WithTxUid = {
-  tx_uid: BigNumber;
+  uid: BigNumber;
 };
 
 export type RawTx = CommonTxFields &
