@@ -6,7 +6,7 @@ const commonFiltersOrder = require('../../../_common/sql/filtersOrder');
 // txs_9 do not contain recipient info directly
 // only txs_8 do
 const byRecipient = (addressOrAlias) =>
-  whereIn('lease_uid', function () {
+  whereIn('lease_tx_uid', function () {
     this.select('uid')
       .from('txs_8')
       .whereRaw(
