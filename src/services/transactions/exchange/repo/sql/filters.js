@@ -10,6 +10,15 @@ const byOrderSender = curryN(2, (orderSender, q) =>
     )
 );
 
+const byOrderSenders = curryN(2, (senders, q) =>
+  q
+    .clone()
+    .whereRaw(
+      "array[order1->>'sender', order2->>'sender'] && ?",
+      `{${senders.join(',')}}`
+    )
+);
+
 const byOrder = curryN(2, (orderId, q) =>
   q
     .whereRaw(`array[t.order1->>'id', t.order2->>'id'] @> array['${orderId}']`)
@@ -25,6 +34,7 @@ module.exports = {
 
     matcher: commonFilters.sender,
     sender: byOrderSender,
+    senders: byOrderSenders,
     amountAsset: byAsset('amount'),
     priceAsset: byAsset('price'),
     orderId: byOrder,
