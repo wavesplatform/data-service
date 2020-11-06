@@ -25,6 +25,7 @@ const selectFromFiltered = (filtered) =>
     fee_asset: 't.fee_asset_id',
     attachment: 't.attachment',
   });
+
 module.exports = {
   select,
   selectFromFiltered,
