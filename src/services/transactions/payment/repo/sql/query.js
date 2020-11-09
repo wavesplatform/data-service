@@ -24,7 +24,7 @@ const select = pg({ t: 'txs_2' });
 const selectFromFiltered = (s) => (filtered) =>
   pg
     .select(columnsWithoutRecipient)
-    .select({ recipeint: 't.recipient' })
+    .select({ recipient: 't.recipient' })
     .from({
       t: filtered
         .select(columnsWithoutRecipient)
