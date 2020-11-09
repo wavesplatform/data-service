@@ -48,14 +48,14 @@ const createApi = ({ filters: F }) => ({
     const sort = defaultTo(defaultValues.SORT, fValues.sort);
 
     const fs = pickBindFilters(F, fNames, withDefaults);
-    const fQuery = pipe(...fs)(select);
 
     return pipe(
+      ...fs,
       selectFromFiltered,
       F.limit(fValues.limit),
       F.sort(sort),
       String
-    )(fQuery);
+    )(select);
   },
 });
 
