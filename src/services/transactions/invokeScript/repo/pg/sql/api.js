@@ -47,7 +47,7 @@ const createApi = ({ filters: F }) => ({
 
     const fs = pickBindFilters(F, fNames, withDefaults);
 
-    return pipe(sort, ...fs, selectFromFiltered, F.sort(sort), String)(select);
+    return pipe(...fs, selectFromFiltered, F.sort(sort), String)(select(sort));
   },
 });
 
