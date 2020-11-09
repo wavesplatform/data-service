@@ -21,12 +21,15 @@ const byOrderSenders = curryN(2, (senders, q) =>
 
 const byOrder = curryN(2, (orderId, q) =>
   q
+    .clone()
     .whereRaw(`array[t.order1->>'id', t.order2->>'id'] @> array['${orderId}']`)
     .limit(1)
 );
 
 const byAsset = (assetType) =>
-  curryN(2, (assetId, q) => q.where(`t.${assetType}_asset_id`, assetId));
+  curryN(2, (assetId, q) =>
+    q.clone().where(`t.${assetType}_asset_id`, assetId)
+  );
 
 module.exports = {
   filters: {

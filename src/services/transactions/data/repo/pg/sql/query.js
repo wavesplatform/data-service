@@ -28,7 +28,7 @@ const selectFromFiltered = (filtered) =>
       data_value_binary: 'td.data_value_binary',
       position_in_tx: 'td.position_in_tx',
     })
-    .from({ t: filtered.select(columnsTx) })
+    .from({ t: filtered.clone().select(columnsTx) })
     .leftJoin({ td: 'txs_12_data' }, 'td.tx_uid', 't.uid');
 
 const select = pg.from({ t: 'txs_12' });
