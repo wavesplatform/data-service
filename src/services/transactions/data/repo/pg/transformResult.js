@@ -9,7 +9,9 @@ const {
   append,
   omit,
   merge,
+  identity,
   isNil,
+  ifElse,
   cond,
   always,
   isEmpty,
@@ -38,7 +40,11 @@ const removeDataEntryFromRow = omit([
 
 const appendRowToTx = (tx, row) =>
   compose(
-    assoc('data', append(getDataObject(row), tx.data)),
+    ifElse(
+      () => isNil(prop('data_key', row)),
+      identity,
+      assoc('data', append(getDataObject(row), tx.data))
+    ),
     merge(removeDataEntryFromRow(row))
   )(tx);
 
