@@ -1502,12 +1502,12 @@ paths:
             type: string
         - in: query
           name: sender
-          description: Address-sender of the transaction; has exclusive relation with senders
+          description: Address-sender of the order; has exclusive relation with senders
           schema:
             type: string
         - in: query
           name: senders
-          description: Array of address-senders of the transaction; has exclusive relation with sender
+          description: Array of address-senders of the order; has exclusive relation with sender
           schema:
             type: array
             items:
