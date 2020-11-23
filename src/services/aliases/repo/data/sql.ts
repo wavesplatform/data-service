@@ -24,21 +24,21 @@ const getAliasRowNumber = (after: string) =>
 const baseQuery = (qb: knex.QueryBuilder) =>
   qb.from({ t: 'txs_10' }).select('t.uid');
 
-const selectAfterFilters = (q: knex.QueryBuilder) =>
-  pg.select(columns).from({ a: q });
+const selectAfterFilters = (filtered: knex.QueryBuilder) =>
+  pg.select(columns).from({ a: filtered });
 
 const filterByAliases = (qb: knex.QueryBuilder, aliasSet: string[]) =>
   qb.whereIn('t.alias', aliasSet);
 
-const selectFiltered = (filtered: knex.QueryBuilder) =>
+const selectFilteredAliases = (filtered: knex.QueryBuilder) =>
   pg.from({
     counted_aliases: pg({ t: 'txs_10' })
-      .select({ alias: 't.alias' })
+      .select('t.alias')
       .min({ address: 't.sender' }) // first sender
       .count({ duplicates: 't.sender' }) // count senders grouped by alias
-      .column({ rn: pg.raw('row_number() over (order by t.uid)') }) // rn for pagination
+      .column({ rn: pg.raw('row_number() over (order by min(t.uid))') }) // rn for pagination
       .whereIn('t.uid', filtered)
-      .groupBy('t.alias', 't.uid'),
+      .groupBy('t.alias'),
   });
 
 const withAddress = (
@@ -56,13 +56,13 @@ const withQueries = (
 export default {
   get: (alias: string) =>
     selectAfterFilters(
-      selectFiltered(filterByAliases(baseQuery(pg()), [alias]))
+      selectFilteredAliases(filterByAliases(baseQuery(pg()), [alias]))
     )
       .clone()
       .toString(),
   mget: (aliases: string[]) =>
     selectAfterFilters(
-      selectFiltered(filterByAliases(baseQuery(pg()), aliases))
+      selectFilteredAliases(filterByAliases(baseQuery(pg()), aliases))
     )
       .clone()
       .toString(),
@@ -78,18 +78,15 @@ export default {
     } else if (withQueries(req)) {
       query.whereIn('sender', req.queries.filter(isAddress));
       aliases = req.queries.filter(complement(isAddress));
+      query.unionAll((qb: knex.QueryBuilder) =>
+        filterByAliases(baseQuery(qb), aliases)
+      );
     }
 
     const q = selectAfterFilters(
       pg('aliases_cte').with(
         'aliases_cte',
-        selectFiltered(
-          query.unionAll((qb: knex.QueryBuilder) =>
-            filterByAliases(baseQuery(qb), aliases)
-          )
-        )
-          .distinct()
-          .select(columnsWithRowNumber)
+        selectFilteredAliases(query).distinct().select(columnsWithRowNumber)
       )
     )
       .orderBy('rn', 'asc')
