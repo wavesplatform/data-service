@@ -1,92 +1,12 @@
-import { propEq, compose } from 'ramda';
+import { withDecimalsProcessing } from '../../_common/transformation/withDecimalsProcessing';
+import { AssetsService } from '../../assets';
+import { createService } from '../_common/createService';
+import { ReissueTxsRepo } from './repo/types';
+import { ReissueTxsService } from './types';
+import { modifyDecimals } from './modifyDecimals';
 
-import { transaction, TransactionInfo, Transaction, Service } from '../../../types';
-import { CommonServiceDependencies } from '../..';
-import { WithLimit, WithSortOrder } from '../../_common';
-import { RequestWithCursor } from '../../_common/pagination';
-import { getByIdPreset } from '../../presets/pg/getById';
-import { mgetByIdsPreset } from '../../presets/pg/mgetByIds';
-import { inputGet } from '../../presets/pg/getById/inputSchema';
-import { inputMget } from '../../presets/pg/mgetByIds/inputSchema';
-import { searchWithPaginationPreset } from '../../presets/pg/searchWithPagination';
-
-import { Cursor, serialize, deserialize } from '../_common/cursor';
-import { RawTx, CommonFilters } from '../_common/types';
-
-import { result as resultSchema, inputSearch as inputSearchSchema } from './schema';
-import * as sql from './sql';
-import * as transformTxInfo from './transformTxInfo';
-
-type ReissueTxsSearchRequest = RequestWithCursor<
-  CommonFilters & WithSortOrder & WithLimit,
-  string
-> &
-  Partial<{
-    assetId: string;
-  }>;
-
-type ReissueTxDbResponse = RawTx & {
-  asset_id: string;
-  quantity: string;
-  reissuable: string;
-};
-
-export type ReissueTxsService = Service<
-  string,
-  string[],
-  ReissueTxsSearchRequest,
-  Transaction
->;
-
-export default ({
-  drivers: { pg },
-  emitEvent,
-}: CommonServiceDependencies): ReissueTxsService => {
-  return {
-    get: getByIdPreset<string, ReissueTxDbResponse, TransactionInfo, Transaction>({
-      name: 'transactions.reissue.get',
-      sql: sql.get,
-      inputSchema: inputGet,
-      resultSchema,
-      resultTypeFactory: transaction,
-      transformResult: transformTxInfo,
-    })({
-      pg,
-      emitEvent,
-    }),
-
-    mget: mgetByIdsPreset<string, ReissueTxDbResponse, TransactionInfo, Transaction>({
-      name: 'transactions.reissue.mget',
-      matchRequestResult: propEq('id'),
-      sql: sql.mget,
-      inputSchema: inputMget,
-      resultTypeFactory: transaction,
-      resultSchema,
-      transformResult: transformTxInfo,
-    })({
-      pg,
-      emitEvent,
-    }),
-
-    search: searchWithPaginationPreset<
-      Cursor,
-      ReissueTxsSearchRequest,
-      ReissueTxDbResponse,
-      TransactionInfo,
-      Transaction
-    >({
-      name: 'transactions.reissue.search',
-      sql: sql.search,
-      inputSchema: inputSearchSchema,
-      resultSchema,
-      transformResult: compose(transaction, transformTxInfo),
-      cursorSerialization: {
-        serialize,
-        deserialize,
-      },
-    })({
-      pg,
-      emitEvent,
-    }),
-  };
-};
+export default (
+  repo: ReissueTxsRepo,
+  assetsService: AssetsService
+): ReissueTxsService =>
+  withDecimalsProcessing(modifyDecimals(assetsService), createService(repo));

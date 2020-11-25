@@ -12,6 +12,7 @@ const {
 
 const commonFiltersOrder = require('./filtersOrder');
 const commonFilters = require('./filters');
+const defaultValues = require('./defaults');
 
 const createSql = ({
   query,
@@ -33,6 +34,8 @@ const createSql = ({
       compose(
         String,
         q => queryAfterFiltersWithDefaults.get(q, id),
+        // tip for postgresql to use index
+        filters.limit(1),
         filters.id(id)
       )(query),
 
@@ -40,6 +43,10 @@ const createSql = ({
       compose(
         String,
         q => queryAfterFiltersWithDefaults.mget(q, ids),
+        // tip for postgresql to use index
+        filters.sort(defaultValues.SORT),
+        // tip for postgresql to use index
+        filters.limit(ids.length),
         filters.ids(ids)
       )(query),
 
@@ -61,4 +68,4 @@ const createSql = ({
   };
 };
 
-module.exports = createSql;
+module.exports = { defaultValues, createSql };

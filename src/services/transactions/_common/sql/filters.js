@@ -1,26 +1,36 @@
-const { where, whereIn, limit } = require('../../../../utils/db/knex/index');
+const {
+  where,
+  whereIn,
+  whereRaw,
+  limit,
+} = require('../../../../utils/db/knex/index');
+const { md5 } = require('../../../../utils/hash');
 
-const id = where('id');
-const ids = whereIn('id');
+const id = (id) => where('t.id', id);
 
-const sender = where('sender');
+const ids = (ids) => whereIn('t.id', ids);
 
-const senders = whereIn('sender');
+const sender = (addr) => where('t.sender', addr);
 
-const timeStart = where('time_stamp', '>=');
-const timeEnd = where('time_stamp', '<=');
+const senders = (addrs) => whereIn('t.sender', addrs);
 
-const sort = s => q =>
-  q
-    .clone()
-    .orderBy('time_stamp', s)
-    .orderBy('id', s);
+const byTimeStamp = (comparator) => (ts) => (q) =>
+  q.clone().where('t.time_stamp', comparator, ts.toISOString());
 
-const after = ({ timestamp, id, sort }) => q => {
+const byAssetId = (assetId) => where('asset_id', assetId);
+
+const byRecipient = (addressOrAlias) =>
+  whereRaw(
+    `recipient_address = coalesce((select sender from txs_10 where alias = '${addressOrAlias}' limit 1), '${addressOrAlias}')`
+  );
+
+const byScript = (s) => whereRaw('md5(script) = ?', md5(s));
+
+const sort = (s) => (q) => q.clone().orderBy('t.uid', s);
+
+const after = ({ uid, sort }) => (q) => {
   const comparator = sort === 'desc' ? '<' : '>';
-  return q
-    .clone()
-    .whereRaw(`(time_stamp, id) ${comparator} (?, ?)`, [timestamp, id]);
+  return q.clone().whereRaw(`t.uid ${comparator} ${uid.toString()}`);
 };
 
 module.exports = {
@@ -28,9 +38,12 @@ module.exports = {
   ids,
   sender,
   senders,
-  timeStart,
-  timeEnd,
+  timeStart: byTimeStamp('>='),
+  timeEnd: byTimeStamp('<='),
   sort,
   after,
   limit,
+  assetId: byAssetId,
+  recipient: byRecipient,
+  script: byScript,
 };

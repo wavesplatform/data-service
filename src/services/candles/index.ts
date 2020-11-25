@@ -1,65 +1,51 @@
 import { Task } from 'folktale/concurrency/task';
-import { identity } from 'ramda';
-
-import { Candle, List, ServiceSearch, AssetIdsPair } from '../../types';
-import { CommonServiceDependencies } from '..';
-
-import { sql } from './sql';
-import { inputSearch, output } from './schema';
-import { CandleDbResponse, transformResults } from './transformResults';
-
 import { AppError } from '../../errorHandling';
+import { Service, SearchedItems, CandleInfo, AssetIdsPair } from '../../types';
+import { searchWithDecimalsProcessing } from '../_common/transformation/withDecimalsProcessing';
+import { AssetsService } from '../assets';
+import { MoneyFormat, WithMoneyFormat } from '../types';
+import { CandlesSearchRequest, CandlesRepo } from './repo';
+import { modifyDecimals } from './modifyDecimals';
 
-import { validateInput, validateResult } from '../presets/validation';
-import { getData } from '../presets/pg/search/pg';
-
-import { search } from './../_common/createResolver/index';
-
-export type CandlesSearchRequest = {
-  amountAsset: string;
-  priceAsset: string;
-  timeStart: Date;
-  timeEnd: Date;
-  interval: string;
-  matcher: string;
+export type CandlesServiceSearchRequest = CandlesSearchRequest &
+  WithMoneyFormat;
+export type CandlesService = {
+  search: Service<CandlesServiceSearchRequest, SearchedItems<CandleInfo>>;
 };
 
-export type CandlesService = ServiceSearch<CandlesSearchRequest, Candle>;
-
-export default ({
-  drivers: { pg },
-  emitEvent,
-  validatePair,
-}: CommonServiceDependencies & {
-  validatePair: (matcher: string, pair: AssetIdsPair) => Task<AppError, void>;
-}): CandlesService => {
-  const SERVICE_NAME = 'candles.search';
-  return {
-    search: search<
-      CandlesSearchRequest,
-      CandlesSearchRequest,
-      CandleDbResponse,
-      List<Candle>
-    >({
-      transformInput: identity,
-      transformResult: transformResults,
-      validateInput: (req) =>
-        validateInput<CandlesSearchRequest>(
-          inputSearch,
-          SERVICE_NAME
-        )(req).chain(() =>
-          validatePair(req.matcher, {
-            amountAsset: req.amountAsset,
-            priceAsset: req.priceAsset,
-          }).map(() => req)
-        ),
-      validateResult: validateResult(output, SERVICE_NAME),
-      getData: getData({
-        name: SERVICE_NAME,
-        sql,
-        pg,
-      }),
-      emitEvent,
-    }),
-  };
-};
+export default (
+  repo: CandlesRepo,
+  validatePairs: (
+    matcher: string,
+    pairs: AssetIdsPair[]
+  ) => Task<AppError, void>,
+  assetsService: AssetsService
+): CandlesService => ({
+  search: (req) =>
+    validatePairs(req.matcher, [
+      {
+        amountAsset: req.amountAsset,
+        priceAsset: req.priceAsset,
+      },
+    ]).chain(() =>
+      searchWithDecimalsProcessing<CandlesServiceSearchRequest, CandleInfo>(
+        modifyDecimals(assetsService, [req.amountAsset, req.priceAsset]),
+        repo.search
+      )(req).map((result) => ({
+        ...result,
+        // weightedAveragePrice can be float after candles concatenation because of dividing
+        // but for long moneyFormat it should be long
+        items:
+          req.moneyFormat === MoneyFormat.Long
+            ? result.items.map((candle) => ({
+                ...candle,
+                weightedAveragePrice:
+                  candle.txsCount > 0
+                    ? candle.weightedAveragePrice.decimalPlaces(0)
+                    : // in fact it will be null
+                      candle.weightedAveragePrice,
+              }))
+            : result.items,
+      }))
+    ),
+});

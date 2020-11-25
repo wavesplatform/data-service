@@ -20,7 +20,7 @@ runDaemon(
     {
       logger,
       pg: pgDriver,
-      tableName: 'pairs',
+      pairsTableName: 'pairs',
     },
     configuration
   ),

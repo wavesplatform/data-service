@@ -8,13 +8,14 @@ const { CandleInterval } = require('../../types');
 const logTaskProgress = require('../utils/logTaskProgress');
 
 const {
+  withoutStatementTimeout,
   truncateTable,
   insertAllMinuteCandles,
   insertAllCandles,
   selectCandlesAfterTimestamp,
   insertOrUpdateCandles,
-  selectLastCandle,
-  selectLastExchangeTx,
+  selectLastCandleHeight,
+  selectLastExchangeTxHeight,
   insertOrUpdateCandlesFromShortInterval,
   selectMinTimestampFromHeight,
 } = require('./sql/query');
@@ -49,9 +50,9 @@ const getStartBlock = (exchangeTx, candle) => {
 };
 
 /** updateCandlesLoop :: (LogTask, Pg, String) -> Task */
-const updateCandlesLoop = (logTask, pg, tableName) => {
+const updateCandlesLoop = (logTask, pg, candlesTableName) => {
   const logMessages = {
-    start: timeStart => ({
+    start: (timeStart) => ({
       message: '[CANDLES] start updating candles',
       time: timeStart,
     }),
@@ -71,15 +72,17 @@ const updateCandlesLoop = (logTask, pg, tableName) => {
   const pgPromiseUpdateCandles = (t, fromTimetamp) =>
     t
       .any(selectCandlesAfterTimestamp(fromTimetamp))
-      .then(candles => t.any(insertOrUpdateCandles(tableName, candles)));
+      .then((candles) =>
+        t.any(insertOrUpdateCandles(candlesTableName, candles))
+      );
 
   return logTask(
     logMessages,
-    pg.tx(t =>
+    pg.tx((t) =>
       t
         .batch([
-          t.oneOrNone(selectLastExchangeTx()),
-          t.oneOrNone(selectLastCandle(tableName)),
+          t.oneOrNone(selectLastExchangeTxHeight()),
+          t.oneOrNone(selectLastCandleHeight(candlesTableName)),
         ])
         .then(([lastTx, candle]) => {
           if (!lastTx) {
@@ -88,15 +91,15 @@ const updateCandlesLoop = (logTask, pg, tableName) => {
           const startHeight = getStartBlock(lastTx, candle);
           return t
             .one(selectMinTimestampFromHeight(startHeight))
-            .then(row => row.time_stamp);
+            .then((row) => row.time_stamp);
         })
-        .then(timestamp => {
+        .then((timestamp) => {
           const nextInterval = compose(
-            m => m.getOrElse(undefined),
-            map(interval =>
+            (m) => m.getOrElse(undefined),
+            map((interval) =>
               t.any(
                 insertOrUpdateCandlesFromShortInterval(
-                  tableName,
+                  candlesTableName,
                   timestamp,
                   interval[0],
                   interval[1]
@@ -104,7 +107,7 @@ const updateCandlesLoop = (logTask, pg, tableName) => {
               )
             ),
             fromNullable,
-            index => nth(index, intervalPairs)
+            (index) => nth(index, intervalPairs)
           );
 
           return pgPromiseUpdateCandles(t, timestamp).then(() =>
@@ -116,10 +119,10 @@ const updateCandlesLoop = (logTask, pg, tableName) => {
 };
 
 /** fillCandlesDBAll :: (LogTask, Pg, String) -> Task */
-const fillCandlesDBAll = (logTask, pg, tableName) =>
+const fillCandlesDBAll = (logTask, pg, candlesTableName) =>
   logTask(
     {
-      start: timeStart => ({
+      start: (timeStart) => ({
         message: '[DB] start filling',
         time: timeStart,
       }),
@@ -133,12 +136,13 @@ const fillCandlesDBAll = (logTask, pg, tableName) =>
         time: timeTaken,
       }),
     },
-    pg.tx(t =>
+    pg.tx((t) =>
       t.batch([
-        t.any(truncateTable(tableName)),
-        t.any(insertAllMinuteCandles(tableName)),
+        t.none(withoutStatementTimeout()),
+        t.any(truncateTable(candlesTableName)),
+        t.any(insertAllMinuteCandles(candlesTableName)),
         ...intervalPairs.map(([shorter, longer]) =>
-          t.any(insertAllCandles(tableName, shorter, longer))
+          t.any(insertAllCandles(candlesTableName, shorter, longer))
         ),
       ])
     )

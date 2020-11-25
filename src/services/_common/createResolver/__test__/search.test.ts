@@ -1,19 +1,14 @@
-import {
-  of as taskOf,
-  rejected as taskRejected,
-} from 'folktale/concurrency/task';
-import { Ok, Error as error } from 'folktale/result';
-import { identity } from 'ramda';
+import { of as taskOf } from 'folktale/concurrency/task';
+import { Ok as ok, Error as error } from 'folktale/result';
 import {
   AppError,
-  ValidationError,
   ResolverError,
   DbError,
   Timeout,
-} from '../../../../errorHandling/';
+} from '../../../../errorHandling';
 
-import { search } from '..';
-import { ValidateSync, ValidateAsync } from '../types';
+import { search } from '../../createResolver';
+import { ValidateSync } from '../types';
 import { PgDriver } from '../../../../db/driver';
 
 const ids = [
@@ -23,10 +18,7 @@ const ids = [
 const errorMessage = 'Bad value';
 
 // mock validation
-const inputOk = (s: string[]) => taskOf<ValidationError, string[]>(s);
-const inputError = () =>
-  taskRejected<ValidationError, string[]>(AppError.Validation(errorMessage));
-const resultOk = (s: string) => Ok<ResolverError, string>(s);
+const resultOk = (s: string) => ok<ResolverError, string>(s);
 const resultError = (s: string) =>
   error<ResolverError, string>(AppError.Resolver(errorMessage));
 
@@ -36,19 +28,20 @@ const mockPgDriver: PgDriver = {
 } as PgDriver;
 
 const commonConfig = {
-  transformInput: identity,
-  transformResult: identity,
+  transformInput: ok,
+  transformResult: (items: any) => ({
+    isLastPage: false,
+    items,
+  }),
   getData: (ids: string[]) => mockPgDriver.many<string>(ids.join('::')),
   emitEvent: () => () => undefined,
 };
 
 const createMockResolver = (
-  validateInput: ValidateAsync<ValidationError, string[]>,
   validateResult: ValidateSync<ResolverError, string>
 ) =>
-  search<string[], string[], string, string[]>({
+  search<string[], string[], string, string>({
     ...commonConfig,
-    validateInput,
     validateResult,
   });
 
@@ -56,13 +49,16 @@ afterEach(() => jest.clearAllMocks());
 
 describe('Resolver', () => {
   it('should return result if all validation pass', done => {
-    const goodResolver = createMockResolver(inputOk, resultOk);
+    const goodResolver = createMockResolver(resultOk);
 
     goodResolver(ids)
       .run()
       .listen({
         onResolved: data => {
-          expect(data).toEqual(ids);
+          expect(data).toEqual({
+            isLastPage: false,
+            items: ids,
+          });
           done();
         },
       });
@@ -70,9 +66,8 @@ describe('Resolver', () => {
 
   it('should call db query is everything is ok', done => {
     const spiedDbQuery = jest.spyOn(mockPgDriver, 'many');
-    const goodResolver = search({
+    const goodResolver = search<string[], string[], string, string>({
       ...commonConfig,
-      validateInput: inputOk,
       validateResult: resultOk,
     });
 
@@ -86,39 +81,8 @@ describe('Resolver', () => {
       });
   });
 
-  it('should take left branch if input validation fails', done => {
-    const badInputResolver = createMockResolver(inputError, resultOk);
-
-    badInputResolver(ids)
-      .run()
-      .listen({
-        onRejected: e => {
-          expect(e).toEqual(AppError.Validation(errorMessage));
-          done();
-        },
-      });
-  });
-
-  it('should NOT call db query if input validation fails', done => {
-    const spiedDbQuery = jest.spyOn(mockPgDriver, 'many');
-    const badInputResolver = search({
-      ...commonConfig,
-      validateInput: inputError,
-      validateResult: resultOk,
-    });
-
-    badInputResolver(ids)
-      .run()
-      .listen({
-        onRejected: () => {
-          expect(spiedDbQuery).not.toBeCalled();
-          done();
-        },
-      });
-  });
-
   it('should take left branch if output validation fails', done => {
-    const badOutputResolver = createMockResolver(inputOk, resultError);
+    const badOutputResolver = createMockResolver(resultError);
 
     badOutputResolver(ids)
       .run()

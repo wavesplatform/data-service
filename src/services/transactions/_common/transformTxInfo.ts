@@ -21,5 +21,6 @@ export const transformTxInfo = compose(
     sender_public_key: 'senderPublicKey',
     time_stamp: 'timestamp',
     status: 'applicationStatus',
-  })
+  }),
+  omit(['uid'])
 );
