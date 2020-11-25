@@ -16,18 +16,13 @@ export const mgetByIdsPreset = <Id, ResponseRaw, ResponseTransformed>({
 }: {
   name: string;
   resultSchema: SchemaLike;
-  transformResult: (
-    response: ResponseRaw,
-    request?: Id[]
-  ) => ResponseTransformed;
+  transformResult: (response: ResponseRaw, request?: Id[]) => ResponseTransformed;
   sql: (r: Id[]) => string;
   matchRequestResult: (req: Id[], res: ResponseRaw) => boolean;
 }) => ({ pg, emitEvent }: RepoPresetInitOptions) =>
   mget<Id[], Id[], ResponseRaw, ResponseTransformed>({
     transformInput: ok,
-    transformResult: transformResultsFn<Id[], ResponseRaw, ResponseTransformed>(
-      transformResult
-    ),
+    transformResult: transformResultsFn(transformResult),
     validateResult: validateResult<ResponseRaw>(resultSchema, name),
     getData: getData<ResponseRaw, Id>({
       name,

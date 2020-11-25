@@ -1,4 +1,4 @@
-import { Joi } from '../../../../../utils/validation';
+import { Joi } from '../../../../../../utils/validation';
 import { CursorSerialization } from 'services/_common/pagination';
 
 const DATE0 = new Date(0);

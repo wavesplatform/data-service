@@ -2,15 +2,6 @@ import { Joi } from '../../../../utils/validation';
 
 import commonFields from '../../_common/commonFieldsSchemas';
 
-export const inputSearch = Joi.object()
-  .keys({
-    ...commonFilters,
-
-    dapp: Joi.string(),
-    function: Joi.string(),
-  })
-  .nand('sender', 'senders');
-
 export const result = Joi.object().keys({
   ...commonFields,
 
