@@ -100,7 +100,7 @@ import {
   RateWithPairIds,
 } from '../types';
 import { RateCache } from './rates/repo';
-import { WithDecimalsFormat } from './types';
+import { WithMoneyFormat } from './types';
 
 import { validatePairs } from './_common/validation/pairs';
 
@@ -123,7 +123,7 @@ export type ServiceMesh = {
   matchers: {
     pairs: PairsService;
     candles: CandlesService;
-    rates: Service<RateMgetParams & WithDecimalsFormat, RateWithPairIds[]>;
+    rates: Service<RateMgetParams & WithMoneyFormat, RateWithPairIds[]>;
   };
   pairs: PairsService;
   transactions: {

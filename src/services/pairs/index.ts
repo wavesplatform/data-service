@@ -8,7 +8,7 @@ import {
   searchWithDecimalsProcessing,
 } from '../_common/transformation/withDecimalsProcessing';
 import { AssetsService } from '../assets';
-import { WithDecimalsFormat } from '../types';
+import { WithMoneyFormat } from '../types';
 import {
   PairsGetRequest,
   PairsMgetRequest,
@@ -21,15 +21,15 @@ export type PairsServiceMgetRequest = PairsMgetRequest;
 export type PairsServiceSearchRequest = PairsSearchRequest;
 export type PairsService = {
   get: Service<
-    PairsGetRequest & WithDecimalsFormat,
+    PairsGetRequest & WithMoneyFormat,
     Maybe<PairInfo & AssetIdsPair>
   >;
   mget: Service<
-    PairsServiceMgetRequest & WithDecimalsFormat,
+    PairsServiceMgetRequest & WithMoneyFormat,
     Maybe<PairInfo & AssetIdsPair>[]
   >;
   search: Service<
-    PairsSearchRequest & WithDecimalsFormat,
+    PairsSearchRequest & WithMoneyFormat,
     SearchedItems<PairInfo & AssetIdsPair>
   >;
 };
@@ -45,7 +45,7 @@ export default (
   get: (req) =>
     validatePairs(req.matcher, [req.pair]).chain(() =>
       getWithDecimalsProcessing<
-        PairsGetRequest & WithDecimalsFormat,
+        PairsGetRequest & WithMoneyFormat,
         PairInfo & AssetIdsPair
       >(
         modifyDecimals(assetsService),
@@ -55,7 +55,7 @@ export default (
   mget: (req) =>
     validatePairs(req.matcher, req.pairs).chain(() =>
       mgetWithDecimalsProcessing<
-        PairsServiceMgetRequest & WithDecimalsFormat,
+        PairsServiceMgetRequest & WithMoneyFormat,
         PairInfo & AssetIdsPair
       >(
         modifyDecimals(assetsService),
@@ -64,7 +64,7 @@ export default (
     ),
   search: (req) =>
     searchWithDecimalsProcessing<
-      PairsSearchRequest & WithDecimalsFormat,
+      PairsSearchRequest & WithMoneyFormat,
       PairInfo & AssetIdsPair
     >(
       modifyDecimals(assetsService),

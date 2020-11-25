@@ -38,13 +38,7 @@ Array [
 exports[`Data transactions db result transform should handle case when there is no data in tx (all nulls in a row) 1`] = `
 Array [
   Object {
-    "data": Array [
-      Object {
-        "key": null,
-        "type": null,
-        "value": undefined,
-      },
-    ],
+    "data": Array [],
     "id": "asd",
   },
 ]

@@ -1,8 +1,8 @@
-export enum DecimalsFormat {
+export enum MoneyFormat {
   Float = 'float',
   Long = 'long',
 }
 
-export type WithDecimalsFormat = {
-  decimalsFormat: DecimalsFormat;
+export type WithMoneyFormat = {
+  moneyFormat: MoneyFormat;
 };

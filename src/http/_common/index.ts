@@ -2,22 +2,27 @@ import { Context } from 'koa';
 import { Result, Ok as ok } from 'folktale/result';
 import { Task } from 'folktale/concurrency/task';
 import { ParseError, AppError, ResolverError } from '../../errorHandling';
-import { WithDecimalsFormat } from '../../services/types';
+import { WithMoneyFormat as WithMoneyFormat } from '../../services/types';
 import { resultToTask } from '../../utils/fp';
 import { handleError } from '../_common/handleError';
 import { LSNFormat } from '../types';
 import { HttpRequest, HttpResponse } from './types';
-import { parseLSN, parseDecimals, setHttpResponse } from './utils';
+import {
+  parseLSNFormat,
+  parseMoneyFormat,
+  setHttpResponse,
+  contentTypeWithMoneyFormat,
+} from './utils';
 
 export function createHttpHandler<Params extends string[], Request>(
   getResponse: (
-    request: WithDecimalsFormat,
+    request: WithMoneyFormat,
     lsnFormat: LSNFormat
   ) => Task<AppError, HttpResponse>
 ): (ctx: Context) => Promise<void>;
 export function createHttpHandler<Params extends string[], Request>(
   getResponse: (
-    request: Request & WithDecimalsFormat,
+    request: Request & WithMoneyFormat,
     lsnFormat: LSNFormat
   ) => Task<AppError, HttpResponse>,
   parseRequest: (
@@ -26,7 +31,7 @@ export function createHttpHandler<Params extends string[], Request>(
 ): (ctx: Context) => Promise<void>;
 export function createHttpHandler<Params extends string[], Request>(
   getResponse: (
-    req: WithDecimalsFormat | (Request & WithDecimalsFormat),
+    req: WithMoneyFormat | (Request & WithMoneyFormat),
     lsnFormat: LSNFormat
   ) => Task<AppError, HttpResponse>,
   parseRequest?: (
@@ -50,26 +55,42 @@ export function createHttpHandler<Params extends string[], Request>(
           params: ctx.params,
           query: ctx.query,
           headers: ctx.headers,
-        }).chain(req =>
-          parseDecimals(ctx.headers).map(dec => ({
+        }).chain((req) =>
+          parseMoneyFormat(ctx.headers).map((dec) => ({
             ...req,
-            decimalsFormat: dec,
+            moneyFormat: dec,
           }))
         )
       )
-        .chain(req =>
-          resultToTask(parseLSN(ctx.headers)).chain(lsnFormat =>
-            getResponse(req, lsnFormat)
+        .chain((req) =>
+          resultToTask(parseLSNFormat(ctx.headers)).chain((lsnFormat) =>
+            getResponse(req, lsnFormat).map((res) => ({
+              request: req,
+              response: res,
+            }))
           )
         )
-        .mapRejected(e => {
+        .mapRejected((e) => {
           ctx.eventBus.emit('ERROR', e);
 
           return handleError(e);
         })
         .run()
         .promise()
-        .then(setResponse)
+        .then((dto) =>
+          setResponse(
+            dto.response.withHeaders({
+              'Content-Type':
+                typeof dto.response.headers !== 'undefined' &&
+                dto.response.headers['Content-Type'] !== 'undefined'
+                  ? contentTypeWithMoneyFormat(
+                      dto.request.moneyFormat,
+                      dto.response.headers['Content-Type']
+                    )
+                  : contentTypeWithMoneyFormat(dto.request.moneyFormat),
+            })
+          )
+        )
         .catch(setResponse);
     } catch (e) {
       const err = new ResolverError(e);

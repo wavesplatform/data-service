@@ -3,17 +3,17 @@ import { empty, Maybe, of as maybeOf } from 'folktale/maybe';
 import { AppError } from '../../../errorHandling';
 import { SearchedItems } from '../../../types';
 import { swapMaybeF } from '../../../utils/fp';
-import { DecimalsFormat, WithDecimalsFormat } from '../../types';
+import { MoneyFormat, WithMoneyFormat } from '../../types';
 
 export const getWithDecimalsProcessing = <
-  GetRequest extends WithDecimalsFormat,
+  GetRequest extends WithMoneyFormat,
   Response
 >(
   modifyDecimals: (items: Response[]) => Task<AppError, Response[]>,
   get: (r: GetRequest) => Task<AppError, Maybe<Response>>
 ) => (req: GetRequest) =>
   get(req).chain<AppError, Maybe<Response>>((m) =>
-    req.decimalsFormat == DecimalsFormat.Long
+    req.moneyFormat == MoneyFormat.Long
       ? taskOf<AppError, Maybe<Response>>(m)
       : swapMaybeF<AppError, Response>(
           taskOf,
@@ -22,14 +22,14 @@ export const getWithDecimalsProcessing = <
   );
 
 export const mgetWithDecimalsProcessing = <
-  MgetRequest extends WithDecimalsFormat,
+  MgetRequest extends WithMoneyFormat,
   Response
 >(
   modifyDecimals: (items: Response[]) => Task<AppError, Response[]>,
   mget: (r: MgetRequest) => Task<AppError, Maybe<Response>[]>
 ) => (req: MgetRequest) =>
   mget(req).chain<AppError, Maybe<Response>[]>((ms) =>
-    req.decimalsFormat == DecimalsFormat.Long
+    req.moneyFormat == MoneyFormat.Long
       ? taskOf(ms)
       : modifyDecimals(
           ms
@@ -52,14 +52,14 @@ export const mgetWithDecimalsProcessing = <
   );
 
 export const searchWithDecimalsProcessing = <
-  SearchRequest extends WithDecimalsFormat,
+  SearchRequest extends WithMoneyFormat,
   Response
 >(
   modifyDecimals: (items: Response[]) => Task<AppError, Response[]>,
   search: (r: SearchRequest) => Task<AppError, SearchedItems<Response>>
 ) => (req: SearchRequest) =>
   search(req).chain<AppError, SearchedItems<Response>>((res) =>
-    req.decimalsFormat == DecimalsFormat.Long
+    req.moneyFormat == MoneyFormat.Long
       ? taskOf(res)
       : modifyDecimals(res.items).map((items) => ({
           ...res,
@@ -68,9 +68,9 @@ export const searchWithDecimalsProcessing = <
   );
 
 export const withDecimalsProcessing = <
-  GetRequest extends WithDecimalsFormat,
-  MgetRequest extends WithDecimalsFormat,
-  SearchRequest extends WithDecimalsFormat,
+  GetRequest extends WithMoneyFormat,
+  MgetRequest extends WithMoneyFormat,
+  SearchRequest extends WithMoneyFormat,
   Response
 >(
   modifyDecimals: (items: Response[]) => Task<AppError, Response[]>,

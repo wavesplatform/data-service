@@ -5,7 +5,7 @@ import {
   ServiceGetRequest,
   ServiceMgetRequest,
 } from '../../../types';
-import { WithDecimalsFormat } from '../../types';
+import { WithMoneyFormat } from '../../types';
 import {
   GenesisTx,
   GenesisTxsGetRequest,
@@ -19,15 +19,15 @@ type GenesisTxsServiceSearchRequest = GenesisTxsSearchRequest;
 
 export type GenesisTxsService = {
   get: Service<
-    GenesisTxsServiceGetRequest & WithDecimalsFormat,
+    GenesisTxsServiceGetRequest & WithMoneyFormat,
     Maybe<GenesisTx>
   >;
   mget: Service<
-    GenesisTxsServiceMgetRequest & WithDecimalsFormat,
+    GenesisTxsServiceMgetRequest & WithMoneyFormat,
     Maybe<GenesisTx>[]
   >;
   search: Service<
-    GenesisTxsServiceSearchRequest & WithDecimalsFormat,
+    GenesisTxsServiceSearchRequest & WithMoneyFormat,
     SearchedItems<GenesisTx>
   >;
 };

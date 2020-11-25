@@ -1,17 +1,18 @@
 import { Ok as ok, Error as error } from 'folktale/result';
 import { AppError } from '../../../errorHandling';
-import { DecimalsFormat } from '../../../services/types';
-import { WITH_DECIMALS_HEADER } from '../../../types';
+import { MoneyFormat as MoneyFormat } from '../../../services/types';
 import { LSNFormat } from '../../types';
 import {
   DEFAULT_LSN_FORMAT,
   LSN_FORMAT_KEY,
-  DEFAULT_DECIMALS_FORMAT,
+  DEFAULT_MONEY_FORMAT,
+  MONEY_FORMAT_KEY,
   setHttpResponse,
   contentTypeWithLSN,
-  parseDecimals,
-  parseLSN,
+  parseMoneyFormat,
+  parseLSNFormat,
   defaultStringify,
+  contentTypeWithMoneyFormat,
 } from '../utils';
 import * as Koa from 'koa';
 import { HttpResponse } from '../types';
@@ -79,48 +80,106 @@ describe('contentTypeWithLSN', () => {
   });
 });
 
-describe('parseDecimals', () => {
-  it('should return default decimals format, when decimals is not presented in headers', () => {
-    expect(parseDecimals({})).toEqual(ok(DEFAULT_DECIMALS_FORMAT));
+describe('contentTypeWithMoneyFormat', () => {
+  it('should return Content-Type with Float Money Format', () => {
+    expect(contentTypeWithMoneyFormat(MoneyFormat.Float)).toBe(
+      'application/json; charset=utf-8'
+    );
   });
 
-  it('should parse decimals-format from headers', () => {
+  it('should return Content-Type with Long Money Format', () => {
+    expect(contentTypeWithMoneyFormat(MoneyFormat.Long)).toBe(
+      `application/json; charset=utf-8; ${MONEY_FORMAT_KEY}=${MoneyFormat.Long}`
+    );
+  });
+});
+
+describe('contentTypeWithLSNWithMoneyFormat', () => {
+  it('should return Content-Type with Number LSN Format and Float Money Format', () => {
     expect(
-      parseDecimals({
-        [WITH_DECIMALS_HEADER]: DecimalsFormat.Float,
+      contentTypeWithMoneyFormat(
+        MoneyFormat.Float,
+        contentTypeWithLSN(LSNFormat.Number)
+      )
+    ).toBe('application/json; charset=utf-8');
+  });
+
+  it('should return Content-Type with Number LSN Format and Long Money Format', () => {
+    expect(
+      contentTypeWithMoneyFormat(
+        MoneyFormat.Long,
+        contentTypeWithLSN(LSNFormat.Number)
+      )
+    ).toBe(
+      `application/json; charset=utf-8; ${MONEY_FORMAT_KEY}=${MoneyFormat.Long}`
+    );
+  });
+
+  it('should return Content-Type with String LSN Format and Float Money Format', () => {
+    expect(
+      contentTypeWithMoneyFormat(
+        MoneyFormat.Float,
+        contentTypeWithLSN(LSNFormat.String)
+      )
+    ).toBe(
+      `application/json; charset=utf-8; ${LSN_FORMAT_KEY}=${LSNFormat.String}`
+    );
+  });
+
+  it('should return Content-Type with String LSN Format and Long Money Format', () => {
+    expect(
+      contentTypeWithMoneyFormat(
+        MoneyFormat.Long,
+        contentTypeWithLSN(LSNFormat.String)
+      )
+    ).toBe(
+      `application/json; charset=utf-8; ${LSN_FORMAT_KEY}=${LSNFormat.String}; ${MONEY_FORMAT_KEY}=${MoneyFormat.Long}`
+    );
+  });
+});
+
+describe('parseMoney', () => {
+  it('should return default money format, when money is not presented in headers', () => {
+    expect(parseMoneyFormat({})).toEqual(ok(DEFAULT_MONEY_FORMAT));
+  });
+
+  it('should parse money-format from headers', () => {
+    expect(
+      parseMoneyFormat({
+        accept: `${MONEY_FORMAT_KEY}=${MoneyFormat.Float}`,
       })
-    ).toEqual(ok(DecimalsFormat.Float));
+    ).toEqual(ok(MoneyFormat.Float));
 
     expect(
-      parseDecimals({
-        [WITH_DECIMALS_HEADER]: DecimalsFormat.Long,
+      parseMoneyFormat({
+        accept: `${MONEY_FORMAT_KEY}=${MoneyFormat.Long}`,
       })
-    ).toEqual(ok(DecimalsFormat.Long));
+    ).toEqual(ok(MoneyFormat.Long));
   });
 
   it('should return error on invalid decimals-header in headers', () => {
     expect(
-      parseDecimals({
-        [WITH_DECIMALS_HEADER]: 'wrong' as DecimalsFormat,
+      parseMoneyFormat({
+        accept: `${MONEY_FORMAT_KEY}=wrong`,
       })
-    ).toEqual(error(AppError.Parse('Invalid DecimalsFormat')));
+    ).toEqual(error(AppError.Parse('Invalid Money Format')));
   });
 });
 
 describe('parseLSN', () => {
   it('should return default lsn format, when lsn is not presented in headers', () => {
-    expect(parseLSN({})).toEqual(ok(DEFAULT_LSN_FORMAT));
+    expect(parseLSNFormat({})).toEqual(ok(DEFAULT_LSN_FORMAT));
   });
 
   it('should parse lsn-format from headers', () => {
     expect(
-      parseLSN({
+      parseLSNFormat({
         accept: `${LSN_FORMAT_KEY}=${LSNFormat.Number}`,
       })
     ).toEqual(ok(LSNFormat.Number));
 
     expect(
-      parseLSN({
+      parseLSNFormat({
         accept: `${LSN_FORMAT_KEY}=${LSNFormat.String}`,
       })
     ).toEqual(ok(LSNFormat.String));
@@ -128,9 +187,26 @@ describe('parseLSN', () => {
 
   it('should return error on invalid decimals-format in headers', () => {
     expect(
-      parseLSN({
+      parseLSNFormat({
         accept: `${LSN_FORMAT_KEY}=bad lsn`,
       })
     ).toEqual(error(AppError.Parse('Invalid Large significand format')));
+  });
+});
+
+describe('parseLSN and parseMoneyFormat simultaneously', () => {
+  it('should parse lsn-format and money-fornat from headers', () => {
+    const acceptHeaderValue = `${LSN_FORMAT_KEY}=${LSNFormat.Number}; ${MONEY_FORMAT_KEY}=${MoneyFormat.Long}`;
+    expect(
+      parseLSNFormat({
+        accept: acceptHeaderValue,
+      })
+    ).toEqual(ok(LSNFormat.Number));
+
+    expect(
+      parseMoneyFormat({
+        accept: acceptHeaderValue,
+      })
+    ).toEqual(ok(MoneyFormat.Long));
   });
 });

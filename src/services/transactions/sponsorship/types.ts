@@ -5,7 +5,7 @@ import {
   ServiceGetRequest,
   ServiceMgetRequest,
 } from '../../../types';
-import { WithDecimalsFormat } from '../../types';
+import { WithMoneyFormat } from '../../types';
 import {
   SponsorshipTxsGetRequest,
   SponsorshipTxsMgetRequest,
@@ -23,15 +23,15 @@ type SponsorshipTxsServiceSearchRequest = SponsorshipTxsSearchRequest;
 
 export type SponsorshipTxsService = {
   get: Service<
-    SponsorshipTxsServiceGetRequest & WithDecimalsFormat,
+    SponsorshipTxsServiceGetRequest & WithMoneyFormat,
     Maybe<SponsorshipTx>
   >;
   mget: Service<
-    SponsorshipTxsServiceMgetRequest & WithDecimalsFormat,
+    SponsorshipTxsServiceMgetRequest & WithMoneyFormat,
     Maybe<SponsorshipTx>[]
   >;
   search: Service<
-    SponsorshipTxsServiceSearchRequest & WithDecimalsFormat,
+    SponsorshipTxsServiceSearchRequest & WithMoneyFormat,
     SearchedItems<SponsorshipTx>
   >;
 };

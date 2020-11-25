@@ -5,7 +5,7 @@ import {
   ServiceGetRequest,
   ServiceMgetRequest,
 } from '../../../types';
-import { WithDecimalsFormat } from '../../types';
+import { WithMoneyFormat } from '../../types';
 import {
   MassTransferTxsGetRequest,
   MassTransferTxsMgetRequest,
@@ -23,15 +23,15 @@ type MassTransferTxsServiceSearchRequest = MassTransferTxsSearchRequest;
 
 export type MassTransferTxsService = {
   get: Service<
-    MassTransferTxsServiceGetRequest & WithDecimalsFormat,
+    MassTransferTxsServiceGetRequest & WithMoneyFormat,
     Maybe<MassTransferTx>
   >;
   mget: Service<
-    MassTransferTxsServiceMgetRequest & WithDecimalsFormat,
+    MassTransferTxsServiceMgetRequest & WithMoneyFormat,
     Maybe<MassTransferTx>[]
   >;
   search: Service<
-    MassTransferTxsServiceSearchRequest & WithDecimalsFormat,
+    MassTransferTxsServiceSearchRequest & WithMoneyFormat,
     SearchedItems<MassTransferTx>
   >;
 };

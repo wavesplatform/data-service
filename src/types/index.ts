@@ -5,8 +5,6 @@ import { AppError } from '../errorHandling';
 import { toSerializable, Serializable } from './serializable';
 import { Interval, interval, Unit } from './interval';
 import { List, list } from './list';
-import { IncomingHttpHeaders } from 'http';
-import { DecimalsFormat } from '../services/types';
 
 export { CacheSync } from './cache';
 
@@ -22,13 +20,6 @@ export const fromMaybe = <A, B>(factory: (a?: A) => B) => (mb: Maybe<A>): B =>
     Just: ({ value }) => factory(value),
     Nothing: () => factory(),
   });
-
-export const WITH_DECIMALS_HEADER = 'x-with-decimals';
-
-export type RequestHeaders = IncomingHttpHeaders &
-  Partial<{
-    WITH_DECIMALS_HEADER: DecimalsFormat;
-  }>;
 
 export type Items<Item> = {
   items: Item[];

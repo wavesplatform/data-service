@@ -5,7 +5,7 @@ import {
   ServiceGetRequest,
   ServiceMgetRequest,
 } from '../../../types';
-import { WithDecimalsFormat } from '../../types';
+import { WithMoneyFormat } from '../../types';
 import {
   SetScriptTxsGetRequest,
   SetScriptTxsMgetRequest,
@@ -21,15 +21,15 @@ type SetScriptTxsServiceSearchRequest = SetScriptTxsSearchRequest;
 
 export type SetScriptTxsService = {
   get: Service<
-    SetScriptTxsServiceGetRequest & WithDecimalsFormat,
+    SetScriptTxsServiceGetRequest & WithMoneyFormat,
     Maybe<SetScriptTx>
   >;
   mget: Service<
-    SetScriptTxsServiceMgetRequest & WithDecimalsFormat,
+    SetScriptTxsServiceMgetRequest & WithMoneyFormat,
     Maybe<SetScriptTx>[]
   >;
   search: Service<
-    SetScriptTxsServiceSearchRequest & WithDecimalsFormat,
+    SetScriptTxsServiceSearchRequest & WithMoneyFormat,
     SearchedItems<SetScriptTx>
   >;
 };

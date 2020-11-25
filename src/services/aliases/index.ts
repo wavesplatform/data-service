@@ -8,7 +8,7 @@ import {
   AliasesSearchRequest,
   AliasesRepo,
 } from './repo';
-import { WithDecimalsFormat } from '../types';
+import { WithMoneyFormat } from '../types';
 export { WithAddress, WithAddresses, WithQueries } from './repo';
 
 export type AliasesServiceGetRequest = {
@@ -22,13 +22,13 @@ export type AliasesServiceMgetRequest = {
 export type AliasesServiceSearchRequest = AliasesSearchRequest;
 
 export type AliasesService = {
-  get: Service<AliasesServiceGetRequest & WithDecimalsFormat, Maybe<AliasInfo>>;
+  get: Service<AliasesServiceGetRequest & WithMoneyFormat, Maybe<AliasInfo>>;
   mget: Service<
-    AliasesServiceMgetRequest & WithDecimalsFormat,
+    AliasesServiceMgetRequest & WithMoneyFormat,
     Maybe<AliasInfo>[]
   >;
   search: Service<
-    AliasesServiceSearchRequest & WithDecimalsFormat,
+    AliasesServiceSearchRequest & WithMoneyFormat,
     SearchedItems<AliasInfo>
   >;
 };

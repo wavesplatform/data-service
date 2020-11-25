@@ -1,17 +1,17 @@
+import { IncomingHttpHeaders } from 'http';
 import {
   DEFAULT_INTERNAL_SERVER_ERROR_MESSAGE,
   DEFAULT_TIMEOUT_OCCURRED_MESSAGE,
   DEFAULT_NOT_FOUND_MESSAGE,
   DEFAULT_BAD_REQUEST_MESSAGE,
 } from '../../errorHandling';
-import { RequestHeaders } from '../../types';
 import { ValuesOf } from '../../types/generic';
 import { defaultStringify } from './utils';
 
 export type HttpRequest<Params extends string[] = string[]> = {
   params?: Record<ValuesOf<Params>, string>;
   query?: Record<string, string>;
-  headers: RequestHeaders;
+  headers: IncomingHttpHeaders;
 };
 
 export class HttpResponse {

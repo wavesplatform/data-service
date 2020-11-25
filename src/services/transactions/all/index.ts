@@ -35,7 +35,7 @@ import {
   AllTxsMgetRequest,
   AllTxsSearchRequest,
 } from './repo/types';
-import { WithDecimalsFormat, DecimalsFormat } from '../../types';
+import { WithMoneyFormat, MoneyFormat } from '../../types';
 import { collect } from '../../../utils/collection';
 
 type AllTxsServiceDep = {
@@ -64,15 +64,15 @@ export type AllTxsServiceSearchRequest = AllTxsSearchRequest;
 
 export type AllTxsService = {
   get: Service<
-    AllTxsServiceGetRequest & WithDecimalsFormat,
+    AllTxsServiceGetRequest & WithMoneyFormat,
     Maybe<TransactionInfo>
   >;
   mget: Service<
-    AllTxsServiceMgetRequest & WithDecimalsFormat,
+    AllTxsServiceMgetRequest & WithMoneyFormat,
     Maybe<TransactionInfo>[]
   >;
   search: Service<
-    AllTxsServiceSearchRequest & WithDecimalsFormat,
+    AllTxsServiceSearchRequest & WithMoneyFormat,
     SearchedItems<TransactionInfo>
   >;
 };
@@ -92,7 +92,7 @@ export default (repo: AllTxsRepo) => (
           Just: ({ value }) => {
             return txsServices[value.type as keyof AllTxsServiceDep].get({
               id: value.id,
-              decimalsFormat: DecimalsFormat.Long,
+              moneyFormat: MoneyFormat.Long,
             });
           },
           Nothing: () => taskOf(emptyOf()),
@@ -109,7 +109,7 @@ export default (repo: AllTxsRepo) => (
               Just: ({ value }) => {
                 return txsServices[value.type as keyof AllTxsServiceDep].get({
                   id: value.id,
-                  decimalsFormat: DecimalsFormat.Long,
+                  moneyFormat: MoneyFormat.Long,
                 });
               },
               Nothing: () => taskOf(emptyOf()),
@@ -135,7 +135,7 @@ export default (repo: AllTxsRepo) => (
                 (type as unknown) as keyof AllTxsServiceDep
               ].mget({
                 ids: txs.map((t) => t.id),
-                decimalsFormat: req.decimalsFormat,
+                moneyFormat: req.moneyFormat,
               });
             })
         )(txsList.items)

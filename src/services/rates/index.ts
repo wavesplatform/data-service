@@ -3,13 +3,13 @@ import { Service, RateMgetParams, RateWithPairIds } from '../../types';
 import { RateSerivceCreatorDependencies } from '..';
 import RateEstimator from './RateEstimator';
 import RemoteRateRepo from './repo/impl/RemoteRateRepo';
-import { DecimalsFormat, WithDecimalsFormat } from '../types';
+import { MoneyFormat, WithMoneyFormat } from '../types';
 import { of as taskOf } from 'folktale/concurrency/task';
 
 export { default as RateCacheImpl } from './repo/impl/RateCache';
 
 export type RatesMgetService = Service<
-  RateMgetParams & WithDecimalsFormat,
+  RateMgetParams & WithMoneyFormat,
   RateWithPairIds[]
 >;
 
@@ -20,7 +20,7 @@ export default function ({
 }: RateSerivceCreatorDependencies): RatesMgetService {
   const estimator = new RateEstimator(cache, new RemoteRateRepo(drivers.pg));
 
-  return (request: RateMgetParams & WithDecimalsFormat) =>
+  return (request: RateMgetParams & WithMoneyFormat) =>
     estimator
       .mget(request)
       .map((data) =>
@@ -34,7 +34,7 @@ export default function ({
         }))
       )
       .chain((items) =>
-        request.decimalsFormat === DecimalsFormat.Long
+        request.moneyFormat === MoneyFormat.Long
           ? taskOf(items)
           : assets
               .precisions({

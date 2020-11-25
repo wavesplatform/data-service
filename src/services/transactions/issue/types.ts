@@ -5,7 +5,7 @@ import {
   ServiceGetRequest,
   ServiceMgetRequest,
 } from '../../../types';
-import { WithDecimalsFormat } from '../../types';
+import { WithMoneyFormat } from '../../types';
 import {
   IssueTx,
   IssueTxsGetRequest,
@@ -18,13 +18,13 @@ type IssueTxsServiceMgetRequest = ServiceMgetRequest<IssueTxsMgetRequest>;
 type IssueTxsServiceSearchRequest = IssueTxsSearchRequest;
 
 export type IssueTxsService = {
-  get: Service<IssueTxsServiceGetRequest & WithDecimalsFormat, Maybe<IssueTx>>;
+  get: Service<IssueTxsServiceGetRequest & WithMoneyFormat, Maybe<IssueTx>>;
   mget: Service<
-    IssueTxsServiceMgetRequest & WithDecimalsFormat,
+    IssueTxsServiceMgetRequest & WithMoneyFormat,
     Maybe<IssueTx>[]
   >;
   search: Service<
-    IssueTxsServiceSearchRequest & WithDecimalsFormat,
+    IssueTxsServiceSearchRequest & WithMoneyFormat,
     SearchedItems<IssueTx>
   >;
 };

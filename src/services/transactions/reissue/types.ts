@@ -5,7 +5,7 @@ import {
   ServiceGetRequest,
   ServiceMgetRequest,
 } from '../../../types';
-import { WithDecimalsFormat } from '../../types';
+import { WithMoneyFormat } from '../../types';
 import {
   ReissueTxsGetRequest,
   ReissueTxsMgetRequest,
@@ -19,15 +19,15 @@ type ReissueTxsServiceSearchRequest = ReissueTxsSearchRequest;
 
 export type ReissueTxsService = {
   get: Service<
-    ReissueTxsServiceGetRequest & WithDecimalsFormat,
+    ReissueTxsServiceGetRequest & WithMoneyFormat,
     Maybe<ReissueTx>
   >;
   mget: Service<
-    ReissueTxsServiceMgetRequest & WithDecimalsFormat,
+    ReissueTxsServiceMgetRequest & WithMoneyFormat,
     Maybe<ReissueTx>[]
   >;
   search: Service<
-    ReissueTxsServiceSearchRequest & WithDecimalsFormat,
+    ReissueTxsServiceSearchRequest & WithMoneyFormat,
     SearchedItems<ReissueTx>
   >;
 };
