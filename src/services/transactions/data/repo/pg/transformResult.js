@@ -19,8 +19,6 @@ const {
   sortBy,
   evolve,
   T,
-  ifElse,
-  identity,
 } = require('ramda');
 
 const getDataObject = (txRow) => ({
