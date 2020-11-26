@@ -17,6 +17,7 @@ const throwPattern: AppErrorPattern<never> = {
   Validation: throwFn,
   Db: throwFn,
   Timeout: throwFn,
+  Parse: throwFn,
 };
 
 describe('AppError', () => {

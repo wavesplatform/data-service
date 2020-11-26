@@ -1,9 +1,6 @@
-import {
-  of as taskOf,
-  rejected as taskRejected,
-} from 'folktale/concurrency/task';
+import { of as taskOf } from 'folktale/concurrency/task';
 import { of as maybeOf } from 'folktale/maybe';
-import { Ok, Error as error } from 'folktale/result';
+import { Ok as ok, Error as error } from 'folktale/result';
 import { identity } from 'ramda';
 import {
   AppError,
@@ -11,9 +8,9 @@ import {
   ResolverError,
   DbError,
   Timeout,
-} from '../../../../errorHandling/';
+} from '../../../../errorHandling';
 
-import { get } from '../';
+import { get } from '..';
 import { PgDriver } from '../../../../db/driver';
 import { ValidateAsync, ValidateSync } from '../types';
 
@@ -21,9 +18,7 @@ const assetId = 'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH';
 
 // mock validation
 const inputOk = (s: string) => taskOf<ValidationError, string>(s);
-const inputError = (s: string) =>
-  taskRejected<ValidationError, string>(AppError.Validation(s));
-const resultOk = (s: string) => Ok<ResolverError, string>(s);
+const resultOk = (s: string) => ok<ResolverError, string>(s);
 const resultError = (s: string) =>
   error<ResolverError, string>(AppError.Resolver(s));
 
@@ -35,7 +30,7 @@ describe('Resolver', () => {
   } as PgDriver;
 
   const commonConfig = {
-    transformInput: identity,
+    transformInput: ok,
     transformResult: identity,
     getData: (id: string) => mockPgDriver.one<string>(id).map(maybeOf),
     emitEvent: () => () => undefined,
@@ -47,7 +42,6 @@ describe('Resolver', () => {
   ) =>
     get<string, string, string, string>({
       ...commonConfig,
-      validateInput,
       validateResult,
     });
 
@@ -69,7 +63,6 @@ describe('Resolver', () => {
 
     const goodResolver = get<string, string, string, string>({
       ...commonConfig,
-      validateInput: inputOk,
       validateResult: resultOk,
     });
 
@@ -92,7 +85,6 @@ describe('Resolver', () => {
 
     const goodResolver = get<string, string, string, string>({
       ...commonConfig,
-      validateInput: inputOk,
       validateResult: resultOk,
       emitEvent: outerSpy,
     });
@@ -102,10 +94,6 @@ describe('Resolver', () => {
       .listen({
         onResolved: () => {
           expect(innerSpy.mock.calls).toEqual([
-            [
-              'INPUT_VALIDATION_OK',
-              'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH',
-            ],
             [
               'TRANSFORM_INPUT_OK',
               'G8VbM7B6Zu8cYMwpfRsaoKvuLVsy8p1kYP4VvSdwxWfH',
@@ -124,37 +112,6 @@ describe('Resolver', () => {
             ],
           ]);
 
-          done();
-        },
-      });
-  });
-
-  it('should take left branch if input validation fails', done => {
-    const badInputResolver = createMockResolver(inputError, resultOk);
-
-    badInputResolver(assetId)
-      .run()
-      .listen({
-        onRejected: error => {
-          expect(error).toEqual(AppError.Validation(assetId));
-          done();
-        },
-      });
-  });
-
-  it('should NOT call db query if input validation fails', done => {
-    const spiedDbQuery = jest.spyOn(mockPgDriver, 'one');
-    const badInputResolver = get<string, string, string, string>({
-      ...commonConfig,
-      validateInput: inputError,
-      validateResult: resultOk,
-    });
-
-    badInputResolver(assetId)
-      .run()
-      .listen({
-        onRejected: () => {
-          expect(spiedDbQuery).not.toBeCalled();
           done();
         },
       });

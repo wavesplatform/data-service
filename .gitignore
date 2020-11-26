@@ -1,3 +1,5 @@
+.dbeaver/
+.github/
 .idea/
 .vscode/
 .history/

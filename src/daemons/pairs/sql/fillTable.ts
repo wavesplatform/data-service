@@ -1,48 +1,52 @@
 import * as knex from 'knex';
 const pg = knex({ client: 'pg' });
 
-const selectExchanges = pg('txs_7')
-  .select([
-    'price_asset',
-    'amount_asset',
-    'amount',
-    'price',
-    'time_stamp',
-    'sender',
-  ])
-  .whereRaw(`time_stamp >= now() - interval '1 day'`)
-  .orderBy('time_stamp', 'desc');
+const selectExchanges = pg({ t: 'txs_7' })
+  .select({
+    uid: 't.uid',
+    amount_asset_id: 't.amount_asset_id',
+    price_asset_id: 't.price_asset_id',
+    amount: 't.amount',
+    price: 't.price',
+    time_stamp: 't.time_stamp',
+    sender: 't.sender',
+  })
+  .with('hp_cte', (qb) =>
+    qb
+      .select('uid')
+      .from('txs')
+      .whereRaw(`time_stamp >= now() - interval '1 day'`)
+      .limit(1)
+  )
+  .where('t.uid', '>=', pg('hp_cte').select('uid'))
+  .orderBy('t.uid', 'desc');
 
 const selectPairsCTE = pg
-  .with('pairs_cte', qp => {
-    qp.select({
-      amount_asset_id: 'amount_asset',
-      price_asset_id: 'price_asset',
+  .with('pairs_cte', (qb) => {
+    qb.select({
+      amount_asset_id: 'amount_asset_id',
+      price_asset_id: 'price_asset_id',
       last_price: pg.raw(
-        '(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals) ORDER BY e.time_stamp DESC)::numeric[])[1]'
+        '(array_agg(e.price ORDER BY e.uid DESC)::numeric[])[1]'
       ),
       first_price: pg.raw(
-        '(array_agg(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals) ORDER BY e.time_stamp)::numeric[])[1]'
+        '(array_agg(e.price ORDER BY e.uid)::numeric[])[1]'
       ),
-      volume: pg.raw('sum(e.amount * 10 ^(-a_dec.decimals))'),
-      quote_volume: pg.raw(
-        'sum(e.amount * 10 ^(-a_dec.decimals) * e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'
-      ),
+      volume: pg.raw('sum(e.amount)'),
+      quote_volume: pg.raw('sum(e.amount::numeric * e.price::numeric)'),
       weighted_average_price: pg.raw(
-        'sum(e.amount * 10 ^(-a_dec.decimals) * e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))/ sum(e.amount * 10 ^(-a_dec.decimals))'
+        'floor(sum(e.amount::numeric * e.price::numeric)/ sum(e.amount))'
       ),
       volume_waves: pg.raw(
-        "case when amount_asset = 'WAVES' then sum(e.amount * 10 ^(-a_dec.decimals)) when price_asset = 'WAVES' then sum(e.amount * 10 ^(-a_dec.decimals) * e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals)) end"
+        `case when amount_asset_id='WAVES' then sum(e.amount) when price_asset_id='WAVES' then sum(e.amount::numeric * e.price::numeric) end`
       ),
-      high: pg.raw('max(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'),
-      low: pg.raw('min(e.price * 10 ^(-8 - p_dec.decimals + a_dec.decimals))'),
+      high: pg.raw('max(e.price)'),
+      low: pg.raw('min(e.price)'),
       txs_count: pg.raw('count(e.price)'),
-      matcher: 'sender',
+      matcher_address: 'sender',
     })
       .from(selectExchanges.clone().as('e'))
-      .innerJoin('asset_decimals as a_dec', 'e.amount_asset', 'a_dec.asset_id')
-      .innerJoin('asset_decimals as p_dec', 'e.price_asset', 'p_dec.asset_id')
-      .groupBy(['amount_asset', 'price_asset', 'sender']);
+      .groupBy(['amount_asset_id', 'price_asset_id', 'sender']);
   })
   .from({ p: 'pairs_cte' })
   .columns(
@@ -53,7 +57,7 @@ const selectPairsCTE = pg
     'p.volume',
     {
       volume_waves: pg.raw(
-        `coalesce(p.volume_waves, p.quote_volume / p1.weighted_average_price, p.quote_volume * p2.weighted_average_price)`
+        `coalesce(p.volume_waves, floor(p.quote_volume / p1.weighted_average_price), p.quote_volume * p2.weighted_average_price)`
       ),
     },
     'p.quote_volume',
@@ -61,21 +65,18 @@ const selectPairsCTE = pg
     'p.low',
     'p.weighted_average_price',
     'p.txs_count',
-    'p.matcher'
+    'p.matcher_address'
   )
-  .leftJoin('pairs_cte as p1', function() {
-    this.on(pg.raw("p1.amount_asset_id='WAVES'"))
+  .leftJoin({ p1: 'pairs_cte' }, function () {
+    this.on(pg.raw(`p1.amount_asset_id='WAVES'`))
       .andOn('p1.price_asset_id', 'p.price_asset_id')
-      .andOn('p1.matcher', 'p.matcher');
+      .andOn('p1.matcher_address', 'p.matcher_address');
   })
-  .leftJoin('pairs_cte as p2', function() {
-    this.on(pg.raw("p2.price_asset_id='WAVES'"))
-      .andOn('p2.amount_asset_id', 'p.price_asset_id')
-      .andOn('p2.matcher', 'p.matcher');
+  .leftJoin({ p2: 'pairs_cte' }, function () {
+    this.on('p2.amount_asset_id', 'p.price_asset_id')
+      .andOn(pg.raw(`p2.price_asset_id='WAVES'`))
+      .andOn('p2.matcher_address', 'p.matcher_address');
   });
 
-export const fillTable = (tableName: string): string =>
-  pg
-    .into(tableName)
-    .insert(selectPairsCTE)
-    .toString();
+export const fillTable = (pairsTableName: string): string =>
+  pg.into(pairsTableName).insert(selectPairsCTE).toString();

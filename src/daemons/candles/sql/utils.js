@@ -7,7 +7,9 @@ const { CandleInterval } = require('../../../types');
  *
  * @param {string} from
  */
-const pgRawExtractFromToTimestamp = from => /** @param {string} interval */ interval =>
+const pgRawExtractFromToTimestamp = (from) => /** @param {string} interval */ (
+  interval
+) =>
   pg.raw(
     `to_timestamp(floor((extract('epoch' from ${from}) / ${interval} )) * ${interval})`
   );
@@ -16,7 +18,7 @@ const pgRawExtractFromToTimestamp = from => /** @param {string} interval */ inte
  *
  * @param {string} from
  */
-const pgRawDateTrunc = from => /** @param {string} interval */ interval =>
+const pgRawDateTrunc = (from) => /** @param {string} interval */ (interval) =>
   pg.raw(`date_trunc('${interval}', ${from})`);
 
 /**
@@ -59,24 +61,19 @@ const toRawTimestamp = (from, interval) => {
 };
 
 /**
- * @param {Date | string} timestamp
+ * @param {Date} timestamp
  * @param {string} interval
  */
-const makeRawTimestamp = (timestamp, interval) => {
-  const ts =
-    timestamp instanceof Date
-      ? `'${timestamp.toISOString()}'::timestamp`
-      : timestamp;
-
-  return toRawTimestamp(ts, interval);
-};
+const makeRawTimestamp = (timestamp, interval) =>
+  toRawTimestamp(`'${timestamp.toISOString()}'::timestamptz`, interval);
 
 // serializeCandle:: Object => Object
-const serializeCandle = candle => ({
-  time_start: candle.time_start,
+// @todo refactor after pg updating for work with BigInt instead of BigNumber
+const serializeCandle = (candle) => ({
+  time_start: candle.time_start.toISOString(),
   amount_asset_id: candle.amount_asset_id,
   price_asset_id: candle.price_asset_id,
-  matcher: candle.matcher,
+  matcher_address: candle.matcher_address,
   low: candle.low.toString(),
   high: candle.high.toString(),
   volume: candle.volume.toString(),
@@ -91,7 +88,7 @@ const serializeCandle = candle => ({
 
 const candlePresets = {
   aggregate: {
-    candle_time: interval => toRawTimestamp('time_start', interval),
+    candle_time: (interval) => toRawTimestamp('time_start', interval),
     low: pg.min('low'),
     high: pg.max('high'),
     volume: pg.sum('volume'),
@@ -99,7 +96,7 @@ const candlePresets = {
     max_height: pg.max('max_height'),
     txs_count: pg.sum('txs_count'),
     weighted_average_price: pg.raw(
-      '(sum((weighted_average_price * volume)::numeric)::numeric / sum(volume)::numeric)::numeric'
+      'floor(sum((weighted_average_price * volume)::numeric)::numeric / sum(volume)::numeric)::numeric'
     ),
     open: pg.raw('(array_agg(open ORDER BY time_start)::numeric[])[1]'),
     close: pg.raw('(array_agg(close ORDER BY time_start DESC)::numeric[])[1]'),

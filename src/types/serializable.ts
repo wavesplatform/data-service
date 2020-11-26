@@ -1,7 +1,9 @@
 export type Serializable<T extends string, U> = {
   __type: T;
-  data: U;
+  data: U | null;
 };
+
+export type Transform<U, S> = (data: U) => S;
 
 export type FromSerializable<
   T extends Serializable<string, any>
@@ -14,7 +16,7 @@ export type FromSerializableType<
 export const toSerializable = <T extends string, U>(
   name: T,
   data: U | null
-): Serializable<T, U | null> => ({
+): Serializable<T, U> => ({
   __type: name,
   data: data === null ? null : data,
 });

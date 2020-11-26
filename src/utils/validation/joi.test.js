@@ -1,11 +1,14 @@
-const Joi = require('./joi');
-const { deserialize } = require('../../services/transactions/_common/cursor');
-
 const { BigNumber } = require('@waves/data-entities');
+const Joi = require('./joi');
+const {
+  serialize,
+  deserialize,
+} = require('../../services/transactions/_common/cursor');
 
-const validate = s => v => Joi.validate(v, s, { convert: false });
-const assertPass = x => expect(x.error).toBe(null);
-const assertError = x => expect(x.error).not.toBe(null);
+
+const validate = (s) => (v) => Joi.validate(v, s, { convert: false });
+const assertPass = (x) => expect(x.error).toBe(null);
+const assertError = (x) => expect(x.error).not.toBe(null);
 
 describe('Joi extended with custom types', () => {
   it('should validate simple strings correctly (despite override)', () => {
@@ -17,11 +20,15 @@ describe('Joi extended with custom types', () => {
 
   it('should validate cursor correctly', () => {
     const validateCursor = validate(Joi.cursor().valid(deserialize));
-    assertPass(
-      validateCursor(
-        'MjAxOC0wOS0xOFQxMzo0NDozNC4wMDBaOjo2b3NpNGI2Q3FrS3oyMVVtWDlxeXdydDJ1aXQ4U1VCOE1udndONjJhNnFLbzo6ZGVzYw=='
-      )
+    const validCursor = serialize(
+      {
+        sort: 'desc',
+      },
+      {
+        uid: new BigNumber(100),
+      }
     );
+    assertPass(validateCursor(validCursor));
     assertError(validateCursor('q')); // not base64
     assertError(validateCursor('MjAxOC0wOS')); // not decodable
     assertError(validateCursor(1));
@@ -42,11 +49,7 @@ describe('Joi extended with custom types', () => {
   });
 
   it('should validate bignumbers correctly', () => {
-    const validateInt64 = validate(
-      Joi.object()
-        .bignumber()
-        .int64()
-    );
+    const validateInt64 = validate(Joi.object().bignumber().int64());
 
     // a good int 64
     assertPass(validateInt64(new BigNumber(100)));
@@ -75,9 +78,7 @@ describe('Joi extended with custom types', () => {
 
     it('should validates accepted intervals correclty', () => {
       const validatePeriod = validate(
-        Joi.string()
-          .period()
-          .accept(['m', 'h', 'd'])
+        Joi.string().period().accept(['m', 'h', 'd'])
       );
 
       assertPass(validatePeriod('1m'));
@@ -88,11 +89,7 @@ describe('Joi extended with custom types', () => {
     });
 
     it('should validates min intervals correclty', () => {
-      const validatePeriod = validate(
-        Joi.string()
-          .period()
-          .min('1m')
-      );
+      const validatePeriod = validate(Joi.string().period().min('1m'));
 
       assertPass(validatePeriod('1m'));
       assertPass(validatePeriod('60s'));
@@ -102,11 +99,7 @@ describe('Joi extended with custom types', () => {
     });
 
     it('should validates max intervals correclty', () => {
-      const validatePeriod = validate(
-        Joi.string()
-          .period()
-          .max('1d')
-      );
+      const validatePeriod = validate(Joi.string().period().max('1d'));
 
       assertPass(validatePeriod('1d'));
       assertPass(validatePeriod('24h'));
@@ -116,11 +109,7 @@ describe('Joi extended with custom types', () => {
     });
 
     it('should validates divisible by intervals correclty', () => {
-      const validatePeriod = validate(
-        Joi.string()
-          .period()
-          .divisibleBy('2m')
-      );
+      const validatePeriod = validate(Joi.string().period().divisibleBy('2m'));
 
       assertPass(validatePeriod('2m'));
       assertPass(validatePeriod('10m'));

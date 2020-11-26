@@ -5,7 +5,7 @@ module.exports = [
   'senders',
   'timeStart',
   'timeEnd',
-  'after',
   'sort',
+  'after',
   'limit',
 ];

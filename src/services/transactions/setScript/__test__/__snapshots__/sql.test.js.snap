@@ -1,3 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`Sql search by type-specific filters supports recipient filter 1`] = `"select \\"height\\", \\"tx_type\\", \\"id\\", \\"time_stamp\\", \\"signature\\", \\"proofs\\", \\"tx_version\\", \\"sender\\", \\"sender_public_key\\", \\"script\\", fee * 10^(-8) as \\"fee\\" from \\"txs_13\\" as \\"t\\" where md5(script) = '19ef6b3d410646859afc954c10322e28'"`;

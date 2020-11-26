@@ -7,9 +7,10 @@ import {
   DbError,
   AppError,
   Timeout,
-} from '../../../errorHandling/';
+} from '../../../errorHandling';
 
 import { PgDriver } from '../../../db/driver';
+import { SearchedItems } from '../../../types';
 
 export type EmitEvent = (name: string) => <A>(object: A) => void;
 
@@ -22,8 +23,7 @@ type CommonResolverDependencies<
   ResRaw,
   ResTransformed
 > = {
-  validateInput: ValidateAsync<AppError, ReqRaw>;
-  transformInput: (r: ReqRaw) => ReqTransformed;
+  transformInput: (r: ReqRaw) => Result<ValidationError, ReqTransformed>;
   validateResult: ValidateSync<ResolverError, ResRaw>;
   emitEvent: EmitEvent;
 };
@@ -58,7 +58,10 @@ export type MgetResolverDependencies<
   ResTransformed
 > & {
   getData: (r: ReqTransformed) => Task<DbError | Timeout, Maybe<ResRaw>[]>;
-  transformResult: (result: Maybe<ResRaw>[], request: ReqRaw) => ResTransformed;
+  transformResult: (
+    result: Maybe<ResRaw>[],
+    request: ReqRaw
+  ) => Maybe<ResTransformed>[];
 };
 
 export type SearchResolverDependencies<
@@ -75,6 +78,6 @@ export type SearchResolverDependencies<
   getData: (r: ReqTransformed) => Task<DbError | Timeout, ResRaw[]>;
   transformResult: (
     results: ResRaw[],
-    request: ReqTransformed
-  ) => ResTransformed;
+    request: ReqRaw
+  ) => SearchedItems<ResTransformed>;
 };

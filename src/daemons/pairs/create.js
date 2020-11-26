@@ -4,7 +4,7 @@ const logTaskProgress = require('../utils/logTaskProgress');
 const sql = require('./sql');
 
 /** loop :: Object -> Task a b */
-const loop = ({ logTask, pg, tableName }) => {
+const loop = ({ logTask, pg, pairsTableName }) => {
   const logMessages = {
     start: timeStart => ({
       message: '[PAIRS] update started',
@@ -25,17 +25,17 @@ const loop = ({ logTask, pg, tableName }) => {
     logMessages,
     pg.tx(t =>
       t.batch([
-        t.none(sql.truncateTable(tableName)),
-        t.none(sql.fillTable(tableName)),
+        t.none(sql.truncateTable(pairsTableName)),
+        t.none(sql.fillTable(pairsTableName)),
       ])
     )
   );
 };
 
-module.exports = ({ logger, pg, tableName }) => {
+module.exports = ({ logger, pg, pairsTableName }) => {
   const unsafeLogTaskProgress = logTaskProgress(logger);
 
   return {
-    loop: () => loop({ logTask: unsafeLogTaskProgress, pg, tableName }),
+    loop: () => loop({ logTask: unsafeLogTaskProgress, pg, pairsTableName }),
   };
 };
