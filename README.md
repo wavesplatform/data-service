@@ -103,8 +103,9 @@ To do this, you have to:
 Its will start the documentation server at `localhost:8080`. Enjoy!
 
 #### General recommendations
-- Set up a dedicated web server such as Nginx in front of data-service backends (for ssl/caching/balancing)
-- Implement a caching strategy. Different endpoints may need different cache time (or no cache at all)
-- Run several process instances behind a load balancer per machine. `docker-compose --scale` can help with that, or it can be done manually. A good rule of thumb is to use as many instances as CPU cores available.
-- Use several machines in different data centers and a balancer to minimize downtime
-- Experiment with PostgreSQL settings to find out what works best for your configuration. Tweaking `PGPOOLSIZE` also can help performance.
+- Set up a dedicated web server such as Nginx in front of data-service backends (for ssl/caching/balancing);
+- Implement a caching strategy. Different endpoints may need different cache time (or no cache at all);
+- Run several process instances behind a load balancer per machine. `docker-compose --scale` can help with that, or it can be done manually. A good rule of thumb is to use as many instances as CPU cores available;
+- Use several machines in different data centers and a balancer to minimize downtime;
+- Experiment with PostgreSQL settings to find out what works best for your configuration. Tweaking `PGPOOLSIZE` also can help performance;
+- Run the sql from `mainnet.sql` to increase exchange-transactions service performance.
