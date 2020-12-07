@@ -21,42 +21,55 @@ export const fromMaybe = <A, B>(factory: (a?: A) => B) => (mb: Maybe<A>): B =>
     Nothing: () => factory(),
   });
 
-export type ServiceGet<
-  Request,
-  ResponseTransformed extends Serializable<string, any>
-> = {
-  readonly get: (
-    request: Request
-  ) => Task<AppError, Maybe<ResponseTransformed>>;
+export type Items<Item> = {
+  items: Item[];
 };
-export type ServiceMget<
-  Request,
-  ResponseTransformed extends Serializable<string, any>
-> = {
+
+export type SearchedItems<Item> = Items<Item> & {
+  lastCursor?: string;
+  isLastPage: boolean;
+};
+
+export type ServiceGetRequest<Id = string> = { id: Id };
+export type ServiceMgetRequest<Ids = string[]> = { ids: Ids };
+
+export type Service<Request, Response> = (
+  request: Request
+) => Task<AppError, Response>;
+
+export type RepoGetResponse<Response> = Maybe<Response>;
+export type RepoGet<Request, Response> = {
+  readonly get: (request: Request) => Task<AppError, RepoGetResponse<Response>>;
+};
+
+export type RepoMgetResponse<Response> = Maybe<Response>[];
+export type RepoMget<Request, Response> = {
   readonly mget: (
     request: Request
-  ) => Task<AppError, List<ResponseTransformed>>;
+  ) => Task<AppError, RepoMgetResponse<Response>>;
 };
-export type ServiceSearch<
-  Request,
-  ResponseTransformed extends Serializable<string, any>
-> = {
+
+export type RepoSearchResponse<Response> = SearchedItems<Response>;
+export type RepoSearch<Request, Response> = {
   readonly search: (
     request: Request
-  ) => Task<AppError, List<ResponseTransformed>>;
+  ) => Task<AppError, RepoSearchResponse<Response>>;
 };
 
-export type Service<
+export type Repo<GetRequest, MgetRequest, SearchRequest, Response> = RepoGet<
   GetRequest,
-  MgetRequest,
-  SearchRequest,
-  Response extends Serializable<string, any>
-> = ServiceGet<GetRequest, Response> &
-  ServiceMget<MgetRequest, Response> &
-  ServiceSearch<SearchRequest, Response>;
+  Response
+> &
+  RepoMget<MgetRequest, Response> &
+  RepoSearch<SearchRequest, Response>;
+
+export type RepoResponse<Response> =
+  | Maybe<Response>
+  | Maybe<Response>[]
+  | RepoSearchResponse<Response>;
 
 export { AssetInfo };
-export type Asset = Serializable<'asset', AssetInfo | null>;
+export type Asset = Serializable<'asset', AssetInfo>;
 export const asset = (data: AssetInfo | null = null): Asset =>
   toSerializable('asset', data);
 
@@ -64,8 +77,8 @@ export type AliasInfo = {
   alias: string;
   address: string | null;
 };
-export type Alias = Serializable<'alias', AliasInfo | null>;
-export const alias = (data: AliasInfo | null = null): Alias =>
+export type Alias = Serializable<'alias', AliasInfo>;
+export const alias = (data: AliasInfo | null): Alias =>
   toSerializable('alias', data);
 
 export type CandleInfo = {
@@ -121,10 +134,19 @@ export const pair = (
 ): Pair => ({ ...toSerializable('pair', data), ...pairData });
 
 // @todo TransactionInfo
-export type DataTxEntryType = 'binary' | 'boolean' | 'integer' | 'string';
+export enum DataEntryType {
+  Binary = 'binary',
+  Boolean = 'boolean',
+  Integer = 'integer',
+  String = 'string',
+}
 export type TransactionInfo = {
   id: string;
+  timestamp: Date;
   type: number;
+};
+export type CommonTransactionInfo = TransactionInfo & {
+  txUid: BigNumber;
 };
 export type NotNullTransaction = Serializable<'transaction', TransactionInfo>;
 export type Transaction = Serializable<'transaction', TransactionInfo | null>;
@@ -151,6 +173,7 @@ export type RateGetParams = {
 export type RateInfo = {
   rate: BigNumber;
 };
+export type RateWithPairIds = RateInfo & AssetIdsPair;
 export type Rate = Serializable<'rate', RateInfo | null> & AssetIdsPair;
 export const rate = (data: RateInfo | null, assetMeta: AssetIdsPair): Rate => ({
   ...toSerializable('rate', data === null ? null : data),

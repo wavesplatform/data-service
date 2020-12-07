@@ -1,18 +1,20 @@
+import { BigNumber } from '@waves/data-entities';
+
 type CommonTxFields = {
   height: number;
   id: string;
   signature: string;
   proofs: string[];
   sender: string;
-  fee: bigint;
+  fee: BigNumber;
 };
 
-export type RawTxWithUid = {
-  tx_uid: number;
+export type WithTxUid = {
+  uid: BigNumber;
 };
 
 export type RawTx = CommonTxFields &
-  RawTxWithUid & {
+  WithTxUid & {
     tx_type: number;
     time_stamp: Date;
     tx_version: number | null;
@@ -24,6 +26,9 @@ export type Tx = CommonTxFields & {
   timestamp: Date;
   version?: number;
   senderPublicKey: string;
+  fee: BigNumber;
+  feeAsset?: string;
+  feeAssetId?: string;
 };
 
 export type CommonFilters = {

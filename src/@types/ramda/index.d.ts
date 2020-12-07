@@ -103,6 +103,11 @@ declare module 'ramda' {
       list: ReadonlyArray<A>
     ): R;
 
+    sequence<A, B>(
+      of: (a: any) => A, // applicative type constructor
+      list: ReadonlyArray<A>  // traversable
+    ): B;
+
     // compose
     compose<V0, T1, T2, T3, T4, T5, T6, T7>(
       fn6: (x: T6) => T7,
@@ -124,5 +129,13 @@ declare module 'ramda' {
       fn1: (x: T1) => T2,
       fn0: (x0: V0) => T1
     ): (x0: V0) => T8;
+
+    mapObjIndexed<T, TResult, TDictionary>(
+      fn: (value: T, key: string, obj?: any) => TResult
+    ): (obj: any) => TDictionary;
+  }
+
+  interface Filter {
+    <T extends Record<string, any>>(fn: (value: T[keyof T]) => boolean): T;
   }
 }

@@ -2,12 +2,10 @@ import { BigNumber } from '@waves/data-entities';
 import { Maybe, of as maybeOf, fromNullable } from 'folktale/maybe';
 import { path, complement } from 'ramda';
 
-import { AssetIdsPair, CacheSync } from '../../../../types';
+import { AssetIdsPair, CacheSync, RateWithPairIds } from '../../../../types';
 import { WavesId, flip, pairHasWaves } from '../../data';
 import { inv, safeDivide } from '../../util';
 import { isDefined, map2 } from '../../../../utils/fp/maybeOps';
-
-import { RateWithPairIds } from '../../../rates'
 
 type RateLookupTable = {
   [amountAsset: string]: {

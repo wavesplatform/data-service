@@ -26,7 +26,8 @@ declare module 'folktale/result' {
     orElse<C, D>(f: (a: A) => Result<C, D>): Result<C, D>;
     swap(): Result<B, A>;
 
-    concat(m: Result<A, B>): B extends Semigroup<any> ? Result<A, B> : unknown;
+    // returns `never` cause when B is not extend Semigroup, the TypeError will be thrown
+    concat(m: Result<A, B>): B extends Semigroup<any> ? Result<A, B> : never;
 
     fold<C>(l: (a: A) => B, r: (b: B) => C): C;
 
@@ -34,7 +35,12 @@ declare module 'folktale/result' {
     filter(pred: (b: B) => boolean): Result<A, B>;
   }
 
-  export const of: <A, B>(value: B) => Result<A, B>;
-  export const Error: <A, B>(error: A) => Result<A, B>;
-  export const Ok: <A, B>(value: B) => Result<A, B>;
+  export function of<A, B>(value: B): Result<A, B>;
+  export function of<A>(): Result<A, void>;
+
+  export function Error<A, B>(error: A): Result<A, B>;
+  export function Error<B>(): Result<void, B>;
+
+  export function Ok<A, B>(value: B): Result<A, B>;
+  export function Ok<A>(): Result<A, void>;
 }

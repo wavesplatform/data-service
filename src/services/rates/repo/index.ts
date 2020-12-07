@@ -1,14 +1,14 @@
+import { Task } from 'folktale/concurrency/task';
 import { partition, chain, uniqWith } from 'ramda';
-import { AssetIdsPair, CacheSync } from '../../../types';
 import { BigNumber } from '@waves/data-entities';
+
+import { AssetIdsPair, CacheSync, RateWithPairIds } from '../../../types';
 import {
   pairIsSymmetric,
   pairsEq,
   generatePossibleRequestItems,
 } from '../data';
 import { RateCacheKey } from './impl/RateCache';
-import { Task } from 'folktale/concurrency/task';
-import { RateWithPairIds } from '../../rates';
 
 export type RateCache = CacheSync<RateCacheKey, BigNumber>;
 

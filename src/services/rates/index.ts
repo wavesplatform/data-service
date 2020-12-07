@@ -1,53 +1,56 @@
 import { BigNumber } from '@waves/data-entities';
-import { withStatementTimeout } from '../../db/driver';
-import {
-  ServiceMget,
-  Rate,
-  RateMgetParams,
-  list,
-  rate,
-  RateInfo,
-  AssetIdsPair,
-} from '../../types';
-import { RateSerivceCreatorDependencies } from '../../services';
+import { Service, RateMgetParams, RateWithPairIds } from '../../types';
+import { RateSerivceCreatorDependencies } from '..';
 import RateEstimator from './RateEstimator';
 import RemoteRateRepo from './repo/impl/RemoteRateRepo';
+import { MoneyFormat, WithMoneyFormat } from '../types';
+import { of as taskOf } from 'folktale/concurrency/task';
 
 export { default as RateCacheImpl } from './repo/impl/RateCache';
 
-export type RateWithPairIds = RateInfo & AssetIdsPair;
+export type RatesMgetService = Service<
+  RateMgetParams & WithMoneyFormat,
+  RateWithPairIds[]
+>;
 
-export default function({
+export default function ({
   drivers,
   cache,
-  timeouts,
-}: RateSerivceCreatorDependencies): ServiceMget<RateMgetParams, Rate> {
-  const estimator = new RateEstimator(
-    cache,
-    new RemoteRateRepo(withStatementTimeout(drivers.pg, timeouts.mget))
-  );
+  assets,
+}: RateSerivceCreatorDependencies): RatesMgetService {
+  const estimator = new RateEstimator(cache, new RemoteRateRepo(drivers.pg));
 
-  return {
-    mget(request: RateMgetParams) {
-      return estimator
-        .mget(request)
-        .map(data =>
-          data.map(item =>
-            rate(
-              {
-                rate: item.res.fold(
-                  () => new BigNumber(0),
-                  it => it.rate
+  return (request: RateMgetParams & WithMoneyFormat) =>
+    estimator
+      .mget(request)
+      .map((data) =>
+        data.map((item) => ({
+          rate: item.res.fold(
+            () => new BigNumber(0),
+            (it) => it.rate
+          ),
+          amountAsset: item.req.amountAsset,
+          priceAsset: item.req.priceAsset,
+        }))
+      )
+      .chain((items) =>
+        request.moneyFormat === MoneyFormat.Long
+          ? taskOf(items)
+          : assets
+              .precisions({
+                ids: items.reduce<string[]>(
+                  (acc, item) =>
+                    acc.concat([item.amountAsset, item.priceAsset]),
+                  []
                 ),
-              },
-              {
-                amountAsset: item.req.amountAsset,
-                priceAsset: item.req.priceAsset,
-              }
-            )
-          )
-        )
-        .map(list);
-    },
-  };
+              })
+              .map((precisions) =>
+                items.map((item) => ({
+                  ...item,
+                  rate: item.rate.multipliedBy(
+                    10 ** (-8 - precisions[1] + precisions[0])
+                  ),
+                }))
+              )
+      );
 }

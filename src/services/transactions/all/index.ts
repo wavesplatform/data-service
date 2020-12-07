@@ -1,53 +1,42 @@
-import * as Task from 'folktale/concurrency/task';
-import * as Maybe from 'folktale/maybe';
+import { waitAll, of as taskOf, Task } from 'folktale/concurrency/task';
+import { Maybe, empty as emptyOf } from 'folktale/maybe';
+import { pipe, groupBy, toPairs, flatten, sort, indexBy } from 'ramda';
+
+import { AppError } from '../../../errorHandling';
 import {
-  pipe,
-  map,
-  groupBy,
-  prop,
-  toPairs,
-  pick,
-  isNil,
-  reject,
-  ifElse,
-  flatten,
-  indexBy,
-  identity,
-  evolve,
-} from 'ramda';
-import { CommonServiceDependencies } from '../..';
-import {
-  List,
-  Transaction,
-  NotNullTransaction,
   TransactionInfo,
   Service,
+  SearchedItems,
+  ServiceMgetRequest,
+  ServiceGetRequest,
+  CommonTransactionInfo,
 } from '../../../types';
-import { AppError } from '../../../errorHandling';
-
-import { CommonFilters } from '../_common/types';
-
-import * as commonData from './commonData';
-import { WithSortOrder, WithLimit } from '../../_common';
-import { RequestWithCursor } from '../../_common/pagination';
-import { GenesisTxsService } from '../genesis';
-import { PaymentTxsService } from '../payment';
-import { IssueTxsService } from '../issue';
-import { TransferTxsService } from '../transfer';
-import { ReissueTxsService } from '../reissue';
-import { BurnTxsService } from '../burn';
-import { ExchangeTxsService } from '../exchange';
-import { LeaseTxsService } from '../lease';
-import { LeaseCancelTxsService } from '../leaseCancel';
-import { AliasTxsService } from '../alias';
-import { MassTransferTxsService } from '../massTransfer';
-import { DataTxsService } from '../data';
-import { SetScriptTxsService } from '../setScript';
-import { SponsorshipTxsService } from '../sponsorship';
-import { SetAssetScriptTxsService } from '../setAssetScript';
-import { InvokeScriptTxsService } from '../invokeScript';
-
-const getData = prop('data');
+import { SortOrder } from '../../_common';
+import { GenesisTxsService } from '../genesis/types';
+import { PaymentTxsService } from '../payment/types';
+import { IssueTxsService } from '../issue/types';
+import { TransferTxsService } from '../transfer/types';
+import { ReissueTxsService } from '../reissue/types';
+import { BurnTxsService } from '../burn/types';
+import { ExchangeTxsService } from '../exchange/types';
+import { LeaseTxsService } from '../lease/types';
+import { LeaseCancelTxsService } from '../leaseCancel/types';
+import { AliasTxsService } from '../alias/types';
+import { MassTransferTxsService } from '../massTransfer/types';
+import { DataTxsService } from '../data/types';
+import { SetScriptTxsService } from '../setScript/types';
+import { SponsorshipTxsService } from '../sponsorship/types';
+import { SetAssetScriptTxsService } from '../setAssetScript/types';
+import { InvokeScriptTxsService } from '../invokeScript/types';
+import { UpdateAssetInfoTxsService } from '../updateAssetInfo/types';
+import {
+  AllTxsRepo,
+  AllTxsGetRequest,
+  AllTxsMgetRequest,
+  AllTxsSearchRequest,
+} from './repo/types';
+import { WithMoneyFormat, MoneyFormat } from '../../types';
+import { collect } from '../../../utils/collection';
 
 type AllTxsServiceDep = {
   1: GenesisTxsService;
@@ -66,159 +55,109 @@ type AllTxsServiceDep = {
   14: SponsorshipTxsService;
   15: SetAssetScriptTxsService;
   16: InvokeScriptTxsService;
+  17: UpdateAssetInfoTxsService;
 };
 
-type AllTxsSearchRequest = RequestWithCursor<
-  CommonFilters & WithSortOrder & WithLimit,
-  string
->;
+export type AllTxsServiceGetRequest = ServiceGetRequest<AllTxsGetRequest>;
+export type AllTxsServiceMgetRequest = ServiceMgetRequest<AllTxsMgetRequest>;
+export type AllTxsServiceSearchRequest = AllTxsSearchRequest;
 
-export type AllTxsService = Service<
-  string,
-  string[],
-  AllTxsSearchRequest,
-  Transaction
->;
+export type AllTxsService = {
+  get: Service<
+    AllTxsServiceGetRequest & WithMoneyFormat,
+    Maybe<TransactionInfo>
+  >;
+  mget: Service<
+    AllTxsServiceMgetRequest & WithMoneyFormat,
+    Maybe<TransactionInfo>[]
+  >;
+  search: Service<
+    AllTxsServiceSearchRequest & WithMoneyFormat,
+    SearchedItems<TransactionInfo>
+  >;
+};
 
 // @todo
 // request by (id, timestamp) instead of just id
 // to ensure correct tx response even if
 // id is duplicated (happens in payment, alias txs)
-export default (deps: CommonServiceDependencies) => (
+export default (repo: AllTxsRepo) => (
   txsServices: AllTxsServiceDep
-): AllTxsService => {
-  const commonTxData = commonData(deps);
-
-  const isEmpty = (t: Transaction) => isNil(t.data);
-
-  /**
-   * idTypeFromCommonData
-   * List CommonData -> { id, type }[]
-   */
-  const idTypeFromCommonData = pipe<
-    List<NotNullTransaction>,
-    NotNullTransaction[],
-    { id: string; type: number }[]
-  >(
-    getData,
-    map(
-      pipe<NotNullTransaction, TransactionInfo, { id: string; type: number }>(
-        getData,
-        pick(['id', 'type'])
-      )
-    )
-  );
-
-  /**
-   * resultsFromIdType
-   * returns unordered response data from types and ids
-   * { id, type }[] -> Task TxData[]
-   */
-  const resultsFromIdType = pipe<
-    { id: string; type: number }[],
-    {
-      [key: string]: {
-        id: string;
-        type: any;
-      }[];
-    },
-    [any, { id: string; type: string }[]][],
-    Task.Task<AppError, List<Transaction>>[],
-    Task.Task<AppError, List<NotNullTransaction>[]>,
-    Task.Task<AppError, TransactionInfo[]>
-  >(
-    groupBy(prop('type') as any),
-    toPairs,
-    (
-      tuples: [keyof AllTxsServiceDep, { id: string; type: string }[]][]
-    ): Task.Task<AppError, List<Transaction>>[] =>
-      tuples.map(([type, txs]) => {
-        return txsServices[type].mget(txs.map(prop('id')));
-      }),
-    Task.waitAll,
-    (t: Task.Task<AppError, List<NotNullTransaction>[]>) =>
-      t.map(
-        pipe(
-          (ls: List<NotNullTransaction>[]): NotNullTransaction[][] =>
-            ls.map(getData),
-          (ls: NotNullTransaction[][]) => flatten<NotNullTransaction>(ls),
-          map(getData)
-        )
-      )
-  );
-
-  return {
-    get: id =>
-      commonTxData
-        .get(id) //Task tx
-        .chain(
-          pipe(
-            (m: Maybe.Maybe<NotNullTransaction>) => m.map(getData),
-            (m: Maybe.Maybe<TransactionInfo>) =>
-              m.matchWith({
-                Just: ({ value }: { value: TransactionInfo }) => {
-                  return txsServices[value.type as keyof AllTxsServiceDep].get(
-                    id
-                  );
-                },
-                Nothing: () => Task.of(Maybe.empty()),
-              })
-          )
-        ),
-    mget: ids =>
-      commonTxData
-        .mget(ids) // Task tx[]. tx can have data: null
-        .chain((txsList: List<Transaction>) =>
-          pipe(
-            (o: any) =>
-              evolve({ data: reject(isEmpty) }, o) as List<NotNullTransaction>,
-            idTypeFromCommonData,
-            resultsFromIdType, // Task TxData[]
-            // format output,
-            t =>
-              t.map(
-                pipe<any[], { [key: string]: any }, List<Transaction>>(
-                  indexBy(prop<string, string>('id')),
-                  resultsMap => ({
-                    ...txsList,
-                    data: txsList.data.map(
-                      ifElse(isEmpty, identity, t => ({
-                        ...t,
-                        data: resultsMap[t.data.id],
-                      }))
-                    ),
-                  })
-                )
-              )
-          )(txsList)
-        ),
-
-    search: filters =>
-      commonTxData.search(filters).chain<AppError, List<Transaction>>(txsList =>
-        pipe<
-          List<NotNullTransaction>,
-          { id: string; type: number }[],
-          Task.Task<AppError, TransactionInfo[]>,
-          Task.Task<AppError, List<Transaction>>
-        >(
-          idTypeFromCommonData,
-          resultsFromIdType,
-          // format output
-          t =>
-            t.map(
-              pipe<any[], { [key: string]: any }, List<Transaction>>(
-                indexBy(prop<string, string>('id')),
-                resultsMap =>
-                  ({
-                    ...txsList,
-                    data: txsList.data.map(t => ({
-                      ...t,
-                      data: resultsMap[t.data.id],
-                    })),
-                  } as List<Transaction>)
-              )
-            )
-        )(txsList as List<NotNullTransaction>)
+): AllTxsService => ({
+  get: (req) =>
+    repo
+      .get(req.id) //Task tx
+      .chain((m) =>
+        m.matchWith({
+          Just: ({ value }) => {
+            return txsServices[value.type as keyof AllTxsServiceDep].get({
+              id: value.id,
+              moneyFormat: MoneyFormat.Long,
+            });
+          },
+          Nothing: () => taskOf(emptyOf()),
+        })
       ),
-  };
-};
+
+  mget: (req) =>
+    repo
+      .mget(req.ids) // Task tx[]. tx can have data: null
+      .chain((txsList: Maybe<TransactionInfo>[]) =>
+        waitAll(
+          txsList.map((m) =>
+            m.matchWith({
+              Just: ({ value }) => {
+                return txsServices[value.type as keyof AllTxsServiceDep].get({
+                  id: value.id,
+                  moneyFormat: MoneyFormat.Long,
+                });
+              },
+              Nothing: () => taskOf(emptyOf()),
+            })
+          )
+        )
+      ),
+
+  search: (req) =>
+    repo.search(req).chain((txsList: SearchedItems<CommonTransactionInfo>) =>
+      waitAll<AppError, Maybe<TransactionInfo>[]>(
+        pipe<
+          CommonTransactionInfo[],
+          Record<string, CommonTransactionInfo[]>,
+          [string, CommonTransactionInfo[]][],
+          Task<AppError, Maybe<TransactionInfo>[]>[]
+        >(
+          groupBy((t) => String(t.type)),
+          toPairs,
+          (tuples) =>
+            tuples.map(([type, txs]) => {
+              return txsServices[
+                (type as unknown) as keyof AllTxsServiceDep
+              ].mget({
+                ids: txs.map((t) => t.id),
+                moneyFormat: req.moneyFormat,
+              });
+            })
+        )(txsList.items)
+      )
+        .map((mss) => flatten<Maybe<TransactionInfo>>(mss))
+        .map(collect((m) => m.getOrElse(undefined)))
+        .map((txs) => {
+          const s = indexBy(
+            (tx) => `${tx.id}:${tx.timestamp.valueOf()}`,
+            txsList.items
+          );
+          return sort((a, b) => {
+            const aTxUid = s[`${a.id}:${a.timestamp.valueOf()}`]['txUid'];
+            const bTxUid = s[`${b.id}:${b.timestamp.valueOf()}`]['txUid'];
+            return req.sort === SortOrder.Ascending
+              ? aTxUid.minus(bTxUid).toNumber()
+              : bTxUid.minus(aTxUid).toNumber();
+          }, txs);
+        })
+        .map((txs) => ({
+          ...txsList,
+          items: txs,
+        }))
+    ),
+});

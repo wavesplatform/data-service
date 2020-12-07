@@ -1,33 +1,34 @@
 import { Result, Error as error, Ok as ok } from 'folktale/result';
+import { BigNumber } from '@waves/data-entities';
 import { ValidationError } from '../../../errorHandling';
 import { SortOrder, WithSortOrder } from '../../_common';
-import { RawTxWithUid } from './types';
+import { WithTxUid } from './types';
 
 const isSortOrder = (s: string): s is SortOrder =>
   s === SortOrder.Ascending || s === SortOrder.Descending;
 
 export type Cursor = {
-  tx_uid: number;
+  uid: BigNumber;
   sort: SortOrder;
 };
 
 export const serialize = <
   Request extends WithSortOrder,
-  Response extends RawTxWithUid
+  Response extends WithTxUid
 >(
   request: Request,
   response: Response
 ): string | undefined =>
   response === null
     ? undefined
-    : Buffer.from(`${response.tx_uid}::${request.sort}`).toString('base64');
+    : Buffer.from(`${response.uid.toString()}::${request.sort}`).toString(
+        'base64'
+      );
 
 export const deserialize = (
   cursor: string
 ): Result<ValidationError, Cursor> => {
-  const data = Buffer.from(cursor, 'base64')
-    .toString('utf8')
-    .split('::');
+  const data = Buffer.from(cursor, 'base64').toString('utf8').split('::');
 
   const err = (message?: string) =>
     new ValidationError('Cursor deserialization is failed', {
@@ -38,25 +39,28 @@ export const deserialize = (
   return (
     ok<ValidationError, string[]>(data)
       // validate length
-      .chain(d =>
+      .chain((d) =>
         d.length === 2
           ? ok<ValidationError, string[]>(d)
           : error<ValidationError, string[]>(
               err('Cursor length is not equals to 2')
             )
       )
-      .chain(d => {
+      .chain((d) => {
         const s = d[1];
         if (isSortOrder(s)) {
-          return ok<ValidationError, [number, SortOrder]>([parseInt(d[0]), s]);
+          return ok<ValidationError, [BigNumber, SortOrder]>([
+            new BigNumber(d[0]),
+            s,
+          ]);
         } else {
-          return error<ValidationError, [number, SortOrder]>(
+          return error<ValidationError, [BigNumber, SortOrder]>(
             err('Sort is not valid')
           );
         }
       })
-      .map(([tx_uid, sort]) => ({
-        tx_uid,
+      .map(([uid, sort]) => ({
+        uid,
         sort,
       }))
   );
