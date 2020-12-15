@@ -13,7 +13,7 @@ import { isEmpty } from '../../utils/fp/maybeOps';
 import { PairsService } from 'services/pairs';
 import { PairOrderingService } from 'services/PairOrderingService';
 import { MoneyFormat } from '../../services/types';
-import { complement } from 'ramda';
+import { BigNumber } from '@waves/data-entities';
 
 type ReqAndRes<TReq, TRes> = {
   req: TReq;
@@ -84,15 +84,15 @@ export default class RateEstimator
           moneyFormat: MoneyFormat.Long,
         }).map(foundPairs => {
           return foundPairs.map(
-            (itm, idx) => itm.map(pair => Object.assign(pair, { rate: pairsWithRates[idx].rate }))
+            (itm, idx) => itm
+              .map(pair => Object.assign(pair, { rate: pairsWithRates[idx].rate }))
+              .getOrElse<EstimationReadyRateInfo>({...pairsWithRates[idx], volumeWaves: new BigNumber(0)})
           )
         })
       })
       .map(results => {
-        const unwrappedRes = results.filter(complement(isEmpty)).map(it => it.unsafeGet())
-        
-        if (shouldCache) cacheAll(unwrappedRes);
-        return unwrappedRes;
+        if (shouldCache) cacheAll(results);
+        return results;
       })
       .map(data => new RateInfoLookup([...data, ...preCount]))
       .map(lookup =>

@@ -37,6 +37,8 @@ export default class RateInfoLookup
   }
 
   get(pair: AssetIdsPair): Maybe<EstimationReadyRateInfo> {
+    console.log("LOOKUP PAIR: ", pair)
+    
     const lookup = (pair: AssetIdsPair, flipped: boolean) =>
       this.getFromLookupTable(pair, flipped);
 
