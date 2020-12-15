@@ -17,9 +17,12 @@ export default function ({
   drivers,
   cache,
   assets,
+  pairs,
+  pairsOrdering,
 }: RateSerivceCreatorDependencies): RatesMgetService {
-  const estimator = new RateEstimator(cache, new RemoteRateRepo(drivers.pg));
-
+  
+  const estimator = new RateEstimator(cache, new RemoteRateRepo(drivers.pg), pairs, pairsOrdering);
+  
   return (request: RateMgetParams & WithMoneyFormat) =>
     estimator
       .mget(request)

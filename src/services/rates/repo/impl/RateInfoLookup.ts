@@ -2,7 +2,7 @@ import { BigNumber } from '@waves/data-entities';
 import { Maybe, of as maybeOf, fromNullable } from 'folktale/maybe';
 import { path, complement } from 'ramda';
 
-import { AssetIdsPair, CacheSync, RateWithPairIds } from '../../../../types';
+import { AssetIdsPair, CacheSync, RateWithPairIds, EstimationReadyRateInfo } from '../../../../types';
 import { WavesId, flip, pairHasWaves } from '../../data';
 import { inv, safeDivide } from '../../util';
 import { isDefined, map2 } from '../../../../utils/fp/maybeOps';
@@ -24,8 +24,12 @@ export default class RateInfoLookup
   implements Omit<CacheSync<AssetIdsPair, RateWithPairIds>, 'set'> {
   private readonly lookupTable: RateLookupTable;
 
-  constructor(data: Array<RateWithPairIds>) {
+  constructor(data: Array<EstimationReadyRateInfo>) {
+
+    console.log("LOOKUP RATE INFO !!!", data);
     this.lookupTable = this.toLookupTable(data);
+
+    console.log("lookup table: ", this.lookupTable);
   }
 
   has(pair: AssetIdsPair): boolean {

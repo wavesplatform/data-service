@@ -20,15 +20,22 @@ type CandleRate = {
 
 export default class RemoteRateRepo
   implements AsyncMget<RateMgetParams, RateWithPairIds, DbError | Timeout> {
-  constructor(private readonly dbDriver: PgDriver) {}
-
+    constructor(
+      private readonly dbDriver: PgDriver,
+    ) {}
+    
   mget(
     request: RateMgetParams
-  ): Task<DbError | Timeout, Array<RateWithPairIds>> {
+  ): Task<DbError | Timeout, Array<RateWithPairIds>> {    
+    
+    // this.pairsService.mget
+    
     const pairsSqlParams = chain(
       it => [it.amountAsset, it.priceAsset],
       request.pairs
     );
+
+    console.log("PAIRS", pairsSqlParams);
 
     const sql = pg.raw(makeSql(request.pairs.length), [
       request.timestamp.getOrElse(new Date()),
@@ -41,7 +48,10 @@ export default class RemoteRateRepo
         ? taskOf([])
         : this.dbDriver.any(sql.toString());
 
-    return dbTask.map(
+    return dbTask.map(resp => {
+      console.log("DB RESULT: ", resp);
+      return resp
+    }).map(
       (result): Array<RateWithPairIds> =>
         map((it): RateWithPairIds => {
           return {

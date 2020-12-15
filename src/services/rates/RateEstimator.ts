@@ -3,13 +3,18 @@ import { Task } from 'folktale/concurrency/task';
 import { Maybe } from 'folktale/maybe';
 
 import { tap } from '../../utils/tap';
-import { AssetIdsPair, RateMgetParams, RateWithPairIds } from '../../types';
+import { AssetIdsPair, RateMgetParams, RateWithPairIds, EstimationReadyRateInfo } from '../../types';
 import { AppError, DbError, Timeout } from '../../errorHandling';
 
 import { partitionByPreCount, AsyncMget, RateCache } from './repo';
 import { RateCacheKey } from './repo/impl/RateCache';
 import RateInfoLookup from './repo/impl/RateInfoLookup';
 import { isEmpty } from '../../utils/fp/maybeOps';
+
+import { PairsService } from 'services/pairs';
+import { PairOrderingService } from 'services/PairOrderingService';
+import { MoneyFormat } from 'services/types';
+import { complement } from 'ramda';
 
 type ReqAndRes<TReq, TRes> = {
   req: TReq;
@@ -29,13 +34,19 @@ export default class RateEstimator
       RateMgetParams,
       RateWithPairIds,
       DbError | Timeout
-    >
+      >,
+    // @ts-ignore-next-line
+    private readonly pairs: PairsService,
+    // @ts-ignore-next-line
+    private readonly pairsOrder: PairOrderingService,
   ) {}
 
   mget(
     request: RateMgetParams
   ): Task<AppError, ReqAndRes<AssetIdsPair, RateWithPairIds>[]> {
     const { pairs, timestamp, matcher } = request;
+
+    console.log("PAIRS_REQ: ", pairs);
 
     const shouldCache = isEmpty(timestamp);
 
@@ -44,16 +55,16 @@ export default class RateEstimator
       matcher,
     });
 
-    const cacheUnlessCached = (item: AssetIdsPair, rate: BigNumber) => {
+    const cacheUnlessCached = (item: EstimationReadyRateInfo) => {
       const key = getCacheKey(item);
 
       if (!this.cache.has(key)) {
-        this.cache.set(key, rate);
+        this.cache.set(key, item);
       }
     };
 
-    const cacheAll = (items: Array<RateWithPairIds>) =>
-      items.forEach(it => cacheUnlessCached(it, it.rate));
+    const cacheAll = (items: Array<EstimationReadyRateInfo>) =>
+      items.forEach(it => cacheUnlessCached(it));
 
     const { preCount, toBeRequested } = partitionByPreCount(
       this.cache,
@@ -62,13 +73,29 @@ export default class RateEstimator
       shouldCache
     );
 
+    console.log("PRE_COUNT: ", preCount);
+    console.log("TO_BE_REQUESTED: ", toBeRequested);
+    
     return this.remoteGet
       .mget({ pairs: toBeRequested, matcher, timestamp })
-      .map(results => {
-        if (shouldCache) cacheAll(results);
-        return results;
+      .chain(pairsWithRates => {
+        return this.pairs.mget({
+          pairs: pairsWithRates,
+          matcher: request.matcher,
+          moneyFormat: MoneyFormat.Long,
+        }).map(foundPairs => {
+          return foundPairs.map(
+            (itm, idx) => itm.map(pair => Object.assign(pair, { rate: pairsWithRates[idx].rate }))
+          )
+        })
       })
-      .map(data => new RateInfoLookup(data.concat(preCount)))
+      .map(results => {
+        const unwrappedRes = results.filter(complement(isEmpty)).map(it => it.unsafeGet())
+        
+        if (shouldCache) cacheAll(unwrappedRes);
+        return unwrappedRes;
+      })
+      .map(data => new RateInfoLookup([...data, ...preCount]))
       .map(lookup =>
         pairs.map(idsPair => ({
           req: idsPair,
@@ -81,7 +108,7 @@ export default class RateEstimator
             reqAndRes.res.map(
               tap(res => {
                 if (shouldCache) {
-                  cacheUnlessCached(reqAndRes.req, res.rate);
+                  cacheUnlessCached(reqAndRes.res);
                 }
               })
             )
