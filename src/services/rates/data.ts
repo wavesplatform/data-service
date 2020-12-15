@@ -11,8 +11,9 @@ export const pairIsSymmetric = isSymmetric((p: AssetIdsPair) => [
 export const pairHasWaves = (pair: AssetIdsPair): boolean =>
   pair.amountAsset === WavesId || pair.priceAsset === WavesId;
 
-export function flip(pair: AssetIdsPair): AssetIdsPair {
+export function flip<T extends AssetIdsPair>(pair: T): T {
   return {
+      ...pair,
     amountAsset: pair.priceAsset,
     priceAsset: pair.amountAsset,
   };
