@@ -1,6 +1,6 @@
 import { BigNumber } from '@waves/data-entities';
-import { Maybe, of as maybeOf, fromNullable } from 'folktale/maybe';
-import { path, complement } from 'ramda';
+import { Maybe, fromNullable } from 'folktale/maybe';
+import { path } from 'ramda';
 
 import { AssetIdsPair, CacheSync, RateWithPairIds, EstimationReadyRateInfo } from '../../../../types';
 import { WavesId, flip, pairHasWaves } from '../../data';
@@ -9,7 +9,7 @@ import { isDefined, map2 } from '../../../../utils/fp/maybeOps';
 
 type RateLookupTable = {
   [amountAsset: string]: {
-    [priceAsset: string]: BigNumber;
+    [priceAsset: string]: EstimationReadyRateInfo;
   };
 };
 
@@ -36,26 +36,32 @@ export default class RateInfoLookup
     return isDefined(this.get(pair));
   }
 
-  get(pair: AssetIdsPair): Maybe<RateWithPairIds> {
+  get(pair: AssetIdsPair): Maybe<EstimationReadyRateInfo> {
     const lookup = (pair: AssetIdsPair, flipped: boolean) =>
       this.getFromLookupTable(pair, flipped);
 
-    return lookup(pair, false)
-      .orElse(() => lookup(pair, true))
-      .orElse(() =>
-        maybeOf(pair)
-          .filter(complement(pairHasWaves))
-          .chain(pair => this.lookupThroughWaves(pair))
-      );
+    if (pairHasWaves(pair)) {
+      return lookup(pair, false).orElse(() => lookup(pair, true));
+    }
+
+    const directPair = lookup(pair, false).orElse(() => lookup(pair, true));
+    const wavesLookupPair = this.lookupThroughWaves(pair);
+
+    return directPair.chain(
+      directVal => wavesLookupPair.map(
+        wavesLookupVal => wavesLookupVal.volumeWaves > directVal.volumeWaves ?
+          wavesLookupVal : directVal
+      )
+    ).or(wavesLookupPair)     
   }
 
-  private toLookupTable(data: Array<RateWithPairIds>): RateLookupTable {
+  private toLookupTable(data: Array<EstimationReadyRateInfo>): RateLookupTable {
     return data.reduce<RateLookupTable>((acc, item) => {
       if (!(item.amountAsset in acc)) {
         acc[item.amountAsset] = {};
       }
 
-      acc[item.amountAsset][item.priceAsset] = item.rate;
+      acc[item.amountAsset][item.priceAsset] = item;
 
       return acc;
     }, {});
@@ -64,24 +70,26 @@ export default class RateInfoLookup
   private getFromLookupTable(
     pair: AssetIdsPair,
     flipped: boolean
-  ): Maybe<RateWithPairIds> {
+  ): Maybe<EstimationReadyRateInfo> {
     const lookupData = flipped ? flip(pair) : pair;
 
-    return fromNullable<BigNumber>(
+    let foundValue = fromNullable<EstimationReadyRateInfo>(
       path([lookupData.amountAsset, lookupData.priceAsset], this.lookupTable)
     )
-      .map((rate: BigNumber) =>
-        flipped ? inv(rate).getOrElse(new BigNumber(0)) : rate
-      )
-      .map((rate: BigNumber) => ({
-        rate,
-        ...lookupData,
-      }));
+
+    return foundValue.map(data => flipped ? {
+        ...data,
+      rate: inv(data.rate).getOrElse(new BigNumber(0))
+    } : data);
   }
 
-  private lookupThroughWaves(pair: AssetIdsPair): Maybe<RateWithPairIds> {
+  private lookupThroughWaves(pair: AssetIdsPair): Maybe<EstimationReadyRateInfo> {
     return map2(
-      (info1, info2) => safeDivide(info1.rate, info2.rate),
+      (info1, info2) => ({
+          ...pair,
+        rate: safeDivide(info1.rate, info2.rate).getOrElse(new BigNumber(0)),
+        volumeWaves: BigNumber.max(info1.volumeWaves, info2.volumeWaves)
+      }),
       this.get({
         amountAsset: pair.amountAsset,
         priceAsset: WavesId,
@@ -90,10 +98,6 @@ export default class RateInfoLookup
         amountAsset: pair.priceAsset,
         priceAsset: WavesId,
       })
-    ).map(rate => ({
-      amountAsset: pair.amountAsset,
-      priceAsset: pair.priceAsset,
-      rate: rate.getOrElse(new BigNumber(0)),
-    }));
+    )
   }
 }

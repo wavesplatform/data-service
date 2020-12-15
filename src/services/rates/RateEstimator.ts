@@ -12,7 +12,7 @@ import { isEmpty } from '../../utils/fp/maybeOps';
 
 import { PairsService } from 'services/pairs';
 import { PairOrderingService } from 'services/PairOrderingService';
-import { MoneyFormat } from 'services/types';
+import { MoneyFormat } from '../../services/types';
 import { complement } from 'ramda';
 
 type ReqAndRes<TReq, TRes> = {
@@ -107,7 +107,7 @@ export default class RateEstimator
             reqAndRes.res.map(
               tap(res => {
                 if (shouldCache) {
-                  cacheUnlessCached(reqAndRes.res);
+                  cacheUnlessCached(res);
                 }
               })
             )
