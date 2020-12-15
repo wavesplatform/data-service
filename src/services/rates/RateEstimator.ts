@@ -11,7 +11,6 @@ import RateInfoLookup from './repo/impl/RateInfoLookup';
 import { isEmpty } from '../../utils/fp/maybeOps';
 
 import { PairsService } from 'services/pairs';
-import { PairOrderingService } from 'services/PairOrderingService';
 import { MoneyFormat } from '../../services/types';
 import { BigNumber } from '@waves/data-entities';
 
@@ -34,10 +33,7 @@ export default class RateEstimator
       RateWithPairIds,
       DbError | Timeout
       >,
-    // @ts-ignore-next-line
     private readonly pairs: PairsService,
-    // @ts-ignore-next-line
-    private readonly pairsOrder: PairOrderingService,
   ) {}
 
   mget(

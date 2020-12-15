@@ -89,7 +89,7 @@ import createUpdateAssetInfoTxsRepo from './transactions/updateAssetInfo/repo';
 import { DataServiceConfig } from '../loadConfig';
 import createRateService, { RateCacheImpl } from './rates';
 
-import { PairOrderingServiceImpl, PairOrderingService } from './PairOrderingService';
+import { PairOrderingServiceImpl } from './PairOrderingService';
 
 import { PgDriver } from '../db/driver';
 import { EmitEvent } from './_common/createResolver/types';
@@ -115,7 +115,6 @@ export type RateSerivceCreatorDependencies = CommonRepoDependencies & {
   cache: RateCache;
   assets: AssetsService;
   pairs: PairsService;
-  pairsOrdering: PairOrderingService,
 };
 
 export type ServiceMesh = {
@@ -262,7 +261,6 @@ export default ({
         cache: ratesCache,
         assets,
         pairs: pairsNoAsyncValidation,
-        pairsOrdering: pairOrderingService,
       });
 
       const candlesRepo = createCandlesRepo(commonDeps);
