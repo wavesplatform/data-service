@@ -19,6 +19,10 @@ export type ServerConfig = {
   port: number;
 };
 
+export type RatesConfig = {
+  pairAcceptanceVolumeThreshold: number;
+}
+
 export type MatcherConfig = {
   matcher: {
     settingsURL?: string;
@@ -31,7 +35,8 @@ export type DefaultConfig = PostgresConfig & ServerConfig & LoggerConfig;
 export type DataServiceConfig = PostgresConfig &
   ServerConfig &
   LoggerConfig &
-  MatcherConfig;
+  MatcherConfig &
+  RatesConfig;
 
 const commonEnvVariables = ['PGHOST', 'PGDATABASE', 'PGUSER', 'PGPASSWORD'];
 
@@ -58,7 +63,7 @@ export const loadDefaultConfig = (): DefaultConfig => {
   };
 };
 
-const envVariables = ['DEFAULT_MATCHER'];
+const envVariables = ['DEFAULT_MATCHER', 'RATE_PAIR_ACCEPTANCE_VOLUME_THRESHOLD'];
 
 const load = (): DataServiceConfig => {
   // assert all necessary env vars are set
@@ -70,6 +75,10 @@ const load = (): DataServiceConfig => {
     },
   };
 
+  const rate: RatesConfig = {
+    pairAcceptanceVolumeThreshold: +(process.env.RATE_PAIR_ACCEPTANCE_VOLUME_THRESHOLD as string)
+  }
+
   if (
     typeof process.env.MATCHER_SETTINGS_URL !== 'undefined' &&
     process.env.MATCHER_SETTINGS_URL !== ''
@@ -80,6 +89,7 @@ const load = (): DataServiceConfig => {
   return {
     ...loadDefaultConfig(),
     ...matcher,
+    ...rate,
   };
 };
 

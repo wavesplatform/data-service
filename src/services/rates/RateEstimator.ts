@@ -34,14 +34,13 @@ export default class RateEstimator
       DbError | Timeout
       >,
     private readonly pairs: PairsService,
+    private readonly pairAcceptanceVolumeThreshold: number,
   ) {}
 
   mget(
     request: RateMgetParams
   ): Task<AppError, ReqAndRes<AssetIdsPair, RateWithPairIds>[]> {
     const { pairs, timestamp, matcher } = request;
-
-    console.log("PAIRS_REQ: ", pairs);
 
     const shouldCache = isEmpty(timestamp);
 
@@ -68,9 +67,6 @@ export default class RateEstimator
       shouldCache
     );
 
-    console.log("PRE_COUNT: ", preCount);
-    console.log("TO_BE_REQUESTED: ", toBeRequested);
-    
     return this.remoteGet
       .mget({ pairs: toBeRequested, matcher, timestamp })
       .chain(pairsWithRates => {
@@ -90,7 +86,7 @@ export default class RateEstimator
         if (shouldCache) cacheAll(results);
         return results;
       })
-      .map(data => new RateInfoLookup([...data, ...preCount]))
+      .map(data => new RateInfoLookup([...data, ...preCount], this.pairAcceptanceVolumeThreshold))
       .map(lookup =>
         pairs.map(idsPair => ({
           req: idsPair,

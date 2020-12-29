@@ -35,8 +35,6 @@ export default class RemoteRateRepo
       request.pairs
     );
 
-    console.log("PAIRS", pairsSqlParams);
-
     const sql = pg.raw(makeSql(request.pairs.length), [
       request.timestamp.getOrElse(new Date()),
       request.matcher,
@@ -48,10 +46,7 @@ export default class RemoteRateRepo
         ? taskOf([])
         : this.dbDriver.any(sql.toString());
 
-    return dbTask.map(resp => {
-      console.log("DB RESULT: ", resp);
-      return resp
-    }).map(
+    return dbTask.map(
       (result): Array<RateWithPairIds> =>
         map((it): RateWithPairIds => {
           return {

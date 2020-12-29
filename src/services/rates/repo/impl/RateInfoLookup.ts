@@ -24,12 +24,8 @@ export default class RateInfoLookup
   implements Omit<CacheSync<AssetIdsPair, RateWithPairIds>, 'set'> {
   private readonly lookupTable: RateLookupTable;
 
-  constructor(data: Array<EstimationReadyRateInfo>) {
-
-    console.log("LOOKUP RATE INFO !!!", data);
+  constructor(data: Array<EstimationReadyRateInfo>, private readonly pairAcceptanceVolumeThreshold: number) {
     this.lookupTable = this.toLookupTable(data);
-
-    console.log("lookup table: ", this.lookupTable);
   }
 
   has(pair: AssetIdsPair): boolean {
@@ -37,8 +33,6 @@ export default class RateInfoLookup
   }
 
   get(pair: AssetIdsPair): Maybe<EstimationReadyRateInfo> {
-    console.log("LOOKUP PAIR: ", pair)
-    
     const lookup = (pair: AssetIdsPair, flipped: boolean) =>
       this.getFromLookupTable(pair, flipped);
 
@@ -46,15 +40,10 @@ export default class RateInfoLookup
       return lookup(pair, false).orElse(() => lookup(pair, true));
     }
 
-    const directPair = lookup(pair, false).orElse(() => lookup(pair, true));
-    const wavesLookupPair = this.lookupThroughWaves(pair);
-
-    return directPair.chain(
-      directVal => wavesLookupPair.map(
-        wavesLookupVal => wavesLookupVal.volumeWaves > directVal.volumeWaves ?
-          wavesLookupVal : directVal
-      )
-    ).or(wavesLookupPair)     
+    return lookup(pair, false)
+      .orElse(() => lookup(pair, true))
+      .filter(val => val.volumeWaves.gte(this.pairAcceptanceVolumeThreshold))
+      .orElse(() => this.lookupThroughWaves(pair));
   }
 
   private toLookupTable(data: Array<EstimationReadyRateInfo>): RateLookupTable {

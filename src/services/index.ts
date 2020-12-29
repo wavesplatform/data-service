@@ -115,6 +115,7 @@ export type RateSerivceCreatorDependencies = CommonRepoDependencies & {
   cache: RateCache;
   assets: AssetsService;
   pairs: PairsService;
+  pairAcceptanceVolumeThreshold: number,
 };
 
 export type ServiceMesh = {
@@ -261,6 +262,7 @@ export default ({
         cache: ratesCache,
         assets,
         pairs: pairsNoAsyncValidation,
+        pairAcceptanceVolumeThreshold: options.pairAcceptanceVolumeThreshold,
       });
 
       const candlesRepo = createCandlesRepo(commonDeps);
