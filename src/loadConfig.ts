@@ -65,6 +65,14 @@ export const loadDefaultConfig = (): DefaultConfig => {
 
 const envVariables = ['DEFAULT_MATCHER', 'RATE_PAIR_ACCEPTANCE_VOLUME_THRESHOLD'];
 
+const ensurePositiveNumber = (x: number, msg: string) => {
+  if (x > 0) {
+    return x;
+  }
+
+  throw new Error(msg)
+}
+
 const load = (): DataServiceConfig => {
   // assert all necessary env vars are set
   checkEnv(envVariables);
@@ -75,8 +83,15 @@ const load = (): DataServiceConfig => {
     },
   };
 
+  const volumeThreshold = ensurePositiveNumber(
+    parseInt(
+      process.env.RATE_PAIR_ACCEPTANCE_VOLUME_THRESHOLD as string
+    ),
+    "RATE_PAIR_ACCEPTANCE_VOLUME_THRESHOLD environment variable should be a positive integer"
+  )
+
   const rate: RatesConfig = {
-    pairAcceptanceVolumeThreshold: +(process.env.RATE_PAIR_ACCEPTANCE_VOLUME_THRESHOLD as string)
+    pairAcceptanceVolumeThreshold: volumeThreshold
   }
 
   if (
