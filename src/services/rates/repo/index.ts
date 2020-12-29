@@ -2,7 +2,7 @@ import { Task } from 'folktale/concurrency/task';
 import { partition, chain, uniqWith } from 'ramda';
 import { BigNumber } from '@waves/data-entities';
 
-import { AssetIdsPair, CacheSync, EstimationReadyRateInfo } from '../../../types';
+import { AssetIdsPair, CacheSync, VolumeAwareRateInfo } from '../../../types';
 import {
   pairIsSymmetric,
   pairsEq,
@@ -10,14 +10,14 @@ import {
 } from '../data';
 import { RateCacheKey } from './impl/RateCache';
 
-export type RateCache = CacheSync<RateCacheKey, EstimationReadyRateInfo>;
+export type RateCache = CacheSync<RateCacheKey, VolumeAwareRateInfo>;
 
 export type AsyncMget<Req, Res, Error> = {
   mget(req: Req): Task<Error, Res[]>;
 };
 
 export type PairsForRequest = {
-  preCount: EstimationReadyRateInfo[];
+  preComputed: VolumeAwareRateInfo[];
   toBeRequested: AssetIdsPair[];
 };
 
@@ -29,7 +29,7 @@ export const partitionByPreCount = (
 ): PairsForRequest => {
   const [eq, uneq] = partition(pairIsSymmetric, pairs);
 
-  const eqRates: Array<EstimationReadyRateInfo> = eq.map(pair => ({
+  const eqRates: Array<VolumeAwareRateInfo> = eq.map(pair => ({
     rate: new BigNumber(1),
     volumeWaves: new BigNumber(0),
     ...pair,
@@ -49,12 +49,12 @@ export const partitionByPreCount = (
     const cachedRates = cached.map(pair => cache.get(getCacheKey(pair)).unsafeGet());
 
     return {
-      preCount: cachedRates.concat(eqRates),
+      preComputed: cachedRates.concat(eqRates),
       toBeRequested: uncached,
     };
   } else {
     return {
-      preCount: eqRates,
+      preComputed: eqRates,
       toBeRequested: allPairsToRequest,
     };
   }

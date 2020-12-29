@@ -2,7 +2,7 @@ import { Task } from 'folktale/concurrency/task';
 import { Maybe } from 'folktale/maybe';
 
 import { tap } from '../../utils/tap';
-import { AssetIdsPair, RateMgetParams, RateWithPairIds, EstimationReadyRateInfo } from '../../types';
+import { AssetIdsPair, RateMgetParams, RateWithPairIds, VolumeAwareRateInfo } from '../../types';
 import { AppError, DbError, Timeout } from '../../errorHandling';
 
 import { partitionByPreCount, AsyncMget, RateCache } from './repo';
@@ -49,7 +49,7 @@ export default class RateEstimator
       matcher,
     });
 
-    const cacheUnlessCached = (item: EstimationReadyRateInfo) => {
+    const cacheUnlessCached = (item: VolumeAwareRateInfo) => {
       const key = getCacheKey(item);
 
       if (!this.cache.has(key)) {
@@ -57,10 +57,10 @@ export default class RateEstimator
       }
     };
 
-    const cacheAll = (items: Array<EstimationReadyRateInfo>) =>
+    const cacheAll = (items: Array<VolumeAwareRateInfo>) =>
       items.forEach(it => cacheUnlessCached(it));
 
-    const { preCount, toBeRequested } = partitionByPreCount(
+    const { preComputed, toBeRequested } = partitionByPreCount(
       this.cache,
       pairs,
       getCacheKey,
@@ -78,7 +78,7 @@ export default class RateEstimator
           return foundPairs.map(
             (itm, idx) => itm
               .map(pair => Object.assign(pair, { rate: pairsWithRates[idx].rate }))
-              .getOrElse<EstimationReadyRateInfo>({...pairsWithRates[idx], volumeWaves: new BigNumber(0)})
+              .getOrElse<VolumeAwareRateInfo>({...pairsWithRates[idx], volumeWaves: new BigNumber(0)})
           )
         })
       })
@@ -86,7 +86,7 @@ export default class RateEstimator
         if (shouldCache) cacheAll(results);
         return results;
       })
-      .map(data => new RateInfoLookup([...data, ...preCount], this.pairAcceptanceVolumeThreshold))
+      .map(data => new RateInfoLookup([...data, ...preComputed], this.pairAcceptanceVolumeThreshold))
       .map(lookup =>
         pairs.map(idsPair => ({
           req: idsPair,

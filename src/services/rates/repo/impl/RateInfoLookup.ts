@@ -2,14 +2,14 @@ import { BigNumber } from '@waves/data-entities';
 import { Maybe, fromNullable } from 'folktale/maybe';
 import { path } from 'ramda';
 
-import { AssetIdsPair, CacheSync, RateWithPairIds, EstimationReadyRateInfo } from '../../../../types';
+import { AssetIdsPair, CacheSync, RateWithPairIds, VolumeAwareRateInfo } from '../../../../types';
 import { WavesId, flip, pairHasWaves } from '../../data';
 import { inv, safeDivide } from '../../util';
 import { isDefined, map2 } from '../../../../utils/fp/maybeOps';
 
 type RateLookupTable = {
   [amountAsset: string]: {
-    [priceAsset: string]: EstimationReadyRateInfo;
+    [priceAsset: string]: VolumeAwareRateInfo;
   };
 };
 
@@ -24,7 +24,7 @@ export default class RateInfoLookup
   implements Omit<CacheSync<AssetIdsPair, RateWithPairIds>, 'set'> {
   private readonly lookupTable: RateLookupTable;
 
-  constructor(data: Array<EstimationReadyRateInfo>, private readonly pairAcceptanceVolumeThreshold: number) {
+  constructor(data: Array<VolumeAwareRateInfo>, private readonly pairAcceptanceVolumeThreshold: number) {
     this.lookupTable = this.toLookupTable(data);
   }
 
@@ -32,7 +32,7 @@ export default class RateInfoLookup
     return isDefined(this.get(pair));
   }
 
-  get(pair: AssetIdsPair): Maybe<EstimationReadyRateInfo> {
+  get(pair: AssetIdsPair): Maybe<VolumeAwareRateInfo> {
     const lookup = (pair: AssetIdsPair, flipped: boolean) =>
       this.getFromLookupTable(pair, flipped);
 
@@ -46,7 +46,7 @@ export default class RateInfoLookup
       .orElse(() => this.lookupThroughWaves(pair));
   }
 
-  private toLookupTable(data: Array<EstimationReadyRateInfo>): RateLookupTable {
+  private toLookupTable(data: Array<VolumeAwareRateInfo>): RateLookupTable {
     return data.reduce<RateLookupTable>((acc, item) => {
       if (!(item.amountAsset in acc)) {
         acc[item.amountAsset] = {};
@@ -61,10 +61,10 @@ export default class RateInfoLookup
   private getFromLookupTable(
     pair: AssetIdsPair,
     flipped: boolean
-  ): Maybe<EstimationReadyRateInfo> {
+  ): Maybe<VolumeAwareRateInfo> {
     const lookupData = flipped ? flip(pair) : pair;
 
-    let foundValue = fromNullable<EstimationReadyRateInfo>(
+    let foundValue = fromNullable<VolumeAwareRateInfo>(
       path([lookupData.amountAsset, lookupData.priceAsset], this.lookupTable)
     )
 
@@ -74,7 +74,7 @@ export default class RateInfoLookup
     } : data);
   }
 
-  private lookupThroughWaves(pair: AssetIdsPair): Maybe<EstimationReadyRateInfo> {
+  private lookupThroughWaves(pair: AssetIdsPair): Maybe<VolumeAwareRateInfo> {
     return map2(
       (info1, info2) => ({
           ...pair,

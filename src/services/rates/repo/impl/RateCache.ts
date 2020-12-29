@@ -1,7 +1,7 @@
 import { fromNullable } from 'folktale/maybe';
 import * as LRU from 'lru-cache';
 
-import { AssetIdsPair, EstimationReadyRateInfo } from '../../../../types';
+import { AssetIdsPair, VolumeAwareRateInfo } from '../../../../types';
 import { inv } from '../../util';
 import { flip } from '../../data';
 import { RateCache } from '../../repo';
@@ -16,7 +16,7 @@ const keyFn = (matcher: string) => (pair: AssetIdsPair): string => {
 };
 
 export default class RateCacheImpl implements RateCache {
-  private readonly lru: LRU<string, EstimationReadyRateInfo>;
+  private readonly lru: LRU<string, VolumeAwareRateInfo>;
 
   constructor(size: number, maxAgeMillis: number) {
     this.lru = new LRU({ max: size, maxAge: maxAgeMillis });
@@ -29,7 +29,7 @@ export default class RateCacheImpl implements RateCache {
     );
   }
 
-  set(key: RateCacheKey, data: EstimationReadyRateInfo) {
+  set(key: RateCacheKey, data: VolumeAwareRateInfo) {
     this.lru.set(keyFn(key.matcher)(key.pair), data);
   }
 
