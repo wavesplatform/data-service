@@ -21,7 +21,7 @@ export type PairsForRequest = {
   toBeRequested: AssetIdsPair[];
 };
 
-export const partitionByPreCount = (
+export const partitionByPreComputed = (
   cache: RateCache,
   pairs: AssetIdsPair[],
   getCacheKey: (pair: AssetIdsPair) => RateCacheKey,

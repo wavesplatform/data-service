@@ -5,7 +5,7 @@ import { tap } from '../../utils/tap';
 import { AssetIdsPair, RateMgetParams, RateWithPairIds, VolumeAwareRateInfo } from '../../types';
 import { AppError, DbError, Timeout } from '../../errorHandling';
 
-import { partitionByPreCount, AsyncMget, RateCache } from './repo';
+import { partitionByPreComputed, AsyncMget, RateCache } from './repo';
 import { RateCacheKey } from './repo/impl/RateCache';
 import RateInfoLookup from './repo/impl/RateInfoLookup';
 import { isEmpty } from '../../utils/fp/maybeOps';
@@ -60,7 +60,7 @@ export default class RateEstimator
     const cacheAll = (items: Array<VolumeAwareRateInfo>) =>
       items.forEach(it => cacheUnlessCached(it));
 
-    const { preComputed, toBeRequested } = partitionByPreCount(
+    const { preComputed, toBeRequested } = partitionByPreComputed(
       this.cache,
       pairs,
       getCacheKey,
