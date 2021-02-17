@@ -60,9 +60,9 @@ export default function ({
               .map((precisions) =>
                 items.map((item) => ({
                   ...item,
-                  rate: item.rate
-                    .multipliedBy(10 ** (-8 - precisions[1] + precisions[0]))
-                    .decimalPlaces(8 + precisions[1] - precisions[0]),
+                  rate: item.rate.multipliedBy(
+                    10 ** (-8 - precisions[1] + precisions[0])
+                  ),
                 }))
               )
       );

@@ -118,7 +118,13 @@ export default class RateInfoLookup
     return map2(
       (info1, info2) => ({
         ...pair,
-        rate: safeDivide(info1.rate, info2.rate).getOrElse(new BigNumber(0)),
+        rate: safeDivide(info1.rate, info2.rate)
+          .map((r) =>
+            pair.moneyFormat === MoneyFormat.Long
+              ? r.multipliedBy(10 ** 8).decimalPlaces(0)
+              : r
+          )
+          .getOrElse(new BigNumber(0)),
         volumeWaves: BigNumber.max(info1.volumeWaves, info2.volumeWaves),
       }),
       this.get({
