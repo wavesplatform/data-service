@@ -1,18 +1,17 @@
 import { fromNullable } from 'folktale/maybe';
 import * as LRU from 'lru-cache';
 
-import { AssetIdsPair, VolumeAwareRateInfo } from '../../../../types';
-import { inv } from '../../util';
 import { flip } from '../../data';
 import { RateCache } from '../../repo';
+import { AssetPair, VolumeAwareRateInfo } from '../../RateEstimator';
 
 export type RateCacheKey = {
-  pair: AssetIdsPair;
+  pair: AssetPair;
   matcher: string;
 };
 
-const keyFn = (matcher: string) => (pair: AssetIdsPair): string => {
-  return `${matcher}::${pair.amountAsset}::${pair.priceAsset}`;
+const keyFn = (matcher: string) => (pair: AssetPair): string => {
+  return `${matcher}::${pair.amountAsset.id}::${pair.priceAsset.id}`;
 };
 
 export default class RateCacheImpl implements RateCache {
@@ -36,10 +35,8 @@ export default class RateCacheImpl implements RateCache {
   get(key: RateCacheKey) {
     const getKey = keyFn(key.matcher);
 
-    return fromNullable(this.lru.get(getKey(key.pair))).orElse(
-      () => fromNullable(this.lru.get(getKey(flip(key.pair)))).chain(
-        it => inv(it.rate).map(rate => ({ ...it, rate }))
-      )
+    return fromNullable(this.lru.get(getKey(key.pair))).orElse(() =>
+      fromNullable(this.lru.get(getKey(flip(key.pair))))
     );
   }
 }

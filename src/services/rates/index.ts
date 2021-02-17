@@ -20,9 +20,14 @@ export default function ({
   pairs,
   pairAcceptanceVolumeThreshold,
 }: RateSerivceCreatorDependencies): RatesMgetService {
-  
-  const estimator = new RateEstimator(cache, new RemoteRateRepo(drivers.pg), pairs, pairAcceptanceVolumeThreshold);
-  
+  const estimator = new RateEstimator(
+    cache,
+    new RemoteRateRepo(drivers.pg),
+    pairs,
+    pairAcceptanceVolumeThreshold,
+    assets
+  );
+
   return (request: RateMgetParams & WithMoneyFormat) =>
     estimator
       .mget(request)
@@ -32,13 +37,18 @@ export default function ({
             () => new BigNumber(0),
             (it) => it.rate
           ),
-          amountAsset: item.req.amountAsset,
-          priceAsset: item.req.priceAsset,
+          amountAsset: item.req.amountAsset.id,
+          priceAsset: item.req.priceAsset.id,
         }))
       )
       .chain((items) =>
         request.moneyFormat === MoneyFormat.Long
-          ? taskOf(items)
+          ? taskOf(
+              items.map((r) => ({
+                ...r,
+                rate: r.rate.decimalPlaces(0),
+              }))
+            )
           : assets
               .precisions({
                 ids: items.reduce<string[]>(
@@ -50,9 +60,9 @@ export default function ({
               .map((precisions) =>
                 items.map((item) => ({
                   ...item,
-                  rate: item.rate.multipliedBy(
-                    10 ** (-8 - precisions[1] + precisions[0])
-                  ),
+                  rate: item.rate
+                    .multipliedBy(10 ** (-8 - precisions[1] + precisions[0]))
+                    .decimalPlaces(8 + precisions[1] - precisions[0]),
                 }))
               )
       );

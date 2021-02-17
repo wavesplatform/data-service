@@ -1,16 +1,26 @@
-import { BigNumber } from '@waves/data-entities';
 import { Maybe, fromNullable } from 'folktale/maybe';
 import { path } from 'ramda';
+import { Asset, BigNumber } from '@waves/data-entities';
 
-import { AssetIdsPair, CacheSync, RateWithPairIds, VolumeAwareRateInfo } from '../../../../types';
-import { WavesId, flip, pairHasWaves } from '../../data';
-import { inv, safeDivide } from '../../util';
+import { CacheSync } from '../../../../types';
+import { flip, pairHasWaves } from '../../data';
+import { inv, invOnSatoshi, safeDivide } from '../../util';
 import { isDefined, map2 } from '../../../../utils/fp/maybeOps';
+import { MoneyFormat } from '../../../../services/types';
+import {
+  AssetPair,
+  VolumeAwareRateInfo,
+  RateWithPair,
+} from '../../RateEstimator';
 
 type RateLookupTable = {
   [amountAsset: string]: {
     [priceAsset: string]: VolumeAwareRateInfo;
   };
+};
+
+type AssetPairWithMoneyFormat = AssetPair & {
+  moneyFormat: MoneyFormat;
 };
 
 /*
@@ -21,74 +31,106 @@ type RateLookupTable = {
    where lookup = getFromTable(asset1, asset2) || 1 / getFromtable(asset2, asset1)   
 */
 export default class RateInfoLookup
-  implements Omit<CacheSync<AssetIdsPair, RateWithPairIds>, 'set'> {
+  implements Omit<CacheSync<AssetPairWithMoneyFormat, RateWithPair>, 'set'> {
   private readonly lookupTable: RateLookupTable;
 
-  constructor(data: Array<VolumeAwareRateInfo>, private readonly pairAcceptanceVolumeThreshold: number) {
+  constructor(
+    data: Array<VolumeAwareRateInfo>,
+    private readonly pairAcceptanceVolumeThreshold: number,
+    private readonly wavesAsset: Asset
+  ) {
     this.lookupTable = this.toLookupTable(data);
   }
 
-  has(pair: AssetIdsPair): boolean {
-    return isDefined(this.get(pair));
+  has(pairWithMoneyFormat: AssetPairWithMoneyFormat): boolean {
+    return isDefined(this.get(pairWithMoneyFormat));
   }
 
-  get(pair: AssetIdsPair): Maybe<VolumeAwareRateInfo> {
-    const lookup = (pair: AssetIdsPair, flipped: boolean) =>
-      this.getFromLookupTable(pair, flipped);
+  get(
+    pairWithMoneyFormat: AssetPairWithMoneyFormat
+  ): Maybe<VolumeAwareRateInfo> {
+    const lookup = (pair: AssetPair, flipped: boolean) =>
+      this.getFromLookupTable(pair, flipped, pairWithMoneyFormat.moneyFormat);
 
-    if (pairHasWaves(pair)) {
-      return lookup(pair, false).orElse(() => lookup(pair, true));
+    if (pairHasWaves(pairWithMoneyFormat)) {
+      return lookup(pairWithMoneyFormat, false).orElse(() =>
+        lookup(pairWithMoneyFormat, true)
+      );
     }
 
-    return lookup(pair, false)
-      .orElse(() => lookup(pair, true))
-      .filter(val => val.volumeWaves.gte(this.pairAcceptanceVolumeThreshold))
-      .orElse(() => this.lookupThroughWaves(pair));
+    return lookup(pairWithMoneyFormat, false)
+      .orElse(() => lookup(pairWithMoneyFormat, true))
+      .filter((val) => val.volumeWaves.gte(this.pairAcceptanceVolumeThreshold))
+      .orElse(() =>
+        this.lookupThroughWaves(this.wavesAsset, pairWithMoneyFormat)
+      );
   }
 
   private toLookupTable(data: Array<VolumeAwareRateInfo>): RateLookupTable {
     return data.reduce<RateLookupTable>((acc, item) => {
-      if (!(item.amountAsset in acc)) {
-        acc[item.amountAsset] = {};
+      if (!(item.amountAsset.id in acc)) {
+        acc[item.amountAsset.id] = {};
       }
 
-      acc[item.amountAsset][item.priceAsset] = item;
+      acc[item.amountAsset.id][item.priceAsset.id] = item;
 
       return acc;
     }, {});
   }
 
   private getFromLookupTable(
-    pair: AssetIdsPair,
-    flipped: boolean
+    pair: AssetPair,
+    flipped: boolean,
+    moneyFormat: MoneyFormat
   ): Maybe<VolumeAwareRateInfo> {
     const lookupData = flipped ? flip(pair) : pair;
 
     let foundValue = fromNullable<VolumeAwareRateInfo>(
-      path([lookupData.amountAsset, lookupData.priceAsset], this.lookupTable)
-    )
+      path(
+        [lookupData.amountAsset.id, lookupData.priceAsset.id],
+        this.lookupTable
+      )
+    );
 
-    return foundValue.map(data => flipped ? {
-        ...data,
-      rate: inv(data.rate).getOrElse(new BigNumber(0))
-    } : data);
+    return foundValue.map((data) => {
+      if (flipped) {
+        let flippedData = { ...data };
+
+        if (moneyFormat === MoneyFormat.Long) {
+          flippedData.rate = invOnSatoshi(flippedData.rate, 8)
+            .map((r) => r.multipliedBy(10 ** 8))
+            .getOrElse(new BigNumber(0));
+        } else {
+          flippedData.rate = inv(flippedData.rate).getOrElse(new BigNumber(0));
+        }
+
+        return flippedData;
+      } else {
+        return data;
+      }
+    });
   }
 
-  private lookupThroughWaves(pair: AssetIdsPair): Maybe<VolumeAwareRateInfo> {
+  private lookupThroughWaves(
+    wavesAsset: Asset,
+    pair: AssetPairWithMoneyFormat
+  ): Maybe<VolumeAwareRateInfo> {
     return map2(
       (info1, info2) => ({
-          ...pair,
+        ...pair,
         rate: safeDivide(info1.rate, info2.rate).getOrElse(new BigNumber(0)),
-        volumeWaves: BigNumber.max(info1.volumeWaves, info2.volumeWaves)
+        volumeWaves: BigNumber.max(info1.volumeWaves, info2.volumeWaves),
       }),
       this.get({
         amountAsset: pair.amountAsset,
-        priceAsset: WavesId,
+        priceAsset: wavesAsset,
+        moneyFormat: pair.moneyFormat,
       }),
       this.get({
         amountAsset: pair.priceAsset,
-        priceAsset: WavesId,
+        priceAsset: wavesAsset,
+        moneyFormat: pair.moneyFormat,
       })
-    )
+    );
   }
 }
