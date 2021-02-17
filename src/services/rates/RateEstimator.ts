@@ -74,123 +74,118 @@ export default class RateEstimator
       return acc;
     }, new Array<string>());
 
-    return this.assetsService.get({ id: WavesId }).chain((m) =>
-      m.matchWith({
-        Nothing: () => rejected(AppError.Db('Waves asset not found.')) as any,
-        Just: ({ value: wavesAsset }) =>
-          this.assetsService.mget({ ids }).chain((ms) =>
-            sequence<Maybe<Asset>, Maybe<Asset[]>>(maybeOf, ms).matchWith({
-              Nothing: () =>
-                rejected(
-                  AppError.Db(
-                    'Some of the assets of specified pairs not found.'
-                  )
-                ) as any,
-              Just: ({ value: assets }) => {
-                let pairsWithAssets = splitEvery(2, assets).map(
-                  ([amountAsset, priceAsset]) => ({
-                    amountAsset,
-                    priceAsset,
-                  })
-                );
+    ids.push(WavesId);
+    
+    return this.assetsService.mget({ ids }).chain((ms) =>
+      sequence<Maybe<Asset>, Maybe<Asset[]>>(maybeOf, ms).matchWith({
+        Nothing: () =>
+          rejected(
+            AppError.Db('Some of the assets of specified pairs not found.')
+          ) as any,
+        Just: ({ value: assets }) => {
+          let wavesAsset = assets.pop() as Asset;
 
-                let assetsMap: Record<string, Asset> = {};
-                assets.forEach((asset) => {
-                  assetsMap[asset.id] = asset;
-                });
-
-                const { preComputed, toBeRequested } = partitionByPreComputed(
-                  this.cache,
-                  pairsWithAssets,
-                  getCacheKey,
-                  shouldCache,
-                  wavesAsset
-                );
-
-                return this.remoteGet
-                  .mget({
-                    pairs: toBeRequested.map((pair) => ({
-                      amountAsset: pair.amountAsset.id,
-                      priceAsset: pair.priceAsset.id,
-                    })),
-                    matcher,
-                    timestamp,
-                  })
-                  .chain((pairsWithRates) => {
-                    return this.pairs
-                      .mget({
-                        pairs: pairsWithRates,
-                        matcher: request.matcher,
-                        moneyFormat: MoneyFormat.Long,
-                      })
-                      .map((foundPairs) => {
-                        return foundPairs.map((itm, idx) =>
-                          itm
-                            .map((pair) => ({
-                              amountAsset: assetsMap[pair.amountAsset],
-                              priceAsset: assetsMap[pair.priceAsset],
-                              volumeWaves: pair.volumeWaves,
-                              rate: pairsWithRates[idx].rate,
-                            }))
-                            .getOrElse<VolumeAwareRateInfo>({
-                              amountAsset:
-                                assetsMap[pairsWithRates[idx].amountAsset],
-                              priceAsset:
-                                assetsMap[pairsWithRates[idx].priceAsset],
-                              rate: pairsWithRates[idx].rate,
-                              volumeWaves: new BigNumber(0),
-                            })
-                        );
-                      });
-                  })
-                  .map(
-                    tap((results) => {
-                      if (shouldCache) cacheAll(results);
-                    })
-                  )
-                  .map(
-                    (data) =>
-                      new RateInfoLookup(
-                        [...data, ...preComputed],
-                        this.pairAcceptanceVolumeThreshold,
-                        wavesAsset
-                      )
-                  )
-                  .map((lookup) => {
-                    return pairsWithAssets.map((pair) => ({
-                      req: pair,
-                      res: lookup.get({
-                        ...pair,
-                        moneyFormat: MoneyFormat.Long,
-                      }),
-                    }));
-                  })
-                  .map(
-                    tap((data) => {
-                      data.forEach((reqAndRes) =>
-                        reqAndRes.res.map(
-                          tap((res) => {
-                            if (shouldCache) {
-                              cacheUnlessCached(res);
-                            }
-                          })
-                        )
-                      );
-                    })
-                  )
-                  .map((rs) =>
-                    rs.map((reqAndRes) => ({
-                      ...reqAndRes,
-                      res: reqAndRes.res.map((res) => ({
-                        ...res,
-                        amountAsset: res.amountAsset.id,
-                        priceAsset: res.priceAsset.id,
-                      })),
-                    }))
-                  );
-              },
+          let pairsWithAssets = splitEvery(2, assets).map(
+            ([amountAsset, priceAsset]) => ({
+              amountAsset,
+              priceAsset,
             })
-          ),
+          );
+
+          let assetsMap: Record<string, Asset> = {};
+          assetsMap[WavesId] = wavesAsset;
+          assets.forEach((asset) => {
+            assetsMap[asset.id] = asset;
+          });
+          
+          const { preComputed, toBeRequested } = partitionByPreComputed(
+            this.cache,
+            pairsWithAssets,
+            getCacheKey,
+            shouldCache,
+            wavesAsset
+          );
+
+          return this.remoteGet
+            .mget({
+              pairs: toBeRequested.map((pair) => ({
+                amountAsset: pair.amountAsset.id,
+                priceAsset: pair.priceAsset.id,
+              })),
+              matcher,
+              timestamp,
+            })
+            .chain((pairsWithRates) =>
+              this.pairs
+                .mget({
+                  pairs: pairsWithRates,
+                  matcher: request.matcher,
+                  moneyFormat: MoneyFormat.Long,
+                })
+                .map((foundPairs) =>
+                  foundPairs.map((itm, idx) =>
+                    itm
+                      .map((pair) => ({
+                        amountAsset: assetsMap[pair.amountAsset],
+                        priceAsset: assetsMap[pair.priceAsset],
+                        volumeWaves: pair.volumeWaves,
+                        rate: pairsWithRates[idx].rate,
+                      }))
+                      .getOrElse<VolumeAwareRateInfo>({
+                        amountAsset: assetsMap[pairsWithRates[idx].amountAsset],
+                        priceAsset: assetsMap[pairsWithRates[idx].priceAsset],
+                        rate: pairsWithRates[idx].rate,
+                        volumeWaves: new BigNumber(0),
+                      })
+                  )
+                )
+            )
+            .map(
+              tap((results) => {
+                if (shouldCache) cacheAll(results);
+              })
+            )
+            .map(
+              (data) =>
+                new RateInfoLookup(
+                  [...data, ...preComputed],
+                  this.pairAcceptanceVolumeThreshold,
+                  wavesAsset
+                )
+            )
+            .map((lookup) =>
+              pairsWithAssets.map((pair) => ({
+                req: pair,
+                res: lookup.get({
+                  ...pair,
+                  moneyFormat: MoneyFormat.Long,
+                }),
+              }))
+            )
+            .map(
+              tap((data) => {
+                data.forEach((reqAndRes) =>
+                  reqAndRes.res.map(
+                    tap((res) => {
+                      if (shouldCache) {
+                        cacheUnlessCached(res);
+                      }
+                    })
+                  )
+                );
+              })
+            )
+            .map((rs) =>
+              rs.map((reqAndRes) => ({
+                ...reqAndRes,
+                res: reqAndRes.res.map((res) => ({
+                  ...res,
+                  amountAsset: res.amountAsset.id,
+                  priceAsset: res.priceAsset.id,
+                })),
+              }))
+            );
+        },
       })
     );
   }
