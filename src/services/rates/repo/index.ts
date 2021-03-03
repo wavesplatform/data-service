@@ -7,57 +7,54 @@ import {
   generatePossibleRequestItems,
 } from '../data';
 import { RateCacheKey } from './impl/RateCache';
+import { VolumeAwareRateInfo } from '../RateEstimator';
 import { Task } from 'folktale/concurrency/task';
 import { RateWithPairIds } from '../../rates';
 
-export type RateCache = CacheSync<RateCacheKey, BigNumber>;
+export type RateCache = CacheSync<RateCacheKey, VolumeAwareRateInfo>;
 
 export type AsyncMget<Req, Res, Error> = {
   mget(req: Req): Task<Error, Res[]>;
 };
 
 export type PairsForRequest = {
-  preCount: RateWithPairIds[];
+  preComputed: VolumeAwareRateInfo[];
   toBeRequested: AssetIdsPair[];
 };
 
-export const partitionByPreCount = (
+export const partitionByPreComputed = (
   cache: RateCache,
   pairs: AssetIdsPair[],
   getCacheKey: (pair: AssetIdsPair) => RateCacheKey,
-  shouldCache: boolean
+  shouldCache: boolean,
 ): PairsForRequest => {
   const [eq, uneq] = partition(pairIsSymmetric, pairs);
 
-  const eqRates: Array<RateWithPairIds> = eq.map(pair => ({
+  const eqRates: Array<RateWithPairIds> = eq.map((pair) => ({
     rate: new BigNumber(1),
     ...pair,
   }));
 
   const allPairsToRequest = uniqWith(
     pairsEq,
-    chain(it => generatePossibleRequestItems(it), uneq)
+    chain((it) => generatePossibleRequestItems(it), uneq)
   );
 
   if (shouldCache) {
     const [cached, uncached] = partition(
-      it => cache.has(getCacheKey(it)),
+      (it) => cache.has(getCacheKey(it)),
       allPairsToRequest
     );
 
-    const cachedRates: Array<RateWithPairIds> = cached.map(pair => ({
-      amountAsset: pair.amountAsset,
-      priceAsset: pair.priceAsset,
-      rate: cache.get(getCacheKey(pair)).getOrElse(new BigNumber(0)),
-    }));
+    const cachedRates = cached.map((pair) => cache.get(getCacheKey(pair)).unsafeGet());
 
     return {
-      preCount: cachedRates.concat(eqRates),
+      preComputed: cachedRates.concat(eqRates),
       toBeRequested: uncached,
     };
   } else {
     return {
-      preCount: eqRates,
+      preComputed: eqRates,
       toBeRequested: allPairsToRequest,
     };
   }

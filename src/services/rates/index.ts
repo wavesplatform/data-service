@@ -19,8 +19,11 @@ export type RateWithPairIds = RateInfo & AssetIdsPair;
 export default function ({
   drivers,
   cache,
+  pairs,
+  pairAcceptanceVolumeThreshold,
 }: RateSerivceCreatorDependencies): ServiceMget<RateMgetParams, Rate> {
-  const estimator = new RateEstimator(cache, new RemoteRateRepo(drivers.pg));
+  const estimator = new RateEstimator(cache, new RemoteRateRepo(drivers.pg),pairs,
+  pairAcceptanceVolumeThreshold,);
 
   return {
     mget(request: RateMgetParams) {

@@ -39,5 +39,5 @@ export function generatePossibleRequestItems(
     priceAsset: WavesId,
   };
 
-  return [wavesL, flip(wavesL), wavesR, flip(wavesR)];
+  return [wavesL, flip(wavesL), wavesR, flip(wavesR), pair, flip(pair)];
 }

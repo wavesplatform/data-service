@@ -7,11 +7,12 @@ import { WavesId, flip, pairHasWaves } from '../../data';
 import { inv, safeDivide } from '../../util';
 import { isDefined, map2 } from '../../../../utils/fp/maybeOps';
 
-import { RateWithPairIds } from '../../../rates'
+import { RateWithPairIds } from '../../../rates';
+import { VolumeAwareRateInfo } from '../../../rates/RateEstimator';
 
 type RateLookupTable = {
   [amountAsset: string]: {
-    [priceAsset: string]: BigNumber;
+    [priceAsset: string]: VolumeAwareRateInfo;
   };
 };
 
@@ -26,7 +27,10 @@ export default class RateInfoLookup
   implements Omit<CacheSync<AssetIdsPair, RateWithPairIds>, 'set'> {
   private readonly lookupTable: RateLookupTable;
 
-  constructor(data: Array<RateWithPairIds>) {
+  constructor(
+    data: Array<VolumeAwareRateInfo>,
+    private readonly pairAcceptanceVolumeThreshold: number
+  ) {
     this.lookupTable = this.toLookupTable(data);
   }
 
@@ -34,16 +38,21 @@ export default class RateInfoLookup
     return isDefined(this.get(pair));
   }
 
-  get(pair: AssetIdsPair): Maybe<RateWithPairIds> {
+  get(pair: AssetIdsPair): Maybe<VolumeAwareRateInfo> {
     const lookup = (pair: AssetIdsPair, flipped: boolean) =>
       this.getFromLookupTable(pair, flipped);
 
+    if (pairHasWaves(pair)) {
+      return lookup(pair, false).orElse(() => lookup(pair, true));
+    }
+
     return lookup(pair, false)
       .orElse(() => lookup(pair, true))
+      .filter((val) => val.volumeWaves.gte(this.pairAcceptanceVolumeThreshold))
       .orElse(() =>
         maybeOf(pair)
           .filter(complement(pairHasWaves))
-          .chain(pair => this.lookupThroughWaves(pair))
+          .chain((pair) => this.lookupThroughWaves(pair))
       );
   }
 
@@ -62,15 +71,13 @@ export default class RateInfoLookup
   private getFromLookupTable(
     pair: AssetIdsPair,
     flipped: boolean
-  ): Maybe<RateWithPairIds> {
+  ): Maybe<VolumeAwareRateInfo> {
     const lookupData = flipped ? flip(pair) : pair;
 
     return fromNullable<BigNumber>(
       path([lookupData.amountAsset, lookupData.priceAsset], this.lookupTable)
     )
-      .map((rate: BigNumber) =>
-        flipped ? inv(rate).getOrElse(new BigNumber(0)) : rate
-      )
+      .map((rate: BigNumber) => (flipped ? inv(rate).getOrElse(new BigNumber(0)) : rate))
       .map((rate: BigNumber) => ({
         rate,
         ...lookupData,
@@ -88,7 +95,7 @@ export default class RateInfoLookup
         amountAsset: pair.priceAsset,
         priceAsset: WavesId,
       })
-    ).map(rate => ({
+    ).map((rate) => ({
       amountAsset: pair.amountAsset,
       priceAsset: pair.priceAsset,
       rate: rate.getOrElse(new BigNumber(0)),
