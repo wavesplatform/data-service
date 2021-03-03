@@ -1,15 +1,10 @@
 import { partition, chain, uniqWith } from 'ramda';
 import { AssetIdsPair, CacheSync } from '../../../types';
 import { BigNumber } from '@waves/data-entities';
-import {
-  pairIsSymmetric,
-  pairsEq,
-  generatePossibleRequestItems,
-} from '../data';
+import { pairIsSymmetric, pairsEq, generatePossibleRequestItems } from '../data';
 import { RateCacheKey } from './impl/RateCache';
 import { VolumeAwareRateInfo } from '../RateEstimator';
 import { Task } from 'folktale/concurrency/task';
-import { RateWithPairIds } from '../../rates';
 
 export type RateCache = CacheSync<RateCacheKey, VolumeAwareRateInfo>;
 
@@ -26,12 +21,13 @@ export const partitionByPreComputed = (
   cache: RateCache,
   pairs: AssetIdsPair[],
   getCacheKey: (pair: AssetIdsPair) => RateCacheKey,
-  shouldCache: boolean,
+  shouldCache: boolean
 ): PairsForRequest => {
   const [eq, uneq] = partition(pairIsSymmetric, pairs);
 
-  const eqRates: Array<RateWithPairIds> = eq.map((pair) => ({
+  const eqRates: Array<VolumeAwareRateInfo> = eq.map((pair) => ({
     rate: new BigNumber(1),
+    volumeWaves: new BigNumber(0),
     ...pair,
   }));
 

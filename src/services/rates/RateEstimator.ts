@@ -70,7 +70,10 @@ export default class RateEstimator
       .chain((pairsWithRates) =>
         this.pairs
           .mget({
-            pairs: pairsWithRates,
+            pairs: pairsWithRates.map((pairWithRate) => ({
+              amountAsset: pairWithRate.amountAsset,
+              priceAsset: pairWithRate.priceAsset,
+            })),
             matcher: request.matcher,
           })
           .map((foundPairs) =>

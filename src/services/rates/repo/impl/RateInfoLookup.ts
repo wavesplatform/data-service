@@ -1,6 +1,6 @@
 import { BigNumber } from '@waves/data-entities';
-import { Maybe, of as maybeOf, fromNullable } from 'folktale/maybe';
-import { path, complement } from 'ramda';
+import { Maybe, fromNullable } from 'folktale/maybe';
+import { path } from 'ramda';
 
 import { AssetIdsPair, CacheSync } from '../../../../types';
 import { WavesId, flip, pairHasWaves } from '../../data';
@@ -49,20 +49,16 @@ export default class RateInfoLookup
     return lookup(pair, false)
       .orElse(() => lookup(pair, true))
       .filter((val) => val.volumeWaves.gte(this.pairAcceptanceVolumeThreshold))
-      .orElse(() =>
-        maybeOf(pair)
-          .filter(complement(pairHasWaves))
-          .chain((pair) => this.lookupThroughWaves(pair))
-      );
+      .orElse(() => this.lookupThroughWaves(pair));
   }
 
-  private toLookupTable(data: Array<RateWithPairIds>): RateLookupTable {
+  private toLookupTable(data: Array<VolumeAwareRateInfo>): RateLookupTable {
     return data.reduce<RateLookupTable>((acc, item) => {
       if (!(item.amountAsset in acc)) {
         acc[item.amountAsset] = {};
       }
 
-      acc[item.amountAsset][item.priceAsset] = item.rate;
+      acc[item.amountAsset][item.priceAsset] = item;
 
       return acc;
     }, {});
@@ -74,19 +70,28 @@ export default class RateInfoLookup
   ): Maybe<VolumeAwareRateInfo> {
     const lookupData = flipped ? flip(pair) : pair;
 
-    return fromNullable<BigNumber>(
+    let foundValue = fromNullable<VolumeAwareRateInfo>(
       path([lookupData.amountAsset, lookupData.priceAsset], this.lookupTable)
-    )
-      .map((rate: BigNumber) => (flipped ? inv(rate).getOrElse(new BigNumber(0)) : rate))
-      .map((rate: BigNumber) => ({
-        rate,
-        ...lookupData,
-      }));
+    );
+
+    return foundValue.map((data) => {
+      if (flipped) {
+        let flippedData = { ...data };
+        flippedData.rate = inv(flippedData.rate).getOrElse(new BigNumber(0));
+        return flippedData;
+      } else {
+        return data;
+      }
+    });
   }
 
-  private lookupThroughWaves(pair: AssetIdsPair): Maybe<RateWithPairIds> {
+  private lookupThroughWaves(pair: AssetIdsPair): Maybe<VolumeAwareRateInfo> {
     return map2(
-      (info1, info2) => safeDivide(info1.rate, info2.rate),
+      (info1, info2) => ({
+        ...pair,
+        rate: safeDivide(info1.rate, info2.rate).getOrElse(new BigNumber(0)),
+        volumeWaves: BigNumber.max(info1.volumeWaves, info2.volumeWaves),
+      }),
       this.get({
         amountAsset: pair.amountAsset,
         priceAsset: WavesId,
@@ -95,10 +100,6 @@ export default class RateInfoLookup
         amountAsset: pair.priceAsset,
         priceAsset: WavesId,
       })
-    ).map((rate) => ({
-      amountAsset: pair.amountAsset,
-      priceAsset: pair.priceAsset,
-      rate: rate.getOrElse(new BigNumber(0)),
-    }));
+    );
   }
 }
