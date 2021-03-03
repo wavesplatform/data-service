@@ -21,5 +21,7 @@ export const searchAssetsByTicker = (ticker: string): knex.QueryBuilder =>
     (q: knex.QueryBuilder) =>
       pg.with('assets_cte', q).from('assets_cte').select(columns).orderBy('rn', 'asc'),
     (q: knex.QueryBuilder) =>
-      ticker === '*' ? q.whereNotNull('ticker') : q.where('ticker', ticker)
+      ticker === '*'
+        ? q.clone().whereNotNull('ticker')
+        : q.clone().where('ticker', ticker)
   )(baseQuery);
