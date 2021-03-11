@@ -36,11 +36,12 @@ const columns = [
 ];
 
 // in get/mget requests sort is tip for postgresql to use index
-export const select = (s: string) => pg({ t: 'txs_16 ' }).orderBy('t.uid', s);
+export const select = (s: string) =>
+  pg({ t: 'txs_16 ' }).column('uid').orderBy('t.uid', s);
 
 export const selectFromFiltered = (filtered: knex.QueryBuilder) =>
-  pg
+  pg({ t: 'txs_16' })
     .select(columns)
-    .from({ t: filtered })
     .leftJoin('txs_16_args as a', 'a.tx_uid', 't.uid')
-    .leftJoin('txs_16_payment as p', 'p.tx_uid', 't.uid');
+    .leftJoin('txs_16_payment as p', 'p.tx_uid', 't.uid')
+    .whereIn('t.uid', filtered);
