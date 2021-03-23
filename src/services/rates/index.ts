@@ -1,20 +1,13 @@
 import { BigNumber } from '@waves/data-entities';
-import {
-  ServiceMget,
-  Rate,
-  RateMgetParams,
-  list,
-  rate,
-  RateInfo,
-  AssetIdsPair,
-} from '../../types';
+import { Maybe } from 'folktale/maybe';
+import { ServiceMget, Rate, RateMgetParams, list, rate, AssetIdsPair } from '../../types';
 import { RateSerivceCreatorDependencies } from '../../services';
 import RateEstimator from './RateEstimator';
 import RemoteRateRepo from './repo/impl/RemoteRateRepo';
 
 export { default as RateCacheImpl } from './repo/impl/RateCache';
 
-export type RateWithPairIds = RateInfo & AssetIdsPair;
+export type RateWithPairIds = { rate: Maybe<BigNumber> } & AssetIdsPair;
 
 export default function ({
   drivers,
@@ -22,8 +15,12 @@ export default function ({
   pairs,
   pairAcceptanceVolumeThreshold,
 }: RateSerivceCreatorDependencies): ServiceMget<RateMgetParams, Rate> {
-  const estimator = new RateEstimator(cache, new RemoteRateRepo(drivers.pg),pairs,
-  pairAcceptanceVolumeThreshold,);
+  const estimator = new RateEstimator(
+    cache,
+    new RemoteRateRepo(drivers.pg),
+    pairs,
+    pairAcceptanceVolumeThreshold
+  );
 
   return {
     mget(request: RateMgetParams) {
@@ -32,12 +29,16 @@ export default function ({
         .map((data) =>
           data.map((item) =>
             rate(
-              {
-                rate: item.res.fold(
-                  () => new BigNumber(0),
-                  (it) => it.rate
-                ),
-              },
+              item.res.fold(
+                () => null,
+                (it) =>
+                  it.rate.matchWith({
+                    Just: ({ value }) => ({
+                      rate: value,
+                    }),
+                    Nothing: () => null,
+                  })
+              ),
               {
                 amountAsset: item.req.amountAsset,
                 priceAsset: item.req.priceAsset,

@@ -1,5 +1,6 @@
 import * as knex from 'knex';
 import { chain } from 'ramda';
+import { fromNullable } from 'folktale/maybe';
 import { Task, of as taskOf } from 'folktale/concurrency/task';
 
 import { DbError, Timeout } from '../../../../errorHandling';
@@ -34,7 +35,7 @@ export default class RemoteRateRepo
             return {
               amountAsset: it.amount_asset_id,
               priceAsset: it.price_asset_id,
-              rate: it.weighted_average_price,
+              rate: fromNullable(it.weighted_average_price),
             };
           }
         )

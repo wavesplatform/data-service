@@ -77,7 +77,7 @@ export default class RateEstimator
             matcher: request.matcher,
           })
           .map((foundPairs) =>
-            foundPairs.data.map((pair: Pair, idx) => {
+            foundPairs.data.map((pair: Pair, idx: number) => {
               if (isNil(pair.data)) {
                 return {
                   ...pairsWithRates[idx],
