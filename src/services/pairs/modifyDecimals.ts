@@ -27,16 +27,14 @@ export const modifyDecimals = <T extends PairInfo & AssetIdsPair>(
             firstPrice: pair.firstPrice.multipliedBy(10 ** decimals),
             lastPrice: pair.lastPrice.multipliedBy(10 ** decimals),
             volume: pair.volume.multipliedBy(10 ** amountAssetDecimals),
-            quoteVolume: pair.quoteVolume.multipliedBy(
-              10 ** priceAssetDecimals
-            ),
+            quoteVolume: pair.quoteVolume.multipliedBy(10 ** priceAssetDecimals),
             volumeWaves:
-              pair.amountAsset === 'WAVES'
+              pair.volumeWaves === null
+                ? null
+                : pair.amountAsset === 'WAVES'
                 ? pair.volumeWaves.multipliedBy(10 ** amountAssetDecimals)
                 : pair.volumeWaves.multipliedBy(10 ** priceAssetDecimals),
-            weightedAveragePrice: pair.weightedAveragePrice.multipliedBy(
-              10 ** decimals
-            ),
+            weightedAveragePrice: pair.weightedAveragePrice.multipliedBy(10 ** decimals),
           };
         })
       );

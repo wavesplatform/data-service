@@ -69,7 +69,7 @@ export type RepoResponse<Response> =
   | RepoSearchResponse<Response>;
 
 export { AssetInfo };
-export type Asset = Serializable<'asset', AssetInfo>;
+export type Asset = Serializable<'asset', AssetInfo | null>;
 export const asset = (data: AssetInfo | null = null): Asset =>
   toSerializable('asset', data);
 
@@ -77,7 +77,7 @@ export type AliasInfo = {
   alias: string;
   address: string | null;
 };
-export type Alias = Serializable<'alias', AliasInfo>;
+export type Alias = Serializable<'alias', AliasInfo | null>;
 export const alias = (data: AliasInfo | null): Alias =>
   toSerializable('alias', data);
 
@@ -122,7 +122,7 @@ export type PairInfo = {
   weightedAveragePrice: BigNumber;
   volume: BigNumber;
   quoteVolume: BigNumber;
-  volumeWaves: BigNumber;
+  volumeWaves: BigNumber | null;
   txsCount: number;
 };
 
