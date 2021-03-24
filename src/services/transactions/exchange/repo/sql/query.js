@@ -52,9 +52,12 @@ const columns = {
   o2_matcher_fee_asset_id: pg.raw("t.order2->>'matcherFeeAssetId'"),
 };
 
-const select = pg({ t: 'txs_7' });
+const select = pg({ t: 'txs_7' }).select('t.uid');
 
-const selectFromFiltered = (filtered) => filtered.clone().select(columns);
+const selectFromFiltered = (filtered) =>
+  pg.with('ts', filtered).select(columns).from({ t: 'txs_7' }).join('ts', {
+    't.uid': 'ts.uid',
+  });
 
 module.exports = {
   select,

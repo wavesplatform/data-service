@@ -51,6 +51,7 @@ const createApi = ({ filters: F }) => ({
 
     return pipe(
       ...fs,
+      F.sort(sort),
       selectFromFiltered,
       F.limit(fValues.limit),
       F.sort(sort),
