@@ -1,7 +1,7 @@
 import * as knex from 'knex';
 const pg = knex({ client: 'pg' });
 
-export const select = pg({ t: 'txs' }).select('uid');
+export const select = pg({ t: 'txs_all' }).select('uid');
 
 export const selectFromFiltered = (filtered: knex.QueryBuilder) =>
   pg
@@ -14,7 +14,7 @@ export const selectFromFiltered = (filtered: knex.QueryBuilder) =>
     })
     .from('ts')
     .join(
-      { t: 'txs' },
+      { t: 'txs_all' },
       {
         't.uid': 'ts.uid',
       }

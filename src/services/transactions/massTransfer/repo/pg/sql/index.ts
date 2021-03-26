@@ -1,7 +1,7 @@
-import { createSql } from '../../../_common/sql';
-import * as filters from '../../../_common/sql/filters';
+import { createSql } from '../../../../_common/sql';
 
 import { select, selectFromFiltered } from './query';
+import { filters, filtersOrder } from './filters';
 
 const queryAfterFilters = {
   get: selectFromFiltered,
@@ -11,6 +11,7 @@ const queryAfterFilters = {
 
 export default createSql({
   query: select,
-  queryAfterFilters,
   filters,
+  filtersOrder,
+  queryAfterFilters,
 });

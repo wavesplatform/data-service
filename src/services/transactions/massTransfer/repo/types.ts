@@ -4,16 +4,21 @@ import { RequestWithCursor } from '../../../_common/pagination';
 import { CommonFilters, RawTx, Tx } from '../../_common/types';
 import { BigNumber } from '@waves/data-entities';
 
-export type MassTransferTxDbResponse = RawTx & {
-  asset_id: string;
-  attachment: string;
-  recipients: string[];
-  amounts: BigNumber[];
+export type RawMassTransferTxTransfer = {
+  recipient: string;
+  amount: BigNumber;
+  positionInTx: number;
 };
 
-type Transfer = {
+export type RawMassTransferTx = RawTx & {
+  asset_id: string;
+  attachment: string;
+} & RawMassTransferTxTransfer;
+
+export type Transfer = {
   amount: BigNumber;
   recipient: string;
+  positionInTx: number;
 };
 
 export type MassTransferTx = Tx & {
@@ -26,9 +31,9 @@ export type MassTransferTxsGetRequest = string;
 
 export type MassTransferTxsMgetRequest = string[];
 
-export type MassTransferTxsSearchRequest = RequestWithCursor<
+export type MassTransferTxsSearchRequest<CursorType = string> = RequestWithCursor<
   CommonFilters & WithSortOrder & WithLimit,
-  string
+  CursorType
 > &
   Partial<{
     sender: string;

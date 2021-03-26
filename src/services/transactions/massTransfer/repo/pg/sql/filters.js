@@ -1,5 +1,5 @@
-const commonFilters = require('../../../_common/sql/filters');
-const commonFiltersOrder = require('../../../_common/sql/filtersOrder');
+const commonFilters = require('../../../../_common/sql/filters');
+const commonFiltersOrder = require('../../../../_common/sql/filtersOrder');
 
 const byRecipient = (addressOrAlias) => (q) =>
   q

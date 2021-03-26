@@ -1,61 +1,65 @@
-import { propEq } from 'ramda';
+import { Ok as ok } from 'folktale/result';
+import { compose } from 'ramda';
 
 import { CommonRepoDependencies } from '../../..';
-import { getByIdPreset } from '../../../_common/presets/pg/getById';
-import { mgetByIdsPreset } from '../../../_common/presets/pg/mgetByIds';
-import { searchPreset } from '../../../_common/presets/pg/search';
+import { get, mget, search } from '../../../_common/createResolver';
+import { validateResult } from '../../../_common/presets/validation';
+import { transformResults as transformResultGet } from '../../../_common/presets/pg/getById/transformResult';
+import { transformResults as transformResultMget } from '../../../_common/presets/pg/mgetByIds/transformResult';
+import { transformInput as transformInputSearch } from '../../../_common/presets/pg/search/transformInput';
+import { transformResults as transformResultSearch } from '../../../_common/presets/pg/search/transformResults';
 
 import { Cursor, serialize, deserialize } from '../../_common/cursor';
 
-import { result } from './schema';
-import * as sql from './sql';
+import pgData from './pg';
+import { result as resultSchema } from './schema';
 import * as transformTxInfo from './transformTxInfo';
 import {
   MassTransferTxsRepo,
   MassTransferTxsSearchRequest,
-  MassTransferTxDbResponse,
+  RawMassTransferTx,
   MassTransferTx,
 } from './types';
+
+const createServiceName = (type: string) => `transactions.massTransfer.${type}`;
 
 export default ({
   drivers: { pg },
   emitEvent,
 }: CommonRepoDependencies): MassTransferTxsRepo => {
   return {
-    get: getByIdPreset({
-      name: 'transactions.massTransfer.get',
-      sql: sql.get,
-      resultSchema: result,
-      transformResult: transformTxInfo,
-    })({
-      pg,
+    get: get({
+      transformInput: ok,
+      transformResult: transformResultGet(transformTxInfo),
+      validateResult: validateResult<RawMassTransferTx>(
+        resultSchema,
+        createServiceName('get')
+      ),
+      getData: pgData.get(pg),
       emitEvent,
     }),
 
-    mget: mgetByIdsPreset({
-      name: 'transactions.massTransfer.mget',
-      matchRequestResult: propEq('id'),
-      sql: sql.mget,
-      resultSchema: result,
-      transformResult: transformTxInfo,
-    })({
-      pg,
+    mget: mget({
+      transformInput: ok,
+      transformResult: transformResultMget(transformTxInfo),
+      validateResult: validateResult(resultSchema, createServiceName('mget')),
+      getData: pgData.mget(pg),
       emitEvent,
     }),
 
-    search: searchPreset<
-      Cursor,
+    search: search<
       MassTransferTxsSearchRequest,
-      MassTransferTxDbResponse,
+      MassTransferTxsSearchRequest<Cursor>,
+      RawMassTransferTx,
       MassTransferTx
     >({
-      name: 'transactions.massTransfer.search',
-      sql: sql.search,
-      resultSchema: result,
-      transformResult: transformTxInfo,
-      cursorSerialization: { serialize, deserialize },
-    })({
-      pg,
+      transformInput: transformInputSearch(deserialize),
+      transformResult: transformResultSearch(compose(transformTxInfo), serialize),
+      validateResult: validateResult<RawMassTransferTx>(
+        resultSchema,
+        createServiceName('search')
+      ),
+      getData: pgData.search(pg),
       emitEvent,
     }),
   };
