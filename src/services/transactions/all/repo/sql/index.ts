@@ -1,16 +1,9 @@
 import { createSql } from '../../../_common/sql';
 import * as filters from '../../../_common/sql/filters';
 
-import { select, selectFromFiltered } from './query';
-
-const queryAfterFilters = {
-  get: selectFromFiltered,
-  mget: selectFromFiltered,
-  search: selectFromFiltered,
-};
+import { select } from './query';
 
 export default createSql({
   query: select,
-  queryAfterFilters,
   filters,
 });
