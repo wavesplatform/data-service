@@ -33,7 +33,7 @@ export class ThresholdAssetRateService implements IThresholdAssetRateService {
                             return rejected(AppError.Resolver(`Rate for pair WAVES/${this.thresholdAssetId} not found`));
                         }
                         this.cache.set(this.thresholdAssetId, value.data.weightedAveragePrice);
-                        return taskOf(value.data?.weightedAveragePrice)
+                        return taskOf(value.data.weightedAveragePrice);
                     },
                     Nothing: () => {
                         return rejected(AppError.Resolver(`Pair WAVES/${this.thresholdAssetId} not found`));
