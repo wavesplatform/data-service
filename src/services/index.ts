@@ -41,6 +41,7 @@ import createTransferTxsService, { TransferTxsService } from './transactions/tra
 import createUpdateAssetInfoTxsService, { UpdateAssetInfoTxsService } from './transactions/updateAssetInfo';
 import { DataServiceConfig } from '../loadConfig';
 import createRateService, { RateCacheImpl } from './rates';
+import { IThresholdAssetRateService, ThresholdAssetRateService } from './rates/ThresholdAssetRateService';
 
 import { PairOrderingServiceImpl } from './PairOrderingService';
 
@@ -62,6 +63,7 @@ export type RateSerivceCreatorDependencies = CommonServiceDependencies & {
   cache: RateCache;
   pairs: PairsService;
   pairAcceptanceVolumeThreshold: number,
+  thresholdAssetRateService: IThresholdAssetRateService
 };
 
 export type ServiceMesh = {
@@ -143,6 +145,8 @@ export default ({
       validatePairs: validatePairs(assets, pairOrderingService),
     });
 
+    const thresholdAssetRateService = new ThresholdAssetRateService(options.thresholdAssetId, options.matcher.defaultMatcherAddress, pairsNoAsyncValidation);
+
     const aliasTxs = createAliasTxsService(commonDeps);
     const burnTxs = createBurnTxsService(commonDeps);
     const dataTxs = createDataTxsService(commonDeps);
@@ -165,6 +169,7 @@ export default ({
       cache: ratesCache,
       pairs: pairsNoAsyncValidation,
       pairAcceptanceVolumeThreshold: options.pairAcceptanceVolumeThreshold,
+      thresholdAssetRateService: thresholdAssetRateService,
     });
 
     const candlesNoAsyncValidation = createCandlesService({

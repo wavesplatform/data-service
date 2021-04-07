@@ -1,10 +1,10 @@
 import { BigNumber } from '@waves/data-entities';
 import { Maybe } from 'folktale/maybe';
+
 import { ServiceMget, Rate, RateMgetParams, list, rate, AssetIdsPair } from '../../types';
 import { RateSerivceCreatorDependencies } from '../../services';
 import RateEstimator from './RateEstimator';
 import RemoteRateRepo from './repo/impl/RemoteRateRepo';
-
 export { default as RateCacheImpl } from './repo/impl/RateCache';
 
 export type RateWithPairIds = { rate: Maybe<BigNumber> } & AssetIdsPair;
@@ -14,12 +14,14 @@ export default function ({
   cache,
   pairs,
   pairAcceptanceVolumeThreshold,
+  thresholdAssetRateService
 }: RateSerivceCreatorDependencies): ServiceMget<RateMgetParams, Rate> {
   const estimator = new RateEstimator(
     cache,
     new RemoteRateRepo(drivers.pg),
     pairs,
-    pairAcceptanceVolumeThreshold
+    pairAcceptanceVolumeThreshold,
+    thresholdAssetRateService
   );
 
   return {

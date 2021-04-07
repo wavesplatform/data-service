@@ -29,7 +29,7 @@ export default class RateInfoLookup
 
   constructor(
     data: Array<VolumeAwareRateInfo>,
-    private readonly pairAcceptanceVolumeThreshold: number
+    private readonly pairAcceptanceVolumeThreshold: BigNumber
   ) {
     this.lookupTable = this.toLookupTable(data);
   }
@@ -51,8 +51,7 @@ export default class RateInfoLookup
     return lookup(pair, false)
       .orElse(() => lookup(pair, true))
       .filter(
-        (val) =>
-          val.volumeWaves.gte(this.pairAcceptanceVolumeThreshold) ||
+        (val) => val.volumeWaves.gte(this.pairAcceptanceVolumeThreshold) ||
           wavesPaired.matchWith({
             Just: ({ value }) =>
               value.rate.matchWith({

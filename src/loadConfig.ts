@@ -28,6 +28,7 @@ export type MatcherConfig = {
 
 export type RatesConfig = {
   pairAcceptanceVolumeThreshold: number;
+  thresholdAssetId: string;
 };
 
 export type DefaultConfig = PostgresConfig & ServerConfig & LoggerConfig;
@@ -54,14 +55,14 @@ export const loadDefaultConfig = (): DefaultConfig => {
     postgresPoolSize: process.env.PGPOOLSIZE ? parseInt(process.env.PGPOOLSIZE) : 20,
     postgresStatementTimeout:
       isNil(process.env.PGSTATEMENTTIMEOUT) ||
-      isNaN(parseInt(process.env.PGSTATEMENTTIMEOUT))
+        isNaN(parseInt(process.env.PGSTATEMENTTIMEOUT))
         ? false
         : parseInt(process.env.PGSTATEMENTTIMEOUT),
     logLevel: process.env.LOG_LEVEL || 'info',
   };
 };
 
-const envVariables = ['DEFAULT_MATCHER', 'RATE_PAIR_ACCEPTANCE_VOLUME_THRESHOLD'];
+const envVariables = ['DEFAULT_MATCHER', 'RATE_PAIR_ACCEPTANCE_VOLUME_THRESHOLD', 'RATE_THRESHOLD_ASSET_ID'];
 
 const ensurePositiveNumber = (x: number, msg: string) => {
   if (x > 0) {
@@ -95,6 +96,7 @@ const load = (): DataServiceConfig => {
 
   const rate: RatesConfig = {
     pairAcceptanceVolumeThreshold: volumeThreshold,
+    thresholdAssetId: process.env.RATE_THRESHOLD_ASSET_ID as string
   };
 
   return {

@@ -10,6 +10,7 @@ import { isEmpty } from '../../utils/fp/maybeOps';
 
 import { PairsService } from '../pairs';
 import { RateWithPairIds } from '../rates';
+import { IThresholdAssetRateService } from './ThresholdAssetRateService';
 import { partitionByPreComputed, AsyncMget, RateCache } from './repo';
 import { RateCacheKey } from './repo/impl/RateCache';
 import RateInfoLookup from './repo/impl/RateInfoLookup';
@@ -23,7 +24,7 @@ export type VolumeAwareRateInfo = RateWithPairIds & { volumeWaves: BigNumber };
 
 export default class RateEstimator
   implements
-    AsyncMget<RateMgetParams, ReqAndRes<AssetIdsPair, RateWithPairIds>, AppError> {
+  AsyncMget<RateMgetParams, ReqAndRes<AssetIdsPair, RateWithPairIds>, AppError> {
   constructor(
     private readonly cache: RateCache,
     private readonly remoteGet: AsyncMget<
@@ -32,8 +33,9 @@ export default class RateEstimator
       DbError | Timeout
     >,
     private readonly pairs: PairsService,
-    private readonly pairAcceptanceVolumeThreshold: number
-  ) {}
+    private readonly pairAcceptanceVolumeThreshold: number,
+    private readonly thresholdAssetRateService: IThresholdAssetRateService
+  ) { }
 
   mget(
     request: RateMgetParams
@@ -98,12 +100,12 @@ export default class RateEstimator
               if (shouldCache) cacheAll(results);
             })
           )
-          .map(
+          .chain(
             (data) =>
-              new RateInfoLookup(
+              this.thresholdAssetRateService.get().map(thresholdAssetRate => new RateInfoLookup(
                 data.concat(preComputed),
-                this.pairAcceptanceVolumeThreshold
-              )
+                new BigNumber(this.pairAcceptanceVolumeThreshold).dividedBy(thresholdAssetRate),
+              ))
           )
           .map((lookup) =>
             pairs.map((idsPair) => ({
