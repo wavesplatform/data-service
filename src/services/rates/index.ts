@@ -31,16 +31,16 @@ export default function ({
         .map((data) =>
           data.map((item) =>
             rate(
-              item.res.fold(
-                () => null,
-                (it) =>
-                  it.rate.matchWith({
-                    Just: ({ value }) => ({
-                      rate: value,
-                    }),
-                    Nothing: () => null,
-                  })
-              ),
+              {
+                rate: item.res.fold(
+                  () => new BigNumber(0),
+                  (it) =>
+                    it.rate.matchWith({
+                      Just: ({ value }) => value,
+                      Nothing: () => new BigNumber(0),
+                    })
+                ),
+              },
               {
                 amountAsset: item.req.amountAsset,
                 priceAsset: item.req.priceAsset,
