@@ -1,11 +1,10 @@
-import { BigNumber } from '@waves/data-entities';
 import { fromNullable } from 'folktale/maybe';
 import * as LRU from 'lru-cache';
 
 import { AssetIdsPair } from '../../../../types';
-import { inv } from '../../util';
 import { flip } from '../../data';
 import { RateCache } from '../../repo';
+import { VolumeAwareRateInfo } from '../../RateEstimator';
 
 export type RateCacheKey = {
   pair: AssetIdsPair;
@@ -17,7 +16,7 @@ const keyFn = (matcher: string) => (pair: AssetIdsPair): string => {
 };
 
 export default class RateCacheImpl implements RateCache {
-  private readonly lru: LRU<string, BigNumber>;
+  private readonly lru: LRU<string, VolumeAwareRateInfo>;
 
   constructor(size: number, maxAgeMillis: number) {
     this.lru = new LRU({ max: size, maxAge: maxAgeMillis });
@@ -30,15 +29,15 @@ export default class RateCacheImpl implements RateCache {
     );
   }
 
-  set(key: RateCacheKey, rate: BigNumber) {
-    this.lru.set(keyFn(key.matcher)(key.pair), rate);
+  set(key: RateCacheKey, data: VolumeAwareRateInfo) {
+    this.lru.set(keyFn(key.matcher)(key.pair), data);
   }
 
   get(key: RateCacheKey) {
     const getKey = keyFn(key.matcher);
 
     return fromNullable(this.lru.get(getKey(key.pair))).orElse(() =>
-      fromNullable(this.lru.get(getKey(flip(key.pair)))).chain(inv)
+      fromNullable(this.lru.get(getKey(flip(key.pair))))
     );
   }
 }

@@ -26,12 +26,18 @@ export type MatcherConfig = {
   };
 };
 
+export type RatesConfig = {
+  pairAcceptanceVolumeThreshold: number;
+  thresholdAssetId: string;
+};
+
 export type DefaultConfig = PostgresConfig & ServerConfig & LoggerConfig;
 
 export type DataServiceConfig = PostgresConfig &
   ServerConfig &
   LoggerConfig &
-  MatcherConfig;
+  MatcherConfig &
+  RatesConfig;
 
 const commonEnvVariables = ['PGHOST', 'PGDATABASE', 'PGUSER', 'PGPASSWORD'];
 
@@ -49,14 +55,22 @@ export const loadDefaultConfig = (): DefaultConfig => {
     postgresPoolSize: process.env.PGPOOLSIZE ? parseInt(process.env.PGPOOLSIZE) : 20,
     postgresStatementTimeout:
       isNil(process.env.PGSTATEMENTTIMEOUT) ||
-      isNaN(parseInt(process.env.PGSTATEMENTTIMEOUT))
+        isNaN(parseInt(process.env.PGSTATEMENTTIMEOUT))
         ? false
         : parseInt(process.env.PGSTATEMENTTIMEOUT),
     logLevel: process.env.LOG_LEVEL || 'info',
   };
 };
 
-const envVariables = ['DEFAULT_MATCHER'];
+const envVariables = ['DEFAULT_MATCHER', 'RATE_PAIR_ACCEPTANCE_VOLUME_THRESHOLD', 'RATE_THRESHOLD_ASSET_ID'];
+
+const ensurePositiveNumber = (x: number, msg: string) => {
+  if (x > 0) {
+    return x;
+  }
+
+  throw new Error(msg);
+};
 
 const load = (): DataServiceConfig => {
   // assert all necessary env vars are set
@@ -75,9 +89,20 @@ const load = (): DataServiceConfig => {
     matcher.matcher.settingsURL = process.env.MATCHER_SETTINGS_URL;
   }
 
+  const volumeThreshold = ensurePositiveNumber(
+    parseInt(process.env.RATE_PAIR_ACCEPTANCE_VOLUME_THRESHOLD as string),
+    'RATE_PAIR_ACCEPTANCE_VOLUME_THRESHOLD environment variable should be a positive integer'
+  );
+
+  const rate: RatesConfig = {
+    pairAcceptanceVolumeThreshold: volumeThreshold,
+    thresholdAssetId: process.env.RATE_THRESHOLD_ASSET_ID as string
+  };
+
   return {
     ...loadDefaultConfig(),
     ...matcher,
+    ...rate,
   };
 };
 

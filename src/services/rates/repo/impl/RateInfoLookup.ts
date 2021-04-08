@@ -1,17 +1,18 @@
 import { BigNumber } from '@waves/data-entities';
-import { Maybe, of as maybeOf, fromNullable } from 'folktale/maybe';
-import { path, complement } from 'ramda';
+import { Maybe, fromNullable, of as maybeOf } from 'folktale/maybe';
+import { path } from 'ramda';
 
 import { AssetIdsPair, CacheSync } from '../../../../types';
 import { WavesId, flip, pairHasWaves } from '../../data';
 import { inv, safeDivide } from '../../util';
-import { isDefined, map2 } from '../../../../utils/fp/maybeOps';
+import { isDefined } from '../../../../utils/fp/maybeOps';
 
-import { RateWithPairIds } from '../../../rates'
+import { RateWithPairIds } from '../../../rates';
+import { VolumeAwareRateInfo } from '../../../rates/RateEstimator';
 
 type RateLookupTable = {
   [amountAsset: string]: {
-    [priceAsset: string]: BigNumber;
+    [priceAsset: string]: VolumeAwareRateInfo;
   };
 };
 
@@ -26,7 +27,10 @@ export default class RateInfoLookup
   implements Omit<CacheSync<AssetIdsPair, RateWithPairIds>, 'set'> {
   private readonly lookupTable: RateLookupTable;
 
-  constructor(data: Array<RateWithPairIds>) {
+  constructor(
+    data: Array<VolumeAwareRateInfo>,
+    private readonly pairAcceptanceVolumeThreshold: BigNumber
+  ) {
     this.lookupTable = this.toLookupTable(data);
   }
 
@@ -34,26 +38,39 @@ export default class RateInfoLookup
     return isDefined(this.get(pair));
   }
 
-  get(pair: AssetIdsPair): Maybe<RateWithPairIds> {
+  get(pair: AssetIdsPair): Maybe<VolumeAwareRateInfo> {
     const lookup = (pair: AssetIdsPair, flipped: boolean) =>
       this.getFromLookupTable(pair, flipped);
 
+    if (pairHasWaves(pair)) {
+      return lookup(pair, false).orElse(() => lookup(pair, true));
+    }
+
+    let wavesPaired = this.lookupThroughWaves(pair);
+
     return lookup(pair, false)
       .orElse(() => lookup(pair, true))
-      .orElse(() =>
-        maybeOf(pair)
-          .filter(complement(pairHasWaves))
-          .chain(pair => this.lookupThroughWaves(pair))
-      );
+      .filter(
+        (val) => (val.volumeWaves !== null && val.volumeWaves.gte(this.pairAcceptanceVolumeThreshold)) ||
+          wavesPaired.matchWith({
+            Just: ({ value }) =>
+              value.rate.matchWith({
+                Just: () => false,
+                Nothing: () => true,
+              }),
+            Nothing: () => true,
+          })
+      )
+      .orElse(() => wavesPaired);
   }
 
-  private toLookupTable(data: Array<RateWithPairIds>): RateLookupTable {
+  private toLookupTable(data: Array<VolumeAwareRateInfo>): RateLookupTable {
     return data.reduce<RateLookupTable>((acc, item) => {
       if (!(item.amountAsset in acc)) {
         acc[item.amountAsset] = {};
       }
 
-      acc[item.amountAsset][item.priceAsset] = item.rate;
+      acc[item.amountAsset][item.priceAsset] = item;
 
       return acc;
     }, {});
@@ -62,36 +79,43 @@ export default class RateInfoLookup
   private getFromLookupTable(
     pair: AssetIdsPair,
     flipped: boolean
-  ): Maybe<RateWithPairIds> {
+  ): Maybe<VolumeAwareRateInfo> {
     const lookupData = flipped ? flip(pair) : pair;
 
-    return fromNullable<BigNumber>(
+    let foundValue = fromNullable<VolumeAwareRateInfo>(
       path([lookupData.amountAsset, lookupData.priceAsset], this.lookupTable)
-    )
-      .map((rate: BigNumber) =>
-        flipped ? inv(rate).getOrElse(new BigNumber(0)) : rate
-      )
-      .map((rate: BigNumber) => ({
-        rate,
-        ...lookupData,
-      }));
+    );
+
+    return foundValue.map((data) => {
+      if (flipped) {
+        let flippedData = { ...data };
+        flippedData.rate = flippedData.rate.chain((rate) => inv(rate));
+        return flippedData;
+      } else {
+        return data;
+      }
+    });
   }
 
-  private lookupThroughWaves(pair: AssetIdsPair): Maybe<RateWithPairIds> {
-    return map2(
-      (info1, info2) => safeDivide(info1.rate, info2.rate),
-      this.get({
-        amountAsset: pair.amountAsset,
-        priceAsset: WavesId,
-      }),
+  private lookupThroughWaves(pair: AssetIdsPair): Maybe<VolumeAwareRateInfo> {
+    return this.get({
+      amountAsset: pair.amountAsset,
+      priceAsset: WavesId,
+    }).chain((info1) =>
       this.get({
         amountAsset: pair.priceAsset,
         priceAsset: WavesId,
-      })
-    ).map(rate => ({
-      amountAsset: pair.amountAsset,
-      priceAsset: pair.priceAsset,
-      rate: rate.getOrElse(new BigNumber(0)),
-    }));
+      }).chain((info2) =>
+        info1.rate.chain((rate1) =>
+          info2.rate.chain((rate2) =>
+            maybeOf<VolumeAwareRateInfo>({
+              ...pair,
+              rate: safeDivide(rate1, rate2),
+              volumeWaves: BigNumber.max(info1.volumeWaves || 0, info2.volumeWaves || 0),
+            })
+          )
+        )
+      )
+    );
   }
 }

@@ -41,6 +41,7 @@ import createTransferTxsService, { TransferTxsService } from './transactions/tra
 import createUpdateAssetInfoTxsService, { UpdateAssetInfoTxsService } from './transactions/updateAssetInfo';
 import { DataServiceConfig } from '../loadConfig';
 import createRateService, { RateCacheImpl } from './rates';
+import { IThresholdAssetRateService, ThresholdAssetRateService } from './rates/ThresholdAssetRateService';
 
 import { PairOrderingServiceImpl } from './PairOrderingService';
 
@@ -60,6 +61,9 @@ export type CommonServiceDependencies = {
 
 export type RateSerivceCreatorDependencies = CommonServiceDependencies & {
   cache: RateCache;
+  pairs: PairsService;
+  pairAcceptanceVolumeThreshold: number,
+  thresholdAssetRateService: IThresholdAssetRateService
 };
 
 export type ServiceMesh = {
@@ -130,6 +134,19 @@ export default ({
       cache: assetsCache,
     });
 
+    const pairsNoAsyncValidation = createPairsService({
+      ...commonDeps,
+      cache: pairsCache,
+      validatePairs: () => taskOf(undefined),
+    });
+    const pairsWithAsyncValidation = createPairsService({
+      ...commonDeps,
+      cache: pairsCache,
+      validatePairs: validatePairs(assets, pairOrderingService),
+    });
+
+    const thresholdAssetRateService = new ThresholdAssetRateService(options.thresholdAssetId, options.matcher.defaultMatcherAddress, pairsNoAsyncValidation);
+
     const aliasTxs = createAliasTxsService(commonDeps);
     const burnTxs = createBurnTxsService(commonDeps);
     const dataTxs = createDataTxsService(commonDeps);
@@ -150,17 +167,9 @@ export default ({
     const rates = createRateService({
       ...commonDeps,
       cache: ratesCache,
-    });
-
-    const pairsNoAsyncValidation = createPairsService({
-      ...commonDeps,
-      cache: pairsCache,
-      validatePairs: () => taskOf(undefined),
-    });
-    const pairsWithAsyncValidation = createPairsService({
-      ...commonDeps,
-      cache: pairsCache,
-      validatePairs: validatePairs(assets, pairOrderingService),
+      pairs: pairsNoAsyncValidation,
+      pairAcceptanceVolumeThreshold: options.pairAcceptanceVolumeThreshold,
+      thresholdAssetRateService: thresholdAssetRateService,
     });
 
     const candlesNoAsyncValidation = createCandlesService({

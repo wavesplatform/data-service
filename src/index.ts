@@ -19,6 +19,8 @@ import * as notFoundHandler from './middleware/notFoundHandler';
 import { loadConfig } from './loadConfig';
 import router from './endpoints';
 
+export const WavesId: string = 'WAVES';
+
 const app = unsafeKoaQs(new Koa());
 
 const options = loadConfig();
