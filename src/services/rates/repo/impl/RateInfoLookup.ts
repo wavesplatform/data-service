@@ -51,7 +51,7 @@ export default class RateInfoLookup
     return lookup(pair, false)
       .orElse(() => lookup(pair, true))
       .filter(
-        (val) => val.volumeWaves.gte(this.pairAcceptanceVolumeThreshold) ||
+        (val) => (val.volumeWaves !== null && val.volumeWaves.gte(this.pairAcceptanceVolumeThreshold)) ||
           wavesPaired.matchWith({
             Just: ({ value }) =>
               value.rate.matchWith({
@@ -111,7 +111,7 @@ export default class RateInfoLookup
             maybeOf<VolumeAwareRateInfo>({
               ...pair,
               rate: safeDivide(rate1, rate2),
-              volumeWaves: BigNumber.max(info1.volumeWaves, info2.volumeWaves),
+              volumeWaves: BigNumber.max(info1.volumeWaves || 0, info2.volumeWaves || 0),
             })
           )
         )

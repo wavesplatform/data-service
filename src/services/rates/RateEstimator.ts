@@ -20,7 +20,7 @@ type ReqAndRes<TReq, TRes> = {
   res: Maybe<TRes>;
 };
 
-export type VolumeAwareRateInfo = RateWithPairIds & { volumeWaves: BigNumber };
+export type VolumeAwareRateInfo = RateWithPairIds & { volumeWaves: BigNumber | null };
 
 export default class RateEstimator
   implements
@@ -101,7 +101,7 @@ export default class RateEstimator
             })
           )
           .chain(
-            (data) =>
+            (data: Array<{ amountAsset: string, priceAsset: string, volumeWaves: BigNumber | null, rate: Maybe<BigNumber> }>) =>
               this.thresholdAssetRateService.get().map(thresholdAssetRate => new RateInfoLookup(
                 data.concat(preComputed),
                 new BigNumber(this.pairAcceptanceVolumeThreshold).dividedBy(thresholdAssetRate),
