@@ -25,7 +25,7 @@ const options = loadConfig();
 const eventBus = createEventBus();
 
 createAndSubscribeLogger({ options, eventBus });
-const requestId = createRequestId({ expose: 'X-Request-Id', header: false });
+const requestId = createRequestId({ expose: 'X-Request-Id', header: 'X-Request-Id' });
 
 // @todo add the test sql query for the db availability checking
 const pgDriver = createPgDriver(options);
