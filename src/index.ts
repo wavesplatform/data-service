@@ -1,3 +1,4 @@
+import { createServer } from 'http';
 import * as Koa from 'koa';
 import chalk from 'chalk';
 import * as createRequestId from 'koa-requestid';
@@ -55,7 +56,10 @@ createServices({
   .run()
   .listen({
     onResolved: app => {
-      app.listen(options.port);
+      const server = createServer(app.callback());
+      // should be smaller than headersTimeout
+      server.keepAliveTimeout = 30 * 1000;
+      server.listen(options.port);
 
       if (process.env.NODE_ENV === 'development') {
         // eslint-disable-next-line
