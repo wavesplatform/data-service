@@ -57,7 +57,7 @@ createServices({
   .listen({
     onResolved: app => {
       const server = createServer(app.callback());
-      // should be smaller than headersTimeout
+      // should be smaller than headersTimeout (by default, 40s)
       server.keepAliveTimeout = 30 * 1000;
       server.listen(options.port);
 
