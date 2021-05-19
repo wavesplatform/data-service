@@ -46,26 +46,27 @@ export default function ({
       .chain((items) =>
         request.moneyFormat === MoneyFormat.Long
           ? taskOf(
-              items.map((r) => ({
-                ...r,
-                rate: r.rate.decimalPlaces(0),
-              }))
-            )
+            items.map((r) => ({
+              ...r,
+              rate: r.rate.decimalPlaces(0),
+            }))
+          )
           : assets
-              .precisions({
-                ids: items.reduce<string[]>(
-                  (acc, item) =>
-                    acc.concat([item.amountAsset, item.priceAsset]),
-                  []
+            .precisions({
+              ids: items.reduce<string[]>(
+                (acc, item) =>
+                  acc.concat([item.amountAsset, item.priceAsset]),
+                []
+              ),
+            })
+            .map((precisions) =>
+              items.map((item, idx) => ({
+                ...item,
+                rate: item.rate.multipliedBy(
+                  10 ** (-8 - precisions[idx * 2 + 1] + precisions[idx * 2])
                 ),
               })
-              .map((precisions) =>
-                items.map((item) => ({
-                  ...item,
-                  rate: item.rate.multipliedBy(
-                    10 ** (-8 - precisions[1] + precisions[0])
-                  ),
-                }))
               )
+            )
       );
 }
