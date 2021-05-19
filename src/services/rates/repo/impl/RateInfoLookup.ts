@@ -36,7 +36,7 @@ export default class RateInfoLookup
 
   constructor(
     data: Array<VolumeAwareRateInfo>,
-    private readonly pairAcceptanceVolumeThreshold: number,
+    private readonly pairAcceptanceVolumeThreshold: BigNumber,
     private readonly wavesAsset: Asset
   ) {
     this.lookupTable = this.toLookupTable(data);

@@ -15,6 +15,7 @@ import { MoneyFormat } from '../types';
 import { partitionByPreComputed, AsyncMget, RateCache } from './repo';
 import { RateCacheKey } from './repo/impl/RateCache';
 import RateInfoLookup from './repo/impl/RateInfoLookup';
+import { IThresholdAssetRateService } from './ThresholdAssetRateService';
 
 type ReqAndRes<TReq, TRes> = {
   req: TReq;
@@ -31,7 +32,7 @@ export type VolumeAwareRateInfo = RateWithPair & { volumeWaves: BigNumber };
 
 export default class RateEstimator
   implements
-    AsyncMget<RateMgetParams, ReqAndRes<AssetPair, RateWithPairIds>, AppError> {
+  AsyncMget<RateMgetParams, ReqAndRes<AssetPair, RateWithPairIds>, AppError> {
   constructor(
     private readonly cache: RateCache,
     private readonly remoteGet: AsyncMget<
@@ -41,8 +42,9 @@ export default class RateEstimator
     >,
     private readonly pairs: PairsService,
     private readonly pairAcceptanceVolumeThreshold: number,
+    private readonly thresholdAssetRateService: IThresholdAssetRateService,
     private readonly assetsService: AssetsService
-  ) {}
+  ) { }
 
   mget(
     request: RateMgetParams
@@ -75,7 +77,7 @@ export default class RateEstimator
     }, new Array<string>());
 
     ids.push(WavesId);
-    
+
     return this.assetsService.mget({ ids }).chain((ms) =>
       sequence<Maybe<Asset>, Maybe<Asset[]>>(maybeOf, ms).matchWith({
         Nothing: () =>
@@ -97,7 +99,7 @@ export default class RateEstimator
           assets.forEach((asset) => {
             assetsMap[asset.id] = asset;
           });
-          
+
           const { preComputed, toBeRequested } = partitionByPreComputed(
             this.cache,
             pairsWithAssets,
@@ -145,13 +147,13 @@ export default class RateEstimator
                 if (shouldCache) cacheAll(results);
               })
             )
-            .map(
-              (data) =>
-                new RateInfoLookup(
-                  [...data, ...preComputed],
-                  this.pairAcceptanceVolumeThreshold,
-                  wavesAsset
-                )
+            .chain(
+              (data: Array<VolumeAwareRateInfo>) =>
+                this.thresholdAssetRateService.get().map(thresholdAssetRate => new RateInfoLookup(
+                  data.concat(preComputed),
+                  new BigNumber(this.pairAcceptanceVolumeThreshold).dividedBy(thresholdAssetRate),
+                  wavesAsset,
+                ))
             )
             .map((lookup) =>
               pairsWithAssets.map((pair) => ({

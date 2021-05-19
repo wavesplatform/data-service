@@ -19,12 +19,14 @@ export default function ({
   assets,
   pairs,
   pairAcceptanceVolumeThreshold,
+  thresholdAssetRateService
 }: RateSerivceCreatorDependencies): RatesMgetService {
   const estimator = new RateEstimator(
     cache,
     new RemoteRateRepo(drivers.pg),
     pairs,
     pairAcceptanceVolumeThreshold,
+    thresholdAssetRateService,
     assets
   );
 
