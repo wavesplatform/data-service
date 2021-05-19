@@ -130,7 +130,7 @@ export default class RateEstimator
                       .map((pair) => ({
                         amountAsset: assetsMap[pair.amountAsset],
                         priceAsset: assetsMap[pair.priceAsset],
-                        volumeWaves: pair.volumeWaves,
+                        volumeWaves: pair.volumeWaves as BigNumber,
                         rate: pairsWithRates[idx].rate,
                       }))
                       .getOrElse<VolumeAwareRateInfo>({
@@ -143,7 +143,7 @@ export default class RateEstimator
                 )
             )
             .map(
-              tap((results) => {
+              tap((results: Array<VolumeAwareRateInfo>) => {
                 if (shouldCache) cacheAll(results);
               })
             )
