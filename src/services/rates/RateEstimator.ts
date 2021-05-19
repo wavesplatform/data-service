@@ -82,7 +82,9 @@ export default class RateEstimator
       sequence<Maybe<Asset>, Maybe<Asset[]>>(maybeOf, ms).matchWith({
         Nothing: () =>
           rejected(
-            AppError.Db('Some of the assets of specified pairs not found.')
+            AppError.Validation('Some of the assets of specified pairs do not exist in the blockchain', {
+              'ids': ms.filter(m => isEmpty(m)).map((_, idx) => ids[idx])
+            })
           ) as any,
         Just: ({ value: assets }) => {
           let wavesAsset = assets.pop() as Asset;
