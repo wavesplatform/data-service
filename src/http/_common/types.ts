@@ -14,6 +14,9 @@ export type HttpRequest<Params extends string[] = string[]> = {
   headers: IncomingHttpHeaders;
 };
 
+const headersWithContentType = {
+  'Content-Type': 'application/json; charset=utf-8'
+};
 export class HttpResponse {
   readonly status: number;
   readonly body?: string;
@@ -43,7 +46,10 @@ export class HttpResponse {
         message: DEFAULT_BAD_REQUEST_MESSAGE,
         meta,
       }),
-      headers
+      {
+        ...headersWithContentType,
+        ...headers,
+      }
     );
   }
 
@@ -53,7 +59,10 @@ export class HttpResponse {
       defaultStringify({
         message: DEFAULT_NOT_FOUND_MESSAGE,
       }),
-      headers
+      {
+        ...headersWithContentType,
+        ...headers,
+      }
     );
   }
 
@@ -63,7 +72,10 @@ export class HttpResponse {
       defaultStringify({
         message: DEFAULT_INTERNAL_SERVER_ERROR_MESSAGE,
       }),
-      headers
+      {
+        ...headersWithContentType,
+        ...headers,
+      }
     );
   }
 
@@ -73,7 +85,10 @@ export class HttpResponse {
       defaultStringify({
         message: DEFAULT_TIMEOUT_OCCURRED_MESSAGE,
       }),
-      headers
+      {
+        ...headersWithContentType,
+        ...headers,
+      }
     );
   }
 

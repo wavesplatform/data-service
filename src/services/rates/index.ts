@@ -17,8 +17,18 @@ export default function ({
   drivers,
   cache,
   assets,
+  pairs,
+  pairAcceptanceVolumeThreshold,
+  thresholdAssetRateService
 }: RateSerivceCreatorDependencies): RatesMgetService {
-  const estimator = new RateEstimator(cache, new RemoteRateRepo(drivers.pg));
+  const estimator = new RateEstimator(
+    cache,
+    new RemoteRateRepo(drivers.pg),
+    pairs,
+    pairAcceptanceVolumeThreshold,
+    thresholdAssetRateService,
+    assets
+  );
 
   return (request: RateMgetParams & WithMoneyFormat) =>
     estimator
@@ -29,13 +39,18 @@ export default function ({
             () => new BigNumber(0),
             (it) => it.rate
           ),
-          amountAsset: item.req.amountAsset,
-          priceAsset: item.req.priceAsset,
+          amountAsset: item.req.amountAsset.id,
+          priceAsset: item.req.priceAsset.id,
         }))
       )
       .chain((items) =>
         request.moneyFormat === MoneyFormat.Long
-          ? taskOf(items)
+          ? taskOf(
+              items.map((r) => ({
+                ...r,
+                rate: r.rate.decimalPlaces(0),
+              }))
+            )
           : assets
               .precisions({
                 ids: items.reduce<string[]>(

@@ -1,14 +1,16 @@
 import { Maybe, of as maybeOf } from 'folktale/maybe';
-
 import { BigNumber } from '@waves/data-entities';
 
 export function safeDivide(n1: BigNumber, n2: BigNumber): Maybe<BigNumber> {
   return maybeOf(n2)
-    .filter(it => !it.isZero())
-    .map(it => n1.div(it));
+    .filter((it) => !it.isZero())
+    .map((it) => n1.div(it));
 }
 
 export const inv = (n: BigNumber) => safeDivide(new BigNumber(1), n);
+
+export const invOnSatoshi = (n: BigNumber, precision: number) =>
+  safeDivide(new BigNumber(10 ** precision), n);
 
 export type Deconstruct<T, Components> = (value: T) => Components;
 

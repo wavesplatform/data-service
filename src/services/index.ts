@@ -103,6 +103,7 @@ import { RateCache } from './rates/repo';
 import { WithMoneyFormat } from './types';
 
 import { validatePairs } from './_common/validation/pairs';
+import { IThresholdAssetRateService, ThresholdAssetRateService } from './rates/ThresholdAssetRateService';
 
 export type CommonRepoDependencies = {
   drivers: {
@@ -114,6 +115,9 @@ export type CommonRepoDependencies = {
 export type RateSerivceCreatorDependencies = CommonRepoDependencies & {
   cache: RateCache;
   assets: AssetsService;
+  pairs: PairsService;
+  pairAcceptanceVolumeThreshold: number,
+  thresholdAssetRateService: IThresholdAssetRateService
 };
 
 export type ServiceMesh = {
@@ -189,6 +193,21 @@ export default ({
       });
       const assets = createAssetsService(assetsRepo);
 
+      const pairsRepo = createPairsRepo({ ...commonDeps, cache: pairsCache });
+      const pairsNoAsyncValidation = createPairsService(
+        pairsRepo,
+        () => taskOf(undefined),
+        assets
+      );
+      const pairsWithAsyncValidation = createPairsService(
+        pairsRepo,
+        (matcher: string, pairs: AssetIdsPair[]) =>
+          validatePairs(assets.mget, pairOrderingService)(matcher, pairs),
+        assets
+      );
+
+      const thresholdAssetRateService = new ThresholdAssetRateService(options.thresholdAssetId, options.matcher.defaultMatcherAddress, pairsNoAsyncValidation);
+
       const aliasTxsRepo = createAliasTxsRepo(commonDeps);
       const aliasTxs = createAliasTxsService(aliasTxsRepo, assets);
       const burnTxsRepo = createBurnTxsRepo(commonDeps);
@@ -246,20 +265,10 @@ export default ({
         ...commonDeps,
         cache: ratesCache,
         assets,
+        pairs: pairsNoAsyncValidation,
+        pairAcceptanceVolumeThreshold: options.pairAcceptanceVolumeThreshold,
+        thresholdAssetRateService: thresholdAssetRateService
       });
-
-      const pairsRepo = createPairsRepo({ ...commonDeps, cache: pairsCache });
-      const pairsNoAsyncValidation = createPairsService(
-        pairsRepo,
-        () => taskOf(undefined),
-        assets
-      );
-      const pairsWithAsyncValidation = createPairsService(
-        pairsRepo,
-        (matcher: string, pairs: AssetIdsPair[]) =>
-          validatePairs(assets.mget, pairOrderingService)(matcher, pairs),
-        assets
-      );
 
       const candlesRepo = createCandlesRepo(commonDeps);
       const candlesNoAsyncValidation = createCandlesService(
