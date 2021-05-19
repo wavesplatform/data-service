@@ -19,6 +19,8 @@ const cors = require('@koa/cors');
 import { loadConfig } from './loadConfig';
 import router from './http';
 
+export const WavesId: string = 'WAVES';
+
 const app = unsafeKoaQs(new Koa());
 
 const options = loadConfig();
@@ -34,9 +36,9 @@ const pgDriver = createPgDriver(options);
 createServices({
   options,
   pgDriver,
-  emitEvent: name => o => eventBus.emit(name, o),
+  emitEvent: (name) => (o) => eventBus.emit(name, o),
 })
-  .map(services =>
+  .map((services) =>
     app
       .use(bodyParser())
       .use(requestId)
@@ -63,7 +65,7 @@ createServices({
         );
       }
     },
-    onRejected: e => {
+    onRejected: (e) => {
       console.error(e);
     },
   });
