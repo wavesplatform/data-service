@@ -151,11 +151,13 @@ export default class RateEstimator
             )
             .chain(
               (data: Array<VolumeAwareRateInfo>) =>
-                this.thresholdAssetRateService.get().map(thresholdAssetRate => new RateInfoLookup(
-                  data.concat(preComputed),
-                  new BigNumber(this.pairAcceptanceVolumeThreshold).dividedBy(thresholdAssetRate),
-                  wavesAsset,
-                ))
+                this.thresholdAssetRateService.get().map(thresholdAssetRate =>
+                  new RateInfoLookup(
+                    data.concat(preComputed),
+                    new BigNumber(this.pairAcceptanceVolumeThreshold).dividedBy(thresholdAssetRate).multipliedBy(10 ** wavesAsset.precision),
+                    wavesAsset,
+                  )
+                )
             )
             .map((lookup) =>
               pairsWithAssets.map((pair) => ({
