@@ -1,6 +1,8 @@
 const pg = require('knex')({ client: 'pg' });
 
-const select = pg({ t: 'txs_11' }).select('t.uid');
+const select = pg({ t: 'txs_11' })
+  .leftJoin({ tfs: 'txs_11_transfers' }, 'tfs.tx_uid', '=', 't.uid')
+  .select('t.uid');
 
 const selectFromFiltered = (filtered) =>
   pg
