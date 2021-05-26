@@ -7,7 +7,6 @@ const select = pg({ t: 'txs_11' })
 
 const selectFromFiltered = (filtered) =>
   pg
-    .with('ts', filtered)
     .select({
       uid: 't.uid',
       id: 't.id',
@@ -28,9 +27,9 @@ const selectFromFiltered = (filtered) =>
       amount: 'tfs.amount',
       position_in_tx: 'tfs.position_in_tx',
     })
-    .from('ts')
-    .join({ t: 'txs_11 ' }, 'ts.uid', 't.uid')
-    .leftJoin({ tfs: 'txs_11_transfers' }, 'tfs.tx_uid', '=', 't.uid');
+    .from({ t: 'txs_11' })
+    .leftJoin({ tfs: 'txs_11_transfers' }, 'tfs.tx_uid', '=', 't.uid')
+    .whereIn('t.uid', filtered);
 
 module.exports = {
   select,

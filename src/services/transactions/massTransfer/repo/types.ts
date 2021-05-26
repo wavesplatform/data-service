@@ -18,7 +18,6 @@ export type RawMassTransferTx = RawTx & {
 export type Transfer = {
   amount: BigNumber;
   recipient: string;
-  positionInTx: number;
 };
 
 export type MassTransferTx = Tx & {

@@ -1,5 +1,4 @@
 import { Ok as ok } from 'folktale/result';
-import { compose } from 'ramda';
 
 import { CommonRepoDependencies } from '../../..';
 import { get, mget, search } from '../../../_common/createResolver';
@@ -54,7 +53,8 @@ export default ({
       MassTransferTx
     >({
       transformInput: transformInputSearch(deserialize),
-      transformResult: transformResultSearch(compose(transformTxInfo), serialize),
+      transformResult: transformResultSearch<Cursor, MassTransferTxsSearchRequest<string>, RawMassTransferTx,
+        MassTransferTx>(transformTxInfo, serialize),
       validateResult: validateResult<RawMassTransferTx>(
         resultSchema,
         createServiceName('search')

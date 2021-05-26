@@ -1,5 +1,4 @@
 import { Ok as ok } from 'folktale/result';
-import { compose } from 'ramda';
 
 import { CommonRepoDependencies } from '../../..';
 import { get, mget, search } from '../../../_common/createResolver';
@@ -55,7 +54,7 @@ export default ({
     >({
       transformInput: transformInputSearch(deserialize),
       transformResult: transformResultSearch(
-        compose(transformTxInfo),
+        transformTxInfo,
         serialize
       ),
       validateResult: validateResult<RawInvokeScriptTx>(
