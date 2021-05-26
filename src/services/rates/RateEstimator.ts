@@ -4,6 +4,7 @@ import { splitEvery, sequence } from 'ramda';
 import { Asset, BigNumber } from '@waves/data-entities';
 
 import { AppError, DbError, Timeout } from '../../errorHandling';
+import { collect } from '../../utils/collection';
 import { tap } from '../../utils/tap';
 import { isEmpty } from '../../utils/fp/maybeOps';
 import { RateInfo, RateMgetParams, RateWithPairIds } from '../../types';
@@ -83,7 +84,7 @@ export default class RateEstimator
         Nothing: () =>
           rejected(
             AppError.Validation('Some of the assets of specified pairs do not exist in the blockchain', {
-              'ids': ms.filter(m => isEmpty(m)).map((_, idx) => ids[idx])
+              ids: collect<Maybe<Asset>, number>((m, idx) => isEmpty(m) ? idx : undefined)(ms).map(idx => ids[idx])
             })
           ) as any,
         Just: ({ value: assets }) => {
@@ -151,10 +152,10 @@ export default class RateEstimator
             )
             .chain(
               (data: Array<VolumeAwareRateInfo>) =>
-                this.thresholdAssetRateService.get().map(thresholdAssetRate =>
+                this.thresholdAssetRateService.get().map(mThresholdAssetRate =>
                   new RateInfoLookup(
                     data.concat(preComputed),
-                    new BigNumber(this.pairAcceptanceVolumeThreshold).dividedBy(thresholdAssetRate).multipliedBy(10 ** wavesAsset.precision),
+                    mThresholdAssetRate.map(thresholdAssetRate => new BigNumber(this.pairAcceptanceVolumeThreshold).dividedBy(thresholdAssetRate).multipliedBy(10 ** wavesAsset.precision)),
                     wavesAsset,
                   )
                 )

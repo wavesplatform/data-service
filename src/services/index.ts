@@ -205,7 +205,7 @@ export default ({
         assets
       );
 
-      const thresholdAssetRateService = new ThresholdAssetRateService(options.thresholdAssetId, options.matcher.defaultMatcherAddress, pairsNoAsyncValidation);
+      const thresholdAssetRateService = new ThresholdAssetRateService(options.thresholdAssetId, options.matcher.defaultMatcherAddress, pairsNoAsyncValidation, emitEvent('log'));
 
       const aliasTxsRepo = createAliasTxsRepo(commonDeps);
       const aliasTxs = createAliasTxsService(aliasTxsRepo, assets);

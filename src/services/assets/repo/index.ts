@@ -93,18 +93,27 @@ export default ({
           return acc;
         }, []);
 
-        const notCachedAssetIds = notCachedIndexes.map((i) => request[i]);
+        const notCachedAssetIdIndexes: Record<string, number[]> = {};
+        notCachedIndexes.forEach((i) => {
+          if (Array.isArray(notCachedAssetIdIndexes[request[i]])) {
+            notCachedAssetIdIndexes[request[i]].push(i);
+          } else {
+            notCachedAssetIdIndexes[request[i]] = [i];
+          }
+        });
 
         return mgetByIdsPg<AssetDbResponse, string>({
           name: SERVICE_NAME.MGET,
           sql: sql.mget,
           matchRequestResult: propEq('asset_id'),
           pg,
-        })(notCachedAssetIds).map((fromDb) => {
-          fromDb.forEach((assetInfo, index) =>
+        })(Object.keys(notCachedAssetIdIndexes)).map((fromDb) => {
+          fromDb.forEach(assetInfo =>
             forEach((value) => {
-              results[notCachedIndexes[index]] = assetInfo;
-              cache.set(notCachedAssetIds[index], value);
+              Object.values(notCachedAssetIdIndexes[value.asset_id]).forEach(idx => {
+                results[idx] = assetInfo;
+              });
+              cache.set(value.asset_id, value);
             }, assetInfo)
           );
           return results;

@@ -5,11 +5,9 @@ import {
   ValidationError,
   ResolverError,
   DbError,
-  AppError,
   Timeout,
 } from '../../../errorHandling';
 
-import { PgDriver } from '../../../db/driver';
 import { SearchedItems } from '../../../types';
 
 export type EmitEvent = (name: string) => <A>(object: A) => void;
@@ -22,62 +20,62 @@ type CommonResolverDependencies<
   ReqTransformed,
   ResRaw,
   ResTransformed
-> = {
-  transformInput: (r: ReqRaw) => Result<ValidationError, ReqTransformed>;
-  validateResult: ValidateSync<ResolverError, ResRaw>;
-  emitEvent: EmitEvent;
-};
+  > = {
+    transformInput: (r: ReqRaw) => Result<ValidationError, ReqTransformed>;
+    validateResult: ValidateSync<ResolverError, ResRaw>;
+    emitEvent: EmitEvent;
+  };
 
 export type GetResolverDependencies<
   ReqRaw,
   ReqTransformed,
   ResRaw,
   ResTransformed
-> = CommonResolverDependencies<
-  ReqRaw,
-  ReqTransformed,
-  ResRaw,
-  ResTransformed
-> & {
-  getData: (r: ReqTransformed) => Task<DbError | Timeout, Maybe<ResRaw>>;
-  transformResult: (
-    result: Maybe<ResRaw>,
-    request: ReqRaw
-  ) => Maybe<ResTransformed>;
-};
+  > = CommonResolverDependencies<
+    ReqRaw,
+    ReqTransformed,
+    ResRaw,
+    ResTransformed
+  > & {
+    getData: (r: ReqTransformed) => Task<DbError | Timeout, Maybe<ResRaw>>;
+    transformResult: (
+      result: Maybe<ResRaw>,
+      request: ReqRaw
+    ) => Maybe<ResTransformed>;
+  };
 
 export type MgetResolverDependencies<
   ReqRaw,
   ReqTransformed,
   ResRaw,
   ResTransformed
-> = CommonResolverDependencies<
-  ReqRaw,
-  ReqTransformed,
-  ResRaw,
-  ResTransformed
-> & {
-  getData: (r: ReqTransformed) => Task<DbError | Timeout, Maybe<ResRaw>[]>;
-  transformResult: (
-    result: Maybe<ResRaw>[],
-    request: ReqRaw
-  ) => Maybe<ResTransformed>[];
-};
+  > = CommonResolverDependencies<
+    ReqRaw,
+    ReqTransformed,
+    ResRaw,
+    ResTransformed
+  > & {
+    getData: (r: ReqTransformed) => Task<DbError | Timeout, Maybe<ResRaw>[]>;
+    transformResult: (
+      result: Maybe<ResRaw>[],
+      request: ReqRaw
+    ) => Maybe<ResTransformed>[];
+  };
 
 export type SearchResolverDependencies<
   ReqRaw,
   ReqTransformed,
   ResRaw,
   ResTransformed
-> = CommonResolverDependencies<
-  ReqRaw,
-  ReqTransformed,
-  ResRaw,
-  ResTransformed
-> & {
-  getData: (r: ReqTransformed) => Task<DbError | Timeout, ResRaw[]>;
-  transformResult: (
-    results: ResRaw[],
-    request: ReqRaw
-  ) => SearchedItems<ResTransformed>;
-};
+  > = CommonResolverDependencies<
+    ReqRaw,
+    ReqTransformed,
+    ResRaw,
+    ResTransformed
+  > & {
+    getData: (r: ReqTransformed) => Task<DbError | Timeout, ResRaw[]>;
+    transformResult: (
+      results: ResRaw[],
+      request: ReqRaw
+    ) => SearchedItems<ResTransformed>;
+  };
