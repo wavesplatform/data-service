@@ -66,20 +66,20 @@ const selectExchanges = pg({ t: 'txs_7' }).select({
 });
 
 /** selectExchangesAfterTimestamp :: Date -> QueryBuilder */
-const selectExchangesAfterTimestamp = (fromTimestamp) =>
-  selectExchanges.clone().where(
-    't.uid',
-    '>=',
-    pg('txs')
-      .select('uid')
-      .whereRaw(
-        `time_stamp >= ${pgRawDateTrunc(
-          `'${fromTimestamp.toISOString()}'::timestamptz`
-        )('minute')}`
-      )
-      .orderBy('uid')
-      .limit(1)
-  );
+const selectExchangesAfterTimestamp = (fromTimestamp) => {
+  let ts = pgRawDateTrunc(`'${fromTimestamp.toISOString()}'::timestamptz`)('minute');
+  return selectExchanges
+    .clone()
+    .where(
+      't.uid',
+      '>=',
+      pg('txs_7')
+        .select('uid')
+        .whereRaw(`time_stamp >= ${ts}`)
+        .orderByRaw(`time_stamp <-> ${ts}`)
+        .limit(1)
+    );
+};
 
 /** selectLastCandle :: String -> String query */
 const selectLastCandleHeight = (candlesTableName) =>
@@ -91,11 +91,7 @@ const selectLastCandleHeight = (candlesTableName) =>
 
 /** selectLastExchangeTx :: String query */
 const selectLastExchangeTxHeight = () =>
-  pg({ t: 'txs_7' })
-    .select('height')
-    .limit(1)
-    .orderBy('uid', 'desc')
-    .toString();
+  pg({ t: 'txs_7' }).select('height').limit(1).orderBy('uid', 'desc').toString();
 
 /** selectLastExchangeTx :: String query */
 const selectMinTimestampFromHeight = (height) =>
@@ -150,16 +146,9 @@ const insertOrUpdateCandlesFromShortInterval = (
           .select(makeCandleCalculateColumns(longerInterval))
           .where('interval', shortInterval)
           .whereRaw(
-            pg.raw(
-              `time_start >= ${makeRawTimestamp(fromTimestamp, longerInterval)}`
-            )
+            pg.raw(`time_start >= ${makeRawTimestamp(fromTimestamp, longerInterval)}`)
           )
-          .groupBy(
-            'candle_time',
-            'amount_asset_id',
-            'price_asset_id',
-            'matcher_address'
-          );
+          .groupBy('candle_time', 'amount_asset_id', 'price_asset_id', 'matcher_address');
       })} on conflict (time_start, amount_asset_id, price_asset_id, matcher_address, interval) do update set ${updatedFieldsExcluded}`
     )
     .toString();
@@ -168,12 +157,10 @@ const insertOrUpdateCandlesFromShortInterval = (
  * SET statement_timeout = 0
  * @returns string
  */
-const withoutStatementTimeout = () =>
-  pg.raw('SET statement_timeout = 0').toString();
+const withoutStatementTimeout = () => pg.raw('SET statement_timeout = 0').toString();
 
 /** truncateTable :: String -> String query */
-const truncateTable = (candlesTableName) =>
-  pg(candlesTableName).truncate().toString();
+const truncateTable = (candlesTableName) => pg(candlesTableName).truncate().toString();
 
 /** insertAllMinuteCandles :: String -> String query */
 const insertAllMinuteCandles = (candlesTableName) =>
@@ -181,9 +168,7 @@ const insertAllMinuteCandles = (candlesTableName) =>
     this.with('e_cte', selectExchanges)
       .select(candleSelectColumns)
       .from({ e: 'e_cte' })
-      .groupByRaw(
-        'e.candle_time, e.amount_asset_id, e.price_asset_id, e.sender'
-      );
+      .groupByRaw('e.candle_time, e.amount_asset_id, e.price_asset_id, e.sender');
   }).toString();
 
 /** insertAllCandles :: (String, Number, Number, Number) -> String query */
@@ -192,12 +177,7 @@ const insertAllCandles = (candlesTableName, shortInterval, longerInterval) =>
     this.from({ t: candlesTableName })
       .column(makeCandleCalculateColumns(longerInterval))
       .where('t.interval', shortInterval)
-      .groupBy([
-        'candle_time',
-        'amount_asset_id',
-        'price_asset_id',
-        'matcher_address',
-      ]);
+      .groupBy(['candle_time', 'amount_asset_id', 'price_asset_id', 'matcher_address']);
   }).toString();
 
 /** selectCandlesAfterTimestamp :: Date -> String query */
@@ -205,12 +185,7 @@ const selectCandlesAfterTimestamp = (timetamp) =>
   pg
     .columns(candleSelectColumns)
     .from(selectExchangesAfterTimestamp(timetamp).clone().as('e'))
-    .groupBy([
-      'e.candle_time',
-      'e.amount_asset_id',
-      'e.price_asset_id',
-      'e.sender',
-    ])
+    .groupBy(['e.candle_time', 'e.amount_asset_id', 'e.price_asset_id', 'e.sender'])
     .toString();
 
 module.exports = {
