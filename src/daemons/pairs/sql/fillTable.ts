@@ -14,7 +14,7 @@ const selectExchanges = pg({ t: 'txs_7' })
   .with('hp_cte', (qb) =>
     qb
       .select('uid')
-      .from('txs')
+      .from('txs_7')
       .whereRaw(`time_stamp >= now() - interval '1 day'`)
       .orderByRaw(`time_stamp <-> now() - interval '1 day'`)
       .limit(1)
