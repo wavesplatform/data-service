@@ -1,3 +1,4 @@
+const pg = require('knex')({ client: 'pg' });
 const { curryN } = require('ramda');
 const { BigNumber } = require('@waves/data-entities');
 
@@ -29,10 +30,25 @@ const byValue = curryN(3, (type, value, q) => {
   });
 });
 
+const byTimeStamp = (comparator) => (ts) => (q) =>
+  q
+    .clone()
+    .where(
+      't.uid',
+      comparator,
+      pg('txs_12')
+        .select('uid')
+        .where('time_stamp', comparator, ts.toISOString())
+        .orderByRaw(`time_stamp <-> '${ts.toISOString()}'::timestamptz`)
+        .limit(1)
+    );
+
 module.exports = {
   ...commonFilters,
   
   key: byKey,
   type: byType,
   value: byValue,
+  timeStart: byTimeStamp('>='),
+  timeEnd: byTimeStamp('<='),
 };
