@@ -17,12 +17,10 @@ const byTimeStamp = (comparator: string) => (ts: Date) => (q: knex.QueryBuilder)
                 .limit(1)
         );
 
-export default {
-    filters: {
-        ...commonFilters,
+export const filters = {
+    ...commonFilters,
 
-        timeStart: byTimeStamp('>='),
-        timeEnd: byTimeStamp('<='),
-    },
-    filtersOrder: commonFiltersOrder,
+    timeStart: byTimeStamp('>='),
+    timeEnd: byTimeStamp('<='),
 };
+export const filtersOrder = [...commonFiltersOrder, 'timeStart', 'timeEnd'];

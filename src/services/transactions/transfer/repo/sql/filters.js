@@ -23,5 +23,5 @@ module.exports = {
     timeStart: byTimeStamp('>='),
     timeEnd: byTimeStamp('<='),
   },
-  filtersOrder: [...commonFiltersOrder, 'assetId', 'recipient'],
+  filtersOrder: [...commonFiltersOrder, 'timeStart', 'timeEnd', 'assetId', 'recipient'],
 };

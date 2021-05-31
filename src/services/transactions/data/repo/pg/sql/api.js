@@ -60,11 +60,6 @@ module.exports = ({ filters: F }) => ({
       withDefaults
     );
 
-    return pipe(
-      ...fs,
-      selectFromFiltered,
-      F.sort(withDefaults.sort),
-      String
-    )(select);
+    return pipe(...fs, selectFromFiltered, F.sort(withDefaults.sort), String)(select);
   },
 });

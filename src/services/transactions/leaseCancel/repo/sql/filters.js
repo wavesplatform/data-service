@@ -36,5 +36,5 @@ module.exports = {
     timeStart: byTimeStamp('>='),
     timeEnd: byTimeStamp('<='),
   },
-  filtersOrder: [...commonFiltersOrder, 'recipient'],
+  filtersOrder: [...commonFiltersOrder, 'timeStart', 'timeEnd', 'recipient'],
 };
