@@ -4,7 +4,7 @@ import { BigNumber } from '@waves/data-entities';
 
 import { transformTxInfo } from '../../_common/transformTxInfo';
 
-import { ExchangeTxDbResponse } from './types';
+import { ExchangeTx, ExchangeTxDbResponse } from './types';
 
 const createOrder = (prefix: string) => <T extends Record<string, any>>({
   [`${prefix}_id`]: id,
@@ -51,7 +51,7 @@ type ExchangeTxFields = {
 };
 
 /** transformTx:: RawTxInfo -> TxInfo */
-export default (tx: ExchangeTxDbResponse) => {
+export default (tx: ExchangeTxDbResponse): ExchangeTx => {
   const commonFields = compose(
     transformTxInfo,
     pick([

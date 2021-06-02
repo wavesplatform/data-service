@@ -57,11 +57,13 @@ type Order = {
   timestamp: string;
   expiration: string;
   matcherFeeAssetId: string;
+  assetPair: {
+    amountAsset: string;
+    priceAsset: string;
+  }
 };
 
 export type ExchangeTx = Tx & {
-  priceAsset: string;
-  amountAsset: string;
   price: BigNumber;
   amount: BigNumber;
   buyMatcherFee: BigNumber;

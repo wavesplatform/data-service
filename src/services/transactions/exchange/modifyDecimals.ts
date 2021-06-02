@@ -14,19 +14,15 @@ export const modifyDecimals = (assetsService: AssetsService) => (
       ids: txs
         .map((tx) => [
           wavesByDefault(tx.feeAsset),
-          wavesByDefault(tx.amountAsset),
-          wavesByDefault(tx.priceAsset),
+          wavesByDefault(tx.order1.assetPair.amountAsset),
+          wavesByDefault(tx.order1.assetPair.priceAsset),
           tx.order1.type === OrderType.Buy
             ? wavesByDefault(tx.order1.matcherFeeAssetId)
             : wavesByDefault(tx.order2.matcherFeeAssetId),
           tx.order1.type === OrderType.Sell
             ? wavesByDefault(tx.order1.matcherFeeAssetId)
             : wavesByDefault(tx.order2.matcherFeeAssetId),
-          wavesByDefault(tx.amountAsset),
-          wavesByDefault(tx.priceAsset),
           wavesByDefault(tx.order1.matcherFeeAssetId),
-          wavesByDefault(tx.amountAsset),
-          wavesByDefault(tx.priceAsset),
           wavesByDefault(tx.order2.matcherFeeAssetId),
         ])
         .reduce((acc, cur) => acc.concat(cur), []),
@@ -41,11 +37,7 @@ export const modifyDecimals = (assetsService: AssetsService) => (
             pricePrecision,
             buyMatcherFeePrecision,
             sellMatcherFeePrecision,
-            order1AmountPrecision,
-            order1PricePrecision,
             order1MatcherFeePrecision,
-            order2AmountPrecision,
-            order2PricePrecision,
             order2MatcherFeePrecision,
           ]
         ) => ({
@@ -61,16 +53,16 @@ export const modifyDecimals = (assetsService: AssetsService) => (
           ),
           order1: {
             ...tx.order1,
-            amount: tx.order1.amount.multipliedBy(10 ** -order1AmountPrecision),
-            price: tx.order1.price.multipliedBy(10 ** -order1PricePrecision),
+            amount: tx.order1.amount.multipliedBy(10 ** -amountPrecision),
+            price: tx.order1.price.multipliedBy(10 ** -pricePrecision),
             matcherFee: tx.order1.matcherFee.multipliedBy(
               10 ** -order1MatcherFeePrecision
             ),
           },
           order2: {
             ...tx.order2,
-            amount: tx.order2.amount.multipliedBy(10 ** -order2AmountPrecision),
-            price: tx.order2.price.multipliedBy(10 ** -order2PricePrecision),
+            amount: tx.order2.amount.multipliedBy(10 ** -amountPrecision),
+            price: tx.order2.price.multipliedBy(10 ** -pricePrecision),
             matcherFee: tx.order2.matcherFee.multipliedBy(
               10 ** -order2MatcherFeePrecision
             ),
