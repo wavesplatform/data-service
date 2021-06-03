@@ -1,5 +1,6 @@
 const Task = require('folktale/concurrency/task');
 const Maybe = require('folktale/maybe');
+const { exitCode } = require('process');
 
 const getErrorMessage = require('../../errorHandling/getErrorMessage');
 const { tap } = require('../../utils/tap');
@@ -115,11 +116,13 @@ const main = (daemon, config, interval, timeout, logger) =>
       onResolved: () => {
         throw '[DAEMON] loop is stopped but never should';
       },
-      onRejected: error =>
+      onRejected: error => {
         logger.error({
           message: `[DAEMON] loop is stopped with error`,
           error: getErrorMessage(error),
-        }),
+        })
+        process.exit(1);
+      },
       onCancelled: () =>
         logger.error({
           message: `[DAEMON] loop canceled`,
