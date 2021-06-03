@@ -21,6 +21,6 @@ export const modifyDecimals = (assetsService: AssetsService) => (
           amount: tx.amount.multipliedBy(10 ** -assetPrecision),
         }),
         txs,
-        splitEvery(2, v)
+        splitEvery(v.length / txs.length, v)
       )
     );
