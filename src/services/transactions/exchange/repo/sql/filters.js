@@ -29,15 +29,17 @@ const byAsset = (assetType) =>
   curryN(2, (assetId, q) => q.clone().where(`t.${assetType}_asset_id`, assetId));
 
 const byTimeStamp = (comparator) => (ts) => (q) =>
-  q.clone().where(
-    't.uid',
-    comparator,
-    pg('txs_7')
-      .select('uid')
-      .where('time_stamp', comparator, ts.toISOString())
-      .orderBy('uid', comparator == '>=' ? 'asc' : 'desc')
-      .limit(1)
-  );
+  q
+    .clone()
+    .where(
+      't.uid',
+      comparator,
+      pg('txs_7')
+        .select('uid')
+        .where('time_stamp', comparator, ts.toISOString())
+        .orderByRaw(`time_stamp <-> '${ts.toISOString()}'::timestamptz`)
+        .limit(1)
+    );
 
 module.exports = {
   filters: {
