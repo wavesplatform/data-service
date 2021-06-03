@@ -7,30 +7,29 @@ export const modifyDecimals = <T extends CandleInfo>(
   assetsService: AssetsService,
   ids: string[]
 ) => (candles: T[]): Task<AppError, T[]> =>
-  assetsService
-    .precisions({
-      ids,
-    })
-    .chain(([amountAssetPrecision, priceAssetPrecision]) => {
-      let decimals = 10 ** (-8 - priceAssetPrecision + amountAssetPrecision);
-      let places = 8 + priceAssetPrecision - amountAssetPrecision;
+    assetsService
+      .precisions({
+        ids,
+      })
+      .chain(([amountAssetPrecision, priceAssetPrecision]) => {
+        let decimals = -8 - priceAssetPrecision + amountAssetPrecision;
 
-      return taskOf(
-        candles.map((candle) =>
-          candle.txsCount === 0
-            ? candle
-            : {
+        return taskOf(
+          candles.map((candle) =>
+            candle.txsCount === 0
+              ? candle
+              : {
                 ...candle,
-                low: candle.low.multipliedBy(decimals).decimalPlaces(places),
-                high: candle.high.multipliedBy(decimals).decimalPlaces(places),
+                low: candle.low.shiftedBy(decimals).decimalPlaces(-decimals),
+                high: candle.high.shiftedBy(decimals).decimalPlaces(-decimals),
                 open:
                   candle.open === null
                     ? null
-                    : candle.open.multipliedBy(decimals).decimalPlaces(places),
+                    : candle.open.shiftedBy(decimals).decimalPlaces(-decimals),
                 close:
                   candle.close === null
                     ? null
-                    : candle.close.multipliedBy(decimals).decimalPlaces(places),
+                    : candle.close.shiftedBy(decimals).decimalPlaces(-decimals),
                 volume: candle.volume
                   .shiftedBy(-amountAssetPrecision)
                   .decimalPlaces(amountAssetPrecision),
@@ -38,9 +37,9 @@ export const modifyDecimals = <T extends CandleInfo>(
                   .shiftedBy(-amountAssetPrecision * decimals)
                   .decimalPlaces(priceAssetPrecision),
                 weightedAveragePrice: candle.weightedAveragePrice
-                  .multipliedBy(decimals)
-                  .decimalPlaces(places),
+                  .shiftedBy(decimals)
+                  .decimalPlaces(-decimals),
               }
-        )
-      );
-    });
+          )
+        );
+      });

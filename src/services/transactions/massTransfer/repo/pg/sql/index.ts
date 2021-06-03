@@ -11,7 +11,7 @@ const queryAfterFilters = {
 
 export default createSql({
   query: select,
-  filters,
+  filters: filters as any,
   filtersOrder,
   queryAfterFilters,
 });

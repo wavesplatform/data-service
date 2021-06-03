@@ -6,5 +6,5 @@ const filterValues = {
 };
 
 test('Sql search supports type-specific filters', () => {
-  expect(sql.search(filterValues)).toMatchSnapshot();
+  expect(sql.default.search(filterValues)).toMatchSnapshot();
 });

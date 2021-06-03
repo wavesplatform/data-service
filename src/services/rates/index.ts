@@ -62,9 +62,7 @@ export default function ({
             .map((precisions) =>
               items.map((item, idx) => ({
                 ...item,
-                rate: item.rate.multipliedBy(
-                  10 ** (-8 - precisions[idx * 2 + 1] + precisions[idx * 2])
-                ),
+                rate: item.rate.shiftedBy(-8 - precisions[idx * 2 + 1] + precisions[idx * 2]),
               })
               )
             )
