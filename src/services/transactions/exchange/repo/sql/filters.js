@@ -4,18 +4,23 @@ const { curryN } = require('ramda');
 const commonFilters = require('../../../_common/sql/filters');
 
 const byOrderSender = curryN(2, (orderSender, q) =>
-  q
-    .clone()
-    .whereRaw(`array[t.order1->>'sender', t.order2->>'sender'] @> '{${orderSender}}'`)
+  pg.union(
+    [
+      q.clone().whereRaw(`t.order1->>'sender' = '${orderSender}'`),
+      q.clone().whereRaw(`t.order2->>'sender' = '${orderSender}'`),
+    ],
+    true
+  )
 );
 
 const byOrderSenders = curryN(2, (senders, q) =>
-  q
-    .clone()
-    .whereRaw(
-      "array[order1->>'sender', order2->>'sender'] && ?",
-      `{${senders.join(',')}}`
-    )
+  pg.union(
+    [
+      q.clone().whereRaw("order1->>'sender' IN ?", senders.join(',')),
+      q.clone().whereRaw("order2->>'sender' IN ?", senders.join(',')),
+    ],
+    true
+  )
 );
 
 const byOrder = curryN(2, (orderId, q) =>
