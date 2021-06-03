@@ -31,15 +31,18 @@ const createApi = ({ filters: F }) => ({
       // tx attributes
       'timeStart',
       'timeEnd',
-      'sender',
-      'senders',
       // specific attributes
       'matcher',
       'orderId',
       'amountAsset',
       'priceAsset',
       // common
+      'limit',
+      'sort',
       'after',
+      // have to be the last one
+      'sender',
+      'senders',
     ];
 
     // { [fName]: fValue }
@@ -51,7 +54,6 @@ const createApi = ({ filters: F }) => ({
 
     return pipe(
       ...fs,
-      F.sort(sort),
       selectFromFiltered,
       F.limit(fValues.limit),
       F.sort(sort),

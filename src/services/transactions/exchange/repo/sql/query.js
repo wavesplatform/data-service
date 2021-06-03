@@ -54,7 +54,7 @@ const columns = {
 
 const select = pg({ t: 'txs_7' });
 
-const selectFromFiltered = (filtered) => filtered.select(columns);
+const selectFromFiltered = (filtered) => pg.from({ t: filtered }).select(columns);
 
 module.exports = {
   select,

@@ -1,6 +1,5 @@
 const Task = require('folktale/concurrency/task');
 const Maybe = require('folktale/maybe');
-const { exitCode } = require('process');
 
 const getErrorMessage = require('../../errorHandling/getErrorMessage');
 const { tap } = require('../../utils/tap');
