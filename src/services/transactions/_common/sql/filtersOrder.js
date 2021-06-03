@@ -3,8 +3,6 @@ module.exports = [
   'ids',
   'sender',
   'senders',
-  'timeStart',
-  'timeEnd',
   'sort',
   'after',
   'limit',

@@ -69,6 +69,6 @@ export const modifyDecimals = (assetsService: AssetsService) => (
           },
         }),
         txs,
-        splitEvery(11, v)
+        splitEvery(v.length / txs.length, v)
       )
     );
