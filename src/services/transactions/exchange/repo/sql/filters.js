@@ -13,15 +13,16 @@ const byOrderSender = curryN(2, (orderSender, q) =>
   )
 );
 
-const byOrderSenders = curryN(2, (senders, q) =>
-  pg.union(
+const byOrderSenders = curryN(2, (senders, q) => {
+  const bindings = '?'.repeat(senders.length).split('').join(',');
+  return pg.union(
     [
-      q.clone().whereRaw("order1->>'sender' IN ?", senders.join(',')),
-      q.clone().whereRaw("order2->>'sender' IN ?", senders.join(',')),
+      q.clone().whereRaw(`order1->>'sender' = ANY(ARRAY[${bindings}])`, senders),
+      q.clone().whereRaw(`order2->>'sender' = ANY(ARRAY[${bindings}])`, senders),
     ],
     true
-  )
-);
+  );
+});
 
 const byOrder = curryN(2, (orderId, q) =>
   q
