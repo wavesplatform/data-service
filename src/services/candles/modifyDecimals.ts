@@ -32,10 +32,10 @@ export const modifyDecimals = <T extends CandleInfo>(
                     ? null
                     : candle.close.multipliedBy(decimals).decimalPlaces(places),
                 volume: candle.volume
-                  .multipliedBy(10 ** -amountAssetPrecision)
+                  .shiftedBy(-amountAssetPrecision)
                   .decimalPlaces(amountAssetPrecision),
                 quoteVolume: candle.quoteVolume
-                  .multipliedBy(10 ** -amountAssetPrecision * decimals)
+                  .shiftedBy(-amountAssetPrecision * decimals)
                   .decimalPlaces(priceAssetPrecision),
                 weightedAveragePrice: candle.weightedAveragePrice
                   .multipliedBy(decimals)

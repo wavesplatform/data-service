@@ -16,8 +16,8 @@ export const modifyDecimals = (assetsService: AssetsService) => (
       return zipWith(
         (tx, assetPrecision) => ({
           ...tx,
-          fee: tx.fee.multipliedBy(10 ** -feePrecision),
-          quantity: tx.quantity.multipliedBy(10 ** -assetPrecision),
+          fee: tx.fee.shiftedBy(-feePrecision),
+          quantity: tx.quantity.shiftedBy(-assetPrecision),
         }),
         txs,
         precisions

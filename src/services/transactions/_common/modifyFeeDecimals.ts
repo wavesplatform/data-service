@@ -11,6 +11,6 @@ export const modifyFeeDecimals = <
   assetsService.precisions({ ids: ['WAVES'] }).map(([feeAssetPrecision]) =>
     txs.map((tx) => ({
       ...tx,
-      fee: tx.fee.multipliedBy(10 ** -feeAssetPrecision),
+      fee: tx.fee.shiftedBy(-feeAssetPrecision),
     }))
   );

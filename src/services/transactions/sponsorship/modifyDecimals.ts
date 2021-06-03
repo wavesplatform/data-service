@@ -25,10 +25,10 @@ export const modifyDecimals = (assetsService: AssetsService) => (
         );
         return {
           ...tx,
-          fee: tx.fee.multipliedBy(10 ** -currentTxValues[0]),
+          fee: tx.fee.shiftedBy(-currentTxValues[0]),
           minSponsoredAssetFee: isNil(tx.minSponsoredAssetFee)
             ? null
-            : tx.minSponsoredAssetFee.multipliedBy(10 ** -currentTxValues[1]),
+            : tx.minSponsoredAssetFee.shiftedBy(-currentTxValues[1]),
         };
       })
     );

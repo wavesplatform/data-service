@@ -22,19 +22,19 @@ export const modifyDecimals = <T extends PairInfo & AssetIdsPair>(
 
           return {
             ...pair,
-            low: pair.low.multipliedBy(10 ** decimals),
-            high: pair.high.multipliedBy(10 ** decimals),
-            firstPrice: pair.firstPrice.multipliedBy(10 ** decimals),
-            lastPrice: pair.lastPrice.multipliedBy(10 ** decimals),
-            volume: pair.volume.multipliedBy(10 ** amountAssetDecimals),
-            quoteVolume: pair.quoteVolume.multipliedBy(10 ** priceAssetDecimals),
+            low: pair.low.shiftedBy(decimals),
+            high: pair.high.shiftedBy(decimals),
+            firstPrice: pair.firstPrice.shiftedBy(decimals),
+            lastPrice: pair.lastPrice.shiftedBy(decimals),
+            volume: pair.volume.shiftedBy(amountAssetDecimals),
+            quoteVolume: pair.quoteVolume.shiftedBy(priceAssetDecimals),
             volumeWaves:
               pair.volumeWaves === null
                 ? null
                 : pair.amountAsset === 'WAVES'
-                ? pair.volumeWaves.multipliedBy(10 ** amountAssetDecimals)
-                : pair.volumeWaves.multipliedBy(10 ** priceAssetDecimals),
-            weightedAveragePrice: pair.weightedAveragePrice.multipliedBy(10 ** decimals),
+                ? pair.volumeWaves.shiftedBy(amountAssetDecimals)
+                : pair.volumeWaves.shiftedBy(priceAssetDecimals),
+            weightedAveragePrice: pair.weightedAveragePrice.shiftedBy(decimals),
           };
         })
       );

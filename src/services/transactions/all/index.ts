@@ -35,7 +35,7 @@ import {
   AllTxsMgetRequest,
   AllTxsSearchRequest,
 } from './repo/types';
-import { WithMoneyFormat, MoneyFormat } from '../../types';
+import { WithMoneyFormat } from '../../types';
 import { collect } from '../../../utils/collection';
 
 type AllTxsServiceDep = {
@@ -92,7 +92,7 @@ export default (repo: AllTxsRepo) => (
           Just: ({ value }) => {
             return txsServices[value.type as keyof AllTxsServiceDep].get({
               id: value.id,
-              moneyFormat: MoneyFormat.Long,
+              moneyFormat: req.moneyFormat,
             });
           },
           Nothing: () => taskOf(emptyOf()),
@@ -109,7 +109,7 @@ export default (repo: AllTxsRepo) => (
               Just: ({ value }) => {
                 return txsServices[value.type as keyof AllTxsServiceDep].get({
                   id: value.id,
-                  moneyFormat: MoneyFormat.Long,
+                  moneyFormat: req.moneyFormat,
                 });
               },
               Nothing: () => taskOf(emptyOf()),

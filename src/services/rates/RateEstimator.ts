@@ -155,7 +155,7 @@ export default class RateEstimator
                 this.thresholdAssetRateService.get().map(mThresholdAssetRate =>
                   new RateInfoLookup(
                     data.concat(preComputed),
-                    mThresholdAssetRate.map(thresholdAssetRate => new BigNumber(this.pairAcceptanceVolumeThreshold).dividedBy(thresholdAssetRate).multipliedBy(10 ** wavesAsset.precision)),
+                    mThresholdAssetRate.map(thresholdAssetRate => new BigNumber(this.pairAcceptanceVolumeThreshold).dividedBy(thresholdAssetRate).shiftedBy(wavesAsset.precision)),
                     wavesAsset,
                   )
                 )

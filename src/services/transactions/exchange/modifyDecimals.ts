@@ -42,31 +42,27 @@ export const modifyDecimals = (assetsService: AssetsService) => (
           ]
         ) => ({
           ...tx,
-          fee: tx.fee.multipliedBy(10 ** -feePrecision),
-          amount: tx.amount.multipliedBy(10 ** -amountPrecision),
-          price: tx.price.multipliedBy(10 ** -pricePrecision),
-          buyMatcherFee: tx.buyMatcherFee.multipliedBy(
-            10 ** -buyMatcherFeePrecision
+          fee: tx.fee.shiftedBy(-feePrecision),
+          amount: tx.amount.shiftedBy(-amountPrecision),
+          price: tx.price.shiftedBy(-pricePrecision),
+          buyMatcherFee: tx.buyMatcherFee.shiftedBy(-buyMatcherFeePrecision
           ),
-          sellMatcherFee: tx.sellMatcherFee.multipliedBy(
-            10 ** -sellMatcherFeePrecision
+          sellMatcherFee: tx.sellMatcherFee.shiftedBy(-sellMatcherFeePrecision
           ),
           order1: {
             ...tx.order1,
-            amount: tx.order1.amount.multipliedBy(10 ** -amountPrecision),
-            price: tx.order1.price.multipliedBy(10 ** -pricePrecision),
-            matcherFee: tx.order1.matcherFee.multipliedBy(
-              10 ** -order1MatcherFeePrecision
+            amount: tx.order1.amount.shiftedBy(-amountPrecision),
+            price: tx.order1.price.shiftedBy(-pricePrecision),
+            matcherFee: tx.order1.matcherFee.shiftedBy(-order1MatcherFeePrecision
             ),
           },
           order2: {
             ...tx.order2,
-            amount: tx.order2.amount.multipliedBy(10 ** -amountPrecision),
-            price: tx.order2.price.multipliedBy(10 ** -pricePrecision),
-            matcherFee: tx.order2.matcherFee.multipliedBy(
-              10 ** -order2MatcherFeePrecision
+            amount: tx.order2.amount.shiftedBy(-amountPrecision),
+            price: tx.order2.price.shiftedBy(-pricePrecision),
+            matcherFee: tx.order2.matcherFee.shiftedBy(-order2MatcherFeePrecision
             ),
-          },
+          }
         }),
         txs,
         splitEvery(v.length / txs.length, v)

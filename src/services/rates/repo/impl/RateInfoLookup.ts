@@ -102,7 +102,7 @@ export default class RateInfoLookup
 
         if (moneyFormat === MoneyFormat.Long) {
           flippedData.rate = invOnSatoshi(flippedData.rate, 8)
-            .map((r) => r.multipliedBy(10 ** 8))
+            .map((r) => r.shiftedBy(8))
             .getOrElse(new BigNumber(0));
         } else {
           flippedData.rate = inv(flippedData.rate).getOrElse(new BigNumber(0));
@@ -125,7 +125,7 @@ export default class RateInfoLookup
         rate: safeDivide(info1.rate, info2.rate)
           .map((r) =>
             pair.moneyFormat === MoneyFormat.Long
-              ? r.multipliedBy(10 ** 8).decimalPlaces(0)
+              ? r.shiftedBy(8).decimalPlaces(0)
               : r
           )
           .getOrElse(new BigNumber(0)),
