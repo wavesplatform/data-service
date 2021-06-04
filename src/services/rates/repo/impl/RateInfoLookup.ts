@@ -58,15 +58,22 @@ export default class RateInfoLookup
       );
     }
 
+    let wavesPaired = this.lookupThroughWaves(this.wavesAsset, pairWithMoneyFormat);
+    let hasPairWithWaves = wavesPaired.matchWith({
+      Just: () => true,
+      Nothing: () => false,
+    });
+
     return lookup(pairWithMoneyFormat, false)
       .orElse(() => lookup(pairWithMoneyFormat, true))
-      .filter((val) => val.volumeWaves !== null && this.mPairAcceptanceVolumeThreshold.matchWith({
+      .filter((val) => (val.volumeWaves !== null && this.mPairAcceptanceVolumeThreshold.matchWith({
         Just: ({ value: pairAcceptanceVolumeThreshold }) => val.volumeWaves.gte(pairAcceptanceVolumeThreshold),
         // lookup through waves
         Nothing: () => false
-      }))
+      })) || !hasPairWithWaves
+      )
       .orElse(() =>
-        this.lookupThroughWaves(this.wavesAsset, pairWithMoneyFormat)
+        wavesPaired
       );
   }
 
