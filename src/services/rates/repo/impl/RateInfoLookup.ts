@@ -60,7 +60,7 @@ export default class RateInfoLookup
 
     return lookup(pairWithMoneyFormat, false)
       .orElse(() => lookup(pairWithMoneyFormat, true))
-      .filter((val) => this.mPairAcceptanceVolumeThreshold.matchWith({
+      .filter((val) => val.volumeWaves !== null && this.mPairAcceptanceVolumeThreshold.matchWith({
         Just: ({ value: pairAcceptanceVolumeThreshold }) => val.volumeWaves.gte(pairAcceptanceVolumeThreshold),
         // lookup through waves
         Nothing: () => false
