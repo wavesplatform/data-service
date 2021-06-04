@@ -44,24 +44,20 @@ export const modifyDecimals = (assetsService: AssetsService) => (
           ...tx,
           fee: tx.fee.shiftedBy(-feePrecision),
           amount: tx.amount.shiftedBy(-amountPrecision),
-          price: tx.price.shiftedBy(-pricePrecision),
-          buyMatcherFee: tx.buyMatcherFee.shiftedBy(-buyMatcherFeePrecision
-          ),
-          sellMatcherFee: tx.sellMatcherFee.shiftedBy(-sellMatcherFeePrecision
-          ),
+          price: tx.price.shiftedBy(-8 - pricePrecision + amountPrecision),
+          buyMatcherFee: tx.buyMatcherFee.shiftedBy(-buyMatcherFeePrecision),
+          sellMatcherFee: tx.sellMatcherFee.shiftedBy(-sellMatcherFeePrecision),
           order1: {
             ...tx.order1,
             amount: tx.order1.amount.shiftedBy(-amountPrecision),
-            price: tx.order1.price.shiftedBy(-pricePrecision),
-            matcherFee: tx.order1.matcherFee.shiftedBy(-order1MatcherFeePrecision
-            ),
+            price: tx.order1.price.shiftedBy(-8 - pricePrecision + amountPrecision),
+            matcherFee: tx.order1.matcherFee.shiftedBy(-order1MatcherFeePrecision),
           },
           order2: {
             ...tx.order2,
             amount: tx.order2.amount.shiftedBy(-amountPrecision),
-            price: tx.order2.price.shiftedBy(-pricePrecision),
-            matcherFee: tx.order2.matcherFee.shiftedBy(-order2MatcherFeePrecision
-            ),
+            price: tx.order2.price.shiftedBy(-8 - pricePrecision + amountPrecision),
+            matcherFee: tx.order2.matcherFee.shiftedBy(-order2MatcherFeePrecision),
           }
         }),
         txs,
