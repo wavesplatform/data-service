@@ -11,13 +11,13 @@ export const modifyDecimals = (assetsService: AssetsService) => (
     .precisions({
       ids: txs
         .map((tx) =>
-          [defaultTo('WAVES', tx.feeAsset)].concat(
+          [defaultTo('WAVES', tx.feeAssetId)].concat(
             tx.payment.map((p) => p.assetId)
           )
         )
         .reduce((acc, cur) => acc.concat(cur), []),
     })
-    .map((precisions) =>
+    .map((precisions: number[]) =>
       txs.map((tx) => {
         let currentTxValues = precisions.splice(0, 1 + tx.payment.length);
         return {

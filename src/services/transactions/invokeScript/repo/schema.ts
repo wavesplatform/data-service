@@ -5,6 +5,7 @@ import commonFields from '../../_common/commonFieldsSchemas';
 export const result = Joi.object().keys({
   ...commonFields,
 
+  fee_asset_id: Joi.string().required(),
   dapp: Joi.string().required(),
   call: Joi.object()
     .keys({

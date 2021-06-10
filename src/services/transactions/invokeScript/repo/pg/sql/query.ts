@@ -13,6 +13,7 @@ const columns = [
   't.tx_version',
   't.status',
   't.fee',
+  't.fee_asset_id',
   't.sender',
   't.sender_public_key',
 

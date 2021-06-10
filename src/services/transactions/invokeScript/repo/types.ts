@@ -33,6 +33,7 @@ export type RawInvokeScriptTxPayment = {
 export type RawInvokeScriptTx = RawTx &
   RawInvokeScriptTxArg &
   RawInvokeScriptTxPayment & {
+    fee_asset_id: string;
     dapp: string;
     function_name: string | null;
   };
@@ -55,6 +56,7 @@ export type InvokeScriptTxPayment = {
 };
 
 export type InvokeScriptTx = Tx & {
+  feeAssetId: string;
   dApp: string;
   call: {
     function: string;

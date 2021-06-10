@@ -27,7 +27,7 @@ export const modifyDecimals = (assetsService: AssetsService) => (
         ])
         .reduce((acc, cur) => acc.concat(cur), []),
     })
-    .map((v) =>
+    .map((v: number[]) =>
       zipWith(
         (
           tx,
