@@ -97,9 +97,9 @@ const searchAssets = (
         compose((q: knex.QueryBuilder) =>
           cleanedQuery.length
             ? q.orWhereRaw(
-                `to_tsvector('simple', ${tableAlias}3.asset_name) @@ to_tsquery(?)`,
-                [`${cleanedQuery}:*`]
-              )
+              `to_tsvector('simple', ${tableAlias}3.asset_name) @@ to_tsquery(?)`,
+              [`${cleanedQuery}:*`]
+            )
             : q
         )(
           q
@@ -135,6 +135,15 @@ export const search = (req: PairsSearchRequest): string => {
     return q
       .with('assets_cte', (qb: knex.QueryBuilder) =>
         searchAssets(qb, amountAsset, getMatchExactly(matchExactly)[0])
+      ).innerJoin(
+        { amount_cte: 'assets_cte' },
+        'amount_cte.asset_id',
+        't.amount_asset_id'
+      )
+      .innerJoin(
+        { price_cte: 'assets_cte' },
+        'price_cte.asset_id',
+        't.amount_asset_id'
       )
       .toString();
   } else if (isSearchByAssetsRequest(req)) {
