@@ -10,11 +10,11 @@ export const modifyDecimals = (assetsService: AssetsService) => (
     .precisions({
       ids: ['WAVES'].concat(txs.map((tx) => tx.assetId)),
     })
-    .map((precisions) => {
+    .map((precisions: number[]) => {
       const feePrecision = precisions.splice(0, 1)[0];
       return txs.map((tx, idx) => ({
         ...tx,
         fee: tx.fee.shiftedBy(-feePrecision),
-        amount: tx.quantity.shiftedBy(-precisions[idx]),
+        quantity: tx.quantity.shiftedBy(-precisions[idx]),
       }));
     });
