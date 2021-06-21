@@ -47,7 +47,7 @@ export enum OrderType {
 type Order = {
   id: string;
   version: string;
-  type: OrderType;
+  orderType: OrderType;
   sender: string;
   senderPublicKey: string;
   signature: string;

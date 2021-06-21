@@ -16,10 +16,10 @@ export const modifyDecimals = (assetsService: AssetsService) => (
           wavesByDefault(tx.feeAsset),
           wavesByDefault(tx.order1.assetPair.amountAsset),
           wavesByDefault(tx.order1.assetPair.priceAsset),
-          tx.order1.type === OrderType.Buy
+          tx.order1.orderType === OrderType.Buy
             ? wavesByDefault(tx.order1.matcherFeeAssetId)
             : wavesByDefault(tx.order2.matcherFeeAssetId),
-          tx.order1.type === OrderType.Sell
+          tx.order1.orderType === OrderType.Sell
             ? wavesByDefault(tx.order1.matcherFeeAssetId)
             : wavesByDefault(tx.order2.matcherFeeAssetId),
           wavesByDefault(tx.order1.matcherFeeAssetId),
@@ -59,7 +59,8 @@ export const modifyDecimals = (assetsService: AssetsService) => (
             price: tx.order2.price.shiftedBy(-8 - pricePrecision + amountPrecision),
             matcherFee: tx.order2.matcherFee.shiftedBy(-order2MatcherFeePrecision),
           }
-        }),
+        })
+        ,
         txs,
         splitEvery(v.length / txs.length, v)
       )
