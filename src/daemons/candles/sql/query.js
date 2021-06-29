@@ -70,15 +70,9 @@ const selectExchangesAfterTimestamp = (fromTimestamp) => {
   let ts = pgRawDateTrunc(`'${fromTimestamp.toISOString()}'::timestamptz`)('minute');
   return selectExchanges
     .clone()
-    .where(
-      't.uid',
-      '>=',
-      pg('txs_7')
-        .select('uid')
-        .whereRaw(`time_stamp >= ${ts}`)
-        .orderByRaw(`time_stamp <-> ${ts}`)
-        .limit(1)
-    );
+    .whereRaw(`time_stamp >= ${ts}`)
+    .orderBy('uid')
+    .orderByRaw(`time_stamp <-> ${ts}`);
 };
 
 /** selectLastCandle :: String -> String query */

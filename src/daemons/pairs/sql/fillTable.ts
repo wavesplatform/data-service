@@ -11,16 +11,9 @@ const selectExchanges = pg({ t: 'txs_7' })
     time_stamp: 't.time_stamp',
     sender: 't.sender',
   })
-  .with('hp_cte', (qb) =>
-    qb
-      .select('uid')
-      .from('txs_7')
-      .whereRaw(`time_stamp >= now() - interval '1 day'`)
-      .orderByRaw(`time_stamp <-> now() - interval '1 day'`)
-      .limit(1)
-  )
-  .where('t.uid', '>=', pg('hp_cte').select('uid'))
-  .orderBy('t.uid', 'desc');
+  .whereRaw(`time_stamp >= now() - interval '1 day'`)
+  .orderBy('t.uid', 'desc')
+  .orderByRaw(`time_stamp <-> now() - interval '1 day'`);
 
 const selectPairsCTE = pg
   .with('pairs_cte', (qb) => {
@@ -57,9 +50,7 @@ const selectPairsCTE = pg
     'p.last_price',
     'p.volume',
     {
-      volume_waves: pg.raw(
-        `coalesce(p.volume_waves, floor(p.quote_volume / p1.weighted_average_price), p.quote_volume * p2.weighted_average_price)`
-      ),
+      volume_waves: pg.raw('COALESCE(p.volume_waves, floor(p.quote_volume / p1.weighted_average_price), p.quote_volume * p2.weighted_average_price)'),
     },
     'p.quote_volume',
     'p.high',
