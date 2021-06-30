@@ -13,7 +13,7 @@ export const modifyDecimals = <T extends PairInfo & AssetIdsPair>(
           []
         ),
       })
-      .chain((precisions) => {
+      .chain((precisions: number[]) => {
         return taskOf(
           pairs.map((pair, idx) => {
             const amountAssetDecimals = precisions[idx * 2];
@@ -33,7 +33,9 @@ export const modifyDecimals = <T extends PairInfo & AssetIdsPair>(
                   ? null
                   : pair.amountAsset === 'WAVES'
                     ? pair.volumeWaves.shiftedBy(-amountAssetDecimals)
-                    : pair.volumeWaves.shiftedBy(priceDecimals - amountAssetDecimals),
+                    : pair.priceAsset === 'WAVES'
+                      ? pair.volumeWaves.shiftedBy(priceDecimals - amountAssetDecimals)
+                      : pair.volumeWaves.shiftedBy(priceDecimals - 8 - amountAssetDecimals),
               weightedAveragePrice: pair.weightedAveragePrice.shiftedBy(priceDecimals),
             };
           })
