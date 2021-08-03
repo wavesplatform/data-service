@@ -35,6 +35,8 @@ const afterFilter: CommonFilters['after'] = parseTrimmedStringIfDefined;
 export default {
   timeStart: parseDate,
   timeEnd: parseDate,
+  blockTimeStart: parseDate,
+  blockTimeEnd: parseDate,
   limit: limitFilter,
   sender: parseTrimmedStringIfDefined,
   senders: parseArrayQuery,

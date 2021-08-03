@@ -9,6 +9,7 @@ const {
   reverse,
   merge,
 } = require('ramda');
+const pg = require('knex')({ client: 'pg' });
 
 const commonFiltersOrder = require('./filtersOrder');
 const commonFilters = require('./filters');
@@ -30,19 +31,19 @@ const createSql = ({
   );
 
   return {
-    get: id =>
+    get: (id) =>
       compose(
         String,
-        q => queryAfterFiltersWithDefaults.get(q, id),
+        (q) => queryAfterFiltersWithDefaults.get(q, id),
         // tip for postgresql to use index
         filters.limit(1),
         filters.id(id)
       )(query),
 
-    mget: ids =>
+    mget: (ids) =>
       compose(
         String,
-        q => queryAfterFiltersWithDefaults.mget(q, ids),
+        (q) => queryAfterFiltersWithDefaults.mget(q, ids),
         // tip for postgresql to use index
         filters.sort(defaultValues.SORT),
         // tip for postgresql to use index
@@ -50,22 +51,54 @@ const createSql = ({
         filters.ids(ids)
       )(query),
 
-    search: fValues => {
+    search: (fValues) => {
       const fValuesPicked = pick(filtersOrder, fValues);
       const appliedFs = compose(
-        map(x => filters[x](fValuesPicked[x])),
+        map((x) => filters[x](fValuesPicked[x])),
         filter(has(__, fValuesPicked)),
         reverse
       )(filtersOrder);
 
       return compose(
         String,
-        q => queryAfterFiltersWithDefaults.search(q, fValuesPicked),
+        (q) => queryAfterFiltersWithDefaults.search(q, fValuesPicked),
         ...appliedFs,
-        q => q.clone()
+        (q) => q.clone()
       )(query);
     },
   };
 };
 
-module.exports = { defaultValues, createSql };
+const createByTimeStamp = (t) => (comparator) => (ts) => (q) =>
+  q
+    .clone()
+    .where(
+      't.uid',
+      comparator,
+      pg(t)
+        .select('uid')
+        .where('time_stamp', comparator, ts.toISOString())
+        .orderByRaw(`time_stamp <-> '${ts.toISOString()}'::timestamptz`)
+        .limit(1)
+    );
+
+const createByBlockTimeStamp = (t) => (comparator) => (ts) => (q) =>
+  q.clone().where(
+    't.uid',
+    comparator,
+    pg(t)
+      .select('uid')
+      .where(
+        'height',
+        comparator,
+        pg('blocks')
+          .select('height')
+          .where('time_stamp', comparator, ts.toISOString())
+          .orderByRaw(`time_stamp <-> '${ts.toISOString()}'::timestamptz`)
+          .limit(1)
+      )
+      .orderBy('height', comparator == '>=' ? 'asc' : 'desc')
+      .limit(1)
+  );
+
+module.exports = { defaultValues, createSql, createByTimeStamp, createByBlockTimeStamp };

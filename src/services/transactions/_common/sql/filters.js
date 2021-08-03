@@ -22,10 +22,9 @@ const sort = (s) => (q) => q.clone().orderBy('t.uid', s);
 
 const after =
   ({ uid, sort }) =>
-    (q) => {
-      const comparator = sort === 'desc' ? '<' : '>';
-      return q.clone().whereRaw(`t.uid ${comparator} ${uid.toString()}`);
-    };
+    (q) =>
+      q.clone().whereRaw(`t.uid ${sort === 'desc' ? '<' : '>'} ${uid.toString()}`);
+
 
 module.exports = {
   id,

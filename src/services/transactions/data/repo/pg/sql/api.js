@@ -32,6 +32,8 @@ module.exports = ({ filters: F }) => ({
       // tx attributes
       'timeStart',
       'timeEnd',
+      'blockTimeStart',
+      'blockTimeEnd',
       'sender',
       'senders',
       // data attributes

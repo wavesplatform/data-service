@@ -1,6 +1,6 @@
-const pg = require('knex')({ client: 'pg' });
 const { whereIn } = require('../../../../../utils/db/knex');
 
+const { createByTimeStamp, createByBlockTimeStamp } = require('../../../_common/sql');
 const commonFilters = require('../../../_common/sql/filters');
 const commonFiltersOrder = require('../../../_common/sql/filtersOrder');
 
@@ -15,18 +15,9 @@ const byRecipient = (addressOrAlias) =>
       );
   });
 
-const byTimeStamp = (comparator) => (ts) => (q) =>
-  q
-    .clone()
-    .where(
-      't.uid',
-      comparator,
-      pg('txs_9')
-        .select('uid')
-        .where('time_stamp', comparator, ts.toISOString())
-        .orderByRaw(`time_stamp <-> '${ts.toISOString()}'::timestamptz`)
-        .limit(1)
-    );
+const byTimeStamp = createByTimeStamp('txs_9');
+
+const byBlockTimeStamp = createByBlockTimeStamp('txs_9');
 
 module.exports = {
   filters: {
@@ -35,6 +26,8 @@ module.exports = {
     recipient: byRecipient,
     timeStart: byTimeStamp('>='),
     timeEnd: byTimeStamp('<='),
+    blockTimeStart: byBlockTimeStamp('>='),
+    blockTimeEnd: byBlockTimeStamp('<='),
   },
   filtersOrder: [...commonFiltersOrder, 'timeStart', 'timeEnd', 'recipient'],
 };

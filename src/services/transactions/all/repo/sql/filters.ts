@@ -1,26 +1,17 @@
-import * as knex from 'knex';
+import { createByTimeStamp, createByBlockTimeStamp } from '../../../_common/sql';
 import * as commonFilters from '../../../_common/sql/filters'
 import * as commonFiltersOrder from '../../../_common/sql/filtersOrder';
-const pg = knex({ client: 'pg' });
 
+const byTimeStamp = createByTimeStamp('txs');
 
-const byTimeStamp = (comparator: string) => (ts: Date) => (q: knex.QueryBuilder) =>
-    q
-        .clone()
-        .where(
-            't.uid',
-            comparator,
-            pg('txs')
-                .select('uid')
-                .where('time_stamp', comparator, ts.toISOString())
-                .orderByRaw(`time_stamp <-> '${ts.toISOString()}'::timestamptz`)
-                .limit(1)
-        );
+const byBlockTimesStamp = createByBlockTimeStamp('txs');
 
 export const filters = {
     ...commonFilters,
 
     timeStart: byTimeStamp('>='),
     timeEnd: byTimeStamp('<='),
+    blockTimeStart: byBlockTimesStamp('>='),
+    blockTimeEnd: byBlockTimesStamp('<='),
 };
 export const filtersOrder = [...commonFiltersOrder, 'timeStart', 'timeEnd'];

@@ -31,6 +31,8 @@ const createApi = ({ filters: F }) => ({
       // tx attributes
       'timeStart',
       'timeEnd',
+      'blockTimeStart',
+      'blockTimeEnd',
       // specific attributes
       'matcher',
       'orderId',

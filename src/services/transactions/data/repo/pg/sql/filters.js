@@ -1,7 +1,7 @@
-const pg = require('knex')({ client: 'pg' });
 const { curryN } = require('ramda');
 const { BigNumber } = require('@waves/data-entities');
 
+const { createByTimeStamp, createByBlockTimeStamp } = require('../../../../_common/sql');
 const commonFilters = require('../../../../_common/sql/filters');
 
 const byKey = curryN(2, (key, q) =>
@@ -26,18 +26,9 @@ const byValue = curryN(3, (type, value, q) => {
   });
 });
 
-const byTimeStamp = (comparator) => (ts) => (q) =>
-  q
-    .clone()
-    .where(
-      't.uid',
-      comparator,
-      pg('txs_12')
-        .select('uid')
-        .where('time_stamp', comparator, ts.toISOString())
-        .orderByRaw(`time_stamp <-> '${ts.toISOString()}'::timestamptz`)
-        .limit(1)
-    );
+const byTimeStamp = createByTimeStamp('txs_12');
+
+const byBlockTimeStamp = createByBlockTimeStamp('txs_12');
 
 module.exports = {
   ...commonFilters,
@@ -47,4 +38,6 @@ module.exports = {
   value: byValue,
   timeStart: byTimeStamp('>='),
   timeEnd: byTimeStamp('<='),
+  blockTimeStart: byBlockTimeStamp('>='),
+  blockTimeEnd: byBlockTimeStamp('<='),
 };

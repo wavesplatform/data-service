@@ -34,6 +34,8 @@ export type Tx = CommonTxFields & {
 export type CommonFilters = {
   timeStart?: Date;
   timeEnd?: Date;
+  blockTimeStart?: Date;
+  blockTimeEnd?: Date;
   sender?: string;
   senders?: string[]
 };

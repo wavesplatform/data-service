@@ -6,4 +6,6 @@ module.exports = [
   'sort',
   'after',
   'limit',
+  'blockTimeStart',
+  'blockTimeEnd',
 ];

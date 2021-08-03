@@ -31,6 +31,8 @@ const createApi = ({ filters: F }) => ({
       'after',
       'timeStart',
       'timeEnd',
+      'blockTimeStart',
+      'blockTimeEnd',
       'sender',
       'senders',
       // specific attributes
