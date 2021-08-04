@@ -35,8 +35,16 @@ export default (repo: AssetsRepo): AssetsService => ({
   mget: (req) => repo.mget(req.ids),
   search: (req) => repo.search(req),
 
-  precisions: (req) =>
-    repo.mget(req.ids).chain((ms) =>
+  precisions: (req) => {
+    const assetIds = new Map<string, number>();
+    req.ids.forEach((assetId) => {
+      // only new id
+      if (!assetIds.has(assetId)) {
+        assetIds.set(assetId, assetIds.size);
+      }
+    });
+
+    return repo.mget(Array.from(assetIds.keys())).chain((ms) =>
       waitAll<AppError, number>(
         ms.map((ma, idx) =>
           ma.matchWith({
@@ -47,6 +55,10 @@ export default (repo: AssetsRepo): AssetsService => ({
               ),
           })
         )
-      )
-    ),
+      ).map(precisions => {
+        // asset id is guaranteed to exist
+        return req.ids.map(id => precisions[assetIds.get(id) as number])
+      })
+    );
+  }
 });
