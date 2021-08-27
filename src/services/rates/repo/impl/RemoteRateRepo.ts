@@ -44,7 +44,7 @@ export default class RemoteRateRepo
         return {
           amountAsset: it.amount_asset_id,
           priceAsset: it.price_asset_id,
-          rate: it.weighted_average_price,
+          rate: it.weighted_average_price || new BigNumber(0), // fix/workaround of 26.08.2021 incident
         };
       });
     });
