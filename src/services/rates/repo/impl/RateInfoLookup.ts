@@ -107,8 +107,6 @@ implements Omit<CacheSync<AssetPairWithMoneyFormat, RateWithPair>, 'set'> {
       if (flipped) {
         let flippedData = { ...data };
 
-        console.log('flippedData before inversion', flippedData, 'data', data);
-
         if (moneyFormat === MoneyFormat.Long) {
           flippedData.rate = invOnSatoshi(flippedData.rate, 8)
             .map((r) => r.shiftedBy(8))
@@ -116,8 +114,6 @@ implements Omit<CacheSync<AssetPairWithMoneyFormat, RateWithPair>, 'set'> {
         } else {
           flippedData.rate = inv(flippedData.rate).getOrElse(new BigNumber(0));
         }
-
-        console.log('flippedData after inversion', flippedData, 'data', data);
 
         return flippedData;
       } else {

@@ -19,16 +19,12 @@ type CandleRate = {
 };
 
 export default class RemoteRateRepo
-  implements AsyncMget<RateMgetParams, RateWithPairIds, DbError | Timeout> {
+  implements AsyncMget<RateMgetParams, RateWithPairIds, DbError | Timeout>
+{
   constructor(private readonly dbDriver: PgDriver) {}
 
-  mget(
-    request: RateMgetParams
-  ): Task<DbError | Timeout, Array<RateWithPairIds>> {
-    const pairsSqlParams = chain(
-      (it) => [it.amountAsset, it.priceAsset],
-      request.pairs
-    );
+  mget(request: RateMgetParams): Task<DbError | Timeout, Array<RateWithPairIds>> {
+    const pairsSqlParams = chain((it) => [it.amountAsset, it.priceAsset], request.pairs);
 
     const sql = pg.raw(makeSql(request.pairs.length), [
       request.timestamp.getOrElse(new Date()),
@@ -37,16 +33,18 @@ export default class RemoteRateRepo
     ]);
 
     const dbTask: Task<DbError | Timeout, CandleRate[]> =
-      request.pairs.length === 0
-        ? taskOf([])
-        : this.dbDriver.any(sql.toString());
+      request.pairs.length === 0 ? taskOf([]) : this.dbDriver.any(sql.toString());
 
-    return dbTask.map((result) =>
-      result.map((it) => ({
-        amountAsset: it.amount_asset_id,
-        priceAsset: it.price_asset_id,
-        rate: it.weighted_average_price,
-      }))
-    );
+    return dbTask.map((result) => {
+      console.log('result from db', result);
+      return result.map((it) => {
+        console.log('result internal from db', it);
+        return {
+          amountAsset: it.amount_asset_id,
+          priceAsset: it.price_asset_id,
+          rate: it.weighted_average_price,
+        };
+      });
+    });
   }
 }
