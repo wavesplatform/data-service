@@ -32,6 +32,8 @@ export default class RemoteRateRepo
       ...pairsSqlParams,
     ]);
 
+    console.log('rates request SQL', sql);
+
     const dbTask: Task<DbError | Timeout, CandleRate[]> =
       request.pairs.length === 0 ? taskOf([]) : this.dbDriver.any(sql.toString());
 
