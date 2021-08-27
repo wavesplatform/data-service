@@ -19,12 +19,16 @@ type CandleRate = {
 };
 
 export default class RemoteRateRepo
-  implements AsyncMget<RateMgetParams, RateWithPairIds, DbError | Timeout>
-{
+  implements AsyncMget<RateMgetParams, RateWithPairIds, DbError | Timeout> {
   constructor(private readonly dbDriver: PgDriver) {}
 
-  mget(request: RateMgetParams): Task<DbError | Timeout, Array<RateWithPairIds>> {
-    const pairsSqlParams = chain((it) => [it.amountAsset, it.priceAsset], request.pairs);
+  mget(
+    request: RateMgetParams
+  ): Task<DbError | Timeout, Array<RateWithPairIds>> {
+    const pairsSqlParams = chain(
+      (it) => [it.amountAsset, it.priceAsset],
+      request.pairs
+    );
 
     const sql = pg.raw(makeSql(request.pairs.length), [
       request.timestamp.getOrElse(new Date()),
@@ -32,21 +36,20 @@ export default class RemoteRateRepo
       ...pairsSqlParams,
     ]);
 
-    console.log('rates request SQL', sql);
-
     const dbTask: Task<DbError | Timeout, CandleRate[]> =
-      request.pairs.length === 0 ? taskOf([]) : this.dbDriver.any(sql.toString());
+      request.pairs.length === 0
+        ? taskOf([])
+        : this.dbDriver.any(sql.toString());
 
-    return dbTask.map((result) => {
-      console.log('result from db', result);
-      return result.map((it) => {
-        console.log('result internal from db', it);
-        return {
-          amountAsset: it.amount_asset_id,
-          priceAsset: it.price_asset_id,
-          rate: it.weighted_average_price || new BigNumber(0), // fix/workaround of 26.08.2021 incident
-        };
-      });
-    });
+    return dbTask.map((result) =>
+      result.map((it) => ({
+        amountAsset: it.amount_asset_id,
+        priceAsset: it.price_asset_id,
+        // `|| new BigNumber(0)` — fix/workaround of 26.08.2021 incident
+        // To reproduce, remove and try a pair `FaCgK3UfvkRF2WfFyKZRVasMmqPRoLG7nUv8HzR451dm/WAVES`
+        // with timestamp `2021-08-25T15:00:00`
+        rate: it.weighted_average_price || new BigNumber(0),
+      }))
+    );
   }
 }
