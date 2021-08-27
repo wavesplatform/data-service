@@ -31,7 +31,7 @@ type AssetPairWithMoneyFormat = AssetPair & {
    where lookup = getFromTable(asset1, asset2) || 1 / getFromtable(asset2, asset1)   
 */
 export default class RateInfoLookup
-  implements Omit<CacheSync<AssetPairWithMoneyFormat, RateWithPair>, 'set'> {
+implements Omit<CacheSync<AssetPairWithMoneyFormat, RateWithPair>, 'set'> {
   private readonly lookupTable: RateLookupTable;
 
   constructor(
@@ -107,6 +107,8 @@ export default class RateInfoLookup
       if (flipped) {
         let flippedData = { ...data };
 
+        console.log('flippedData before inversion', flippedData, 'data', data);
+
         if (moneyFormat === MoneyFormat.Long) {
           flippedData.rate = invOnSatoshi(flippedData.rate, 8)
             .map((r) => r.shiftedBy(8))
@@ -114,6 +116,8 @@ export default class RateInfoLookup
         } else {
           flippedData.rate = inv(flippedData.rate).getOrElse(new BigNumber(0));
         }
+
+        console.log('flippedData after inversion', flippedData, 'data', data);
 
         return flippedData;
       } else {
@@ -127,17 +131,18 @@ export default class RateInfoLookup
     pair: AssetPairWithMoneyFormat
   ): Maybe<VolumeAwareRateInfo> {
     return map2(
-      (info1, info2) => ({
-        ...pair,
-        rate: safeDivide(info1.rate, info2.rate)
-          .map((r) =>
-            pair.moneyFormat === MoneyFormat.Long
-              ? r.shiftedBy(8).decimalPlaces(0)
-              : r
-          )
-          .getOrElse(new BigNumber(0)),
-        volumeWaves: BigNumber.max(info1.volumeWaves, info2.volumeWaves),
-      }),
+      (info1, info2) => {
+        console.log('lookupThroughWaves | info1', info1, '| info2', info2);
+        return {
+          ...pair,
+          rate: safeDivide(info1.rate, info2.rate)
+            .map((r) =>
+              pair.moneyFormat === MoneyFormat.Long ? r.shiftedBy(8).decimalPlaces(0) : r
+            )
+            .getOrElse(new BigNumber(0)),
+          volumeWaves: BigNumber.max(info1.volumeWaves, info2.volumeWaves),
+        };
+      },
       this.get({
         amountAsset: pair.amountAsset,
         priceAsset: wavesAsset,
