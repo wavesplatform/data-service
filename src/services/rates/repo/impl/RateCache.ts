@@ -23,9 +23,7 @@ export default class RateCacheImpl implements RateCache {
 
   has(key: RateCacheKey): boolean {
     const getKey = keyFn(key.matcher);
-    return (
-      this.lru.has(getKey(key.pair)) || this.lru.has(getKey(flip(key.pair)))
-    );
+    return this.lru.has(getKey(key.pair));
   }
 
   set(key: RateCacheKey, data: VolumeAwareRateInfo) {
