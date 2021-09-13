@@ -15,7 +15,7 @@ type CandleRate = {
   amount_asset_id: string;
   price_asset_id: string;
   matcher: string;
-  weighted_average_price: BigNumber;
+  weighted_average_price: BigNumber | null;
 };
 
 export default class RemoteRateRepo
@@ -45,9 +45,6 @@ export default class RemoteRateRepo
       result.map((it) => ({
         amountAsset: it.amount_asset_id,
         priceAsset: it.price_asset_id,
-        // `|| new BigNumber(0)` — fix/workaround of 26.08.2021 incident
-        // To reproduce, remove and try a pair `FaCgK3UfvkRF2WfFyKZRVasMmqPRoLG7nUv8HzR451dm/WAVES`
-        // with timestamp `2021-08-25T15:00:00`
         rate: it.weighted_average_price || new BigNumber(0),
       }))
     );
