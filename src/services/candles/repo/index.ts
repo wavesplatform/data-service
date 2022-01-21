@@ -1,6 +1,6 @@
 import { Ok as ok } from 'folktale/result';
 
-import { CandleInfo, RepoSearch } from '../../../types';
+import { CandleInfo, Interval, RepoSearch } from '../../../types';
 import { CommonRepoDependencies } from '../..';
 
 import { sql } from './sql';
@@ -17,16 +17,13 @@ export type CandlesSearchRequest = {
   priceAsset: string;
   timeStart: Date;
   timeEnd: Date;
-  interval: string;
+  interval: Interval;
   matcher: string;
 };
 
 export type CandlesRepo = RepoSearch<CandlesSearchRequest, CandleInfo>;
 
-export default ({
-  drivers: { pg },
-  emitEvent,
-}: CommonRepoDependencies): CandlesRepo => {
+export default ({ drivers: { pg }, emitEvent }: CommonRepoDependencies): CandlesRepo => {
   const SERVICE_NAME = 'candles.search';
   return {
     search: search({

@@ -1,5 +1,5 @@
 import * as knex from 'knex';
-import { interval, CandleInterval } from '../../../../types';
+import { CandleInterval, Interval } from '../../../../types';
 import { unsafeIntervalsFromStrings } from '../../../../utils/interval';
 import { highestDividerLessThan } from './utils';
 import { CandlesSearchRequest } from '../../repo';
@@ -43,7 +43,7 @@ export interface CandleSelectionParams {
   priceAsset: string;
   timeStart: Date;
   timeEnd: Date;
-  interval: string;
+  interval: Interval;
   matcher: string;
 }
 
@@ -53,7 +53,7 @@ export const selectCandles = ({
   timeStart,
   timeEnd,
   matcher,
-  interval: inter,
+  interval,
 }: CandleSelectionParams): knex.QueryBuilder =>
   pg({ c: 'candles' })
     .select(FIELDS)
@@ -65,10 +65,7 @@ export const selectCandles = ({
     .where(
       'interval',
       // should always be valid after validation
-      highestDividerLessThan(
-        interval(inter).unsafeGet(),
-        unsafeIntervalsFromStrings(DIVIDERS)
-      ).matchWith({
+      highestDividerLessThan(interval, unsafeIntervalsFromStrings(DIVIDERS)).matchWith({
         Ok: ({ value: i }) => i.source,
         Error: ({ value: error }) => CandleInterval.Minute1,
       })
@@ -79,7 +76,7 @@ export const sql = ({
   priceAsset,
   timeStart,
   timeEnd,
-  interval: inter,
+  interval,
   matcher,
 }: CandlesSearchRequest): string =>
   pg('candles')
@@ -90,7 +87,7 @@ export const sql = ({
         priceAsset,
         timeStart,
         timeEnd,
-        interval: inter,
+        interval,
         matcher,
       }),
     })

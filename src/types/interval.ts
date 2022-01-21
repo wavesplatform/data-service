@@ -23,7 +23,7 @@ export const units: Record<Unit, number> = {
 };
 
 export const parseUnit = (s: string): Result<ValidationError, Unit> => {
-  switch (s.substr(-1)) {
+  switch (s.slice(-1)) {
     case Unit.Second:
       return ok(Unit.Second);
     case Unit.Minute:
@@ -39,22 +39,17 @@ export const parseUnit = (s: string): Result<ValidationError, Unit> => {
     case Unit.Year:
       return ok(Unit.Year);
     default:
-      return error(new ValidationError('Provided string is not a valid unit.'));
+      return error(new ValidationError(`Provided string (${s}) is not a valid unit`));
   }
 };
 
 /** Calculates interval length in milliseconds **/
-const parseLength = (
-  s: string,
-  unit: Unit
-): Result<ValidationError, number> => {
-  const sub = s.substr(0, s.length - 1);
+const parseLength = (s: string, unit: Unit): Result<ValidationError, number> => {
+  const sub = s.slice(0, s.length - 1);
   const n = parseInt(sub);
   return !isNaN(n)
     ? ok(n * units[unit] * 1000)
-    : error(
-        new ValidationError('Provided string is not a valid intervallength.')
-      );
+    : error(new ValidationError(`Provided string (${s}) is not a valid interval length`));
 };
 
 export type Interval = {
@@ -66,7 +61,7 @@ export type Interval = {
 export const interval = (source: string): Result<ValidationError, Interval> => {
   if (!intervalRegex.test(source))
     return error(
-      new ValidationError('String argument does not match interval pattern')
+      new ValidationError(`Provided string (${source}) is not valid interval`)
     );
 
   return parseUnit(source).matchWith({

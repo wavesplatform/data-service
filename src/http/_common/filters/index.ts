@@ -8,6 +8,8 @@ import { SortOrder, WithLimit, WithSortOrder } from '../../../services/_common';
 const DEFAULT_LIMIT = 100;
 const DEFAULT_SORT = SortOrder.Descending;
 
+export const DEFAULT_MAX_LIMIT = DEFAULT_LIMIT;
+
 export const withDefaults = <T>(fValues: T): T & WithLimit & WithSortOrder =>
   merge(
     {
@@ -72,4 +74,4 @@ export const parseFilterValues = <
       ReturnType<Parser<ParsedFilterValues[keyof ParsedFilterValues]>>,
       AllParsedFilterValues
     >((val, key) => val(values[key]))
-  )({ ...filters, ...commonFilters });
+  )({ ...commonFilters, ...filters });

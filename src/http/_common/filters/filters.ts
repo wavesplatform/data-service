@@ -1,5 +1,5 @@
-import { Result, Error as error, Ok as ok } from 'folktale/result';
-import { compose } from 'ramda';
+import { Error as error, Ok as ok } from 'folktale/result';
+import { isNil } from 'ramda';
 import { ParseError } from '../../../errorHandling';
 import { isSortOrder } from '../../../services/_common';
 import {
@@ -8,19 +8,26 @@ import {
   parseTrimmedStringIfDefined,
 } from '../../../utils/parsers';
 
+import { DEFAULT_MAX_LIMIT } from './';
 import { CommonFilters } from './types';
 
 // default limit is 100
-const limitFilter: CommonFilters['limit'] = (raw) =>
-  typeof raw === 'undefined'
-    ? ok(undefined)
-    : compose<string, number, Result<ParseError, number>>(
-        (n) =>
-          isNaN(n)
-            ? error(new ParseError(new Error('limit has to be a number')))
-            : ok(n),
-        parseInt
-      )(raw);
+const limitFilter =
+  (max: number): CommonFilters['limit'] =>
+  (raw) => {
+    if (isNil(raw)) {
+      return ok(undefined);
+    } else {
+      const n = parseInt(raw);
+      if (isNaN(n)) {
+        return error(new ParseError(new Error('limit has to be a number')));
+      } else if (n > max) {
+        return error(new ParseError(new Error(`Max limit ${max} exceeded`)));
+      } else {
+        return ok(n);
+      }
+    }
+  };
 
 // default sort is SortOrder.Descending
 const sortFilter: CommonFilters['sort'] = (s) =>
@@ -37,7 +44,7 @@ export default {
   timeEnd: parseDate,
   blockTimeStart: parseDate,
   blockTimeEnd: parseDate,
-  limit: limitFilter,
+  limit: limitFilter(DEFAULT_MAX_LIMIT),
   sender: parseTrimmedStringIfDefined,
   senders: parseArrayQuery,
   sort: sortFilter,

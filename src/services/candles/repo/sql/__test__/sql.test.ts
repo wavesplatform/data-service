@@ -1,3 +1,4 @@
+import { interval as intervalFromString } from '../../../../../types/interval';
 import { sql } from '../sql';
 
 describe('sql query from candles', () => {
@@ -8,7 +9,7 @@ describe('sql query from candles', () => {
         priceAsset: '222',
         timeStart: new Date('2017-04-03T00:00:00.000Z'),
         timeEnd: new Date('2017-04-03T23:59:59.999Z'),
-        interval: '1h',
+        interval: intervalFromString('1h').unsafeGet(),
         matcher: '123',
       })
     ).toMatchSnapshot();
@@ -21,7 +22,7 @@ describe('sql query from candles', () => {
         priceAsset: '222',
         timeStart: new Date('2017-04-03T00:00:00.000Z'),
         timeEnd: new Date('2017-04-03T23:59:59.999Z'),
-        interval: '1d',
+        interval: intervalFromString('1d').unsafeGet(),
         matcher: '123',
       })
     ).toMatchSnapshot();
@@ -34,7 +35,7 @@ describe('sql query from candles', () => {
         priceAsset: '222',
         timeStart: new Date('2017-04-03T00:00:00.000Z'),
         timeEnd: new Date('2017-04-03T23:59:59.999Z'),
-        interval: '1m',
+        interval: intervalFromString('1m').unsafeGet(),
         matcher: '123',
       })
     ).toMatchSnapshot();
