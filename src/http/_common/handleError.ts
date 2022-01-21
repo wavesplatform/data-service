@@ -16,6 +16,7 @@ export const handleError = (error: AppError): HttpResponse => {
       HttpResponse.BadRequest([
         {
           message: errorInfo.error.message,
+          ...errorInfo.meta,
         },
       ]),
     Validation: errorInfo => {

@@ -27,18 +27,13 @@ export type AppErrorPattern<C> = {
   Timeout: (e: ErrorInfo) => C;
 };
 
-const isJoiError = (err: any): err is joi.ValidationError => {
+export const isJoiError = (err: any): err is joi.ValidationError => {
   return err && err.isJoi;
 };
 
-const ensureError = (e: Error | string): Error =>
-  e instanceof Error ? e : new Error(e);
+const ensureError = (e: Error | string): Error => (e instanceof Error ? e : new Error(e));
 
-function createErrorInfo(
-  type: ErrorType,
-  error: Error,
-  meta?: ErrorMetaInfo
-): ErrorInfo;
+function createErrorInfo(type: ErrorType, error: Error, meta?: ErrorMetaInfo): ErrorInfo;
 function createErrorInfo(
   type: ErrorType,
   error: Error,
@@ -155,14 +150,11 @@ export class ValidationError extends AppError {
   constructor(error: Error | string, meta?: ErrorInfo['meta']) {
     super();
     this.error = ensureError(error);
-    this.meta =
-      meta && meta.error && isJoiError(meta.error) ? meta.error : meta;
+    this.meta = meta && meta.error && isJoiError(meta.error) ? meta.error : meta;
   }
 
   public matchWith<C>(pattern: AppErrorPattern<C>): C {
-    return pattern.Validation(
-      createErrorInfo(this.type, this.error, this.meta)
-    );
+    return pattern.Validation(createErrorInfo(this.type, this.error, this.meta));
   }
 }
 
