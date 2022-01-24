@@ -125,6 +125,7 @@ export const parse = ({
     const fValuesWithDefaults = mergeAll<CandlesSearchRequest & WithMatcher>([
       {
         matcher: config.matcher.defaultMatcherAddress,
+        timeEnd: new Date(),
       },
       withDefaults(fValues),
     ]);
@@ -165,7 +166,7 @@ export const parse = ({
       priceAsset: params.priceAsset,
       matcher: fValuesWithDefaults.matcher,
       timeStart: fValuesWithDefaults.timeStart,
-      timeEnd: fValuesWithDefaults.timeEnd || new Date(),
+      timeEnd: fValuesWithDefaults.timeEnd,
       interval: fValuesWithDefaults.interval,
     });
   });
