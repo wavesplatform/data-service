@@ -1,12 +1,12 @@
 import { Result, Error as error, Ok as ok } from 'folktale/result';
-import { isNil } from 'ramda';
+import { isNil, mergeAll } from 'ramda';
 
 import { ParseError } from '../../../errorHandling';
 import { CandlesSearchRequest } from '../../../services/candles/repo';
 import { interval as intervalFromString } from '../../../types/interval';
-import { parseFilterValues } from '../../_common/filters';
+import { parseFilterValues, withDefaults } from '../../_common/filters';
 import { HttpRequest } from '../../_common/types';
-import { CandleIntervals, parseInterval } from '../../candles/parse';
+import { CandleIntervals, MAX_CANDLES_COUNT, parseInterval } from '../../candles/parse';
 
 export const parse = ({
   params,
@@ -34,21 +34,43 @@ export const parse = ({
       allowed: CandleIntervals,
     }),
   })(query).chain((fValues) => {
-    if (isNil(fValues.timeStart)) {
+    const fValuesWithDefaults = mergeAll<CandlesSearchRequest>([
+      {
+        timeEnd: new Date(),
+      },
+      withDefaults(fValues),
+    ]);
+
+    if (isNil(fValuesWithDefaults.timeStart)) {
       return error(new ParseError(new Error('timeStart is undefined')));
     }
 
-    if (isNil(fValues.interval)) {
+    if (isNil(fValuesWithDefaults.interval)) {
       return error(new ParseError(new Error('interval is undefined')));
+    }
+
+    const periodLength =
+      fValuesWithDefaults.timeEnd.getTime() - fValuesWithDefaults.timeStart.getTime();
+    const expectedCandlesCount = Math.ceil(
+      periodLength / fValuesWithDefaults.interval.length
+    );
+    if (expectedCandlesCount > MAX_CANDLES_COUNT) {
+      return error(
+        new ParseError(
+          new Error(
+            `${expectedCandlesCount} of candles is more then allowed of ${MAX_CANDLES_COUNT}. Try to decrease requested period of time.`
+          )
+        )
+      );
     }
 
     return ok({
       amountAsset: params.amountAsset,
       priceAsset: params.priceAsset,
       matcher: params.matcher,
-      timeStart: fValues.timeStart,
-      timeEnd: fValues.timeEnd || new Date(),
-      interval: fValues.interval,
+      timeStart: fValuesWithDefaults.timeStart,
+      timeEnd: fValuesWithDefaults.timeEnd,
+      interval: fValuesWithDefaults.interval,
     });
   });
 };
