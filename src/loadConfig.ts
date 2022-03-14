@@ -95,7 +95,7 @@ const load = (): DataServiceConfig => {
   const rate: RatesConfig = {
     pairAcceptanceVolumeThreshold: volumeThreshold,
     thresholdAssetId: process.env.RATE_THRESHOLD_ASSET_ID as string,
-    rateBaseAssetId: process.env.RATE_BASE_ASSET_ID as string,
+    rateBaseAssetId: (process.env.RATE_BASE_ASSET_ID as string) || 'WAVES',
   };
 
   if (

@@ -34,16 +34,16 @@ export function createGeneratePossibleRequestItemsWithAsset(
       return [pair, flip(pair)];
     }
 
-    const wavesL: AssetPair = {
+    const baseAssetL: AssetPair = {
       amountAsset: pair.amountAsset,
       priceAsset: baseAsset,
     };
 
-    const wavesR: AssetPair = {
+    const baseAssetR: AssetPair = {
       amountAsset: pair.priceAsset,
       priceAsset: baseAsset,
     };
 
-    return [wavesL, flip(wavesL), wavesR, flip(wavesR), pair, flip(pair)];
+    return [baseAssetL, flip(baseAssetL), baseAssetR, flip(baseAssetR), pair, flip(pair)];
   };
 }
