@@ -3,15 +3,11 @@ import { path } from 'ramda';
 import { Asset, BigNumber } from '@waves/data-entities';
 
 import { CacheSync } from '../../../../types';
-import { flip, pairHasWaves } from '../../data';
+import { flip, createPairHasBaseAsset } from '../../data';
 import { inv, invOnSatoshi, safeDivide } from '../../util';
 import { isDefined, map2 } from '../../../../utils/fp/maybeOps';
 import { MoneyFormat } from '../../../../services/types';
-import {
-  AssetPair,
-  VolumeAwareRateInfo,
-  RateWithPair,
-} from '../../RateEstimator';
+import { AssetPair, VolumeAwareRateInfo, RateWithPair } from '../../RateEstimator';
 
 type RateLookupTable = {
   [amountAsset: string]: {
@@ -26,18 +22,19 @@ type AssetPairWithMoneyFormat = AssetPair & {
 /*
    find rate data from RateLookupTable using the following strategy:
    
-   lookup(amountAsset, priceAsset) || ( lookup(amountAsset, waves) / lookup(priceAsset, waves) }
+   lookup(amountAsset, priceAsset) || ( lookup(amountAsset, baseAsset) / lookup(priceAsset, baseAsset) }
    
    where lookup = getFromTable(asset1, asset2) || 1 / getFromtable(asset2, asset1)   
 */
 export default class RateInfoLookup
-  implements Omit<CacheSync<AssetPairWithMoneyFormat, RateWithPair>, 'set'> {
+  implements Omit<CacheSync<AssetPairWithMoneyFormat, RateWithPair>, 'set'>
+{
   private readonly lookupTable: RateLookupTable;
 
   constructor(
     data: Array<VolumeAwareRateInfo>,
     private readonly mPairAcceptanceVolumeThreshold: Maybe<BigNumber>,
-    private readonly wavesAsset: Asset
+    private readonly baseAsset: Asset
   ) {
     this.lookupTable = this.toLookupTable(data);
   }
@@ -46,35 +43,41 @@ export default class RateInfoLookup
     return isDefined(this.get(pairWithMoneyFormat));
   }
 
-  get(
-    pairWithMoneyFormat: AssetPairWithMoneyFormat
-  ): Maybe<VolumeAwareRateInfo> {
+  get(pairWithMoneyFormat: AssetPairWithMoneyFormat): Maybe<VolumeAwareRateInfo> {
+    const pairHasBaseAsset = createPairHasBaseAsset(this.baseAsset.id);
+
     const lookup = (pair: AssetPair, flipped: boolean) =>
       this.getFromLookupTable(pair, flipped, pairWithMoneyFormat.moneyFormat);
 
-    if (pairHasWaves(pairWithMoneyFormat)) {
+    if (pairHasBaseAsset(pairWithMoneyFormat)) {
       return lookup(pairWithMoneyFormat, false).orElse(() =>
         lookup(pairWithMoneyFormat, true)
       );
     }
 
-    let wavesPaired = this.lookupThroughWaves(this.wavesAsset, pairWithMoneyFormat);
-    let hasPairWithWaves = wavesPaired.matchWith({
+    let baseAssetPaired = this.lookupThroughBaseAsset(
+      this.baseAsset,
+      pairWithMoneyFormat
+    );
+    let hasPairWithBaseAsset = baseAssetPaired.matchWith({
       Just: () => true,
       Nothing: () => false,
     });
 
     return lookup(pairWithMoneyFormat, false)
       .orElse(() => lookup(pairWithMoneyFormat, true))
-      .filter((val) => (val.volumeWaves !== null && this.mPairAcceptanceVolumeThreshold.matchWith({
-        Just: ({ value: pairAcceptanceVolumeThreshold }) => val.volumeWaves.gte(pairAcceptanceVolumeThreshold),
-        // lookup through waves
-        Nothing: () => false
-      })) || !hasPairWithWaves
+      .filter(
+        (val) =>
+          (val.volumeWaves !== null &&
+            this.mPairAcceptanceVolumeThreshold.matchWith({
+              Just: ({ value: pairAcceptanceVolumeThreshold }) =>
+                val.volumeWaves.gte(pairAcceptanceVolumeThreshold),
+              // lookup through waves
+              Nothing: () => false,
+            })) ||
+          !hasPairWithBaseAsset
       )
-      .orElse(() =>
-        wavesPaired
-      );
+      .orElse(() => baseAssetPaired);
   }
 
   private toLookupTable(data: Array<VolumeAwareRateInfo>): RateLookupTable {
@@ -97,10 +100,7 @@ export default class RateInfoLookup
     const lookupData = flipped ? flip(pair) : pair;
 
     let foundValue = fromNullable<VolumeAwareRateInfo>(
-      path(
-        [lookupData.amountAsset.id, lookupData.priceAsset.id],
-        this.lookupTable
-      )
+      path([lookupData.amountAsset.id, lookupData.priceAsset.id], this.lookupTable)
     );
 
     return foundValue.map((data) => {
@@ -122,8 +122,8 @@ export default class RateInfoLookup
     });
   }
 
-  private lookupThroughWaves(
-    wavesAsset: Asset,
+  private lookupThroughBaseAsset(
+    baseAsset: Asset,
     pair: AssetPairWithMoneyFormat
   ): Maybe<VolumeAwareRateInfo> {
     return map2(
@@ -131,21 +131,19 @@ export default class RateInfoLookup
         ...pair,
         rate: safeDivide(info1.rate, info2.rate)
           .map((r) =>
-            pair.moneyFormat === MoneyFormat.Long
-              ? r.shiftedBy(8).decimalPlaces(0)
-              : r
+            pair.moneyFormat === MoneyFormat.Long ? r.shiftedBy(8).decimalPlaces(0) : r
           )
           .getOrElse(new BigNumber(0)),
         volumeWaves: BigNumber.max(info1.volumeWaves, info2.volumeWaves),
       }),
       this.get({
         amountAsset: pair.amountAsset,
-        priceAsset: wavesAsset,
+        priceAsset: baseAsset,
         moneyFormat: pair.moneyFormat,
       }),
       this.get({
         amountAsset: pair.priceAsset,
-        priceAsset: wavesAsset,
+        priceAsset: baseAsset,
         moneyFormat: pair.moneyFormat,
       })
     );

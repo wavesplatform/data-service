@@ -29,6 +29,7 @@ export type MatcherConfig = {
 export type RatesConfig = {
   pairAcceptanceVolumeThreshold: number;
   thresholdAssetId: string;
+  rateBaseAssetId: string;
 };
 
 export type DefaultConfig = PostgresConfig & ServerConfig & LoggerConfig;
@@ -62,15 +63,19 @@ export const loadDefaultConfig = (): DefaultConfig => {
   };
 };
 
-const envVariables = ['DEFAULT_MATCHER', 'RATE_PAIR_ACCEPTANCE_VOLUME_THRESHOLD', 'RATE_THRESHOLD_ASSET_ID'];
+const envVariables = [
+  'DEFAULT_MATCHER',
+  'RATE_PAIR_ACCEPTANCE_VOLUME_THRESHOLD',
+  'RATE_THRESHOLD_ASSET_ID',
+];
 
 const ensurePositiveNumber = (x: number, msg: string) => {
   if (x > 0) {
     return x;
   }
 
-  throw new Error(msg)
-}
+  throw new Error(msg);
+};
 
 const load = (): DataServiceConfig => {
   // assert all necessary env vars are set
@@ -83,16 +88,15 @@ const load = (): DataServiceConfig => {
   };
 
   const volumeThreshold = ensurePositiveNumber(
-    parseInt(
-      process.env.RATE_PAIR_ACCEPTANCE_VOLUME_THRESHOLD as string
-    ),
-    "RATE_PAIR_ACCEPTANCE_VOLUME_THRESHOLD environment variable should be a positive integer"
-  )
+    parseInt(process.env.RATE_PAIR_ACCEPTANCE_VOLUME_THRESHOLD as string),
+    'RATE_PAIR_ACCEPTANCE_VOLUME_THRESHOLD environment variable should be a positive integer'
+  );
 
   const rate: RatesConfig = {
     pairAcceptanceVolumeThreshold: volumeThreshold,
-    thresholdAssetId: process.env.RATE_THRESHOLD_ASSET_ID as string
-  }
+    thresholdAssetId: process.env.RATE_THRESHOLD_ASSET_ID as string,
+    rateBaseAssetId: process.env.RATE_BASE_ASSET_ID as string,
+  };
 
   if (
     typeof process.env.MATCHER_SETTINGS_URL !== 'undefined' &&

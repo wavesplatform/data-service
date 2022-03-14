@@ -6,9 +6,7 @@ import createAliasesService, { AliasesService } from './aliases';
 import createAliasesRepo from './aliases/repo';
 
 import createAssetsService, { AssetsService } from './assets';
-import createAssetsRepo, {
-  createCache as createAssetsCache,
-} from './assets/repo';
+import createAssetsRepo, { createCache as createAssetsCache } from './assets/repo';
 
 import createCandlesService, { CandlesService } from './candles';
 import createCandlesRepo from './candles/repo';
@@ -93,31 +91,34 @@ import { PairOrderingServiceImpl } from './PairOrderingService';
 
 import { PgDriver } from '../db/driver';
 import { EmitEvent } from './_common/createResolver/types';
-import {
-  Service,
-  RateMgetParams,
-  AssetIdsPair,
-  RateWithPairIds,
-} from '../types';
+import { Service, RateMgetParams, AssetIdsPair, RateWithPairIds } from '../types';
 import { RateCache } from './rates/repo';
 import { WithMoneyFormat } from './types';
 
 import { validatePairs } from './_common/validation/pairs';
-import { IThresholdAssetRateService, ThresholdAssetRateService } from './rates/ThresholdAssetRateService';
+import {
+  IThresholdAssetRateService,
+  ThresholdAssetRateService,
+} from './rates/ThresholdAssetRateService';
+import RemoteRateRepo from './rates/repo/impl/RemoteRateRepo';
 
+type WithEventBus = {
+  emitEvent: EmitEvent;
+};
 export type CommonRepoDependencies = {
   drivers: {
     pg: PgDriver;
   };
-  emitEvent: EmitEvent;
-};
+} & WithEventBus;
 
-export type RateSerivceCreatorDependencies = CommonRepoDependencies & {
+export type RateSerivceCreatorDependencies = WithEventBus & {
+  repo: RemoteRateRepo;
   cache: RateCache;
   assets: AssetsService;
   pairs: PairsService;
-  pairAcceptanceVolumeThreshold: number,
-  thresholdAssetRateService: IThresholdAssetRateService
+  pairAcceptanceVolumeThreshold: number;
+  thresholdAssetRateService: IThresholdAssetRateService;
+  baseAssetId: string;
 };
 
 export type ServiceMesh = {
@@ -168,174 +169,169 @@ export default ({
   }
 
   // @todo async init whatever is necessary
-  return PairOrderingServiceImpl.create(matcherConfig).map(
-    (pairOrderingService) => {
-      // caches
-      const ratesCache = new RateCacheImpl(200000, 60000); // 1 minute
-      const pairsCache = createPairsCache(1000, 5000);
-      const assetsCache = createAssetsCache(10000, 60000); // 1 minute
+  return PairOrderingServiceImpl.create(matcherConfig).map((pairOrderingService) => {
+    // caches
+    const ratesCache = new RateCacheImpl(200000, 60000); // 1 minute
+    const pairsCache = createPairsCache(1000, 5000);
+    const assetsCache = createAssetsCache(10000, 60000); // 1 minute
 
-      const commonDeps = {
-        drivers: {
-          pg: pgDriver,
-        },
-        emitEvent,
-      };
+    const commonDeps = {
+      drivers: {
+        pg: pgDriver,
+      },
+      emitEvent,
+    };
 
-      // common init services
-      const aliasesRepo = createAliasesRepo(commonDeps);
-      const aliases = createAliasesService(aliasesRepo);
+    // common init services
+    const aliasesRepo = createAliasesRepo(commonDeps);
+    const aliases = createAliasesService(aliasesRepo);
 
-      const assetsRepo = createAssetsRepo({
-        ...commonDeps,
-        cache: assetsCache,
-      });
-      const assets = createAssetsService(assetsRepo);
+    const assetsRepo = createAssetsRepo({
+      ...commonDeps,
+      cache: assetsCache,
+    });
+    const assets = createAssetsService(assetsRepo);
 
-      const pairsRepo = createPairsRepo({ ...commonDeps, cache: pairsCache });
-      const pairsNoAsyncValidation = createPairsService(
-        pairsRepo,
-        () => taskOf(undefined),
-        assets
-      );
-      const pairsWithAsyncValidation = createPairsService(
-        pairsRepo,
-        (matcher: string, pairs: AssetIdsPair[]) =>
-          validatePairs(assets.mget, pairOrderingService)(matcher, pairs),
-        assets
-      );
+    const pairsRepo = createPairsRepo({ ...commonDeps, cache: pairsCache });
+    const pairsNoAsyncValidation = createPairsService(
+      pairsRepo,
+      () => taskOf(undefined),
+      assets
+    );
+    const pairsWithAsyncValidation = createPairsService(
+      pairsRepo,
+      (matcher: string, pairs: AssetIdsPair[]) =>
+        validatePairs(assets.mget, pairOrderingService)(matcher, pairs),
+      assets
+    );
 
-      const thresholdAssetRateService = new ThresholdAssetRateService(options.thresholdAssetId, options.matcher.defaultMatcherAddress, pairsNoAsyncValidation, emitEvent('log'));
+    const thresholdAssetRateService = new ThresholdAssetRateService(
+      options.thresholdAssetId,
+      options.matcher.defaultMatcherAddress,
+      pairsNoAsyncValidation,
+      emitEvent('log')
+    );
 
-      const aliasTxsRepo = createAliasTxsRepo(commonDeps);
-      const aliasTxs = createAliasTxsService(aliasTxsRepo, assets);
-      const burnTxsRepo = createBurnTxsRepo(commonDeps);
-      const burnTxs = createBurnTxsService(burnTxsRepo, assets);
-      const dataTxsRepo = createDataTxsRepo(commonDeps);
-      const dataTxs = createDataTxsService(dataTxsRepo, assets);
-      const exchangeTxsRepo = createExchangeTxsRepo(commonDeps);
-      const exchangeTxs = createExchangeTxsService(exchangeTxsRepo, assets);
-      const genesisTxsRepo = createGenesisTxsRepo(commonDeps);
-      const genesisTxs = createGenesisTxsService(genesisTxsRepo, assets);
-      const invokeScriptTxsRepo = createInvokeScriptTxsRepo(commonDeps);
-      const invokeScriptTxs = createInvokeScriptTxsService(
-        invokeScriptTxsRepo,
-        assets
-      );
-      const issueTxsRepo = createIssueTxsRepo(commonDeps);
-      const issueTxs = createIssueTxsService(issueTxsRepo, assets);
-      const leaseTxsRepo = createLeaseTxsRepo(commonDeps);
-      const leaseTxs = createLeaseTxsService(leaseTxsRepo, assets);
-      const leaseCancelTxsRepo = createLeaseCancelTxsRepo(commonDeps);
-      const leaseCancelTxs = createLeaseCancelTxsService(
-        leaseCancelTxsRepo,
-        assets
-      );
-      const massTransferTxsRepo = createMassTransferTxsRepo(commonDeps);
-      const massTransferTxs = createMassTransferTxsService(
-        massTransferTxsRepo,
-        assets
-      );
-      const paymentTxsRepo = createPaymentTxsRepo(commonDeps);
-      const paymentTxs = createPaymentTxsService(paymentTxsRepo, assets);
-      const reissueTxsRepo = createReissueTxsRepo(commonDeps);
-      const reissueTxs = createReissueTxsService(reissueTxsRepo, assets);
-      const setAssetScriptTxsRepo = createSetAssetScriptTxsRepo(commonDeps);
-      const setAssetScriptTxs = createSetAssetScriptTxsService(
-        setAssetScriptTxsRepo,
-        assets
-      );
-      const setScriptTxsRepo = createSetScriptTxsRepo(commonDeps);
-      const setScriptTxs = createSetScriptTxsService(setScriptTxsRepo, assets);
-      const sponsorshipTxsRepo = createSponsorshipTxsRepo(commonDeps);
-      const sponsorshipTxs = createSponsorshipTxsService(
-        sponsorshipTxsRepo,
-        assets
-      );
-      const transferTxsRepo = createTransferTxsRepo(commonDeps);
-      const transferTxs = createTransferTxsService(transferTxsRepo, assets);
-      const updateAssetInfoRepo = createUpdateAssetInfoTxsRepo(commonDeps);
-      const updateAssetInfoTxs = createUpdateAssetInfoTxsService(
-        updateAssetInfoRepo,
-        assets
-      );
+    const aliasTxsRepo = createAliasTxsRepo(commonDeps);
+    const aliasTxs = createAliasTxsService(aliasTxsRepo, assets);
+    const burnTxsRepo = createBurnTxsRepo(commonDeps);
+    const burnTxs = createBurnTxsService(burnTxsRepo, assets);
+    const dataTxsRepo = createDataTxsRepo(commonDeps);
+    const dataTxs = createDataTxsService(dataTxsRepo, assets);
+    const exchangeTxsRepo = createExchangeTxsRepo(commonDeps);
+    const exchangeTxs = createExchangeTxsService(exchangeTxsRepo, assets);
+    const genesisTxsRepo = createGenesisTxsRepo(commonDeps);
+    const genesisTxs = createGenesisTxsService(genesisTxsRepo, assets);
+    const invokeScriptTxsRepo = createInvokeScriptTxsRepo(commonDeps);
+    const invokeScriptTxs = createInvokeScriptTxsService(invokeScriptTxsRepo, assets);
+    const issueTxsRepo = createIssueTxsRepo(commonDeps);
+    const issueTxs = createIssueTxsService(issueTxsRepo, assets);
+    const leaseTxsRepo = createLeaseTxsRepo(commonDeps);
+    const leaseTxs = createLeaseTxsService(leaseTxsRepo, assets);
+    const leaseCancelTxsRepo = createLeaseCancelTxsRepo(commonDeps);
+    const leaseCancelTxs = createLeaseCancelTxsService(leaseCancelTxsRepo, assets);
+    const massTransferTxsRepo = createMassTransferTxsRepo(commonDeps);
+    const massTransferTxs = createMassTransferTxsService(massTransferTxsRepo, assets);
+    const paymentTxsRepo = createPaymentTxsRepo(commonDeps);
+    const paymentTxs = createPaymentTxsService(paymentTxsRepo, assets);
+    const reissueTxsRepo = createReissueTxsRepo(commonDeps);
+    const reissueTxs = createReissueTxsService(reissueTxsRepo, assets);
+    const setAssetScriptTxsRepo = createSetAssetScriptTxsRepo(commonDeps);
+    const setAssetScriptTxs = createSetAssetScriptTxsService(
+      setAssetScriptTxsRepo,
+      assets
+    );
+    const setScriptTxsRepo = createSetScriptTxsRepo(commonDeps);
+    const setScriptTxs = createSetScriptTxsService(setScriptTxsRepo, assets);
+    const sponsorshipTxsRepo = createSponsorshipTxsRepo(commonDeps);
+    const sponsorshipTxs = createSponsorshipTxsService(sponsorshipTxsRepo, assets);
+    const transferTxsRepo = createTransferTxsRepo(commonDeps);
+    const transferTxs = createTransferTxsService(transferTxsRepo, assets);
+    const updateAssetInfoRepo = createUpdateAssetInfoTxsRepo(commonDeps);
+    const updateAssetInfoTxs = createUpdateAssetInfoTxsService(
+      updateAssetInfoRepo,
+      assets
+    );
 
-      const rates = createRateService({
-        ...commonDeps,
-        cache: ratesCache,
-        assets,
-        pairs: pairsNoAsyncValidation,
-        pairAcceptanceVolumeThreshold: options.pairAcceptanceVolumeThreshold,
-        thresholdAssetRateService: thresholdAssetRateService
-      });
+    const rateRepo = new RemoteRateRepo(commonDeps.drivers.pg);
 
-      const candlesRepo = createCandlesRepo(commonDeps);
-      const candlesNoAsyncValidation = createCandlesService(
-        candlesRepo,
-        () => taskOf(undefined),
-        assets
-      );
-      const candlesWithAsyncValidation = createCandlesService(
-        candlesRepo,
-        (matcher: string, pairs: AssetIdsPair[]) =>
-          validatePairs(assets.mget, pairOrderingService)(matcher, pairs),
-        assets
-      );
+    const rates = createRateService({
+      ...commonDeps,
+      repo: rateRepo,
+      cache: ratesCache,
+      assets,
+      pairs: pairsNoAsyncValidation,
+      pairAcceptanceVolumeThreshold: options.pairAcceptanceVolumeThreshold,
+      thresholdAssetRateService: thresholdAssetRateService,
+      baseAssetId: options.rateBaseAssetId,
+    });
 
-      // specific init services
-      // all txs service
-      const allTxsRepo = createAllTxsRepo(commonDeps);
-      const allTxs = createAllTxsService(allTxsRepo)({
-        1: genesisTxs,
-        2: paymentTxs,
-        3: issueTxs,
-        4: transferTxs,
-        5: reissueTxs,
-        6: burnTxs,
-        7: exchangeTxs,
-        8: leaseTxs,
-        9: leaseCancelTxs,
-        10: aliasTxs,
-        11: massTransferTxs,
-        12: dataTxs,
-        13: setScriptTxs,
-        14: sponsorshipTxs,
-        15: setAssetScriptTxs,
-        16: invokeScriptTxs,
-        17: updateAssetInfoTxs,
-      });
+    const candlesRepo = createCandlesRepo(commonDeps);
+    const candlesNoAsyncValidation = createCandlesService(
+      candlesRepo,
+      () => taskOf(undefined),
+      assets
+    );
+    const candlesWithAsyncValidation = createCandlesService(
+      candlesRepo,
+      (matcher: string, pairs: AssetIdsPair[]) =>
+        validatePairs(assets.mget, pairOrderingService)(matcher, pairs),
+      assets
+    );
 
-      return {
-        aliases,
-        assets,
-        candles: candlesNoAsyncValidation,
-        pairs: pairsNoAsyncValidation,
-        transactions: {
-          all: allTxs,
-          genesis: genesisTxs,
-          payment: paymentTxs,
-          issue: issueTxs,
-          transfer: transferTxs,
-          reissue: reissueTxs,
-          burn: burnTxs,
-          exchange: exchangeTxs,
-          lease: leaseTxs,
-          leaseCancel: leaseCancelTxs,
-          alias: aliasTxs,
-          massTransfer: massTransferTxs,
-          data: dataTxs,
-          setScript: setScriptTxs,
-          sponsorship: sponsorshipTxs,
-          setAssetScript: setAssetScriptTxs,
-          invokeScript: invokeScriptTxs,
-          updateAssetInfo: updateAssetInfoTxs,
-        },
-        matchers: {
-          rates,
-          candles: candlesWithAsyncValidation,
-          pairs: pairsWithAsyncValidation,
-        },
-      };
-    }
-  );
+    // specific init services
+    // all txs service
+    const allTxsRepo = createAllTxsRepo(commonDeps);
+    const allTxs = createAllTxsService(allTxsRepo)({
+      1: genesisTxs,
+      2: paymentTxs,
+      3: issueTxs,
+      4: transferTxs,
+      5: reissueTxs,
+      6: burnTxs,
+      7: exchangeTxs,
+      8: leaseTxs,
+      9: leaseCancelTxs,
+      10: aliasTxs,
+      11: massTransferTxs,
+      12: dataTxs,
+      13: setScriptTxs,
+      14: sponsorshipTxs,
+      15: setAssetScriptTxs,
+      16: invokeScriptTxs,
+      17: updateAssetInfoTxs,
+    });
+
+    return {
+      aliases,
+      assets,
+      candles: candlesNoAsyncValidation,
+      pairs: pairsNoAsyncValidation,
+      transactions: {
+        all: allTxs,
+        genesis: genesisTxs,
+        payment: paymentTxs,
+        issue: issueTxs,
+        transfer: transferTxs,
+        reissue: reissueTxs,
+        burn: burnTxs,
+        exchange: exchangeTxs,
+        lease: leaseTxs,
+        leaseCancel: leaseCancelTxs,
+        alias: aliasTxs,
+        massTransfer: massTransferTxs,
+        data: dataTxs,
+        setScript: setScriptTxs,
+        sponsorship: sponsorshipTxs,
+        setAssetScript: setAssetScriptTxs,
+        invokeScript: invokeScriptTxs,
+        updateAssetInfo: updateAssetInfoTxs,
+      },
+      matchers: {
+        rates,
+        candles: candlesWithAsyncValidation,
+        pairs: pairsWithAsyncValidation,
+      },
+    };
+  });
 };

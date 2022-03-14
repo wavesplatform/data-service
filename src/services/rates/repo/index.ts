@@ -6,7 +6,7 @@ import { CacheSync } from '../../../types';
 import {
   pairIsSymmetric,
   pairsEq,
-  createGeneratePossibleRequestItems,
+  createGeneratePossibleRequestItemsWithAsset,
 } from '../data';
 import { RateCacheKey } from './impl/RateCache';
 import { AssetPair, VolumeAwareRateInfo } from '../RateEstimator';
@@ -27,14 +27,15 @@ export const partitionByPreComputed = (
   pairs: AssetPair[],
   getCacheKey: (pair: AssetPair) => RateCacheKey,
   shouldCache: boolean,
-  wavesAsset: Asset
+  baseAsset: Asset
 ): PairsForRequest => {
-  const generatePossibleRequestItems = createGeneratePossibleRequestItems(
-    wavesAsset
-  );
-  const [eq, uneq] = partition(pairIsSymmetric, pairs);
+  const generatePossibleRequestItems =
+    createGeneratePossibleRequestItemsWithAsset(baseAsset);
+  // pair is symmetric if amountAsset == priceAsset
+  // therefore rate = 1, volume = 0
+  const [symmetric, asymmetric] = partition(pairIsSymmetric, pairs);
 
-  const eqRates: Array<VolumeAwareRateInfo> = eq.map((pair) => ({
+  const eqRates: Array<VolumeAwareRateInfo> = symmetric.map((pair) => ({
     rate: new BigNumber(1),
     volumeWaves: new BigNumber(0),
     ...pair,
@@ -42,7 +43,7 @@ export const partitionByPreComputed = (
 
   const allPairsToRequest = uniqWith(
     pairsEq,
-    chain((it) => generatePossibleRequestItems(it), uneq)
+    chain((it) => generatePossibleRequestItems(it), asymmetric)
   );
 
   if (shouldCache) {
@@ -51,9 +52,7 @@ export const partitionByPreComputed = (
       allPairsToRequest
     );
 
-    const cachedRates = cached.map((pair) =>
-      cache.get(getCacheKey(pair)).unsafeGet()
-    );
+    const cachedRates = cached.map((pair) => cache.get(getCacheKey(pair)).unsafeGet());
     return {
       preComputed: cachedRates.concat(eqRates),
       toBeRequested: uncached,

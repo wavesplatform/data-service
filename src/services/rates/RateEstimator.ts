@@ -8,7 +8,6 @@ import { collect } from '../../utils/collection';
 import { tap } from '../../utils/tap';
 import { isEmpty } from '../../utils/fp/maybeOps';
 import { RateInfo, RateMgetParams, RateWithPairIds } from '../../types';
-import { WavesId } from '../..';
 import { PairsService } from '../pairs';
 import { AssetsService } from '../assets';
 import { MoneyFormat } from '../types';
@@ -32,9 +31,10 @@ export type RateWithPair = RateInfo & AssetPair;
 export type VolumeAwareRateInfo = RateWithPair & { volumeWaves: BigNumber };
 
 export default class RateEstimator
-  implements
-  AsyncMget<RateMgetParams, ReqAndRes<AssetPair, RateWithPairIds>, AppError> {
+  implements AsyncMget<RateMgetParams, ReqAndRes<AssetPair, RateWithPairIds>, AppError>
+{
   constructor(
+    private readonly baseAssetId: string,
     private readonly cache: RateCache,
     private readonly remoteGet: AsyncMget<
       RateMgetParams,
@@ -45,14 +45,11 @@ export default class RateEstimator
     private readonly pairAcceptanceVolumeThreshold: number,
     private readonly thresholdAssetRateService: IThresholdAssetRateService,
     private readonly assetsService: AssetsService
-  ) { }
+  ) {}
 
   mget(
     request: RateMgetParams
-  ): Task<
-    AppError | DbError | Timeout,
-    ReqAndRes<AssetPair, RateWithPairIds>[]
-  > {
+  ): Task<AppError | DbError | Timeout, ReqAndRes<AssetPair, RateWithPairIds>[]> {
     const { pairs, timestamp, matcher } = request;
 
     const shouldCache = isEmpty(timestamp);
@@ -77,18 +74,23 @@ export default class RateEstimator
       return acc;
     }, new Array<string>());
 
-    ids.push(WavesId);
+    ids.push(this.baseAssetId);
 
     return this.assetsService.mget({ ids }).chain((ms) =>
       sequence<Maybe<Asset>, Maybe<Asset[]>>(maybeOf, ms).matchWith({
         Nothing: () =>
           rejected(
-            AppError.Validation('Some of the assets of specified pairs do not exist in the blockchain', {
-              ids: collect<Maybe<Asset>, number>((m, idx) => isEmpty(m) ? idx : undefined)(ms).map(idx => ids[idx])
-            })
+            AppError.Validation(
+              'Some of the assets of specified pairs do not exist in the blockchain',
+              {
+                ids: collect<Maybe<Asset>, number>((m, idx) =>
+                  isEmpty(m) ? idx : undefined
+                )(ms).map((idx) => ids[idx]),
+              }
+            )
           ) as any,
         Just: ({ value: assets }) => {
-          let wavesAsset = assets.pop() as Asset;
+          let baseAsset = assets.pop() as Asset;
 
           let pairsWithAssets = splitEvery(2, assets).map(
             ([amountAsset, priceAsset]) => ({
@@ -98,7 +100,7 @@ export default class RateEstimator
           );
 
           let assetsMap: Record<string, Asset> = {};
-          assetsMap[WavesId] = wavesAsset;
+          assetsMap[this.baseAssetId] = baseAsset;
           assets.forEach((asset) => {
             assetsMap[asset.id] = asset;
           });
@@ -108,7 +110,7 @@ export default class RateEstimator
             pairsWithAssets,
             getCacheKey,
             shouldCache,
-            wavesAsset
+            baseAsset
           );
 
           return this.remoteGet
@@ -125,7 +127,9 @@ export default class RateEstimator
                 .mget({
                   pairs: pairsWithRates,
                   matcher: request.matcher,
-                  moneyFormat: MoneyFormat.Long,
+                  // NB: affect volumeWaves, that is compared with threshold in RateInfoLookup
+                  // should be float mutually with mPairAcceptanceVolumeThreshold, passed to RateInfoLookup
+                  moneyFormat: MoneyFormat.Float,
                 })
                 .map((foundPairs) =>
                   foundPairs.map((itm, idx) =>
@@ -150,15 +154,19 @@ export default class RateEstimator
                 if (shouldCache) cacheAll(results);
               })
             )
-            .chain(
-              (data: Array<VolumeAwareRateInfo>) =>
-                this.thresholdAssetRateService.get().map(mThresholdAssetRate =>
+            .chain((data: Array<VolumeAwareRateInfo>) =>
+              this.thresholdAssetRateService.get().map(
+                (mThresholdAssetRate) =>
                   new RateInfoLookup(
                     data.concat(preComputed),
-                    mThresholdAssetRate.map(thresholdAssetRate => new BigNumber(this.pairAcceptanceVolumeThreshold).dividedBy(thresholdAssetRate).shiftedBy(wavesAsset.precision)),
-                    wavesAsset,
+                    mThresholdAssetRate.map((thresholdAssetRate) =>
+                      new BigNumber(this.pairAcceptanceVolumeThreshold).dividedBy(
+                        thresholdAssetRate
+                      )
+                    ),
+                    baseAsset
                   )
-                )
+              )
             )
             .map((lookup) =>
               pairsWithAssets.map((pair) => ({
