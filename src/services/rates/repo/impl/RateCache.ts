@@ -10,9 +10,11 @@ export type RateCacheKey = {
   matcher: string;
 };
 
-const keyFn = (matcher: string) => (pair: AssetPair): string => {
-  return `${matcher}::${pair.amountAsset.id}::${pair.priceAsset.id}`;
-};
+const keyFn =
+  (matcher: string) =>
+  (pair: AssetPair): string => {
+    return `${matcher}::${pair.amountAsset.id}::${pair.priceAsset.id}`;
+  };
 
 export default class RateCacheImpl implements RateCache {
   private readonly lru: LRU<string, VolumeAwareRateInfo>;

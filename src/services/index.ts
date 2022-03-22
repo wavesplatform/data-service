@@ -84,23 +84,22 @@ import createUpdateAssetInfoTxsService from './transactions/updateAssetInfo';
 import { UpdateAssetInfoTxsService } from './transactions/updateAssetInfo/types';
 import createUpdateAssetInfoTxsRepo from './transactions/updateAssetInfo/repo';
 
-import { DataServiceConfig } from '../loadConfig';
-import createRateService, { RateCacheImpl } from './rates';
-
-import { PairOrderingServiceImpl } from './PairOrderingService';
-
-import { PgDriver } from '../db/driver';
-import { EmitEvent } from './_common/createResolver/types';
-import { Service, RateMgetParams, AssetIdsPair, RateWithPairIds } from '../types';
+import createRateService, { RateCacheImpl, RatesMgetService } from './rates';
 import { RateCache } from './rates/repo';
-import { WithMoneyFormat } from './types';
-
-import { validatePairs } from './_common/validation/pairs';
 import {
   IThresholdAssetRateService,
   ThresholdAssetRateService,
 } from './rates/ThresholdAssetRateService';
 import RemoteRateRepo from './rates/repo/impl/RemoteRateRepo';
+
+import { PairOrderingServiceImpl } from './PairOrderingService';
+
+import { DataServiceConfig } from '../loadConfig';
+import { PgDriver } from '../db/driver';
+import { AssetIdsPair } from '../types';
+
+import { EmitEvent } from './_common/createResolver/types';
+import { validatePairs } from './_common/validation/pairs';
 
 type WithEventBus = {
   emitEvent: EmitEvent;
@@ -128,7 +127,7 @@ export type ServiceMesh = {
   matchers: {
     pairs: PairsService;
     candles: CandlesService;
-    rates: Service<RateMgetParams & WithMoneyFormat, RateWithPairIds[]>;
+    rates: RatesMgetService;
   };
   pairs: PairsService;
   transactions: {

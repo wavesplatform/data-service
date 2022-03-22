@@ -66,7 +66,7 @@ export default class RateEstimator
       }
     };
 
-    const cacheAll = (items: Array<VolumeAwareRateInfo>) =>
+    const cacheAllUnlessCached = (items: Array<VolumeAwareRateInfo>) =>
       items.forEach((it) => cacheUnlessCached(it));
 
     let ids = pairs.reduce((acc, cur) => {
@@ -151,7 +151,7 @@ export default class RateEstimator
             )
             .map(
               tap((results: Array<VolumeAwareRateInfo>) => {
-                if (shouldCache) cacheAll(results);
+                if (shouldCache) cacheAllUnlessCached(results);
               })
             )
             .chain((data: Array<VolumeAwareRateInfo>) =>
@@ -193,7 +193,7 @@ export default class RateEstimator
             .map((rs) =>
               rs.map((reqAndRes) => ({
                 ...reqAndRes,
-                res: reqAndRes.res.map((res) => ({
+                res: reqAndRes.res.map<RateWithPairIds>((res) => ({
                   ...res,
                   amountAsset: res.amountAsset.id,
                   priceAsset: res.priceAsset.id,

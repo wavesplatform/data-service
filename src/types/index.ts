@@ -15,11 +15,13 @@ export { Serializable, FromSerializable } from './serializable';
 
 export { Without, XOR } from './generic';
 
-export const fromMaybe = <A, B>(factory: (a?: A) => B) => (mb: Maybe<A>): B =>
-  mb.matchWith({
-    Just: ({ value }) => factory(value),
-    Nothing: () => factory(),
-  });
+export const fromMaybe =
+  <A, B>(factory: (a?: A) => B) =>
+  (mb: Maybe<A>): B =>
+    mb.matchWith({
+      Just: ({ value }) => factory(value),
+      Nothing: () => factory(),
+    });
 
 export type Items<Item> = {
   items: Item[];
@@ -33,9 +35,7 @@ export type SearchedItems<Item> = Items<Item> & {
 export type ServiceGetRequest<Id = string> = { id: Id };
 export type ServiceMgetRequest<Ids = string[]> = { ids: Ids };
 
-export type Service<Request, Response> = (
-  request: Request
-) => Task<AppError, Response>;
+export type Service<Request, Response> = (request: Request) => Task<AppError, Response>;
 
 export type RepoGetResponse<Response> = Maybe<Response>;
 export type RepoGet<Request, Response> = {
@@ -44,16 +44,12 @@ export type RepoGet<Request, Response> = {
 
 export type RepoMgetResponse<Response> = Maybe<Response>[];
 export type RepoMget<Request, Response> = {
-  readonly mget: (
-    request: Request
-  ) => Task<AppError, RepoMgetResponse<Response>>;
+  readonly mget: (request: Request) => Task<AppError, RepoMgetResponse<Response>>;
 };
 
 export type RepoSearchResponse<Response> = SearchedItems<Response>;
 export type RepoSearch<Request, Response> = {
-  readonly search: (
-    request: Request
-  ) => Task<AppError, RepoSearchResponse<Response>>;
+  readonly search: (request: Request) => Task<AppError, RepoSearchResponse<Response>>;
 };
 
 export type Repo<GetRequest, MgetRequest, SearchRequest, Response> = RepoGet<
@@ -78,8 +74,7 @@ export type AliasInfo = {
   address: string | null;
 };
 export type Alias = Serializable<'alias', AliasInfo | null>;
-export const alias = (data: AliasInfo | null): Alias =>
-  toSerializable('alias', data);
+export const alias = (data: AliasInfo | null): Alias => toSerializable('alias', data);
 
 export type CandleInfo = {
   time: Date;
@@ -126,12 +121,11 @@ export type PairInfo = {
   txsCount: number;
 };
 
-export type Pair = Serializable<'pair', PairInfo | null> &
-  Partial<AssetIdsPair>;
-export const pair = (
-  data: PairInfo | null,
-  pairData: AssetIdsPair | null
-): Pair => ({ ...toSerializable('pair', data), ...pairData });
+export type Pair = Serializable<'pair', PairInfo | null> & Partial<AssetIdsPair>;
+export const pair = (data: PairInfo | null, pairData: AssetIdsPair | null): Pair => ({
+  ...toSerializable('pair', data),
+  ...pairData,
+});
 
 // @todo TransactionInfo
 export enum DataEntryType {

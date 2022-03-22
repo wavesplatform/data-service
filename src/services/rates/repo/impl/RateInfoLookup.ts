@@ -92,12 +92,17 @@ export default class RateInfoLookup
     }, {});
   }
 
+  // Returns rate for requested pair
+  // If `flipped`, then it has to search for flipped assets pair,
+  // but has to response for requested pair
   private getFromLookupTable(
     pair: AssetPair,
     flipped: boolean,
     moneyFormat: MoneyFormat
   ): Maybe<VolumeAwareRateInfo> {
+    // src: A/B
     const lookupData = flipped ? flip(pair) : pair;
+    // lookup for: flipped ? B/A : A/B
 
     let foundValue = fromNullable<VolumeAwareRateInfo>(
       path([lookupData.amountAsset.id, lookupData.priceAsset.id], this.lookupTable)
@@ -105,7 +110,10 @@ export default class RateInfoLookup
 
     return foundValue.map((data) => {
       if (flipped) {
-        let flippedData = { ...data };
+        // found for: B/A
+        let flippedData = flip({ ...data });
+        // result for: A/B (src),
+        // otherwise 1/rate will be cached for rate B/A, but it incorrect
 
         if (moneyFormat === MoneyFormat.Long) {
           flippedData.rate = invOnSatoshi(flippedData.rate, 8)

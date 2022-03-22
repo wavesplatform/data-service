@@ -81,8 +81,6 @@ const ratesService = createRateService({
 });
 
 describe('Rates', () => {
-  beforeAll(async () => {});
-
   // Test case:
   // 1. Calculate thresholdWaves in Waves using thresholdAssetRateService and acceptance volume threshold
   // 2. Find pair P with volumeWaves greater or equal to thresholdWaves
