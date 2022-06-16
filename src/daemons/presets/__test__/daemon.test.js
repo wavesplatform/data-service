@@ -11,7 +11,7 @@ const createLogger = () => {
 
 describe('Preset for create daemon', () => {
   describe('Should started without any or all function', () => {
-    it('should throw exception if no loop', done => {
+    it.skip('should throw exception if no loop', done => {
       let logger = createLogger();
       let init = jest.fn(() => Task.of());
 
@@ -47,7 +47,7 @@ describe('Preset for create daemon', () => {
       setTimeout(() => d.cancel(), 20);
     });
 
-    it('should stop if no init and no loop', done => {
+    it.skip('should stop if no init and no loop', done => {
       let logger = createLogger();
 
       daemon({}, {}, 1000, 2000, logger)
@@ -108,7 +108,7 @@ describe('Preset for create daemon', () => {
       setTimeout(() => d.cancel(), 140);
     });
 
-    it('should throw exception when timeout expired', done => {
+    it.skip('should throw exception when timeout expired', done => {
       let loop = jest.fn(() =>
         Task.task(resolver => setTimeout(resolver.resolve, 10000))
       );
