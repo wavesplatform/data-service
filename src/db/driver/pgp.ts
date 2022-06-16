@@ -5,7 +5,14 @@ import * as pgPromise from 'pg-promise';
 
 import { toBigNumber } from '../../utils/bigNumber';
 
-const pgp: IMain = pgPromise();
+// 1) add import
+import { attach } from 'pg-monitor';
+// 2) create empty object
+const i = {}
+// 3) pass it
+const pgp: IMain = pgPromise(i);
+// 4) attach to it
+attach(i);
 
 const parsePgArray = compose<string, string, string, string[]>(
   split(','),

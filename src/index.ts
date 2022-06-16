@@ -25,6 +25,8 @@ const app = unsafeKoaQs(new Koa());
 
 const options = loadConfig();
 
+console.log(options);
+
 const eventBus = createEventBus();
 
 createAndSubscribeLogger({ options, eventBus });

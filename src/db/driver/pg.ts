@@ -66,7 +66,13 @@ export const createPgDriver = (
     one: <T>(query: SqlQuery, values?: any) =>
       toTasked<T>(() => driverP.one(query, values)),
     oneOrNone: <T>(query: SqlQuery, values?: any) =>
-      toTasked<T>(() => driverP.oneOrNone(query, values)),
+      toTasked<T>(() => {
+        console.log("src/db/driver/pg.ts:72", query, values);
+        return driverP.oneOrNone(query, values).then(res => {
+          console.log("src/db/driver/pg.ts:74", res);
+          return res;
+        })
+      }),
     many: <T>(query: SqlQuery, values?: any) =>
       toTasked<T[]>(() => driverP.many(query, values)),
     any: <T>(query: SqlQuery, values?: any) =>
