@@ -21,6 +21,7 @@ const orderTypes = (prefix: string) => ({
     .required(),
   [`${prefix}_signature`]: Joi.string()
     .base58()
+    .allow('')
     .required(),
   [`${prefix}_matcher_fee`]: Joi.object()
     .bignumber()
