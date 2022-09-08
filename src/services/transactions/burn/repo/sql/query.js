@@ -1,6 +1,6 @@
 const pg = require('knex')({ client: 'pg' });
 
-const select = pg({ t: 'txs_6' }).select('*');
+const select = pg({ t: 'txs_6' });
 
 const selectFromFiltered = (filtered) =>
   filtered.select({
