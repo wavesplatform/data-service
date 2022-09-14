@@ -37,7 +37,9 @@ const columns = {
   o1_amount: pg.raw("(t.order1->>'amount')::double precision"),
   o1_matcher_fee: pg.raw("(t.order1->>'matcherFee')::double precision"),
   o1_matcher_fee_asset_id: pg.raw("t.order1->>'matcherFeeAssetId'"),
-
+  o1_price_mode: pg.raw("t.order1->>'priceMode'"),
+  o1_eip712signature: pg.raw("t.order1->>'eip712Signature'"),
+  
   o2_id: pg.raw("t.order2->>'id'"),
   o2_version: pg.raw("t.order2->>'version'"),
   o2_time_stamp: pg.raw("text_timestamp_cast(t.order2->>'timestamp')"),
@@ -50,6 +52,8 @@ const columns = {
   o2_amount: pg.raw("(t.order2->>'amount')::double precision"),
   o2_matcher_fee: pg.raw("(t.order2->>'matcherFee')::double precision"),
   o2_matcher_fee_asset_id: pg.raw("t.order2->>'matcherFeeAssetId'"),
+  o2_price_mode: pg.raw("t.order1->>'priceMode'"),
+  o2_eip712signature: pg.raw("t.order1->>'eip712Signature'"),
 };
 
 const select = pg({ t: 'txs_7' });

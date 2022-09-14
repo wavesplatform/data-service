@@ -39,6 +39,11 @@ export type ExchangeTxDbResponse = RawTx & {
   o2_matcher_fee_asset_id: string;
 };
 
+export enum OrderPriceMode {
+  AssetDecimals = 'assetDecimals',
+  FixedDecimals = 'fixedDecimals',
+}
+
 export enum OrderType {
   Buy = 'buy',
   Sell = 'sell',
@@ -46,7 +51,7 @@ export enum OrderType {
 
 type Order = {
   id: string;
-  version: string;
+  version: number;
   orderType: OrderType;
   sender: string;
   senderPublicKey: string;
@@ -60,7 +65,9 @@ type Order = {
   assetPair: {
     amountAsset: string;
     priceAsset: string;
-  }
+  },
+  eip712Signature?: string | null;
+  priceMode?: OrderPriceMode | null;
 };
 
 export type ExchangeTx = Tx & {
