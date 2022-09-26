@@ -405,7 +405,7 @@ Object {
   "open": "0.01",
   "quoteVolume": "3.3000442",
   "time": 2018-11-01T00:00:00.000Z,
-  "timeClose": 2018-11-01T00:00:59.999Z,
+  "timeClose": 2018-11-01T23:59:59.999Z,
   "txsCount": 20,
   "volume": "2842",
   "weightedAveragePrice": "0.0011",
