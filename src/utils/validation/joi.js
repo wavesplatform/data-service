@@ -33,6 +33,7 @@ module.exports = rawJoi
       base64Prefixed: 'must be a string of "base64:${base64EncodedString}"',
       noNullChars: 'must not contain unicode null characters',
       saneForDbLike: 'must not end with unescaped slash symbol',
+      eip712Signature: 'must be a hex-encoded string starting with `0x`',
       pair: 'must be a valid pair string',
       period: {
         value: 'interval must be a valid interval value',
@@ -58,6 +59,9 @@ module.exports = rawJoi
       regexRule(joi, 'saneForDbLike', [
         { regex: regex.saneForDbLike, errorCode: 'string.saneForDbLike' },
         { regex: regex.noNullChars, errorCode: 'string.noNullChars' },
+      ]),
+      regexRule(joi, 'eip712Signature', [
+        { regex: regex.eip712Signature, errorCode: 'string.eip712Signature' },
       ]),
       {
         name: 'base64Prefixed',

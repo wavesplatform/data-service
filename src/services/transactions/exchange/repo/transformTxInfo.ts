@@ -8,7 +8,7 @@ import { ExchangeTx, ExchangeTxDbResponse } from './types';
 
 const createOrder = (prefix: string) => <T extends Record<string, any>>({
   [`${prefix}_id`]: id,
-  [`${prefix}_version`]: version,
+  [`${prefix}_version`]: versionStr,
   [`${prefix}_sender_public_key`]: senderPublicKey,
   [`${prefix}_sender`]: sender,
   [`${prefix}_type`]: orderType,
@@ -19,12 +19,17 @@ const createOrder = (prefix: string) => <T extends Record<string, any>>({
   [`${prefix}_signature`]: signature,
   [`${prefix}_matcher_fee`]: matcherFee,
   [`${prefix}_matcher_fee_asset_id`]: matcherFeeAssetId,
+  [`${prefix}_price_mode`]: priceMode,
+  [`${prefix}_eip712signature`]: eip712Signature,
   price_asset: priceAsset,
   amount_asset: amountAsset,
   sender_public_key: matcherPublicKey,
 }: T) => {
-  const tx = {
+  const version = parseInt(versionStr) || 1;
+
+  const o: any = {
     id,
+    version,
     senderPublicKey,
     matcherPublicKey,
     assetPair: {
@@ -40,7 +45,15 @@ const createOrder = (prefix: string) => <T extends Record<string, any>>({
     matcherFee,
     signature,
   };
-  return version === '3' ? { ...tx, matcherFeeAssetId } : tx;
+  
+  if (version > 2) o.matcherFeeAssetId = matcherFeeAssetId;
+
+  if (version > 3) {
+    o.priceMode = priceMode;
+    o.eip712Signature = eip712Signature;
+  }
+
+  return o;
 };
 
 type ExchangeTxFields = {
