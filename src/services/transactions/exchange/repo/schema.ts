@@ -1,6 +1,6 @@
 import { Joi } from '../../../../utils/validation';
-
 import commonFields from '../../_common/commonFieldsSchemas';
+import { OrderPriceMode, OrderType } from './types';
 
 const orderTypes = (prefix: string) => ({
   [`${prefix}_id`]: Joi.string()
@@ -11,7 +11,7 @@ const orderTypes = (prefix: string) => ({
     .required()
     .allow(null),
   [`${prefix}_type`]: Joi.string()
-    .noNullChars()
+    .valid(OrderType.Buy, OrderType.Sell)
     .required(),
   [`${prefix}_sender`]: Joi.string()
     .base58()
@@ -21,8 +21,8 @@ const orderTypes = (prefix: string) => ({
     .required(),
   [`${prefix}_signature`]: Joi.string()
     .base58()
-    .allow('')
-    .required(),
+    .required()
+    .allow(""),
   [`${prefix}_matcher_fee`]: Joi.object()
     .bignumber()
     .required(),
@@ -40,6 +40,12 @@ const orderTypes = (prefix: string) => ({
     .required(),
   [`${prefix}_matcher_fee_asset_id`]: Joi.string()
     .assetId()
+    .allow(null),
+  [`${prefix}_eip712signature`]: Joi.string()
+    .eip712Signature()
+    .allow(null),
+  [`${prefix}_price_mode`]: Joi.string()
+    .valid(OrderPriceMode.AssetDecimals, OrderPriceMode.FixedDecimals)
     .allow(null),
 });
 

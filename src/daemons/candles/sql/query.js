@@ -62,7 +62,14 @@ const selectExchanges = pg({ t: 'txs_7' }).select({
   height: 't.height',
   candle_time: pgRawDateTrunc('t.time_stamp')('minute'),
   amount: 't.amount',
-  price: 't.price',
+  price: pg.raw(`
+    CASE WHEN t.tx_version > 2
+      THEN t.price::numeric
+        * 10^(select decimals from assets where asset_id = t.price_asset_id)
+        * 10^(select -decimals from assets where asset_id = t.amount_asset_id)
+      ELSE t.price::numeric
+    END
+  `),
 });
 
 /** selectExchangesAfterTimestamp :: Date -> QueryBuilder */
