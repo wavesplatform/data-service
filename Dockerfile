@@ -7,6 +7,11 @@ ADD package-lock.json /tmp/package-lock.json
 RUN cd /tmp && npm install
 RUN mkdir -p /opt/dataservice && cp -a /tmp/node_modules /opt/dataservice
 
+# pg-native 
+RUN apk --no-cache add make python gcc postgresql-dev g++
+RUN npm install pg-native
+ENV NODE_PG_FORCE_NATIVE 1
+
 # set work dir
 WORKDIR /opt/dataservice
 ADD . /opt/dataservice

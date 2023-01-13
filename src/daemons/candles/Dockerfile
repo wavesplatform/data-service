@@ -7,6 +7,11 @@ ADD package-lock.json /tmp/package-lock.json
 RUN cd /tmp && npm install
 RUN mkdir -p /opt/app && cp -a /tmp/node_modules /opt/app
 
+# pg-native 
+RUN apk --no-cache add make python gcc postgresql-dev g++
+RUN npm install pg-native
+ENV NODE_PG_FORCE_NATIVE 1
+
 # set work dir
 WORKDIR /opt/app
 ADD . /opt/app
