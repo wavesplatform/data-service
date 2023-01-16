@@ -1,16 +1,14 @@
 FROM node:10-alpine
 
+# pg-native 
+RUN apk --no-cache add make python gcc postgresql-dev g++
+
 # enable node_modules caching layer
 RUN apk add --no-cache tini git
 ADD package.json /tmp/package.json
 ADD package-lock.json /tmp/package-lock.json
 RUN cd /tmp && npm install
 RUN mkdir -p /opt/app && cp -a /tmp/node_modules /opt/app
-
-# pg-native 
-RUN apk --no-cache add make python gcc postgresql-dev g++
-RUN npm install pg-native
-ENV NODE_PG_FORCE_NATIVE 1
 
 # set work dir
 WORKDIR /opt/app
@@ -23,5 +21,4 @@ ENTRYPOINT ["/sbin/tini", "--"]
 
 # NodeJS launch
 USER node
-ENV NODE_ENV production
-CMD ["node", "--max-old-space-size=2048", "dist/daemons/pairs/index.js"]
+CMD ["npm", "run", "pairs"]
