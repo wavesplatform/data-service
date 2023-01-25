@@ -12,7 +12,7 @@ import { DEFAULT_MAX_LIMIT } from './';
 import { CommonFilters } from './types';
 
 // default limit is 100
-const limitFilter =
+export const limit =
   (max: number): CommonFilters['limit'] =>
   (raw) => {
     if (isNil(raw)) {
@@ -30,25 +30,25 @@ const limitFilter =
   };
 
 // default sort is SortOrder.Descending
-const sortFilter: CommonFilters['sort'] = (s) =>
+const sort: CommonFilters['sort'] = (s) =>
   typeof s === 'undefined'
     ? ok(undefined)
     : isSortOrder(s)
     ? ok(s)
     : error(new ParseError(new Error('Invalid sort value')));
 
-const afterFilter: CommonFilters['after'] = parseTrimmedStringIfDefined;
+const after: CommonFilters['after'] = parseTrimmedStringIfDefined;
 
 export default {
   timeStart: parseDate,
   timeEnd: parseDate,
   blockTimeStart: parseDate,
   blockTimeEnd: parseDate,
-  limit: limitFilter(DEFAULT_MAX_LIMIT),
+  limit: limit(DEFAULT_MAX_LIMIT),
   sender: parseTrimmedStringIfDefined,
   senders: parseArrayQuery,
-  sort: sortFilter,
-  after: afterFilter,
+  sort,
+  after,
   ids: parseArrayQuery,
   query: parseTrimmedStringIfDefined,
 };

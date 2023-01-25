@@ -11,8 +11,10 @@ import { parseArrayQuery, parseBool, parsePairs } from '../../utils/parsers';
 import { ParseArrayQuery } from '../../utils/parsers/parseArrayQuery';
 import { parseFilterValues } from '../_common/filters';
 import { ParsedFilterValues, Parser } from '../_common/filters/types';
-import commonFilters from '../_common/filters/filters';
+import commonFilters, { limit } from '../_common/filters/filters';
 import { withMatcher } from '../_common/utils';
+
+const PAIRS_MAX_LIMIT = 1000;
 
 export type ParseMatchExactly = Parser<boolean[]>;
 export const parseMatchExactly: ParseMatchExactly = (
@@ -40,6 +42,7 @@ export const mgetOrSearchParser = parseFilterValues({
   match_exactly: parseMatchExactly,
   search_by_asset: commonFilters.query,
   search_by_assets: parseArrayQuery as ParseArrayQuery, // merge function type and overloads
+  limit: limit(PAIRS_MAX_LIMIT),
 });
 
 type ParserFnType = typeof mgetOrSearchParser;
