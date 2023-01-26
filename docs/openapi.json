@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "version": "0.32.0",
+    "version": "0.36.0",
     "title": "Waves Data Service",
     "description": "This is a a public Waves Data Services API documentation. The goal of the API is to provide a simple and convenient way to get data from Waves blockchain."
   },
@@ -3244,95 +3244,6 @@
             }
           }
         ],
-        "responses": {
-          "200": {
-            "description": "List of alias transactions satisfying provided filters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ListOfTxAlias"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "transactions"
-        ],
-        "summary": "Get a list of alias transactions by applying filters",
-        "operationId": "postSearchTxsAlias",
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "ids": {
-                    "type": "array",
-                    "description": "Transaction IDs array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "sender": {
-                    "type": "string",
-                    "description": "Address-sender of the transaction"
-                  },
-                  "timeStart": {
-                    "oneOf": [
-                      {
-                        "type": "string",
-                        "format": "date-time"
-                      },
-                      {
-                        "type": "number"
-                      }
-                    ],
-                    "description": "Time range filter, start. Defaults to first transaction's time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)",
-                    "example": "2019-01-01T00:00:00.000"
-                  },
-                  "timeEnd": {
-                    "oneOf": [
-                      {
-                        "type": "string",
-                        "format": "date-time"
-                      },
-                      {
-                        "type": "number"
-                      }
-                    ],
-                    "description": "Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)",
-                    "example": "2020-01-01T00:00:00.000"
-                  },
-                  "after": {
-                    "type": "string",
-                    "description": "Cursor in base64 encoding. Holds information about timestamp, id, sort."
-                  },
-                  "sort": {
-                    "type": "string",
-                    "description": "Sort order. Gonna be rewritten by cursor's sort if present.",
-                    "enum": [
-                      "asc",
-                      "desc"
-                    ],
-                    "default": "desc"
-                  },
-                  "limit": {
-                    "type": "integer",
-                    "description": "How many transactions to await in response.",
-                    "minimum": 1,
-                    "maximum": 100,
-                    "default": 100,
-                    "example": 100
-                  }
-                }
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "List of alias transactions satisfying provided filters",
