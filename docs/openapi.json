@@ -4703,7 +4703,7 @@
         "tags": [
           "transactions"
         ],
-        "summary": "Get a Invoke-script transaction info by id",
+        "summary": "Get an Invoke-script transaction info by id",
         "operationId": "getTxsInvokeScript",
         "parameters": [
           {
@@ -4957,6 +4957,510 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ListOfTxInvokeScript"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/transactions/update-asset-info/{id}": {
+      "get": {
+        "tags": [
+          "transactions"
+        ],
+        "summary": "Get an Update asset info transaction by id",
+        "operationId": "getTxsUpdateAssetInfo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "transaction ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Update asset info transaction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TxUpdateAssetInfo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Transaction not found"
+          }
+        }
+      }
+    },
+    "/transactions/update-asset-info": {
+      "get": {
+        "tags": [
+          "transactions"
+        ],
+        "summary": "Get a list of Update asset info transactions by applying filters",
+        "operationId": "searchTxsUpdateAssetInfo",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "ids",
+            "description": "Transaction IDs array",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "in": "query",
+            "name": "sender",
+            "description": "Address-sender of the transaction; has exclusive relation with senders",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "senders",
+            "description": "Array of address-senders of the transaction; has exclusive relation with sender",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "in": "query",
+            "name": "timeStart",
+            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)",
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "timeEnd",
+            "description": "Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)",
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "after",
+            "description": "Cursor in base64 encoding. Holds information about timestamp, id, sort.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "description": "Sort order. Gonna be rewritten by cursor's sort if present.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "How many transactions to await in response.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of UpdateAssetInfo transactions satisfying provided filters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListOfTxUpdateAssetInfo"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "transactions"
+        ],
+        "summary": "Get a list of Update asset info transactions by applying filters",
+        "operationId": "postSearchTxsUpdateAssetInfo",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "description": "Transaction IDs array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "sender": {
+                    "type": "string",
+                    "description": "Address-sender of the transaction"
+                  },
+                  "timeStart": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ],
+                    "description": "Time range filter, start. Defaults to first transaction's time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)",
+                    "example": "2019-01-01T00:00:00.000"
+                  },
+                  "timeEnd": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ],
+                    "description": "Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)",
+                    "example": "2020-01-01T00:00:00.000"
+                  },
+                  "after": {
+                    "type": "string",
+                    "description": "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+                  },
+                  "sort": {
+                    "type": "string",
+                    "description": "Sort order. Gonna be rewritten by cursor's sort if present.",
+                    "enum": [
+                      "asc",
+                      "desc"
+                    ],
+                    "default": "desc"
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "description": "How many transactions to await in response.",
+                    "minimum": 1,
+                    "maximum": 100,
+                    "default": 100,
+                    "example": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "List of UpdateAssetInfo transactions satisfying provided filters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListOfTxUpdateAssetInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/transactions/ethereum-like/{id}": {
+      "get": {
+        "tags": [
+          "transactions"
+        ],
+        "summary": "Get an Ethereum-like info transaction info by id",
+        "operationId": "getTxsEthereumLike",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "transaction ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ethereum-like transaction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TxEthereumLike"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Transaction not found"
+          }
+        }
+      }
+    },
+    "/transactions/ethereum-like": {
+      "get": {
+        "tags": [
+          "transactions"
+        ],
+        "summary": "Get a list of Ethereum-like transactions by applying filters",
+        "operationId": "searchTxsEthereumLike",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "ids",
+            "description": "Transaction IDs array",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "in": "query",
+            "name": "sender",
+            "description": "Address-sender of the transaction; has exclusive relation with senders",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "senders",
+            "description": "Array of address-senders of the transaction; has exclusive relation with sender",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "in": "query",
+            "name": "timeStart",
+            "description": "Time range filter, start. Defaults to first transaction's time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)",
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "timeEnd",
+            "description": "Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)",
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "description": "Transaction type.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "invocation",
+                "transfer"
+              ],
+            }
+          },
+          {
+            "in": "query",
+            "name": "function",
+            "description": "Search transactions by the called function name. Only for `invocation` type transactions.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "after",
+            "description": "Cursor in base64 encoding. Holds information about timestamp, id, sort.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "description": "Sort order. Gonna be rewritten by cursor's sort if present.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "How many transactions to await in response.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of EthereumLike transactions satisfying provided filters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListOfTxEthereumLike"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "transactions"
+        ],
+        "summary": "Get a list of Ethereum-like transactions by applying filters",
+        "operationId": "postSearchTxsEthereumLike",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "description": "Transaction IDs array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "sender": {
+                    "type": "string",
+                    "description": "Address-sender of the transaction"
+                  },
+                  "timeStart": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ],
+                    "description": "Time range filter, start. Defaults to first transaction's time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)",
+                    "example": "2019-01-01T00:00:00.000"
+                  },
+                  "timeEnd": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ],
+                    "description": "Time range filter, end. Defaults to now. (ISO-8601 or timestamp in milliseconds, UTC)",
+                    "example": "2020-01-01T00:00:00.000"
+                  },
+                  "after": {
+                    "type": "string",
+                    "description": "Cursor in base64 encoding. Holds information about timestamp, id, sort."
+                  },
+                  "sort": {
+                    "type": "string",
+                    "description": "Sort order. Gonna be rewritten by cursor's sort if present.",
+                    "enum": [
+                      "asc",
+                      "desc"
+                    ],
+                    "default": "desc"
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "description": "How many transactions to await in response.",
+                    "minimum": 1,
+                    "maximum": 100,
+                    "default": 100,
+                    "example": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "List of UpdateAssetInfo transactions satisfying provided filters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListOfTxUpdateAssetInfo"
                 }
               }
             }
@@ -5829,6 +6333,9 @@
               "signature": {
                 "type": "string"
               },
+              "applicationStatus": {
+                "type": "string"
+              },
               "order1": {
                 "$ref": "#/components/schemas/Order"
               },
@@ -5923,6 +6430,9 @@
                 "items": {
                   "type": "string"
                 }
+              },
+              "applicationStatus": {
+                "type": "string"
               },
               "data": {
                 "type": "array",
@@ -6024,6 +6534,9 @@
                   "type": "string"
                 }
               },
+              "applicationStatus": {
+                "type": "string"
+              },
               "assetId": {
                 "type": "string"
               },
@@ -6096,6 +6609,9 @@
                   "type": "string"
                 }
               },
+              "applicationStatus": {
+                "type": "string"
+              },
               "recipient": {
                 "type": "string"
               },
@@ -6157,6 +6673,9 @@
                   "type": "string"
                 }
               },
+              "applicationStatus": {
+                "type": "string"
+              },
               "recipient": {
                 "type": "string"
               },
@@ -6211,6 +6730,9 @@
                   "type": "string"
                 }
               },
+              "applicationStatus": {
+                "type": "string"
+              },
               "leaseId": {
                 "type": "string"
               }
@@ -6263,6 +6785,9 @@
                   "type": "string"
                 }
               },
+              "applicationStatus": {
+                "type": "string"
+              },
               "script": {
                 "type": "string"
               }
@@ -6314,6 +6839,9 @@
                 "items": {
                   "type": "string"
                 }
+              },
+              "applicationStatus": {
+                "type": "string"
               },
               "recipient": {
                 "type": "string"
@@ -6369,6 +6897,9 @@
                 "items": {
                   "type": "string"
                 }
+              },
+              "applicationStatus": {
+                "type": "string"
               },
               "assetId": {
                 "type": "string"
@@ -6440,6 +6971,9 @@
                   "type": "string"
                 }
               },
+              "applicationStatus": {
+                "type": "string"
+              },
               "assetId": {
                 "type": "string"
               },
@@ -6498,6 +7032,9 @@
                   "type": "string"
                 }
               },
+              "applicationStatus": {
+                "type": "string"
+              },
               "assetId": {
                 "type": "string"
               },
@@ -6552,6 +7089,9 @@
                 "items": {
                   "type": "string"
                 }
+              },
+              "applicationStatus": {
+                "type": "string"
               },
               "assetId": {
                 "type": "string"
@@ -6608,6 +7148,9 @@
                   "type": "string"
                 }
               },
+              "applicationStatus": {
+                "type": "string"
+              },
               "alias": {
                 "type": "string"
               }
@@ -6656,6 +7199,9 @@
                 "items": {
                   "type": "string"
                 }
+              },
+              "applicationStatus": {
+                "type": "string"
               },
               "recipient": {
                 "type": "string"
@@ -6712,6 +7258,9 @@
                   "type": "string"
                 }
               },
+              "applicationStatus": {
+                "type": "string"
+              },
               "assetId": {
                 "type": "string"
               },
@@ -6766,6 +7315,9 @@
                 "items": {
                   "type": "string"
                 }
+              },
+              "applicationStatus": {
+                "type": "string"
               },
               "dApp": {
                 "type": "string"
@@ -6830,6 +7382,135 @@
                     },
                     "assetId": {
                       "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "TxUpdateAssetInfo": {
+        "type": "object",
+        "properties": {
+          "__type": {
+            "type": "string",
+            "example": "transaction"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "height": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "type": {
+                "type": "integer"
+              },
+              "id": {
+                "type": "string"
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "signature": {
+                "type": "string"
+              },
+              "proofs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "version": {
+                "type": "integer"
+              },
+              "fee": {
+                "type": "number"
+              },
+              "applicationStatus": {
+                "type": "string"
+              },
+              "sender": {
+                "type": "string"
+              },
+              "senderPublicKey": {
+                "type": "string"
+              },
+              "assetId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "TxEthereumLike": {
+        "type": "object",
+        "properties": {
+          "__type": {
+            "type": "string",
+            "example": "transaction"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "height": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "type": {
+                "type": "integer"
+              },
+              "id": {
+                "type": "string"
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "proofs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "version": {
+                "type": "integer"
+              },
+              "fee": {
+                "type": "number"
+              },
+              "applicationStatus": {
+                "type": "string"
+              },
+              "sender": {
+                "type": "string"
+              },
+              "senderPublicKey": {
+                "type": "string"
+              },
+              "bytes": {
+                "type": "string",
+              },
+              "payload": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string"
+                  },
+                  "call": {
+                    "type": "object",
+                    "properties": {
+                      "function": {
+                        "type": "string"
+                      }
                     }
                   }
                 }
@@ -7446,6 +8127,58 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TxInvokeScript"
+            }
+          },
+          "lastCursor": {
+            "type": "string",
+            "example": "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          },
+          "isLastPage": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ListOfTxUpdateAssetInfo": {
+        "type": "object",
+        "required": [
+          "__type",
+          "data"
+        ],
+        "properties": {
+          "__type": {
+            "type": "string",
+            "example": "list"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TxUpdateAssetInfo"
+            }
+          },
+          "lastCursor": {
+            "type": "string",
+            "example": "U2F0IEp1biAwMiAyMDE4IDE0OjAxOjQ1IEdNVCswMzAwIChNU0spOjozUHVrdnJzN2FwN1ZmQVlyTHlpZlNvZ0xYM0NuTVV4c0VFbmhuNk40WUVHWjo6YXNj"
+          },
+          "isLastPage": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ListOfTxEthereumLike": {
+        "type": "object",
+        "required": [
+          "__type",
+          "data"
+        ],
+        "properties": {
+          "__type": {
+            "type": "string",
+            "example": "list"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TxEthereumLike"
             }
           },
           "lastCursor": {
