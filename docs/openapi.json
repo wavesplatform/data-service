@@ -5040,6 +5040,14 @@
           },
           {
             "in": "query",
+            "name": "assetId",
+            "description": "Filter transactions by assetId",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
             "name": "timeStart",
             "description": "Time range filter, start. Defaults to first transaction's time_stamp in db. (ISO-8601 or timestamp in milliseconds, UTC)",
             "schema": {
