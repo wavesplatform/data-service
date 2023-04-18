@@ -17,7 +17,7 @@ const selectFromFiltered = (filtered) =>
     sender: 't.sender',
     sender_public_key: 't.sender_public_key',
 
-    bytes: 't.payload', // todo rename in DB
+    bytes: 't.bytes',
     function_name: 't.function_name',
   });
 
