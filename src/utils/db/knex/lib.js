@@ -5,21 +5,25 @@ const hasMethod = curryN(
   (method, x) => (x && x[method] && type(x[method]) === 'Function') || false
 );
 
-const createPointfree = method => (...args) => {
-  const instanceIdx = findIndex(hasMethod(method), args);
+const createPointfree =
+  (method) =>
+  (...args) => {
+    const instanceIdx = findIndex(hasMethod(method), args);
 
-  if (instanceIdx !== -1) {
-    return args[instanceIdx].clone()[method](...slice(0, instanceIdx, args));
-  } else {
-    return (...args2) => createPointfree(method)(...concat(args, args2));
-  }
-};
+    if (instanceIdx !== -1) {
+      return args[instanceIdx].clone()[method](...slice(0, instanceIdx, args));
+    } else {
+      return (...args2) => createPointfree(method)(...concat(args, args2));
+    }
+  };
 
 module.exports = {
   hasMethod,
   where: createPointfree('where'),
   whereIn: createPointfree('whereIn'),
   whereRaw: createPointfree('whereRaw'),
+  whereNull: createPointfree('whereNull'),
+  whereNotNull: createPointfree('whereNotNull'),
   limit: createPointfree('limit'),
   orWhere: createPointfree('orWhere'),
   orderBy: createPointfree('orderBy'),

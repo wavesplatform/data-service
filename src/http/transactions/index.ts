@@ -2,11 +2,7 @@ import * as Router from 'koa-router';
 import { ServiceMesh } from '../../services';
 import commonFilters from '../_common/filters/filters';
 import { Parser } from '../_common/filters/types';
-import {
-  createTransactionHttpHandlers,
-  parseGet,
-  parseMgetOrSearch,
-} from './_common';
+import { createTransactionHttpHandlers, parseGet, parseMgetOrSearch } from './_common';
 import { parseDataMgetOrSearch } from './parseDataMgetOrSearch';
 
 const createParseRequest = <SearchRequest>(
@@ -22,40 +18,70 @@ export default (txsServices: ServiceMesh['transactions']) => {
   const all = createTransactionHttpHandlers(
     new Router(),
     '/transactions/all',
-    txsServices['all'],
+    txsServices.all,
     createParseRequest()
   );
 
-  const alias = createTransactionHttpHandlers(
+  const genesis = createTransactionHttpHandlers(
     new Router(),
-    '/transactions/alias',
-    txsServices['alias'],
-    createParseRequest()
+    '/transactions/genesis',
+    txsServices.genesis,
+    createParseRequest({
+      recipient: commonFilters.query,
+    })
   );
 
-  const burn = createTransactionHttpHandlers(
+  const payment = createTransactionHttpHandlers(
     new Router(),
-    '/transactions/burn',
-    txsServices['burn'],
+    '/transactions/payment',
+    txsServices.payment,
+    createParseRequest({
+      recipient: commonFilters.query,
+    })
+  );
+
+  const issue = createTransactionHttpHandlers(
+    new Router(),
+    '/transactions/issue',
+    txsServices.issue,
+    createParseRequest({
+      assetId: commonFilters.query,
+      script: commonFilters.query,
+    })
+  );
+
+  const transfer = createTransactionHttpHandlers(
+    new Router(),
+    '/transactions/transfer',
+    txsServices.transfer,
+    createParseRequest({
+      assetId: commonFilters.query,
+      recipient: commonFilters.query,
+    })
+  );
+
+  const reissue = createTransactionHttpHandlers(
+    new Router(),
+    '/transactions/reissue',
+    txsServices.reissue,
     createParseRequest({
       assetId: commonFilters.query,
     })
   );
 
-  const data = createTransactionHttpHandlers(
+  const burn = createTransactionHttpHandlers(
     new Router(),
-    '/transactions/data',
-    txsServices['data'],
-    {
-      get: parseGet,
-      mgetOrSearch: parseDataMgetOrSearch,
-    }
+    '/transactions/burn',
+    txsServices.burn,
+    createParseRequest({
+      assetId: commonFilters.query,
+    })
   );
 
   const exchange = createTransactionHttpHandlers(
     new Router(),
     '/transactions/exchange',
-    txsServices['exchange'],
+    txsServices.exchange,
     createParseRequest({
       amountAsset: commonFilters.query,
       matcher: commonFilters.query,
@@ -64,39 +90,10 @@ export default (txsServices: ServiceMesh['transactions']) => {
     })
   );
 
-  const genesis = createTransactionHttpHandlers(
-    new Router(),
-    '/transactions/genesis',
-    txsServices['genesis'],
-    createParseRequest({
-      recipient: commonFilters.query,
-    })
-  );
-
-  const invokeScript = createTransactionHttpHandlers(
-    new Router(),
-    '/transactions/invoke-script',
-    txsServices['invokeScript'],
-    createParseRequest({
-      dapp: commonFilters.query,
-      function: commonFilters.query,
-    })
-  );
-
-  const issue = createTransactionHttpHandlers(
-    new Router(),
-    '/transactions/issue',
-    txsServices['issue'],
-    createParseRequest({
-      assetId: commonFilters.query,
-      script: commonFilters.query,
-    })
-  );
-
   const lease = createTransactionHttpHandlers(
     new Router(),
     '/transactions/lease',
-    txsServices['lease'],
+    txsServices.lease,
     createParseRequest({
       recipient: commonFilters.query,
     })
@@ -105,54 +102,43 @@ export default (txsServices: ServiceMesh['transactions']) => {
   const leaseCancel = createTransactionHttpHandlers(
     new Router(),
     '/transactions/lease-cancel',
-    txsServices['leaseCancel'],
+    txsServices.leaseCancel,
     createParseRequest({
       recipient: commonFilters.query,
     })
+  );
+
+  const alias = createTransactionHttpHandlers(
+    new Router(),
+    '/transactions/alias',
+    txsServices.alias,
+    createParseRequest()
   );
 
   const massTransfer = createTransactionHttpHandlers(
     new Router(),
     '/transactions/mass-transfer',
-    txsServices['massTransfer'],
+    txsServices.massTransfer,
     createParseRequest({
       assetId: commonFilters.query,
       recipient: commonFilters.query,
     })
   );
 
-  const payment = createTransactionHttpHandlers(
+  const data = createTransactionHttpHandlers(
     new Router(),
-    '/transactions/payment',
-    txsServices['payment'],
-    createParseRequest({
-      recipient: commonFilters.query,
-    })
-  );
-
-  const reissue = createTransactionHttpHandlers(
-    new Router(),
-    '/transactions/reissue',
-    txsServices['reissue'],
-    createParseRequest({
-      assetId: commonFilters.query,
-    })
-  );
-
-  const setAssetScript = createTransactionHttpHandlers(
-    new Router(),
-    '/transactions/set-asset-script',
-    txsServices['setAssetScript'],
-    createParseRequest({
-      assetId: commonFilters.query,
-      script: commonFilters.query,
-    })
+    '/transactions/data',
+    txsServices.data,
+    {
+      get: parseGet,
+      mgetOrSearch: parseDataMgetOrSearch,
+    }
   );
 
   const setScript = createTransactionHttpHandlers(
     new Router(),
     '/transactions/set-script',
-    txsServices['setScript'],
+    txsServices.setScript,
     createParseRequest({
       script: commonFilters.query,
     })
@@ -161,30 +147,51 @@ export default (txsServices: ServiceMesh['transactions']) => {
   const sponsorship = createTransactionHttpHandlers(
     new Router(),
     '/transactions/sponsorship',
-    txsServices['sponsorship'],
+    txsServices.sponsorship,
     createParseRequest({
       assetId: commonFilters.query,
     })
   );
 
-  const transfer = createTransactionHttpHandlers(
+  const setAssetScript = createTransactionHttpHandlers(
     new Router(),
-    '/transactions/transfer',
-    txsServices['transfer'],
+    '/transactions/set-asset-script',
+    txsServices.setAssetScript,
     createParseRequest({
       assetId: commonFilters.query,
-      recipient: commonFilters.query,
+      script: commonFilters.query,
+    })
+  );
+
+  const invokeScript = createTransactionHttpHandlers(
+    new Router(),
+    '/transactions/invoke-script',
+    txsServices.invokeScript,
+    createParseRequest({
+      dapp: commonFilters.query,
+      function: commonFilters.query,
     })
   );
 
   const updateAssetInfo = createTransactionHttpHandlers(
     new Router(),
     '/transactions/update-asset-info',
-    txsServices['updateAssetInfo'],
+    txsServices.updateAssetInfo,
     createParseRequest({
       assetId: commonFilters.query,
     })
   );
+
+  const ethereumLike = createTransactionHttpHandlers(
+    new Router(),
+    '/transactions/ethereum-like',
+    txsServices['ethereumLike'],
+    createParseRequest({
+      type: commonFilters.query,
+      function: commonFilters.query,
+    })
+  );
+
   return subrouter.use(
     alias.routes(),
     all.routes(),
@@ -204,5 +211,6 @@ export default (txsServices: ServiceMesh['transactions']) => {
     sponsorship.routes(),
     transfer.routes(),
     updateAssetInfo.routes(),
+    ethereumLike.routes()
   );
 };
