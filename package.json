@@ -10,7 +10,6 @@
     "build": "rm -rf dist/ && tsc",
     "start": "NODE_PG_FORCE_NATIVE=1 node dist/index.js",
     "dev": "NODE_PG_FORCE_NATIVE=1 NODE_ENV=development LOG_LEVEL=debug node dist/index.js",
-    "candles": "NODE_PG_FORCE_NATIVE=1 node dist/daemons/candles/index.js",
     "pairs": "NODE_PG_FORCE_NATIVE=1 node dist/daemons/pairs/index.js",
     "lint": "eslint src",
     "test": "jest --runInBand --detectOpenHandles --config=config/jest.config.unit.json",
