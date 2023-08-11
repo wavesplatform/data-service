@@ -23,7 +23,7 @@ export const get = (id: string): string => mget([id]);
 
 export const search = (request: AssetsSearchRequest): string => {
   const filter = (ticker: string) => (q: knex.QueryBuilder) => {
-    if (ticker === '*') return q.whereNotNull('ticker');
+    if (ticker === '*') return q.whereNotNull('ticker').andWhere('ticker', '<>', '');
     else return q.where('ticker', ticker);
   };
 
