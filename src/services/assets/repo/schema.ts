@@ -9,7 +9,7 @@ export const result = Joi.object().keys({
   total_quantity: Joi.object().bignumber(),
   decimals: Joi.number().required(),
   reissuable: Joi.boolean().required(),
-  ticker: Joi.string().required().allow(null),
+  ticker: Joi.string().required().allow(null, ''),
   issue_timestamp: Joi.object().type(Date).required(),
   has_script: Joi.boolean().required(),
   min_sponsored_asset_fee: Joi.object().bignumber().required().allow(null),
