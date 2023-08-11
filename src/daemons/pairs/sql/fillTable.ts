@@ -10,8 +10,8 @@ const selectExchanges = pg({ t: 'txs_7' })
     price: pg.raw(`
       CASE WHEN t.tx_version > 2
         THEN t.price::numeric
-          * 10^(select decimals from assets where asset_id = t.price_asset_id)
-          * 10^(select -decimals from assets where asset_id = t.amount_asset_id)
+          * 10^(select decimals from decimals where asset_id = t.price_asset_id)
+          * 10^(select -decimals from decimals where asset_id = t.amount_asset_id)
         ELSE t.price::numeric
       END
     `),
@@ -27,12 +27,8 @@ const selectPairsCTE = pg
     qb.select({
       amount_asset_id: 'amount_asset_id',
       price_asset_id: 'price_asset_id',
-      last_price: pg.raw(
-        '(array_agg(e.price ORDER BY e.uid DESC)::numeric[])[1]'
-      ),
-      first_price: pg.raw(
-        '(array_agg(e.price ORDER BY e.uid)::numeric[])[1]'
-      ),
+      last_price: pg.raw('(array_agg(e.price ORDER BY e.uid DESC)::numeric[])[1]'),
+      first_price: pg.raw('(array_agg(e.price ORDER BY e.uid)::numeric[])[1]'),
       volume: pg.raw('sum(e.amount)'),
       quote_volume: pg.raw('sum(e.amount::numeric * e.price::numeric)'),
       weighted_average_price: pg.raw(
@@ -57,7 +53,9 @@ const selectPairsCTE = pg
     'p.last_price',
     'p.volume',
     {
-      volume_waves: pg.raw('COALESCE(p.volume_waves, floor(p.quote_volume / p1.weighted_average_price), p.quote_volume * p2.weighted_average_price)'),
+      volume_waves: pg.raw(
+        'COALESCE(p.volume_waves, floor(p.quote_volume / p1.weighted_average_price), p.quote_volume * p2.weighted_average_price)'
+      ),
     },
     'p.quote_volume',
     'p.high',
