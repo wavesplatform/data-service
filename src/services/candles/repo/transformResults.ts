@@ -110,3 +110,25 @@ export const transformResults = (
     addMissingCandles(request.interval, request.timeStart, request.timeEnd),
     groupBy((candle) => truncToMinutes(floor(request.interval, candle.time_start)))
   )(result);
+
+  export const transformLastResult = (
+    result: CandleDbResponse[],
+    request: CandlesSearchRequest
+  ): SearchedItems<CandleInfo> =>
+  compose<
+    CandleDbResponse[],
+    Record<string, RawCandle[]>,
+    Record<string, RawCandle>,
+    [string, RawCandle][],
+    CandleInfo[],
+    SearchedItems<CandleInfo>
+  >(
+    (items) => ({
+      items: items,
+      isLastPage: false,
+    }),
+    map(transformCandle(request.interval)),
+    toPairs,
+    map<Record<string, RawCandle[]>, Record<string, RawCandle>>(concatAll(candleMonoid)),
+    groupBy((candle) => truncToMinutes(floor(request.interval, candle.time_start)))
+  )(result);
