@@ -71,7 +71,7 @@ export const selectCandles = ({
       })
     );
 
-export const sql = ({
+export const search = ({
   amountAsset,
   priceAsset,
   timeStart,
@@ -93,6 +93,59 @@ export const sql = ({
     })
     .orderBy('c.time_start', 'asc')
     .toString();
+
+export const selectLastCandle = ({
+  amountAsset,
+  priceAsset,
+  timeEnd,
+  matcher,
+  interval,
+}: CandleSelectionParams): knex.QueryBuilder =>
+  pg({ c: 'candles' })
+  .select(FIELDS)
+  .where('amount_asset_id', amountAsset)
+  .where('price_asset_id', priceAsset)
+  .where('time_start', '<=', timeEnd.toISOString())
+  .where('matcher_address', matcher)
+  .where('txs_count', '>', 0)
+  .where(
+    'interval',
+    // should always be valid after validation
+    highestDividerLessThan(interval, unsafeIntervalsFromStrings(DIVIDERS)).matchWith({
+      Ok: ({ value: i }) => i.source,
+      Error: ({ value: error }) => CandleInterval.Minute1,
+    })
+  )
+;
+
+export const searchLast = ({
+  amountAsset,
+  priceAsset,
+  timeStart,
+  timeEnd,
+  interval,
+  matcher,
+}: CandlesSearchRequest): string =>
+  pg('candles')
+    .select(FIELDS)
+    .from({
+      c: selectLastCandle({
+        amountAsset,
+        priceAsset,
+        timeStart,
+        timeEnd,
+        interval,
+        matcher,
+      }),
+    })
+    .orderBy('c.time_start', 'desc')
+    .limit(1)
+    .toString();
+
+export const sql = {
+  search,
+  searchLast
+}
 
 module.exports = {
   sql,
