@@ -11,19 +11,19 @@ import transformTxInfo from './transformTxInfo';
 import { result as resultSchema } from './schema';
 import * as sql from './sql';
 import {
-  UpdateAssetInfoTxsRepo,
-  UpdateAssetInfoTxsSearchRequest,
-  UpdateAssetInfoTxDbResponse,
-  UpdateAssetInfoTx,
+  EthereumLikeTxsRepo,
+  EthereumLikeTxsSearchRequest,
+  EthereumLikeTxDbResponse,
+  EthereumLikeTx,
 } from './types';
 
 export default ({
   drivers: { pg },
   emitEvent,
-}: CommonRepoDependencies): UpdateAssetInfoTxsRepo => {
+}: CommonRepoDependencies): EthereumLikeTxsRepo => {
   return {
     get: getByIdPreset({
-      name: 'transactions.updateAssetInfo.get',
+      name: 'transactions.ethereumLike.get',
       sql: sql.get,
       resultSchema,
       transformResult: transformTxInfo,
@@ -33,7 +33,7 @@ export default ({
     }),
 
     mget: mgetByIdsPreset({
-      name: 'transactions.updateAssetInfo.mget',
+      name: 'transactions.ethereumLike.mget',
       matchRequestResult: propEq('id'),
       sql: sql.mget,
       resultSchema,
@@ -45,11 +45,11 @@ export default ({
 
     search: searchPreset<
       Cursor,
-      UpdateAssetInfoTxsSearchRequest,
-      UpdateAssetInfoTxDbResponse,
-      UpdateAssetInfoTx
+      EthereumLikeTxsSearchRequest,
+      EthereumLikeTxDbResponse,
+      EthereumLikeTx
     >({
-      name: 'transactions.updateAssetInfo.search',
+      name: 'transactions.ethereumLike.search',
       sql: sql.search,
       resultSchema,
       transformResult: transformTxInfo,

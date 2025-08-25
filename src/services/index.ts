@@ -83,6 +83,10 @@ import createTransferTxsRepo from './transactions/transfer/repo';
 import createUpdateAssetInfoTxsService from './transactions/updateAssetInfo';
 import { UpdateAssetInfoTxsService } from './transactions/updateAssetInfo/types';
 import createUpdateAssetInfoTxsRepo from './transactions/updateAssetInfo/repo';
+// ethereum-like txs
+import createEthereumLikeTxsService from './transactions/ethereumLike';
+import { EthereumLikeTxsService } from './transactions/ethereumLike/types';
+import createEthereumLikeTxsRepo from './transactions/ethereumLike/repo';
 
 import createRateService, { RateCacheImpl, RatesMgetService } from './rates';
 import { RateCache } from './rates/repo';
@@ -149,6 +153,7 @@ export type ServiceMesh = {
     sponsorship: SponsorshipTxsService;
     transfer: TransferTxsService;
     updateAssetInfo: UpdateAssetInfoTxsService;
+    ethereumLike: EthereumLikeTxsService;
   };
 };
 
@@ -251,6 +256,8 @@ export default ({
       updateAssetInfoRepo,
       assets
     );
+    const ethereumLikeRepo = createEthereumLikeTxsRepo(commonDeps);
+    const ethereumLikeTxs = createEthereumLikeTxsService(ethereumLikeRepo, assets);
 
     const rateRepo = new RemoteRateRepo(commonDeps.drivers.pg);
 
@@ -299,6 +306,7 @@ export default ({
       15: setAssetScriptTxs,
       16: invokeScriptTxs,
       17: updateAssetInfoTxs,
+      18: ethereumLikeTxs,
     });
 
     return {
@@ -325,6 +333,7 @@ export default ({
         setAssetScript: setAssetScriptTxs,
         invokeScript: invokeScriptTxs,
         updateAssetInfo: updateAssetInfoTxs,
+        ethereumLike: ethereumLikeTxs,
       },
       matchers: {
         rates,

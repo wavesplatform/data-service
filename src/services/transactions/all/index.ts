@@ -29,6 +29,7 @@ import { SponsorshipTxsService } from '../sponsorship/types';
 import { SetAssetScriptTxsService } from '../setAssetScript/types';
 import { InvokeScriptTxsService } from '../invokeScript/types';
 import { UpdateAssetInfoTxsService } from '../updateAssetInfo/types';
+import { EthereumLikeTxsService } from '../ethereumLike/types';
 import {
   AllTxsRepo,
   AllTxsGetRequest,
@@ -56,6 +57,7 @@ type AllTxsServiceDep = {
   15: SetAssetScriptTxsService;
   16: InvokeScriptTxsService;
   17: UpdateAssetInfoTxsService;
+  18: EthereumLikeTxsService;
 };
 
 export type AllTxsServiceGetRequest = ServiceGetRequest<AllTxsGetRequest>;
@@ -63,14 +65,8 @@ export type AllTxsServiceMgetRequest = ServiceMgetRequest<AllTxsMgetRequest>;
 export type AllTxsServiceSearchRequest = AllTxsSearchRequest;
 
 export type AllTxsService = {
-  get: Service<
-    AllTxsServiceGetRequest & WithMoneyFormat,
-    Maybe<TransactionInfo>
-  >;
-  mget: Service<
-    AllTxsServiceMgetRequest & WithMoneyFormat,
-    Maybe<TransactionInfo>[]
-  >;
+  get: Service<AllTxsServiceGetRequest & WithMoneyFormat, Maybe<TransactionInfo>>;
+  mget: Service<AllTxsServiceMgetRequest & WithMoneyFormat, Maybe<TransactionInfo>[]>;
   search: Service<
     AllTxsServiceSearchRequest & WithMoneyFormat,
     SearchedItems<TransactionInfo>
@@ -81,83 +77,80 @@ export type AllTxsService = {
 // request by (id, timestamp) instead of just id
 // to ensure correct tx response even if
 // id is duplicated (happens in payment, alias txs)
-export default (repo: AllTxsRepo) => (
-  txsServices: AllTxsServiceDep
-): AllTxsService => ({
-  get: (req) =>
-    repo
-      .get(req.id) //Task tx
-      .chain((m) =>
-        m.matchWith({
-          Just: ({ value }) => {
-            return txsServices[value.type as keyof AllTxsServiceDep].get({
-              id: value.id,
-              moneyFormat: req.moneyFormat,
-            });
-          },
-          Nothing: () => taskOf(emptyOf()),
-        })
-      ),
-
-  mget: (req) =>
-    repo
-      .mget(req.ids) // Task tx[]. tx can have data: null
-      .chain((txsList: Maybe<TransactionInfo>[]) =>
-        waitAll(
-          txsList.map((m) =>
-            m.matchWith({
-              Just: ({ value }) => {
-                return txsServices[value.type as keyof AllTxsServiceDep].get({
-                  id: value.id,
-                  moneyFormat: req.moneyFormat,
-                });
-              },
-              Nothing: () => taskOf(emptyOf()),
-            })
-          )
-        )
-      ),
-
-  search: (req) =>
-    repo.search(req).chain((txsList: SearchedItems<CommonTransactionInfo>) =>
-      waitAll<AppError, Maybe<TransactionInfo>[]>(
-        pipe<
-          CommonTransactionInfo[],
-          Record<string, CommonTransactionInfo[]>,
-          [string, CommonTransactionInfo[]][],
-          Task<AppError, Maybe<TransactionInfo>[]>[]
-        >(
-          groupBy((t) => String(t.type)),
-          toPairs,
-          (tuples) =>
-            tuples.map(([type, txs]) => {
-              return txsServices[
-                (type as unknown) as keyof AllTxsServiceDep
-              ].mget({
-                ids: txs.map((t) => t.id),
+export default (repo: AllTxsRepo) =>
+  (txsServices: AllTxsServiceDep): AllTxsService => ({
+    get: (req) =>
+      repo
+        .get(req.id) //Task tx
+        .chain((m) =>
+          m.matchWith({
+            Just: ({ value }) => {
+              return txsServices[value.type as keyof AllTxsServiceDep].get({
+                id: value.id,
                 moneyFormat: req.moneyFormat,
               });
-            })
-        )(txsList.items)
-      )
-        .map((mss) => flatten<Maybe<TransactionInfo>>(mss))
-        .map(collect((m) => m.getOrElse(undefined)))
-        .map((txs) => {
-          const s = indexBy(
-            (tx) => `${tx.id}:${tx.timestamp.valueOf()}`,
-            txsList.items
-          );
-          return sort((a, b) => {
-            const aTxUid = s[`${a.id}:${a.timestamp.valueOf()}`]['txUid'];
-            const bTxUid = s[`${b.id}:${b.timestamp.valueOf()}`]['txUid'];
-            return req.sort === SortOrder.Ascending
-              ? aTxUid.minus(bTxUid).toNumber()
-              : bTxUid.minus(aTxUid).toNumber();
-          }, txs);
-        })
-        .map((txs) => ({
-          ...txsList,
-          items: txs,
-        }))
-    ),
-});
+            },
+            Nothing: () => taskOf(emptyOf()),
+          })
+        ),
+
+    mget: (req) =>
+      repo
+        .mget(req.ids) // Task tx[]. tx can have data: null
+        .chain((txsList: Maybe<TransactionInfo>[]) =>
+          waitAll(
+            txsList.map((m) =>
+              m.matchWith({
+                Just: ({ value }) => {
+                  return txsServices[value.type as keyof AllTxsServiceDep].get({
+                    id: value.id,
+                    moneyFormat: req.moneyFormat,
+                  });
+                },
+                Nothing: () => taskOf(emptyOf()),
+              })
+            )
+          )
+        ),
+
+    search: (req) =>
+      repo.search(req).chain((txsList: SearchedItems<CommonTransactionInfo>) =>
+        waitAll<AppError, Maybe<TransactionInfo>[]>(
+          pipe<
+            CommonTransactionInfo[],
+            Record<string, CommonTransactionInfo[]>,
+            [string, CommonTransactionInfo[]][],
+            Task<AppError, Maybe<TransactionInfo>[]>[]
+          >(
+            groupBy((t) => String(t.type)),
+            toPairs,
+            (tuples) =>
+              tuples.map(([type, txs]) => {
+                return txsServices[type as unknown as keyof AllTxsServiceDep].mget({
+                  ids: txs.map((t) => t.id),
+                  moneyFormat: req.moneyFormat,
+                });
+              })
+          )(txsList.items)
+        )
+          .map((mss) => flatten<Maybe<TransactionInfo>>(mss))
+          .map(collect((m) => m.getOrElse(undefined)))
+          .map((txs) => {
+            const s = indexBy(
+              (tx) => `${tx.id}:${tx.timestamp.valueOf()}`,
+              txsList.items
+            );
+            return sort((a, b) => {
+              const aTxUid = s[`${a.id}:${a.timestamp.valueOf()}`]['txUid'];
+              const bTxUid = s[`${b.id}:${b.timestamp.valueOf()}`]['txUid'];
+              return req.sort === SortOrder.Ascending
+                ? aTxUid.minus(bTxUid).toNumber()
+                : bTxUid.minus(aTxUid).toNumber();
+            }, txs);
+          })
+          .map((txs) => ({
+            ...txsList,
+            items: txs,
+          }))
+      ),
+  });
