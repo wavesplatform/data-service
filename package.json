@@ -54,7 +54,7 @@
     "merge-descriptors": "^1.0.1",
     "pg-native": "^3.0.1",
     "pg-promise": "^8.2.3",
-    "qs": "^6.5.2",
+    "qs": "^6.6.1",
     "ramda": "^0.25.0",
     "ramda-adjunct": "^2.6.0",
     "winston": "^3.0.0-rc4"
