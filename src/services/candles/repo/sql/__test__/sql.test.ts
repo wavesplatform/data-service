@@ -4,7 +4,7 @@ import { sql } from '../sql';
 describe('sql query from candles', () => {
   it('should search candles for 1h', () => {
     expect(
-      sql({
+      sql.search({
         amountAsset: '111',
         priceAsset: '222',
         timeStart: new Date('2017-04-03T00:00:00.000Z'),
@@ -17,7 +17,7 @@ describe('sql query from candles', () => {
 
   it('should search candles for 1d', () => {
     expect(
-      sql({
+      sql.search({
         amountAsset: '111',
         priceAsset: '222',
         timeStart: new Date('2017-04-03T00:00:00.000Z'),
@@ -30,7 +30,7 @@ describe('sql query from candles', () => {
 
   it('should search candles for 1m', () => {
     expect(
-      sql({
+      sql.search({
         amountAsset: '111',
         priceAsset: '222',
         timeStart: new Date('2017-04-03T00:00:00.000Z'),

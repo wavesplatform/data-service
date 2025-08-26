@@ -390,3 +390,24 @@ Object {
   ],
 }
 `;
+
+exports[`Candles search last candle between 2017-04-12 00:00:00 and 2017-04-12 23:59:59 should return last candle with txs_count != 0 correctly 1`] = `
+Object {
+  "isLastPage": false,
+  "items": Array [
+    Object {
+      "close": "33000",
+      "high": "33000",
+      "low": "33000",
+      "maxHeight": 516971,
+      "open": "33000",
+      "quoteVolume": "4677635160000",
+      "time": 2017-05-29T20:19:00.000Z,
+      "timeClose": 2017-05-29T20:19:00.001Z,
+      "txsCount": 1,
+      "volume": "141746520",
+      "weightedAveragePrice": "33000",
+    },
+  ],
+}
+`;
